@@ -59,10 +59,22 @@ Run in the terminal:
 
 ```
 > pip install typing future argparse six
-> python gen_blocks_json_rpc_input.py --start-block=0 --end-block=1000 --output=gen_blocks_json_rpc_input.json
-> nc -U ~/Library/Ethereum/geth.ipc < gen_blocks_json_rpc_input.json > blocks_json_rpc_output.json
-> python extract_blocks.py --input blocks_json_rpc_output.json --output blocks1.csv
-> python extract_transactions.py --input blocks_json_rpc_output.json --output transactions1.csv
+> python gen_blocks_rpc.py --start-block=0 --end-block=1000 --output=blocks_rpc.json
+> nc -U ~/Library/Ethereum/geth.ipc < blocks_rpc.json > blocks_rpc_output.json
+> python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
+> python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
+```
+
+One-liner for blocks:
+
+```
+> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_blocks.py > blocks.csv
+```
+
+One-liner for transactions:
+
+```
+> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_transactions.py > transactions.csv
 ```
 
 The output will be in 
