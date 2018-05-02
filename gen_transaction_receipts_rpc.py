@@ -25,5 +25,5 @@ def generate_get_transaction_receipt_json_rpc(tx_hash):
 with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
     for tx_hash in input_file.readlines():
         json_rpc = generate_get_transaction_receipt_json_rpc(tx_hash.rstrip())
-        output_file.write(json.dumps(json_rpc))
+        output_file.write(json.dumps(json_rpc) + '\n')
 

@@ -26,4 +26,4 @@ def generate_get_block_by_number_json_rpc(start_block, end_block):
 
 with smart_open(args.output) as output_file:
     for data in generate_get_block_by_number_json_rpc(args.start_block, args.end_block):
-        output_file.write(json.dumps(data))
+        output_file.write(json.dumps(data) + '\n')
