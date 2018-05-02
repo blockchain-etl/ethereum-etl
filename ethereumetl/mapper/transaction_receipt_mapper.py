@@ -1,6 +1,6 @@
-from ethscraper.domain.transaction_receipt import EthTransactionReceipt
-from ethscraper.mapper.transaction_receipt_log_mapper import EthTransactionReceiptLogMapper
-from ethscraper.utils import hex_to_dec
+from ethereumetl.domain.transaction_receipt import EthTransactionReceipt
+from ethereumetl.mapper.transaction_receipt_log_mapper import EthTransactionReceiptLogMapper
+from ethereumetl.utils import hex_to_dec
 from builtins import map
 
 

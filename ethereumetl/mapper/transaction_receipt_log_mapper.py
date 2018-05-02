@@ -1,5 +1,5 @@
-from ethscraper.domain.transaction_receipt_log import EthTransactionReceiptLog
-from ethscraper.utils import hex_to_dec
+from ethereumetl.domain.transaction_receipt_log import EthTransactionReceiptLog
+from ethereumetl.utils import hex_to_dec
 
 
 class EthTransactionReceiptLogMapper(object):
