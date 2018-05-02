@@ -1,5 +1,4 @@
 import argparse
-import fileinput
 import json
 
 from ethereumetl.exporters import CsvItemExporter
@@ -14,14 +13,14 @@ parser.add_argument('--output', default=None, type=str, help='The output file. I
 
 args = parser.parse_args()
 
-with smart_open(args.output, binary=True) as output_handle:
+with smart_open(args.input, 'r') as input_file, smart_open(args.output, binary=True) as output_file:
     transaction_receipt_mapper = EthTransactionReceiptMapper()
     erc20_transfer_mapper = EthErc20TransferMapper()
     erc20_processor = EthErc20Processor()
 
-    exporter = CsvItemExporter(output_handle)
+    exporter = CsvItemExporter(output_file)
     exporter.start_exporting()
-    for line in fileinput.input(files=args.input):
+    for line in input_file.readlines():
         json_line = json.loads(line)
         result = json_line.get('result', None)
         if result is None:

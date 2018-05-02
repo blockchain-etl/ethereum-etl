@@ -7,11 +7,12 @@ import os
 @contextlib.contextmanager
 def smart_open(filename=None, mode='w', binary=False):
     is_file = filename and filename != '-'
+    full_mode = mode + ('b' if binary else '')
     if is_file:
-        fh = open(filename, mode + ('b' if binary else ''))
+        fh = open(filename, full_mode)
     else:
         fd = sys.stdout.fileno() if mode == 'w' else sys.stdin.fileno()
-        fh = os.fdopen(fd, mode + ('b' if binary else ''))
+        fh = os.fdopen(fd, full_mode)
 
     try:
         yield fh

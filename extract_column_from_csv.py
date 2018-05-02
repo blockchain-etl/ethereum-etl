@@ -10,10 +10,8 @@ parser.add_argument('--column', required=True, type=str, help='The csv column na
 
 args = parser.parse_args()
 
-with smart_open(args.input, 'r') as input_file:
-    with smart_open(args.output, 'w') as output_file:
-
-        reader = csv.DictReader(input_file)  # read rows into a dictionary format
-        for row in reader:  # read a row as {column1: value1, column2: value2,...}
-            output_file.write(row[args.column] + '\n')
+with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
+    reader = csv.DictReader(input_file)  # read rows into a dictionary format
+    for row in reader:
+        output_file.write(row[args.column] + '\n')
 
