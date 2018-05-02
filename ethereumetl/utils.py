@@ -1,19 +1,21 @@
 import sys
 import contextlib
+import os
 
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
 @contextlib.contextmanager
 def smart_open(filename=None, binary=False):
-    if filename and filename != '-':
+    is_file = filename and filename != '-'
+    if is_file:
         fh = open(filename, 'w' + ('b' if binary else ''))
     else:
-        fh = sys.stdout.buffer if binary else sys.stdout
+        fh = os.fdopen(sys.stdout.fileno(), 'w' + ('b' if binary else ''))
 
     try:
         yield fh
     finally:
-        if fh is not (sys.stdout.buffer if binary else sys.stdout):
+        if is_file:
             fh.close()
 
 
