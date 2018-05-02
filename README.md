@@ -1,5 +1,17 @@
 # Ethereum ETL
 
+One-liner for blocks:
+
+```
+> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_blocks.py > blocks.csv
+```
+
+One-liner for transactions:
+
+```
+> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_transactions.py > transactions.csv
+```
+
 ## Schema
 
 `blocks.csv`
@@ -64,24 +76,6 @@ Run in the terminal:
 > python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
 > python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
 ```
-
-One-liner for blocks:
-
-```
-> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_blocks.py > blocks.csv
-```
-
-One-liner for transactions:
-
-```
-> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_transactions.py > transactions.csv
-```
-
-The output will be in 
-`blocks.csv`, 
-`transactions.csv`, 
-`erc20_transfers.csv` 
-in the current directory.
 
 Should work on both python2 and python3. Tested on python2.7.
 
