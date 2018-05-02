@@ -1,0 +1,75 @@
+# Ethereum ETL
+
+## Schema
+
+`blocks.csv`
+
+Column                  | Type               |
+------------------------|---------------------
+block_number            | bigint             |
+block_hash              | hex_string         |
+block_parent_hash       | hex_string         |
+block_nonce             | hex_string         |
+block_sha3_uncles       | hex_string         |
+block_logs_bloom        | hex_string         |
+block_transactions_root | hex_string         |
+block_state_root        | hex_string         |
+block_miner             | hex_string         |
+block_difficulty        | bigint             |
+block_total_difficulty  | bigint             |
+block_size              | bigint             |
+block_extra_data        | hex_string         |
+block_gas_limit         | bigint             |
+block_gas_used          | bigint             |
+block_timestamp         | bigint             |
+block_transaction_count | bigint             |
+
+`transactions.csv`
+
+Column              |    Type     |
+--------------------|--------------
+tx_hash             | hex_string  |
+tx_nonce            | bigint      |
+tx_block_hash       | hex_string  |
+tx_block_number     | bigint      |
+tx_index            | bigint      |
+tx_from             | hex_string  |
+tx_to               | hex_string  |
+tx_value            | bigint      |
+tx_gas              | bigint      |
+tx_gas_price        | bigint      |
+tx_input            | hex_string  |
+
+`erc20_transfers.csv`
+
+Column              |    Type     |
+--------------------|--------------
+erc20_token         | hex_string  |
+erc20_from          | hex_string  |
+erc20_to            | hex_string  |
+erc20_value         | bigint      |
+erc20_tx_hash       | hex_string  |
+erc20_block_number  | bigint      |
+
+### Usage
+
+Start geth, make sure it's synchronized with the Ethereum network.
+
+Run in the terminal:
+
+```
+> pip install typing future argparse six
+> python gen_blocks_json_rpc_input.py --start-block=0 --end-block=1000 --output=gen_blocks_json_rpc_input.json
+> nc -U ~/Library/Ethereum/geth.ipc < gen_blocks_json_rpc_input.json > blocks_json_rpc_output.json
+> python extract_blocks.py --input blocks_json_rpc_output.json --output blocks1.csv
+> python extract_transactions.py --input blocks_json_rpc_output.json --output transactions1.csv
+```
+
+The output will be in 
+`blocks.csv`, 
+`transactions.csv`, 
+`erc20_transfers.csv` 
+in the current directory.
+
+Should work on both python2 and python3. Tested on python2.7.
+
