@@ -91,5 +91,5 @@ Run in the terminal:
 > python extract_erc20_transfers.py --input transaction_receipts_rpc_output.json --output erc20_transfers.csv
 ```
 
-Should work on both python 2 and 3. Tested on python2.7.
+Should work on both Python 2 and 3. Tested on Python 3.6.
 
