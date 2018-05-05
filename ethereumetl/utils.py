@@ -33,3 +33,17 @@ def hex_to_dec(hex_string):
 
 def chunk_string(string, length):
     return (string[0 + i:length + i] for i in range(0, len(string), length))
+
+
+def batch_readlines(file, batch_size):
+    current_batch_size = 0
+    batch = []
+    for line in file.readlines():
+        batch.append(line)
+        current_batch_size += 1
+        if current_batch_size == batch_size:
+            yield batch
+            batch = []
+            current_batch_size = 0
+    if current_batch_size != 0:
+        yield batch
