@@ -61,11 +61,11 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
     python extract_blocks.py < ${blocks_rpc_output_file} > ${blocks_file}
 
     transactions_file=${output_dir}/transactions_${file_name_suffix}.csv
-    log "Extracting transactions for blocks ${block_range} to ${transactions_file}"
+    log "Extracting transactions from blocks ${block_range} to ${transactions_file}"
     python extract_transactions.py < ${blocks_rpc_output_file} > ${transactions_file}
 
     erc20_transfers_file=${output_dir}/erc20_transfers_${file_name_suffix}.csv
-    log "Exporting ERC20 transfers for blocks ${block_range} to ${erc20_transfers_file}"
+    log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
     python export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path=${ipc_path} --batch-size=${export_erc20_batch_size} > ${erc20_transfers_file}
 
     end_time=$(date +%s)
