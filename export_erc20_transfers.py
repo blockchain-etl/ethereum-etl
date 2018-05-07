@@ -45,3 +45,5 @@ with smart_open(args.output, binary=True) as output_file:
             erc20_transfer = erc20_processor.filter_transfer_from_receipt_log(log)
             if erc20_transfer is not None:
                 exporter.export_item(erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
+
+        web3.eth.uninstallFilter(event_filter.filter_id)
