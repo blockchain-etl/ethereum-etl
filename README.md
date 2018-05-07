@@ -74,22 +74,66 @@ erc20_block_number  | bigint      |
 
 ### Usage
 
-Start geth, make sure it's synchronized with the Ethereum network.
+`Start geth. 
+Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
+`currentBlock` is what you need to check. 
+You don't need to wait until the full sync as state is not needed.
 
-Run in the terminal:
+Install all dependencies:
 
 ```
 > pip install typing future argparse six
-> python gen_blocks_rpc.py --start-block=0 --end-block=1000 --output=blocks_rpc.json
-> nc -U ~/Library/Ethereum/geth.ipc < blocks_rpc.json > blocks_rpc_output.json
-> python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
-> python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
+```
 
+Generate JSON RPC calls for exporting blocks and transactions for specified block range:
+
+```
+> python gen_blocks_rpc.py --start-block=0 --end-block=1000 --output=blocks_rpc.json
+```
+
+Call JSON RPC via IPC for exporting blocks and transactions:
+
+```
+> nc -U ~/Library/Ethereum/geth.ipc < blocks_rpc.json > blocks_rpc_output.json
+```
+
+Extract blocks from JSON RPC response:
+
+```
+> python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
+```
+
+Extract transactions from JSON RPC response:
+
+```
+> python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
+```
+
+Extract transaction hashes from transactions.csv:
+
+```
 > python extract_csv_column.py --column=tx_hash --input=transactions.csv --output transaction_hashes.csv
+```
+
+Generate JSON RPC calls for exporting transaction receipts for given transaction hashes:
+
+```
 > python gen_transaction_receipts_rpc.py --input=transaction_hashes.csv --output transaction_receipts_rpc.json
+```
+
+Call JSON RPC via IPC for exporting transaction receipts:
+
+```
 > nc -U ~/Library/Ethereum/geth.ipc --input=transaction_receipts_rpc.json --output=transaction_receipts_rpc_output.json
+```
+
+Extract ERC20 transfers from transaction receipts:
+
+```
 > python extract_erc20_transfers.py --input transaction_receipts_rpc_output.json --output erc20_transfers.csv
 ```
 
-Should work on both python 2 and 3. Tested on python2.7.
+Should work with python 2 and 3. Tested with Python 3.6.
+
+
 
