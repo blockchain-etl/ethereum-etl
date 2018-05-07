@@ -51,26 +51,26 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
 
     blocks_rpc_output_file=${output_dir}/blocks_rpc_output_${file_name_suffix}.json
     log "Exporting blocks ${block_range} to ${blocks_rpc_output_file}"
-#    python gen_blocks_rpc.py --start-block=${batch_start_block} --end-block=${batch_end_block} | \
-#    python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${blocks_rpc_output_file}
+    python gen_blocks_rpc.py --start-block=${batch_start_block} --end-block=${batch_end_block} | \
+    python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${blocks_rpc_output_file}
 
     blocks_file=${output_dir}/blocks_${file_name_suffix}.csv
     log "Extracting blocks ${block_range} to ${blocks_file}"
-#    python extract_blocks.py < ${blocks_rpc_output_file} > ${blocks_file}
+    python extract_blocks.py < ${blocks_rpc_output_file} > ${blocks_file}
 
     transactions_file=${output_dir}/transactions_${file_name_suffix}.csv
     log "Extracting transactions for blocks ${block_range} to ${transactions_file}"
-#    python extract_transactions.py < ${blocks_rpc_output_file} > ${transactions_file}
+    python extract_transactions.py < ${blocks_rpc_output_file} > ${transactions_file}
 
     transaction_receipts_rpc_output_file=${output_dir}/transaction_receipts_rpc_output_${file_name_suffix}.json
     log "Exporting transaction receipts for blocks ${block_range} to ${transaction_receipts_rpc_output_file}"
-#    python extract_csv_column.py --input=${transactions_file} --column=tx_hash | \
-#    python gen_transaction_receipts_rpc.py | \
-#    python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${transaction_receipts_rpc_output_file}
+    python extract_csv_column.py --input=${transactions_file} --column=tx_hash | \
+    python gen_transaction_receipts_rpc.py | \
+    python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${transaction_receipts_rpc_output_file}
 
     erc20_transfers_file=${output_dir}/erc20_transfers_${file_name_suffix}.csv
     log "Extracting ERC20 transfers for blocks ${block_range} to ${erc20_transfers_file}"
-#    python extract_erc20_transfers.py < ${transaction_receipts_rpc_output_file} > ${erc20_transfers_file}
+    python extract_erc20_transfers.py < ${transaction_receipts_rpc_output_file} > ${erc20_transfers_file}
 
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
