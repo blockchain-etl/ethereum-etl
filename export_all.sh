@@ -2,13 +2,14 @@
 
 ipc_path=~/Library/Ethereum/geth.ipc
 ipc_batch_size=100
+export_erc20_batch_size=10000
 output_dir=.
 
 current_time() { echo `date '+%Y-%m-%d %H:%M:%S'`; }
 
 log() { echo "$(current_time) ${1}"; }
 
-usage() { echo "Usage: $0 [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i <ipc_path>] [-o <output_dir>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]" 1>&2; exit 1; }
 
 while getopts ":s:e:b:i:o:" opt; do
     case "${opt}" in
@@ -43,6 +44,7 @@ mkdir -p ${output_dir};
 for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $end_block; batch_start_block+=$batch_size )); do
     start_time=$(date +%s)
     batch_end_block=$((batch_start_block + batch_size - 1))
+    batch_end_block=$((batch_end_block > end_block ? end_block : batch_end_block))
 
     padded_batch_start_block=`printf "%08d" ${batch_start_block}`
     padded_batch_end_block=`printf "%08d" ${batch_end_block}`
@@ -62,15 +64,9 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
     log "Extracting transactions for blocks ${block_range} to ${transactions_file}"
     python extract_transactions.py < ${blocks_rpc_output_file} > ${transactions_file}
 
-    transaction_receipts_rpc_output_file=${output_dir}/transaction_receipts_rpc_output_${file_name_suffix}.json
-    log "Exporting transaction receipts for blocks ${block_range} to ${transaction_receipts_rpc_output_file}"
-    python extract_csv_column.py --input=${transactions_file} --column=tx_hash | \
-    python gen_transaction_receipts_rpc.py | \
-    python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${transaction_receipts_rpc_output_file}
-
     erc20_transfers_file=${output_dir}/erc20_transfers_${file_name_suffix}.csv
-    log "Extracting ERC20 transfers for blocks ${block_range} to ${erc20_transfers_file}"
-    python extract_erc20_transfers.py < ${transaction_receipts_rpc_output_file} > ${erc20_transfers_file}
+    log "Exporting ERC20 transfers for blocks ${block_range} to ${erc20_transfers_file}"
+    python export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path=${ipc_path} --batch-size=${export_erc20_batch_size} > ${erc20_transfers_file}
 
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))

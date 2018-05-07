@@ -16,11 +16,7 @@ parser.add_argument('--batch-size', default=100, type=int, help='The number of l
 args = parser.parse_args()
 
 with smart_open(args.input, 'r') as input_file, smart_open(args.output) as output_file:
-    output_file_lock = threading.Lock()
-
     for line_batch in batch_readlines(input_file, args.batch_size):
         response = socket_exchange(args.ipc_path, ''.join(line_batch), args.ipc_timeout)
-
-        with output_file_lock:
-            output_file.write(response)
+        output_file.write(response)
 
