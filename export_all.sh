@@ -2,7 +2,7 @@
 
 ipc_path=~/Library/Ethereum/geth.ipc
 ipc_batch_size=100
-export_erc20_batch_size=10000
+export_erc20_batch_size=1000
 output_dir=.
 
 current_time() { echo `date '+%Y-%m-%d %H:%M:%S'`; }
