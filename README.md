@@ -74,7 +74,7 @@ erc20_block_number  | bigint      |
 
 ### Usage
 
-`Start geth. 
+Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
 `currentBlock` is what you need to check. 
 You don't need to wait until the full sync as state is not needed.
