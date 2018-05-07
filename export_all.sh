@@ -75,5 +75,5 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
 
-    log "Exporting for blocks ${block_range} took ${time_diff} seconds"
+    log "Exporting blocks ${block_range} took ${time_diff} seconds"
 done

@@ -76,8 +76,8 @@ erc20_block_number  | bigint      |
 
 Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
-`currentBlock` is what you need to check. 
-You don't need to wait until the full sync as state is not needed.
+You can export blocks below `currentBlock`, 
+there is no need to wait until the full sync as the state is not needed.
 
 Install all dependencies:
 
@@ -85,6 +85,15 @@ Install all dependencies:
 > pip install typing future argparse six
 ```
 
+Run in the terminal:
+
+```
+> ./export_all.sh -h
+Usage: ./export_all.sh [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i <ipc_path>] [-o <output_dir>]
+> ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
+```
+
+#### Commands
 Generate JSON RPC calls for exporting blocks and transactions for specified block range:
 
 ```
@@ -94,7 +103,7 @@ Generate JSON RPC calls for exporting blocks and transactions for specified bloc
 Call JSON RPC via IPC for exporting blocks and transactions:
 
 ```
-> nc -U ~/Library/Ethereum/geth.ipc < blocks_rpc.json > blocks_rpc_output.json
+> python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc --input=blocks_rpc.json --output=blocks_rpc_output.json
 ```
 
 Extract blocks from JSON RPC response:
@@ -124,7 +133,7 @@ Generate JSON RPC calls for exporting transaction receipts for given transaction
 Call JSON RPC via IPC for exporting transaction receipts:
 
 ```
-> nc -U ~/Library/Ethereum/geth.ipc --input=transaction_receipts_rpc.json --output=transaction_receipts_rpc_output.json
+> python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc --input=transaction_receipts_rpc.json --output=transaction_receipts_rpc_output.json
 ```
 
 Extract ERC20 transfers from transaction receipts:
@@ -133,7 +142,8 @@ Extract ERC20 transfers from transaction receipts:
 > python extract_erc20_transfers.py --input transaction_receipts_rpc_output.json --output erc20_transfers.csv
 ```
 
-Should work with python 2 and 3. Tested with Python 3.6.
+Should work with python 2 and 3. 
+Tested with Python 2.7, geth 1.8.7, Ubuntu 16.04.4
 
 
 
