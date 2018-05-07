@@ -16,7 +16,7 @@ One-liner for ERC20 transfers:
 
 ```
 > python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | \
-python extract_transactions.py | python extract_column_from_csv.py --column=tx_hash | \
+python extract_transactions.py | python extract_csv_column.py --column=tx_hash | \
 python gen_transaction_receipts_rpc.py | nc -U ~/Library/Ethereum/geth.ipc | \
 python extract_erc20_transfers.py > erc20_transfers.csv
 ```
@@ -112,7 +112,7 @@ Extract transactions from JSON RPC response:
 Extract transaction hashes from transactions.csv:
 
 ```
-> python extract_column_from_csv.py --column=tx_hash --input=transactions.csv --output transaction_hashes.csv
+> python extract_csv_column.py --column=tx_hash --input=transactions.csv --output transaction_hashes.csv
 ```
 
 Generate JSON RPC calls for exporting transaction receipts for given transaction hashes:
