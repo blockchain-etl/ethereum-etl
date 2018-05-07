@@ -1,6 +1,6 @@
 from ethereumetl.domain.block import EthBlock
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
-from ethereumetl.utils import hex_to_dec
+from ethereumetl.utils import hex_to_dec, to_checksum_address
 from builtins import map
 
 
@@ -20,7 +20,7 @@ class EthBlockMapper(object):
         block.logs_bloom = json_dict.get('logsBloom', None)
         block.transactions_root = json_dict.get('transactionsRoot', None)
         block.state_root = json_dict.get('stateRoot', None)
-        block.miner = json_dict.get('miner', None)
+        block.miner = to_checksum_address(json_dict.get('miner', None))
         block.difficulty = hex_to_dec(json_dict.get('difficulty', None))
         block.total_difficulty = hex_to_dec(json_dict.get('totalDifficulty', None))
         block.size = hex_to_dec(json_dict.get('size', None))

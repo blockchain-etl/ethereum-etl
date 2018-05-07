@@ -1,5 +1,6 @@
 from ethereumetl.domain.transaction import EthTransaction
-from ethereumetl.utils import hex_to_dec
+from ethereumetl.utils import hex_to_dec, to_checksum_address
+
 
 class EthTransactionMapper(object):
 
@@ -12,8 +13,8 @@ class EthTransactionMapper(object):
         transaction.block_hash = json_dict.get('blockHash', None)
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
         transaction.index = hex_to_dec(json_dict.get('transactionIndex', None))
-        transaction.from_address = json_dict.get('from', None)
-        transaction.to_address = json_dict.get('to', None)
+        transaction.from_address = to_checksum_address(json_dict.get('from', None))
+        transaction.to_address = to_checksum_address(json_dict.get('to', None))
         transaction.value = hex_to_dec(json_dict.get('value', None))
         transaction.gas = hex_to_dec(json_dict.get('gas', None))
         transaction.gas_price = hex_to_dec(json_dict.get('gasPrice', None))

@@ -6,7 +6,7 @@ from builtins import map
 from ethereumetl.domain.erc20_transfer import EthErc20Transfer
 from ethereumetl.domain.transaction_receipt import EthTransactionReceipt
 from ethereumetl.domain.transaction_receipt_log import EthTransactionReceiptLog
-from ethereumetl.utils import chunk_string, hex_to_dec
+from ethereumetl.utils import chunk_string, hex_to_dec, to_checksum_address
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
 TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -42,8 +42,8 @@ class EthErc20Processor(object):
 
             erc20_transfer = EthErc20Transfer()
             erc20_transfer.erc20_token = tx_receipt_log.address
-            erc20_transfer.erc20_from = topics_with_data[1]
-            erc20_transfer.erc20_to = topics_with_data[2]
+            erc20_transfer.erc20_from = to_checksum_address(topics_with_data[1])
+            erc20_transfer.erc20_to = to_checksum_address(topics_with_data[2])
             erc20_transfer.erc20_value = hex_to_dec(topics_with_data[3])
             erc20_transfer.erc20_tx_hash = tx_receipt_log.transaction_hash
             erc20_transfer.erc20_block_number = tx_receipt_log.block_number

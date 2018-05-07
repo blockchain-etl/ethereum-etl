@@ -4,6 +4,9 @@ import os
 
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
+import eth_utils
+
+
 @contextlib.contextmanager
 def smart_open(filename=None, mode='w', binary=False):
     is_file = filename and filename != '-'
@@ -47,3 +50,9 @@ def batch_readlines(file, batch_size):
             current_batch_size = 0
     if current_batch_size != 0:
         yield batch
+
+
+def to_checksum_address(address):
+    if address is None:
+        return None
+    return eth_utils.to_checksum_address(address)
