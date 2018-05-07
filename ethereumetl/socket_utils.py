@@ -6,12 +6,12 @@ BUFFER_SIZE = 65536  # 64 KiB
 ENCODING = 'utf-8'
 
 
-def exchange(socket_path, inp, timeout_seconds=10):
+def socket_exchange(socket_path, request, timeout_seconds=10):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
     try:
         sock.connect(socket_path)
-        sock.sendall(inp.encode(ENCODING))
+        sock.sendall(request.encode(ENCODING))
         sock.shutdown(socket.SHUT_WR)
         response = recv_all(sock, timeout_seconds)
     finally:
@@ -19,11 +19,11 @@ def exchange(socket_path, inp, timeout_seconds=10):
     return response.decode(ENCODING)
 
 
-def exchange_with_retries(socket_path, inp, max_retries=10, timeout_seconds=5):
+def socket_exchange_with_retries(socket_path, inp, max_retries=10, timeout_seconds=5):
     retry_count = 0
     while True:
         try:
-            return exchange(socket_path, inp, timeout_seconds)
+            return socket_exchange(socket_path, inp, timeout_seconds)
         except SocketTimeoutException as e:
             retry_count += 1
             if retry_count > max_retries:
