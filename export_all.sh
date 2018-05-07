@@ -66,7 +66,7 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
 
     erc20_transfers_file=${output_dir}/erc20_transfers_${file_name_suffix}.csv
     echo "Extracting ERC20 transfers for blocks ${block_range} to ${erc20_transfers_file}"
-    python extract_erc2_transfers.py < ${transaction_receipts_rpc_output_file} > ${erc20_transfers_file}
+    python extract_erc20_transfers.py < ${transaction_receipts_rpc_output_file} > ${erc20_transfers_file}
 
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
