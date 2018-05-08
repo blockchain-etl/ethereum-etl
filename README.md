@@ -3,22 +3,23 @@
 One-liner for blocks:
 
 ```
-> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_blocks.py > blocks.csv
+> python gen_blocks_rpc.py --end-block=1000 | \
+python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
+python extract_blocks.py > blocks.csv
 ```
 
 One-liner for transactions:
 
 ```
-> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | python extract_transactions.py > transactions.csv
+> python gen_blocks_rpc.py --end-block=1000 | \
+python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
+python extract_transactions.py > transactions.csv
 ```
 
 One-liner for ERC20 transfers:
 
 ```
-> python gen_blocks_rpc.py --end-block=1000 | nc -U ~/Library/Ethereum/geth.ipc | \
-python extract_transactions.py | python extract_csv_column.py --column=tx_hash | \
-python gen_transaction_receipts_rpc.py | nc -U ~/Library/Ethereum/geth.ipc | \
-python extract_erc20_transfers.py > erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc > erc20_transfers.csv
 ```
 
 ## Schema
@@ -118,28 +119,10 @@ Extract transactions from JSON RPC response:
 > python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
 ```
 
-Extract transaction hashes from transactions.csv:
+Export ERC20 transfers:
 
 ```
-> python extract_csv_column.py --column=tx_hash --input=transactions.csv --output transaction_hashes.csv
-```
-
-Generate JSON RPC calls for exporting transaction receipts for given transaction hashes:
-
-```
-> python gen_transaction_receipts_rpc.py --input=transaction_hashes.csv --output transaction_receipts_rpc.json
-```
-
-Call JSON RPC via IPC for exporting transaction receipts:
-
-```
-> python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc --input=transaction_receipts_rpc.json --output=transaction_receipts_rpc_output.json
-```
-
-Extract ERC20 transfers from transaction receipts:
-
-```
-> python extract_erc20_transfers.py --input transaction_receipts_rpc_output.json --output erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc --batch-size=100 > erc20_transfers.csv
 ```
  
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
@@ -165,7 +148,7 @@ Upload transactions for first 1 million blocks: `--include "transactions_00*.csv
 
 Upload ERC20 transfers for first 1 million blocks: `--include "erc20_transfers_00*.csv"`
 
-### Creating Table in AWS Athena
+### Creating Tables in AWS Athena
 
 Create database:
 
@@ -239,5 +222,25 @@ TBLPROPERTIES (
 
 Create `erc20_transfers` table:
 
-
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
+    erc20_token STRING, 
+    erc20_from STRING, 
+    erc20_to STRING, 
+    erc20_value BIGINT, 
+    erc20_tx_hash STRING, 
+    erc20_block_number BIGINT  
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+    'serialization.format' = ',',
+    'field.delim' = ',',
+    'escape.delim' = '\\'
+)
+STORED AS TEXTFILE
+LOCATION 's3://<your_bucket>/athena/lab1/erc20_transfers'
+TBLPROPERTIES (
+  'skip.header.line.count' = '1'
+);
+```
 
