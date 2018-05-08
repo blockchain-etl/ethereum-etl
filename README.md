@@ -141,9 +141,103 @@ Extract ERC20 transfers from transaction receipts:
 ```
 > python extract_erc20_transfers.py --input transaction_receipts_rpc_output.json --output erc20_transfers.csv
 ```
+ 
+Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
-Should work with python 2 and 3. 
-Tested with Python 2.7, geth 1.8.7, Ubuntu 16.04.4
+### Uploading to S3
+
+Upload blocks, transactions, erc20_transfers:
+
+```
+> cd output
+> aws s3 sync . s3://<your_bucket>/athena/lab1/blocks --region ap-southeast-1  --exclude "*" --include "blocks_*.csv"
+> aws s3 sync . s3://<your_bucket>/athena/lab1/transactions --region ap-southeast-1  --exclude "*" --include "transactions_*.csv"
+> aws s3 sync . s3://<your_bucket>/athena/lab1/erc20_transfers --region ap-southeast-1  --exclude "*" --include "erc20_transfers_*.csv"
+```
+
+Change `--include` option to
+
+Upload first 1 million blocks: `--include "blocks_00*.csv"`
+
+Upload second 1 million blocks: `--include "blocks_01*.csv"`
+
+Upload transactions for first 1 million blocks: `--include "transactions_00*.csv"`
+
+Upload ERC20 transfers for first 1 million blocks: `--include "erc20_transfers_00*.csv"`
+
+### Creating Table in AWS Athena
+
+Create database:
+
+```sql
+CREATE DATABASE lab1;
+```
+
+Create `blocks` table:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
+    block_number BIGINT,
+    block_hash STRING,
+    block_parent_hash STRING,
+    block_nonce STRING,
+    block_sha3_uncles STRING,
+    block_logs_bloom STRING,
+    block_transactions_root STRING,
+    block_state_root STRING,
+    block_miner STRING,
+    block_difficulty BIGINT,
+    block_total_difficulty BIGINT,
+    block_size BIGINT,
+    block_extra_data STRING,
+    block_gas_limit BIGINT,
+    block_gas_used BIGINT,
+    block_timestamp BIGINT,
+    block_transaction_count BIGINT
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+    'serialization.format' = ',',
+    'field.delim' = ',',
+    'escape.delim' = '\\'
+)
+STORED AS TEXTFILE
+LOCATION 's3://<your_bucket>/athena/lab1/blocks'
+TBLPROPERTIES (
+  'skip.header.line.count' = '1'
+);
+```
+
+Create `transactions` table:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
+    tx_hash STRING, 
+    tx_nonce BIGINT, 
+    tx_block_hash STRING,
+    tx_block_number BIGINT, 
+    tx_index BIGINT, 
+    tx_from STRING, 
+    tx_to STRING, 
+    tx_value BIGINT, 
+    tx_gas BIGINT, 
+    tx_gas_price BIGINT, 
+    tx_input STRING  
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+    'serialization.format' = ',',
+    'field.delim' = ',',
+    'escape.delim' = '\\'
+)
+STORED AS TEXTFILE
+LOCATION 's3://<your_bucket>/athena/lab1/transactions'
+TBLPROPERTIES (
+  'skip.header.line.count' = '1'
+);
+```
+
+Create `erc20_transfers` table:
 
 
 
