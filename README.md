@@ -2,7 +2,7 @@
 
 One-liner for blocks:
 
-```
+```bash
 > python gen_blocks_rpc.py --end-block=1000 | \
 python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
 python extract_blocks.py > blocks.csv
@@ -10,7 +10,7 @@ python extract_blocks.py > blocks.csv
 
 One-liner for transactions:
 
-```
+```bash
 > python gen_blocks_rpc.py --end-block=1000 | \
 python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
 python extract_transactions.py > transactions.csv
@@ -18,7 +18,7 @@ python extract_transactions.py > transactions.csv
 
 One-liner for ERC20 transfers:
 
-```
+```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc > erc20_transfers.csv
 ```
 
@@ -82,13 +82,13 @@ there is no need to wait until the full sync as the state is not needed.
 
 Install all dependencies:
 
-```
+```bash
 > pip install typing future argparse six web3
 ```
 
 Run in the terminal:
 
-```
+```bash
 > ./export_all.sh -h
 Usage: ./export_all.sh [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i <ipc_path>] [-o <output_dir>]
 > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
@@ -97,31 +97,31 @@ Usage: ./export_all.sh [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i
 #### Commands
 Generate JSON RPC calls for exporting blocks and transactions for specified block range:
 
-```
+```bash
 > python gen_blocks_rpc.py --start-block=0 --end-block=1000 --output=blocks_rpc.json
 ```
 
 Call JSON RPC via IPC for exporting blocks and transactions:
 
-```
+```bash
 > python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc --input=blocks_rpc.json --output=blocks_rpc_output.json
 ```
 
 Extract blocks from JSON RPC response:
 
-```
+```bash
 > python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
 ```
 
 Extract transactions from JSON RPC response:
 
-```
+```bash
 > python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
 ```
 
 Export ERC20 transfers:
 
-```
+```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc --batch-size=100 > erc20_transfers.csv
 ```
  
@@ -131,7 +131,7 @@ Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
 Upload blocks, transactions, erc20_transfers:
 
-```
+```bash
 > cd output
 > aws s3 sync . s3://<your_bucket>/athena/lab1/blocks --region ap-southeast-1  --exclude "*" --include "blocks_*.csv"
 > aws s3 sync . s3://<your_bucket>/athena/lab1/transactions --region ap-southeast-1  --exclude "*" --include "transactions_*.csv"
@@ -156,7 +156,7 @@ Create database:
 CREATE DATABASE lab1;
 ```
 
-Create `blocks` table:
+#### blocks
 
 ```sql
 CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
@@ -178,6 +178,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
     block_timestamp BIGINT,
     block_transaction_count BIGINT
 )
+PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
@@ -191,7 +192,7 @@ TBLPROPERTIES (
 );
 ```
 
-Create `transactions` table:
+#### transactions
 
 ```sql
 CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
@@ -220,7 +221,7 @@ TBLPROPERTIES (
 );
 ```
 
-Create `erc20_transfers` table:
+#### erc20_transfers
 
 ```sql
 CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
