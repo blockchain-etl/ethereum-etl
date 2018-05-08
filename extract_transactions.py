@@ -18,7 +18,7 @@ with smart_open(args.input, 'r') as input_file, smart_open(args.output, binary=T
 
     exporter = CsvItemExporter(output_file)
     exporter.start_exporting()
-    for line in input_file.readlines():
+    for line in input_file:
         json_line = json.loads(line)
         result = json_line.get('result', None)
         if result is None:

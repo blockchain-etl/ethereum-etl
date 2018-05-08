@@ -41,7 +41,7 @@ def chunk_string(string, length):
 def batch_readlines(file, batch_size):
     current_batch_size = 0
     batch = []
-    for line in file.readlines():
+    for line in file:
         batch.append(line)
         current_batch_size += 1
         if current_batch_size == batch_size:
