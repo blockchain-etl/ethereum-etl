@@ -14,7 +14,7 @@ parser.add_argument('--start-block', default=0, type=int, help='Start block')
 parser.add_argument('--end-block', required=True, type=int, help='End block')
 parser.add_argument('--output', default=None, type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc socket file.')
-parser.add_argument('--ipc-timeout', default=60, type=int, help='The timeout in seconds for ipc calls.')
+parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
 parser.add_argument('--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 
 args = parser.parse_args()
