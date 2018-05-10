@@ -262,6 +262,7 @@ MSCK REPAIR TABLE erc20_transfers;
 
 ### TODOs
 
+1. Unit tests
 1. Send batch requests http://www.jsonrpc.org/specification#batch. 
 1. Support Parity
 1. Add HTTPProvider
