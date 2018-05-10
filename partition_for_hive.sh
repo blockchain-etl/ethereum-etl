@@ -4,7 +4,7 @@ input_dir=.
 
 usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> [-i <input_dir>]" 1>&2; exit 1; }
 
-while getopts ":s:e:" opt; do
+while getopts ":s:e:b:i:" opt; do
     case "${opt}" in
         s)
             start_block=${OPTARG}

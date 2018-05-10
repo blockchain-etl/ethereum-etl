@@ -75,6 +75,8 @@ erc20_block_number  | bigint      |
 
 ### Usage
 
+Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
+
 Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
 You can export blocks below `currentBlock`, 
@@ -133,9 +135,9 @@ Upload blocks, transactions, erc20_transfers:
 
 ```bash
 > cd output
-> aws s3 sync . s3://<your_bucket>/athena/lab1/blocks --region ap-southeast-1  --exclude "*" --include "blocks_*.csv"
-> aws s3 sync . s3://<your_bucket>/athena/lab1/transactions --region ap-southeast-1  --exclude "*" --include "transactions_*.csv"
-> aws s3 sync . s3://<your_bucket>/athena/lab1/erc20_transfers --region ap-southeast-1  --exclude "*" --include "erc20_transfers_*.csv"
+> aws s3 sync . s3://<your_bucket>/athena/lab1/blocks --region ap-southeast-1  --exclude "*" --include "*blocks_*.csv"
+> aws s3 sync . s3://<your_bucket>/athena/lab1/transactions --region ap-southeast-1  --exclude "*" --include "*transactions_*.csv"
+> aws s3 sync . s3://<your_bucket>/athena/lab1/erc20_transfers --region ap-southeast-1  --exclude "*" --include "*erc20_transfers_*.csv"
 ```
 
 Change `--include` option to
@@ -247,3 +249,10 @@ TBLPROPERTIES (
 );
 ```
 
+Add partitions:
+
+```sql
+MSCK REPAIR TABLE blocks;
+MSCK REPAIR TABLE transactions;
+MSCK REPAIR TABLE erc20_transfers;
+```
