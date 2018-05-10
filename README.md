@@ -259,3 +259,10 @@ MSCK REPAIR TABLE blocks;
 MSCK REPAIR TABLE transactions;
 MSCK REPAIR TABLE erc20_transfers;
 ```
+
+### TODOs
+
+1. Send batch requests http://www.jsonrpc.org/specification#batch. 
+1. Support Parity
+1. Add HTTPProvider
+1. Error handling and logging
