@@ -208,6 +208,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
     tx_gas_price BIGINT, 
     tx_input STRING  
 )
+PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
@@ -232,6 +233,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
     erc20_tx_hash STRING, 
     erc20_block_number BIGINT  
 )
+PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
