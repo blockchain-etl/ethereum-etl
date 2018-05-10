@@ -22,6 +22,8 @@ One-liner for ERC20 transfers:
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc > erc20_transfers.csv
 ```
 
+Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
+
 ## Schema
 
 `blocks.csv`
@@ -75,7 +77,8 @@ erc20_block_number  | bigint      |
 
 ### Usage
 
-Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
+If you want to export just a few thousand blocks and don't want to sync your own node 
+refer to https://github.com/medvedev1088/ethereum-scraper.
 
 Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
