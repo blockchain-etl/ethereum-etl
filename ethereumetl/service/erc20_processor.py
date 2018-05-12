@@ -1,12 +1,10 @@
 import logging
-
-from typing import Optional
 from builtins import map
+from typing import Optional
 
 from ethereumetl.domain.erc20_transfer import EthErc20Transfer
-from ethereumetl.domain.transaction_receipt import EthTransactionReceipt
 from ethereumetl.domain.transaction_receipt_log import EthTransactionReceiptLog
-from ethereumetl.utils import chunk_string, hex_to_dec, to_checksum_address
+from ethereumetl.utils import chunk_string, hex_to_dec
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
 TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -15,25 +13,18 @@ logger = logging.getLogger(__name__)
 
 class EthErc20Processor(object):
 
-    def filter_transfers_from_receipt(self, tx_receipt):
-        # type: (EthTransactionReceipt) -> [EthErc20Transfer]
-
-        erc20_transfers = list(map(lambda log: self.filter_transfer_from_receipt_log(log), tx_receipt.logs))
-        erc20_transfers = filter(None, erc20_transfers)
-
-        return erc20_transfers
-
     def filter_transfer_from_receipt_log(self, tx_receipt_log):
         # type: (EthTransactionReceiptLog) -> Optional[EthErc20Transfer]
 
         topics = tx_receipt_log.topics
         if len(topics) < 1:
-            logger.warning("Topics are empty in log {} of transaction {}".format(tx_receipt_log.log_index, tx_receipt_log.transaction_hash))
+            logger.warning("Topics are empty in log {} of transaction {}".format(tx_receipt_log.log_index,
+                                                                                 tx_receipt_log.transaction_hash))
             return None
 
         if topics[0] == TRANSFER_EVENT_TOPIC:
             # Handle unindexed event fields
-            topics_with_data = topics + self.split_to_words(tx_receipt_log.data)
+            topics_with_data = topics + split_to_words(tx_receipt_log.data)
             # if the number of topics and fields in data part != 4, then it's a weird event
             if len(topics_with_data) != 4:
                 logger.warning("The number of topics and data parts is not equal to 4 in log {} of transaction {}"
@@ -51,21 +42,18 @@ class EthErc20Processor(object):
 
         return None
 
-    @staticmethod
-    def split_to_words(data):
-        if data and len(data) > 2:
-            data_without_0x = data[2:]
-            words = list(chunk_string(data_without_0x, 64))
-            words_with_0x = list(map(lambda word: '0x' + word, words))
-            return words_with_0x
-        return []
 
-    @staticmethod
-    def word_to_address(param):
-        if len(param) >= 40:
-            return '0x' + param[-40:]
-        else:
-            return param
+def split_to_words(data):
+    if data and len(data) > 2:
+        data_without_0x = data[2:]
+        words = list(chunk_string(data_without_0x, 64))
+        words_with_0x = list(map(lambda word: '0x' + word, words))
+        return words_with_0x
+    return []
 
 
-
+def word_to_address(param):
+    if len(param) >= 40:
+        return '0x' + param[-40:]
+    else:
+        return param

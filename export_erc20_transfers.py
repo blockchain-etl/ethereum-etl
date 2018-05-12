@@ -5,7 +5,7 @@ from web3 import IPCProvider, Web3
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mapper.transaction_receipt_log_mapper import EthTransactionReceiptLogMapper
-from ethereumetl.service.erc20_processor import EthErc20Processor
+from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
 from ethereumetl.utils import smart_open
 
 parser = argparse.ArgumentParser(
@@ -19,7 +19,6 @@ parser.add_argument('--batch-size', default=100, type=int, help='The number of b
 
 args = parser.parse_args()
 
-TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 
 with smart_open(args.output, binary=True) as output_file:
     transaction_receipt_log_mapper = EthTransactionReceiptLogMapper()
