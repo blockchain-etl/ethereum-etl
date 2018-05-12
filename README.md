@@ -4,7 +4,7 @@ One-liner for blocks:
 
 ```bash
 > python gen_blocks_rpc.py --end-block=1000 | \
-python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
+python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc | \
 python extract_blocks.py > blocks.csv
 ```
 
@@ -12,14 +12,14 @@ One-liner for transactions:
 
 ```bash
 > python gen_blocks_rpc.py --end-block=1000 | \
-python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc | \
+python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc | \
 python extract_transactions.py > transactions.csv
 ```
 
 One-liner for ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc > erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc > erc20_transfers.csv
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -80,6 +80,8 @@ erc20_block_number  | bigint      |
 If you want to export just a few thousand blocks and don't want to sync your own node 
 refer to https://github.com/medvedev1088/ethereum-scraper.
 
+Parity is not supported for now https://github.com/medvedev1088/ethereum-etl/issues/2
+
 Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
 You can export blocks below `currentBlock`, 
@@ -109,7 +111,7 @@ Generate JSON RPC calls for exporting blocks and transactions for specified bloc
 Call JSON RPC via IPC for exporting blocks and transactions:
 
 ```bash
-> python exchange_with_ipc.py --ipc-path=~/Library/Ethereum/geth.ipc --input=blocks_rpc.json --output=blocks_rpc_output.json
+> python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc --input=blocks_rpc.json --output=blocks_rpc_output.json
 ```
 
 Extract blocks from JSON RPC response:
@@ -127,7 +129,7 @@ Extract transactions from JSON RPC response:
 Export ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=~/Library/Ethereum/geth.ipc --batch-size=100 > erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc --batch-size=100 > erc20_transfers.csv
 ```
  
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
