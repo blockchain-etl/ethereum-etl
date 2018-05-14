@@ -1,24 +1,28 @@
 import argparse
 import json
 
+from ethereumetl.argparse_utils import str_to_bool
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import smart_open
 
-parser = argparse.ArgumentParser(description='Extract blocks from eth_getBlockByNumber JSON RPC output')
+parser = argparse.ArgumentParser(
+    description='Extract blocks and transactions from eth_getBlockByNumber JSON RPC output')
 parser.add_argument('--input', default=None, type=str, help='The input file. If not specified stdin is used.')
-parser.add_argument('--extract-blocks', default=True, type=bool, help='Whether or not to extract blocks.')
+parser.add_argument('--extract-blocks', const=True, default=True, type=str_to_bool, nargs='?',
+                    help='Whether or not to extract blocks.')
 parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not specified stdout is used.')
-parser.add_argument('--extract-transactions', default=True, type=bool, help='Whether or not to extract transactions.')
+parser.add_argument('--extract-transactions', const=True, default=True, type=str_to_bool, nargs='?',
+                    help='Whether or not to extract transactions.')
 parser.add_argument('--transactions-output', default=None, type=str,
                     help='The output file for transactions. If not specified stdout is used.')
 
 args = parser.parse_args()
 
 with smart_open(args.input, 'r') as input_file, \
-        smart_open(args.blocks_output, binary=True) if args.extract_blocks else None as blocks_output_file , \
+        smart_open(args.blocks_output, binary=True) if args.extract_blocks else None as blocks_output_file, \
         smart_open(args.transactions_output, binary=True) if args.extract_transactions else None as tx_output_file:
     block_mapper = EthBlockMapper()
     tx_mapper = EthTransactionMapper()

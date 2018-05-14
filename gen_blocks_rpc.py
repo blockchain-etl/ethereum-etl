@@ -3,14 +3,15 @@ import argparse
 
 from builtins import str
 
+from ethereumetl.argparse_utils import str_to_bool
 from ethereumetl.utils import smart_open
 
 parser = argparse.ArgumentParser(
     description='Generate Ethereum eth_getBlockByNumber JSON RPC call inputs for a block range')
 parser.add_argument('--start-block', default=0, type=int, help='Start block')
 parser.add_argument('--end-block', required=True, type=int, help='End block')
-parser.add_argument('--no-transactions', dest='no_transactions', default=False, action='store_true',
-                    help='Exclude transactions from response')
+parser.add_argument('--include-transactions', const=True, default=True, type=str_to_bool, nargs='?',
+                    help='Whether or not to include transactions')
 parser.add_argument('--output', default=None, type=str, help='The output file. If not specified stdout is used.')
 
 args = parser.parse_args()
@@ -27,5 +28,5 @@ def generate_get_block_by_number_json_rpc(start_block, end_block, include_transa
 
 
 with smart_open(args.output) as output_file:
-    for data in generate_get_block_by_number_json_rpc(args.start_block, args.end_block, not args.no_transactions):
+    for data in generate_get_block_by_number_json_rpc(args.start_block, args.end_block, args.include_transactions):
         output_file.write(json.dumps(data) + '\n')
