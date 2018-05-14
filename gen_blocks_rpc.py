@@ -9,21 +9,23 @@ parser = argparse.ArgumentParser(
     description='Generate Ethereum eth_getBlockByNumber JSON RPC call inputs for a block range')
 parser.add_argument('--start-block', default=0, type=int, help='Start block')
 parser.add_argument('--end-block', required=True, type=int, help='End block')
+parser.add_argument('--no-transactions', dest='no_transactions', default=False, action='store_true',
+                    help='Exclude transactions from response')
 parser.add_argument('--output', default=None, type=str, help='The output file. If not specified stdout is used.')
 
 args = parser.parse_args()
 
 
-def generate_get_block_by_number_json_rpc(start_block, end_block):
+def generate_get_block_by_number_json_rpc(start_block, end_block, include_transactions):
     for block_number in range(start_block, end_block + 1):
         yield {
             'jsonrpc': '2.0',
             'method': 'eth_getBlockByNumber',
-            'params': [hex(block_number), True],
+            'params': [hex(block_number), include_transactions],
             'id': 1,
         }
 
 
 with smart_open(args.output) as output_file:
-    for data in generate_get_block_by_number_json_rpc(args.start_block, args.end_block):
+    for data in generate_get_block_by_number_json_rpc(args.start_block, args.end_block, not args.no_transactions):
         output_file.write(json.dumps(data) + '\n')

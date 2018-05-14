@@ -17,3 +17,4 @@ class EthBlock(object):
     timestamp = None
 
     transactions = []
+    transaction_count = None

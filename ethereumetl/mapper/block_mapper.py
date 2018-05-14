@@ -5,7 +5,6 @@ from builtins import map
 
 
 class EthBlockMapper(object):
-
     transaction_mapper = EthTransactionMapper()
 
     def json_dict_to_block(self, json_dict):
@@ -27,10 +26,15 @@ class EthBlockMapper(object):
         block.extra_data = json_dict.get('extraData', None)
         block.gas_limit = hex_to_dec(json_dict.get('gasLimit', None))
         block.gas_used = hex_to_dec(json_dict.get('gasUsed', None))
-        block.timestamp = json_dict.get('timestamp', None)
+        block.timestamp = hex_to_dec(json_dict.get('timestamp', None))
 
         if 'transactions' in json_dict:
-            block.transactions = list(map(lambda tx: self.transaction_mapper.json_dict_to_transaction(tx), json_dict['transactions']))
+            block.transactions = [
+                self.transaction_mapper.json_dict_to_transaction(tx) for tx in json_dict['transactions']
+                if isinstance(tx, dict)
+            ]
+
+            block.transaction_count = len(json_dict['transactions'])
 
         return block
 
@@ -54,5 +58,5 @@ class EthBlockMapper(object):
             'block_gas_limit': block.gas_limit,
             'block_gas_used': block.gas_used,
             'block_timestamp': block.timestamp,
-            'block_transaction_count': len(block.transactions),
+            'block_transaction_count': block.transaction_count,
         }
