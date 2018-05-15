@@ -277,9 +277,9 @@ I'm currently working on a SaaS solution for analysts and developers:
 - Web console for running SQLs based on Redash http://demo.redash.io/
 - Built on top of AWS, cost efficient
 - Can provide access to raw CSV data if needed
-- Supports Ethereum at first, later Bitcoin and other blockchains
-- Supports internal transactions
-- Supports API access
+- Support for internal transactions in the future
+- Support for API access in the future
+- Support for Bitcoin and other blockchains in the future
 - Users pay per query
 
 Contact me if you would like to join evge.medvedev@gmail.com
