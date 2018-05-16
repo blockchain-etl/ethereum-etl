@@ -3,9 +3,7 @@ from ethereumetl.utils import hex_to_dec
 
 
 class EthTransactionReceiptLogMapper(object):
-
-    def json_dict_to_transaction_receipt_log(self, json_dict):
-        # type: ({}) -> EthTransactionReceiptLog
+    def json_dict_to_transaction_receipt_log(self, json_dict) -> EthTransactionReceiptLog:
 
         tx_receipt_log = EthTransactionReceiptLog()
 
@@ -19,8 +17,7 @@ class EthTransactionReceiptLogMapper(object):
 
         return tx_receipt_log
 
-    def web3_dict_to_transaction_receipt_log(self, dict):
-        # type: ({}) -> EthTransactionReceiptLog
+    def web3_dict_to_transaction_receipt_log(self, dict) -> EthTransactionReceiptLog:
 
         tx_receipt_log = EthTransactionReceiptLog()
 
@@ -41,6 +38,6 @@ class EthTransactionReceiptLogMapper(object):
         tx_receipt_log.data = dict.get('data', None)
 
         if 'topics' in dict:
-            tx_receipt_log.topics = list(map(lambda topic: topic.hex(), dict['topics']))
+            tx_receipt_log.topics = [topic.hex() for topic in dict['topics']]
 
         return tx_receipt_log

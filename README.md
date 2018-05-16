@@ -90,7 +90,7 @@ there is no need to wait until the full sync as the state is not needed.
 Install all dependencies:
 
 ```bash
-> pip install typing future argparse six web3
+> pip install -r requirements.txt
 ```
 
 Run in the terminal:

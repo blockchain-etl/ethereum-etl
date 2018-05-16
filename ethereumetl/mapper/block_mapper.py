@@ -1,15 +1,12 @@
 from ethereumetl.domain.block import EthBlock
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import hex_to_dec, to_checksum_address
-from builtins import map
 
 
 class EthBlockMapper(object):
     transaction_mapper = EthTransactionMapper()
 
-    def json_dict_to_block(self, json_dict):
-        # type: ({}) -> EthBlock
-
+    def json_dict_to_block(self, json_dict) -> EthBlock:
         block = EthBlock()
         block.number = hex_to_dec(json_dict.get('number', None))
         block.hash = json_dict.get('hash', None)
@@ -38,9 +35,7 @@ class EthBlockMapper(object):
 
         return block
 
-    def block_to_dict(self, block):
-        # type: (EthBlock) -> {}
-
+    def block_to_dict(self, block: EthBlock):
         return {
             'block_number': block.number,
             'block_hash': block.hash,
