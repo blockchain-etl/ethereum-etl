@@ -1,4 +1,4 @@
-class EthTransactionReceiptLog(object):
+class EthReceiptLog(object):
     log_index = None
     transaction_hash = None
     block_hash = None

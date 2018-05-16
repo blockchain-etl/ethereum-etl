@@ -52,7 +52,8 @@ def batch_readlines(file, batch_size):
         yield batch
 
 
-def to_checksum_address(address):
-    if address is None:
-        return None
-    return eth_utils.to_checksum_address(address)
+def to_normalized_address(address):
+    if address is None or not isinstance(address, str):
+        return address
+    return address.lower()
+
