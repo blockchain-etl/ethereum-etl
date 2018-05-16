@@ -134,6 +134,12 @@ Export ERC20 transfers:
  
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
+### Running Tests
+
+```bash
+> pytest
+```
+
 ### Uploading to S3
 
 Upload blocks, transactions, erc20_transfers:

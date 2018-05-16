@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class EthErc20Processor(object):
-
-    def filter_transfer_from_receipt_log(self, tx_receipt_log):
-        # type: (EthTransactionReceiptLog) -> Optional[EthErc20Transfer]
+    def filter_transfer_from_receipt_log(self, tx_receipt_log: EthTransactionReceiptLog) -> Optional[EthErc20Transfer]:
 
         topics = tx_receipt_log.topics
         if len(topics) < 1:
