@@ -11,7 +11,7 @@ parser.add_argument('--input', default=None, type=str, help='The input file. If 
 parser.add_argument('--output', default=None, type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc socket file.')
 parser.add_argument('--ipc-timeout', default=10, type=int, help='The timeout for ipc calls.')
-parser.add_argument('--batch-size', default=100, type=int, help='The number of lines in the batch to send to socket.')
+parser.add_argument('--batch-size', default=1, type=int, help='The number of lines in the batch to send to socket.')
 
 
 args = parser.parse_args()

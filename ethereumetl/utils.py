@@ -57,3 +57,16 @@ def to_normalized_address(address):
         return address
     return address.lower()
 
+
+def batch(iterator, batch_size):
+    current_batch = []
+    for item in iterator:
+        current_batch.append(item)
+        if len(current_batch) == batch_size:
+            yield current_batch
+            current_batch = []
+
+    if len(current_batch) != 0:
+        yield current_batch
+
+
