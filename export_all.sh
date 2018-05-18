@@ -9,6 +9,14 @@ current_time() { echo `date '+%Y-%m-%d %H:%M:%S'`; }
 
 log() { echo "$(current_time) ${1}"; }
 
+quit_on_error() {
+    ret_val=$?
+    if [ ${ret_val} -ne 0 ]; then
+        log "An error occurred. Quitting."
+    fi
+    exit ${ret_val}
+}
+
 usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]" 1>&2; exit 1; }
 
 while getopts ":s:e:b:i:o:" opt; do
@@ -57,16 +65,19 @@ for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $
     log "Exporting blocks ${block_range} to ${blocks_rpc_output_file}"
     python gen_blocks_rpc.py --start-block=${batch_start_block} --end-block=${batch_end_block} | \
     python exchange_with_ipc.py --ipc-path=${ipc_path} --batch-size=${ipc_batch_size} > ${blocks_rpc_output_file}
+    quit_on_error
 
     blocks_file=${full_output_dir}/blocks_${file_name_suffix}.csv
     transactions_file=${full_output_dir}/transactions_${file_name_suffix}.csv
     log "Extracting blocks ${block_range} to ${blocks_file}"
     log "Extracting transactions from blocks ${block_range} to ${transactions_file}"
     python extract_blocks_and_transactions.py --input=${blocks_rpc_output_file} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
+    quit_on_error
 
     erc20_transfers_file=${full_output_dir}/erc20_transfers_${file_name_suffix}.csv
     log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
     python export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path=${ipc_path} --batch-size=${export_erc20_batch_size} > ${erc20_transfers_file}
+    quit_on_error
 
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
