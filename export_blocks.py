@@ -1,11 +1,10 @@
 import argparse
 
 from ethereumetl.ipc import IPCWrapper
-from ethereumetl.jobs import ExportBlocksJob, UnixGethExportBlocksJob
+from ethereumetl.jobs import ExportBlocksJob, UnixGethOptimizedExportBlocksJob
 from ethereumetl.socket_utils import UnixGethIPCWrapper
 
-parser = argparse.ArgumentParser(
-    description='Exports blocks and transactions.')
+parser = argparse.ArgumentParser(description='Export blocks and transactions.')
 parser.add_argument('--start-block', default=0, type=int, help='Start block')
 parser.add_argument('--end-block', required=True, type=int, help='End block')
 parser.add_argument('--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
@@ -28,11 +27,11 @@ if args.strategy == 'default':
                           blocks_output=args.blocks_output,
                           transactions_output=args.transactions_output)
 else:
-    job = UnixGethExportBlocksJob(start_block=args.start_block,
-                                  end_block=args.end_block,
-                                  batch_size=args.batch_size,
-                                  ipc_wrapper=UnixGethIPCWrapper(args.ipc_path, args.ipc_timeout),
-                                  blocks_output=args.blocks_output,
-                                  transactions_output=args.transactions_output)
+    job = UnixGethOptimizedExportBlocksJob(start_block=args.start_block,
+                                           end_block=args.end_block,
+                                           batch_size=args.batch_size,
+                                           ipc_wrapper=UnixGethIPCWrapper(args.ipc_path, args.ipc_timeout),
+                                           blocks_output=args.blocks_output,
+                                           transactions_output=args.transactions_output)
 
 job.run()

@@ -100,10 +100,10 @@ class ExportBlocksJob(BaseJob):
 
 
 # Only works on Unix with geth, about 2 times faster
-class UnixGethExportBlocksJob(ExportBlocksJob):
+class UnixGethOptimizedExportBlocksJob(ExportBlocksJob):
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        serialized_blocks_rpc = [json.dumps(b) for b in blocks_rpc]
+        serialized_blocks_rpc = [json.dumps(block_rpc) for block_rpc in blocks_rpc]
         response = self.ipc_wrapper.make_request('\n'.join(serialized_blocks_rpc))
         for item in response.splitlines():
             decoded_item = json.loads(item)
