@@ -1,13 +1,11 @@
 import json
-import os
 import socket
-import sys
 import threading
 
+from web3.providers.ipc import get_default_ipc_path, PersistantSocket
 from web3.utils.threads import (
     Timeout,
 )
-
 
 try:
     from json import JSONDecodeError
@@ -15,125 +13,7 @@ except ImportError:
     JSONDecodeError = ValueError
 
 
-def get_ipc_socket(ipc_path, timeout=0.1):
-    if sys.platform == 'win32':
-        # On Windows named pipe is used. Simulate socket with it.
-        from web3.utils.windows import NamedPipe
-
-        return NamedPipe(ipc_path)
-    else:
-        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        sock.connect(ipc_path)
-        sock.settimeout(timeout)
-        return sock
-
-
-class PersistantSocket:
-    sock = None
-
-    def __init__(self, ipc_path):
-        self.ipc_path = ipc_path
-
-    def __enter__(self):
-        if not self.ipc_path:
-            raise FileNotFoundError("cannot connect to IPC socket at path: %r" % self.ipc_path)
-
-        if not self.sock:
-            self.sock = self._open()
-        return self.sock
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        # only close the socket if there was an error
-        if exc_value is not None:
-            try:
-                self.sock.close()
-            except Exception:
-                pass
-            self.sock = None
-
-    def _open(self):
-        return get_ipc_socket(self.ipc_path)
-
-    def reset(self):
-        self.sock.close()
-        self.sock = self._open()
-        return self.sock
-
-
-def get_default_ipc_path(testnet=False):
-    if testnet:
-        testnet = "testnet"
-    else:
-        testnet = ""
-
-    if sys.platform == 'darwin':
-        ipc_path = os.path.expanduser(os.path.join(
-            "~",
-            "Library",
-            "Ethereum",
-            testnet,
-            "geth.ipc"
-        ))
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-        ipc_path = os.path.expanduser(os.path.join(
-            "~",
-            "Library",
-            "Application Support",
-            "io.parity.ethereum",
-            "jsonrpc.ipc"
-        ))
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-    elif sys.platform.startswith('linux'):
-        ipc_path = os.path.expanduser(os.path.join(
-            "~",
-            ".ethereum",
-            testnet,
-            "geth.ipc"
-        ))
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-        ipc_path = os.path.expanduser(os.path.join(
-            "~",
-            ".local",
-            "share",
-            "io.parity.ethereum",
-            "jsonrpc.ipc"
-        ))
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-    elif sys.platform == 'win32':
-        ipc_path = os.path.join(
-            "\\\\",
-            ".",
-            "pipe",
-            "geth.ipc"
-        )
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-        ipc_path = os.path.join(
-            "\\\\",
-            ".",
-            "pipe",
-            "jsonrpc.ipc"
-        )
-        if os.path.exists(ipc_path):
-            return ipc_path
-
-    else:
-        raise ValueError(
-            "Unsupported platform '{0}'.  Only darwin/linux2/win32 are "
-            "supported.  You must specify the ipc_path".format(sys.platform)
-        )
-
-
-class IPCProvider:
+class BatchIPCProvider:
     _socket = None
 
     def __init__(self, ipc_path=None, testnet=False, timeout=10, *args, **kwargs):
@@ -174,7 +54,7 @@ class IPCProvider:
                             timeout.sleep(0)
                             continue
                         else:
-                            return json.dumps(response)
+                            return response
                     else:
                         timeout.sleep(0)
                         continue
@@ -182,9 +62,8 @@ class IPCProvider:
 
 # A valid JSON RPC response can only end in } or ] http://www.jsonrpc.org/specification
 def has_valid_json_rpc_ending(raw_response):
-    stripped_raw_response = raw_response.rstrip()
-    for valid_ending in [b"}", b"]"]:
-        if stripped_raw_response.endswith(valid_ending):
+    for valid_ending in [b"}\n", b"]\n"]:
+        if raw_response.endswith(valid_ending):
             return True
     else:
         return False

@@ -1,29 +1,3 @@
-import sys
-import contextlib
-import os
-
-
-# https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
-import eth_utils
-
-
-@contextlib.contextmanager
-def smart_open(filename=None, mode='w', binary=False):
-    is_file = filename and filename != '-'
-    full_mode = mode + ('b' if binary else '')
-    if is_file:
-        fh = open(filename, full_mode)
-    else:
-        fd = sys.stdout.fileno() if mode == 'w' else sys.stdin.fileno()
-        fh = os.fdopen(fd, full_mode)
-
-    try:
-        yield fh
-    finally:
-        if is_file:
-            fh.close()
-
-
 def hex_to_dec(hex_string):
     if hex_string is None:
         return None
@@ -58,7 +32,7 @@ def to_normalized_address(address):
     return address.lower()
 
 
-def batch(iterator, batch_size):
+def batch_iterator(iterator, batch_size):
     current_batch = []
     for item in iterator:
         current_batch.append(item)
