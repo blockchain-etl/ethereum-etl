@@ -16,11 +16,12 @@ parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in
 
 args = parser.parse_args()
 
-job = ExportErc20TransfersJob(start_block=args.start_block,
-                              end_block=args.end_block,
-                              batch_size=args.batch_size,
-                              web3=Web3(IPCProvider(args.ipc_path, timeout=args.ipc_timeout)),
-                              output=args.output,
-                              tokens=args.tokens.strip().split(',') if args.tokens is not None else None)
+job = ExportErc20TransfersJob(
+    start_block=args.start_block,
+    end_block=args.end_block,
+    batch_size=args.batch_size,
+    web3=Web3(IPCProvider(args.ipc_path, timeout=args.ipc_timeout)),
+    output=args.output,
+    tokens=args.tokens.strip().split(',') if args.tokens is not None else None)
 
 job.run()

@@ -20,18 +20,20 @@ parser.add_argument('--strategy', default='default', type=str, choices=['default
 args = parser.parse_args()
 
 if args.strategy == 'default':
-    job = ExportBlocksJob(start_block=args.start_block,
-                          end_block=args.end_block,
-                          batch_size=args.batch_size,
-                          ipc_wrapper=IPCWrapper(args.ipc_path, args.ipc_timeout),
-                          blocks_output=args.blocks_output,
-                          transactions_output=args.transactions_output)
+    job = ExportBlocksJob(
+        start_block=args.start_block,
+        end_block=args.end_block,
+        batch_size=args.batch_size,
+        ipc_wrapper=IPCWrapper(args.ipc_path, args.ipc_timeout),
+        blocks_output=args.blocks_output,
+        transactions_output=args.transactions_output)
 else:
-    job = UnixGethOptimizedExportBlocksJob(start_block=args.start_block,
-                                           end_block=args.end_block,
-                                           batch_size=args.batch_size,
-                                           ipc_wrapper=UnixGethIPCWrapper(args.ipc_path, args.ipc_timeout),
-                                           blocks_output=args.blocks_output,
-                                           transactions_output=args.transactions_output)
+    job = UnixGethOptimizedExportBlocksJob(
+        start_block=args.start_block,
+        end_block=args.end_block,
+        batch_size=args.batch_size,
+        ipc_wrapper=UnixGethIPCWrapper(args.ipc_path, args.ipc_timeout),
+        blocks_output=args.blocks_output,
+        transactions_output=args.transactions_output)
 
 job.run()

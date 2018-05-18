@@ -34,13 +34,14 @@ class BaseJob(object):
 
 # Exports blocks and transactions
 class ExportBlocksJob(BaseJob):
-    def __init__(self,
-                 start_block,
-                 end_block,
-                 batch_size,
-                 ipc_wrapper,
-                 blocks_output=None,
-                 transactions_output=None):
+    def __init__(
+            self,
+            start_block,
+            end_block,
+            batch_size,
+            ipc_wrapper,
+            blocks_output=None,
+            transactions_output=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
@@ -116,13 +117,14 @@ class UnixGethOptimizedExportBlocksJob(ExportBlocksJob):
 
 
 class ExportErc20TransfersJob(BaseJob):
-    def __init__(self,
-                 start_block,
-                 end_block,
-                 batch_size,
-                 web3,
-                 output,
-                 tokens=None):
+    def __init__(
+            self,
+            start_block,
+            end_block,
+            batch_size,
+            web3,
+            output,
+            tokens=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
