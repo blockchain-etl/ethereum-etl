@@ -100,7 +100,9 @@ class ExportBlocksJob(BaseJob):
             self.transactions_output_file.close()
 
 
-# Only works on Unix with geth, about 2 times faster
+# Only works on Unix with geth, about 2 times faster. Sends a new-line delimited JSON RPC request batch, shuts down
+# the socket and reads the response until it gets an empty string from the other side.
+# Doesn't work in Parity as it interleaves responses with each other. On Windows shutdown is not supported.
 class UnixGethOptimizedExportBlocksJob(ExportBlocksJob):
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
@@ -144,7 +146,7 @@ class ExportErc20TransfersJob(BaseJob):
             try:
                 self._export_batch(batch_start, batch_end)
             except (Timeout, SocketTimeoutException):
-                # try exporting blocks one by one
+                # try exporting one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)
 
