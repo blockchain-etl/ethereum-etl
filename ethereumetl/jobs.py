@@ -18,13 +18,13 @@ class ExportBlocksJob(object):
                  start_block,
                  end_block,
                  batch_size,
-                 batch_ipc_provider,
+                 ipc_wrapper,
                  blocks_output=None,
                  transactions_output=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
-        self.batch_ipc_provider = batch_ipc_provider
+        self.ipc_wrapper = ipc_wrapper
         self.blocks_output = blocks_output
         self.transactions_output = transactions_output
 
@@ -67,15 +67,18 @@ class ExportBlocksJob(object):
 
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        response = self.batch_ipc_provider.make_request(json.dumps(blocks_rpc))
+        response = self.ipc_wrapper.make_request(json.dumps(blocks_rpc))
         for response_item in response:
             result = response_item['result']
             block = self.block_mapper.json_dict_to_block(result)
-            if self.export_blocks:
-                self.blocks_exporter.export_item(self.block_mapper.block_to_dict(block))
-            if self.export_transactions:
-                for tx in block.transactions:
-                    self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
+            self._export_block(block)
+
+    def _export_block(self, block):
+        if self.export_blocks:
+            self.blocks_exporter.export_item(self.block_mapper.block_to_dict(block))
+        if self.export_transactions:
+            for tx in block.transactions:
+                self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
 
     def _end(self):
         if self.blocks_output_file is not None:

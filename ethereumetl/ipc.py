@@ -13,10 +13,10 @@ except ImportError:
     JSONDecodeError = ValueError
 
 
-class BatchIPCProvider:
+class IPCWrapper:
     _socket = None
 
-    def __init__(self, ipc_path=None, testnet=False, timeout=10, *args, **kwargs):
+    def __init__(self, ipc_path=None, testnet=False, timeout=10):
         if ipc_path is None:
             self.ipc_path = get_default_ipc_path(testnet)
         else:
@@ -25,7 +25,6 @@ class BatchIPCProvider:
         self.timeout = timeout
         self._lock = threading.Lock()
         self._socket = PersistantSocket(self.ipc_path)
-        super().__init__(*args, **kwargs)
 
     def make_request(self, text):
         request = text.encode('utf-8')

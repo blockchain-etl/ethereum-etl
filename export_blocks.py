@@ -1,6 +1,6 @@
 import argparse
 
-from ethereumetl.ipc import BatchIPCProvider
+from ethereumetl.ipc import IPCWrapper
 from ethereumetl.jobs import ExportBlocksJob
 
 parser = argparse.ArgumentParser(
@@ -20,7 +20,7 @@ args = parser.parse_args()
 job = ExportBlocksJob(start_block=args.start_block,
                       end_block=args.end_block,
                       batch_size=args.batch_size,
-                      batch_ipc_provider=BatchIPCProvider(args.ipc_path, args.ipc_timeout),
+                      ipc_wrapper=IPCWrapper(args.ipc_path, args.ipc_timeout),
                       blocks_output=args.blocks_output,
                       transactions_output=args.transactions_output)
 
