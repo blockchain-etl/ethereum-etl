@@ -10,6 +10,7 @@ from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.mapper.transaction_receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
+from ethereumetl.socket_utils import SocketTimeoutException
 from ethereumetl.utils import split_to_batches
 
 
@@ -60,7 +61,7 @@ class ExportBlocksJob(object):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except Timeout:
+            except (Timeout, SocketTimeoutException):
                 # try exporting blocks one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)
@@ -85,6 +86,18 @@ class ExportBlocksJob(object):
             self.blocks_output_file.close()
         if self.transactions_output_file is not None:
             self.transactions_output_file.close()
+
+
+# Only works on Unix with geth
+class UnixGethExportBlocksJob(ExportBlocksJob):
+    def _export_batch(self, batch_start, batch_end):
+        blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
+        response = self.ipc_wrapper.make_request('\n'.join(json.dumps(b) for b in blocks_rpc))
+        for item in response.splitlines():
+            decoded_item = json.loads(item)
+            result = decoded_item['result']
+            block = self.block_mapper.json_dict_to_block(result)
+            self._export_block(block)
 
 
 class ExportErc20TransfersJob(object):
@@ -122,7 +135,7 @@ class ExportErc20TransfersJob(object):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except Timeout:
+            except (Timeout, SocketTimeoutException):
                 # try exporting blocks one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)

@@ -1,7 +1,8 @@
 import argparse
 
 from ethereumetl.ipc import IPCWrapper
-from ethereumetl.jobs import ExportBlocksJob
+from ethereumetl.jobs import ExportBlocksJob, UnixGethExportBlocksJob
+from ethereumetl.socket_utils import UnixGethIPCWrapper
 
 parser = argparse.ArgumentParser(
     description='Exports blocks and transactions.')
@@ -14,14 +15,24 @@ parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not provided blocks will not be exported.')
 parser.add_argument('--transactions-output', default=None, type=str,
                     help='The output file for transactions. If not provided transactions will not be exported.')
+parser.add_argument('--strategy', default='default', type=str,
+                    help='Can be either default or unix-geth. unix-geth works about 2 times faster.')
 
 args = parser.parse_args()
 
-job = ExportBlocksJob(start_block=args.start_block,
-                      end_block=args.end_block,
-                      batch_size=args.batch_size,
-                      ipc_wrapper=IPCWrapper(args.ipc_path, args.ipc_timeout),
-                      blocks_output=args.blocks_output,
-                      transactions_output=args.transactions_output)
+if args.strategy == 'default':
+    job = ExportBlocksJob(start_block=args.start_block,
+                          end_block=args.end_block,
+                          batch_size=args.batch_size,
+                          ipc_wrapper=IPCWrapper(args.ipc_path, args.ipc_timeout),
+                          blocks_output=args.blocks_output,
+                          transactions_output=args.transactions_output)
+else:
+    job = UnixGethExportBlocksJob(start_block=args.start_block,
+                                  end_block=args.end_block,
+                                  batch_size=args.batch_size,
+                                  ipc_wrapper=UnixGethIPCWrapper(args.ipc_path, args.ipc_timeout),
+                                  blocks_output=args.blocks_output,
+                                  transactions_output=args.transactions_output)
 
 job.run()
