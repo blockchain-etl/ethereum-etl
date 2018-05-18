@@ -1,25 +1,31 @@
 # Ethereum ETL
 
+One-liner for blocks and transactions:
+
+```bash
+> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
+--ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv --transactions-output=transactions.csv
+```
+
 One-liner for blocks:
 
 ```bash
-> python gen_blocks_rpc.py --end-block=1000 | \
-python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc | \
-python extract_blocks.py > blocks.csv
-```
-
-One-liner for transactions:
-
-```bash
-> python gen_blocks_rpc.py --end-block=1000 | \
-python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc | \
-python extract_transactions.py > transactions.csv
+> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
+--ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv
 ```
 
 One-liner for ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc > erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
+--output=erc20_transfers.csv
+```
+
+One-liner for ERC20 transfers, filtered for list of tokens:
+
+```bash
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
+--output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -80,7 +86,9 @@ erc20_block_number  | bigint      |
 If you want to export just a few thousand blocks and don't want to sync your own node 
 refer to https://github.com/medvedev1088/ethereum-scraper.
 
-Parity is not supported for now https://github.com/medvedev1088/ethereum-etl/issues/2
+Install python 3 https://conda.io/miniconda.html
+
+Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
 Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
@@ -90,7 +98,7 @@ there is no need to wait until the full sync as the state is not needed.
 Install all dependencies:
 
 ```bash
-> pip install typing future argparse six web3
+> pip install -r requirements.txt
 ```
 
 Run in the terminal:
@@ -101,38 +109,54 @@ Usage: ./export_all.sh [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i
 > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
 ```
 
+Should work with geth and parity, on Linux, Mac, Windows. 
+Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
+
+#### Windows
+
+Install Visual C++ Build Tools https://landinghub.visualstudio.com/visual-cpp-build-tools
+
+Install Git for Windows with Git Bash
+
+Run in Git Bash:
+
+```bash
+>  ./export_all.sh -s 0 -e 9999 -b 10000 -i '\\.\pipe\geth.ipc' -o output 
+```
+
 #### Commands
-Generate JSON RPC calls for exporting blocks and transactions for specified block range:
+
+Export blocks and transactions:
 
 ```bash
-> python gen_blocks_rpc.py --start-block=0 --end-block=1000 --output=blocks_rpc.json
+> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
+--ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv --transactions-output=transactions.csv
 ```
 
-Call JSON RPC via IPC for exporting blocks and transactions:
+Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-```bash
-> python exchange_with_ipc.py --ipc-path=$HOME/Library/Ethereum/geth.ipc --input=blocks_rpc.json --output=blocks_rpc_output.json
-```
-
-Extract blocks from JSON RPC response:
-
-```bash
-> python extract_blocks.py --input blocks_rpc_output.json --output blocks.csv
-```
-
-Extract transactions from JSON RPC response:
-
-```bash
-> python extract_transactions.py --input blocks_rpc_output.json --output transactions.csv
-```
+If you run geth on a unix-based OS try using `--strategy=unix-geth`, it will work around 2 times faster 
+due to the way IPC interaction is handled.
 
 Export ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc --batch-size=100 > erc20_transfers.csv
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 \
+--ipc-path=$HOME/Library/Ethereum/geth.ipc --batch-size=100 --output=erc20_transfers.csv
 ```
- 
-Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
+
+Include `--tokens=<comma_separated_list_of_token_address>` to filter only certain tokens, e.g.
+
+```bash
+> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
+--output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
+```
+
+### Running Tests
+
+```bash
+> pytest
+```
 
 ### Uploading to S3
 
@@ -262,11 +286,12 @@ MSCK REPAIR TABLE transactions;
 MSCK REPAIR TABLE erc20_transfers;
 ```
 
+Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
+so some ERC20 values will be null.
+
 ### TODOs
 
 1. Unit tests
-1. Send batch requests http://www.jsonrpc.org/specification#batch. 
-1. Support Parity
 1. Add HTTPProvider
 1. Error handling and logging
 

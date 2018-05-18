@@ -6,6 +6,17 @@ BUFFER_SIZE = 65536  # 64 KiB
 ENCODING = 'utf-8'
 
 
+class UnixGethIPCWrapper:
+    _socket = None
+
+    def __init__(self, ipc_path, timeout=10):
+        self.ipc_path = ipc_path
+        self.timeout = timeout
+
+    def make_request(self, text):
+        return socket_exchange(self.ipc_path, text, self.timeout)
+
+
 def socket_exchange(socket_path, request, timeout_seconds=10):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
@@ -19,15 +30,17 @@ def socket_exchange(socket_path, request, timeout_seconds=10):
     return response.decode(ENCODING)
 
 
-def socket_exchange_with_retries(socket_path, inp, max_retries=10, timeout_seconds=5):
-    retry_count = 0
-    while True:
-        try:
-            return socket_exchange(socket_path, inp, timeout_seconds)
-        except SocketTimeoutException as e:
-            retry_count += 1
-            if retry_count > max_retries:
-                raise e
+def socket_exchange_geth_unix(socket_path, request, timeout_seconds=10):
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
+    try:
+        sock.connect(socket_path)
+        sock.sendall(request.encode(ENCODING))
+        sock.shutdown(socket.SHUT_WR)
+        response = recv_all(sock, timeout_seconds)
+    finally:
+        sock.close()
+    return response.decode(ENCODING)
 
 
 # https://www.binarytides.com/receive-full-data-with-the-recv-socket-function-in-python/

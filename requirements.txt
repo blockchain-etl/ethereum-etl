@@ -1,0 +1,4 @@
+web3>=4.2.0
+typing
+pytest==3.2.5
+pytest-mock==1.*

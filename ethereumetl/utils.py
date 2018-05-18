@@ -1,29 +1,3 @@
-import sys
-import contextlib
-import os
-
-
-# https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
-import eth_utils
-
-
-@contextlib.contextmanager
-def smart_open(filename=None, mode='w', binary=False):
-    is_file = filename and filename != '-'
-    full_mode = mode + ('b' if binary else '')
-    if is_file:
-        fh = open(filename, full_mode)
-    else:
-        fd = sys.stdout.fileno() if mode == 'w' else sys.stdin.fileno()
-        fh = os.fdopen(fd, full_mode)
-
-    try:
-        yield fh
-    finally:
-        if is_file:
-            fh.close()
-
-
 def hex_to_dec(hex_string):
     if hex_string is None:
         return None
@@ -52,7 +26,25 @@ def batch_readlines(file, batch_size):
         yield batch
 
 
-def to_checksum_address(address):
-    if address is None:
-        return None
-    return eth_utils.to_checksum_address(address)
+def to_normalized_address(address):
+    if address is None or not isinstance(address, str):
+        return address
+    return address.lower()
+
+
+def batch_iterator(iterator, batch_size):
+    current_batch = []
+    for item in iterator:
+        current_batch.append(item)
+        if len(current_batch) == batch_size:
+            yield current_batch
+            current_batch = []
+
+    if len(current_batch) != 0:
+        yield current_batch
+
+
+def split_to_batches(start, end, batch_size):
+    for batch_start in range(start, end + 1, batch_size):
+        batch_end = min(batch_start + batch_size - 1, end)
+        yield batch_start, batch_end
