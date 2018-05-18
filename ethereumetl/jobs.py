@@ -118,12 +118,14 @@ class ExportErc20TransfersJob(BaseJob):
                  end_block,
                  batch_size,
                  web3,
-                 output):
+                 output,
+                 tokens=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
         self.web3 = web3
         self.output = output
+        self.tokens = tokens
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.erc20_transfer_mapper = EthErc20TransferMapper()
@@ -146,14 +148,17 @@ class ExportErc20TransfersJob(BaseJob):
                     self._export_batch(block_number, block_number)
 
     def _export_batch(self, batch_start, batch_end):
-        event_filter = self.web3.eth.filter({
-            "fromBlock": batch_start,
-            "toBlock": batch_end,
-            "topics": [TRANSFER_EVENT_TOPIC]
-        })
+        filter_params = {
+            'fromBlock': batch_start,
+            'toBlock': batch_end,
+            'topics': [TRANSFER_EVENT_TOPIC]
+        }
 
+        if self.tokens is not None and len(self.tokens) > 0:
+            filter_params["address"] = self.tokens
+
+        event_filter = self.web3.eth.filter(filter_params)
         events = event_filter.get_all_entries()
-
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_transaction_receipt_log(event)
             erc20_transfer = self.erc20_processor.filter_transfer_from_log(log)
