@@ -13,6 +13,7 @@ except ImportError:
     JSONDecodeError = ValueError
 
 
+# Mostly copied from web3/providers/ipc.py. Supports batch requests.
 class IPCWrapper:
     _socket = None
 

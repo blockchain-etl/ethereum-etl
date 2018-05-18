@@ -5,7 +5,9 @@ import time
 BUFFER_SIZE = 65536  # 64 KiB
 ENCODING = 'utf-8'
 
-
+# Only works on Unix with geth. Sends a new-line delimited JSON RPC request batch, shuts down
+# the socket and reads the response until it gets an empty string from the other side.
+# Doesn't work in Parity as it interleaves responses with each other. On Windows shutdown is not supported.
 class UnixGethIPCWrapper:
     _socket = None
 
