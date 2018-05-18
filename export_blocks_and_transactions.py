@@ -11,9 +11,9 @@ parser.add_argument('--batch-size', default=100, type=int, help='The number of b
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc socket file.')
 parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
 parser.add_argument('--blocks-output', default=None, type=str,
-                    help='The output file for blocks. If not provided blocks will not be exported.')
+                    help='The output file for blocks. If not provided blocks will not be exported. - for stdout')
 parser.add_argument('--transactions-output', default=None, type=str,
-                    help='The output file for transactions. If not provided transactions will not be exported.')
+                    help='The output file for transactions. If not provided transactions will not be exported. - for stdout')
 parser.add_argument('--strategy', default='default', type=str, choices=['default', 'unix-geth'],
                     help='Can be either default or unix-geth. unix-geth works about 2 times faster.')
 

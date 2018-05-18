@@ -32,6 +32,7 @@ class BaseJob(object):
         pass
 
 
+# Exports blocks and transactions
 class ExportBlocksJob(BaseJob):
     def __init__(self,
                  start_block,
