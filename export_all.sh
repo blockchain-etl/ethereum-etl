@@ -13,8 +13,8 @@ quit_on_error() {
     ret_val=$?
     if [ ${ret_val} -ne 0 ]; then
         log "An error occurred. Quitting."
+        exit ${ret_val}
     fi
-    exit ${ret_val}
 }
 
 usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]" 1>&2; exit 1; }
