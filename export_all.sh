@@ -47,7 +47,7 @@ if [ -z "${start_block}" ] || [ -z "${end_block}" ] || [ -z "${batch_size}" ] ||
     usage
 fi
 
-for (( batch_start_block=$start_block; (batch_start_block + batch_size - 1) <= $end_block; batch_start_block+=$batch_size )); do
+for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_start_block+=$batch_size )); do
     start_time=$(date +%s)
     batch_end_block=$((batch_start_block + batch_size - 1))
     batch_end_block=$((batch_end_block > end_block ? end_block : batch_end_block))
