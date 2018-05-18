@@ -14,7 +14,25 @@ from ethereumetl.socket_utils import SocketTimeoutException
 from ethereumetl.utils import split_to_batches
 
 
-class ExportBlocksJob(object):
+class BaseJob(object):
+    def run(self):
+        try:
+            self._start()
+            self._export()
+        finally:
+            self._end()
+
+    def _start(self):
+        pass
+
+    def _export(self):
+        pass
+
+    def _end(self):
+        pass
+
+
+class ExportBlocksJob(BaseJob):
     def __init__(self,
                  start_block,
                  end_block,
@@ -42,13 +60,6 @@ class ExportBlocksJob(object):
 
         self.blocks_exporter = None
         self.transactions_exporter = None
-
-    def run(self):
-        try:
-            self._start()
-            self._export()
-        finally:
-            self._end()
 
     def _start(self):
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
@@ -88,11 +99,12 @@ class ExportBlocksJob(object):
             self.transactions_output_file.close()
 
 
-# Only works on Unix with geth
+# Only works on Unix with geth, about 2 times faster
 class UnixGethExportBlocksJob(ExportBlocksJob):
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        response = self.ipc_wrapper.make_request('\n'.join(json.dumps(b) for b in blocks_rpc))
+        serialized_blocks_rpc = [json.dumps(b) for b in blocks_rpc]
+        response = self.ipc_wrapper.make_request('\n'.join(serialized_blocks_rpc))
         for item in response.splitlines():
             decoded_item = json.loads(item)
             result = decoded_item['result']
@@ -100,7 +112,7 @@ class UnixGethExportBlocksJob(ExportBlocksJob):
             self._export_block(block)
 
 
-class ExportErc20TransfersJob(object):
+class ExportErc20TransfersJob(BaseJob):
     def __init__(self,
                  start_block,
                  end_block,
@@ -119,13 +131,6 @@ class ExportErc20TransfersJob(object):
 
         self.output_file = None
         self.exporter = None
-
-    def run(self):
-        try:
-            self._start()
-            self._export()
-        finally:
-            self._end()
 
     def _start(self):
         self.output_file = get_file_handle(self.output, binary=True)

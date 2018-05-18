@@ -15,7 +15,7 @@ parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not provided blocks will not be exported.')
 parser.add_argument('--transactions-output', default=None, type=str,
                     help='The output file for transactions. If not provided transactions will not be exported.')
-parser.add_argument('--strategy', default='default', type=str,
+parser.add_argument('--strategy', default='default', type=str, choices=['default', 'unix-geth'],
                     help='Can be either default or unix-geth. unix-geth works about 2 times faster.')
 
 args = parser.parse_args()
