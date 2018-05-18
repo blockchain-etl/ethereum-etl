@@ -25,7 +25,7 @@ One-liner for ERC20 transfers, filtered for list of tokens:
 
 ```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
---output=erc20_transfers.csv --tokens=0x86Fa049857E0209aa7D9e616F7eb3b3B78ECfdb0,0x06012c8cf97BEaD5deAe237070F9587f8E7A266d
+--output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -149,7 +149,7 @@ Include `--tokens=<comma_separated_list_of_token_address>` to filter only certai
 
 ```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
---output=erc20_transfers.csv --tokens=0x86Fa049857E0209aa7D9e616F7eb3b3B78ECfdb0,0x06012c8cf97BEaD5deAe237070F9587f8E7A266d
+--output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 ### Running Tests
