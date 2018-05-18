@@ -44,3 +44,7 @@ def batch_iterator(iterator, batch_size):
         yield current_batch
 
 
+def split_to_batches(start, end, batch_size):
+    for batch_start in range(start, end + 1, batch_size):
+        batch_end = min(batch_start + batch_size - 1, end)
+        yield batch_start, batch_end

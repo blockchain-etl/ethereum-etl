@@ -1,6 +1,7 @@
 import argparse
 
-from ethereumetl.service.etl_service import EthEtlService
+from ethereumetl.ipc import BatchIPCProvider
+from ethereumetl.jobs import ExportBlocksJob
 
 parser = argparse.ArgumentParser(
     description='Exports blocks and transactions.')
@@ -16,12 +17,11 @@ parser.add_argument('--transactions-output', default=None, type=str,
 
 args = parser.parse_args()
 
-etl_service = EthEtlService()
+job = ExportBlocksJob(start_block=args.start_block,
+                      end_block=args.end_block,
+                      batch_size=args.batch_size,
+                      batch_ipc_provider=BatchIPCProvider(args.ipc_path, args.ipc_timeout),
+                      blocks_output=args.blocks_output,
+                      transactions_output=args.transactions_output)
 
-etl_service.export_blocks(start_block=args.start_block,
-                          end_block=args.end_block,
-                          batch_size=args.batch_size,
-                          ipc_path=args.ipc_path,
-                          ipc_timeout=args.ipc_timeout,
-                          blocks_output=args.blocks_output,
-                          transactions_output=args.transactions_output)
+job.run()
