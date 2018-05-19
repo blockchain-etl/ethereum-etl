@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import argparse
 
 from web3 import IPCProvider, Web3
