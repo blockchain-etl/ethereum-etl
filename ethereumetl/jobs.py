@@ -8,7 +8,7 @@ from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
 from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
-from ethereumetl.mapper.transaction_receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
 from ethereumetl.socket_utils import SocketTimeoutException
 from ethereumetl.utils import split_to_batches

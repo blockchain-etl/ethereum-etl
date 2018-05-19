@@ -137,7 +137,7 @@ Additional steps:
 
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-If you run geth on a unix-based OS try using `--strategy=unix-geth`, it will work around 2 times faster 
+If you run geth on a unix-based OS try using `--strategy=unix-geth`, it will export the data ~2 times faster 
 due to the way IPC interaction is handled.
 
 - Export ERC20 transfers:
