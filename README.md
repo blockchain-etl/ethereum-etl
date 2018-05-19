@@ -86,47 +86,49 @@ erc20_block_number  | bigint      |
 If you want to export just a few thousand blocks and don't want to sync your own node 
 refer to https://github.com/medvedev1088/ethereum-scraper.
 
-Install python 3 https://conda.io/miniconda.html
+1. Install python 3.6 https://conda.io/miniconda.html
 
-Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
+1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
-Start geth. 
+1. Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
 You can export blocks below `currentBlock`, 
 there is no need to wait until the full sync as the state is not needed.
 
-Install all dependencies:
+1. Install all dependencies:
 
-```bash
-> pip install -r requirements.txt
-```
+    ```bash
+    > pip install -r requirements.txt
+    ```
 
-Run in the terminal:
+1. Run in the terminal:
 
-```bash
-> ./export_all.sh -h
-Usage: ./export_all.sh [-s <start_block>] [-e <end_block>] [-b <batch_size>] [-i <ipc_path>] [-o <output_dir>]
-> ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
-```
+    ```bash
+    > ./export_all.sh -h
+    Usage: ./export_all.sh -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]
+    > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
+    ```
 
 Should work with geth and parity, on Linux, Mac, Windows. 
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
 #### Windows
 
-Install Visual C++ Build Tools https://landinghub.visualstudio.com/visual-cpp-build-tools
+Additional steps:
 
-Install Git for Windows with Git Bash
+1. Install Visual C++ Build Tools https://landinghub.visualstudio.com/visual-cpp-build-tools
 
-Run in Git Bash:
+1. Install Git Bash with  Git for Windows https://git-scm.com/download/win
 
-```bash
->  ./export_all.sh -s 0 -e 9999 -b 10000 -i '\\.\pipe\geth.ipc' -o output 
-```
+1. Run in Git Bash:
+
+    ```bash
+    >  ./export_all.sh -s 0 -e 999999 -b 100000 -i '\\.\pipe\geth.ipc' -o output 
+    ```
 
 #### Commands
 
-Export blocks and transactions:
+- Export blocks and transactions:
 
 ```bash
 > python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
@@ -138,7 +140,7 @@ Omit `--blocks-output` or `--transactions-output` options if you don't want to e
 If you run geth on a unix-based OS try using `--strategy=unix-geth`, it will work around 2 times faster 
 due to the way IPC interaction is handled.
 
-Export ERC20 transfers:
+- Export ERC20 transfers:
 
 ```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 \
