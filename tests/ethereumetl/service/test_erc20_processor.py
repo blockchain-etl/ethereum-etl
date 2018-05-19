@@ -1,9 +1,6 @@
 from ethereumetl.domain.transaction_receipt_log import EthReceiptLog
 from ethereumetl.service.erc20_processor import EthErc20Processor
 
-# https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
-TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-
 erc20_processor = EthErc20Processor()
 
 

@@ -14,6 +14,7 @@ except ImportError:
 
 
 # Mostly copied from web3/providers/ipc.py. Supports batch requests.
+# Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
 class IPCWrapper:
     _socket = None
 
