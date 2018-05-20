@@ -1,27 +1,20 @@
 # Ethereum ETL
 
-One-liner for blocks and transactions:
+Export blocks and transactions:
 
 ```bash
 > python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
 --ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv --transactions-output=transactions.csv
 ```
 
-One-liner for blocks:
-
-```bash
-> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
---ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv
-```
-
-One-liner for ERC20 transfers:
+Export ERC20 transfers:
 
 ```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
 --output=erc20_transfers.csv
 ```
 
-One-liner for ERC20 transfers, filtered for list of tokens:
+Export ERC20 transfers, filtered for the list of tokens:
 
 ```bash
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \

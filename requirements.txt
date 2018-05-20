@@ -1,4 +1,4 @@
-web3~=4.2.0
+web3~=4.2.1
 typing
 pytest~=3.2.0
 pytest-mock~=1.10.0
