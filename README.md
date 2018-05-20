@@ -88,18 +88,32 @@ Make sure it downloaded the blocks that you need by executing `eth.synching` in 
 You can export blocks below `currentBlock`, 
 there is no need to wait until the full sync as the state is not needed.
 
-1. Install all dependencies:
+1. Clone Ethereum ETL and install the dependencies:
 
     ```bash
+    > git clone https://github.com/medvedev1088/ethereum-etl.git
+    > cd ethereum-etl
     > pip install -r requirements.txt
     ```
 
-1. Run in the terminal:
+1. Export all:
 
     ```bash
     > ./export_all.sh -h
     Usage: ./export_all.sh -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]
     > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
+    ```
+    
+    The result will be in the `output` subdirectory, partitioned in Hive style:
+   
+    ```bash
+    output/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
+    output/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
+    ...
+    output/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
+    ...
+    output/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
+    ...
     ```
 
 Should work with geth and parity, on Linux, Mac, Windows. 
