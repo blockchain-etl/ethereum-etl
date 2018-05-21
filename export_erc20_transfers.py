@@ -3,7 +3,7 @@ import argparse
 
 from web3 import IPCProvider, Web3
 
-from ethereumetl.jobs import ExportErc20TransfersJob
+from ethereumetl.job.export_erc20_transfers_job import ExportErc20TransfersJob
 
 parser = argparse.ArgumentParser(
     description='Exports ERC20 transfers using eth_newFilter and eth_getFilterLogs JSON RPC APIs.')

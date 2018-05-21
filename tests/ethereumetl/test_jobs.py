@@ -1,7 +1,7 @@
-from ethereumetl.jobs import ExportBlocksJob
-
-
 # TODO: Read from file
+from ethereumetl.job.export_blocks_job import ExportBlocksJob
+
+
 class MockIPCWrapper(object):
     def make_request(self, text):
         return [{

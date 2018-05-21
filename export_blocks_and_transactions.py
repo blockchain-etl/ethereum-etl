@@ -2,7 +2,7 @@
 import argparse
 
 from ethereumetl.ipc import IPCWrapper
-from ethereumetl.jobs import ExportBlocksJob
+from ethereumetl.job.export_blocks_job import ExportBlocksJob
 
 parser = argparse.ArgumentParser(description='Export blocks and transactions.')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
