@@ -10,7 +10,7 @@ from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
-from ethereumetl.socket_utils import SocketTimeoutException
+from ethereumetl.unix_geth_ipc import SocketTimeoutException
 from ethereumetl.utils import split_to_batches
 
 

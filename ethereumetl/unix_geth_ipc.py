@@ -5,6 +5,7 @@ import time
 BUFFER_SIZE = 65536  # 64 KiB
 ENCODING = 'utf-8'
 
+
 # Only works on Unix with geth. Sends a new-line delimited JSON RPC request batch, shuts down
 # the socket and reads the response until it gets an empty string from the other side.
 # Doesn't work in Parity as it interleaves responses with each other. On Windows shutdown is not supported.
@@ -20,19 +21,6 @@ class UnixGethIPCWrapper:
 
 
 def socket_exchange(socket_path, request, timeout_seconds=10):
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-
-    try:
-        sock.connect(socket_path)
-        sock.sendall(request.encode(ENCODING))
-        sock.shutdown(socket.SHUT_WR)
-        response = recv_all(sock, timeout_seconds)
-    finally:
-        sock.close()
-    return response.decode(ENCODING)
-
-
-def socket_exchange_geth_unix(socket_path, request, timeout_seconds=10):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
     try:
