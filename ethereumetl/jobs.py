@@ -10,7 +10,7 @@ from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
-from ethereumetl.unix_geth_ipc import SocketTimeoutException
+from ethereumetl.unix_geth_ipc import SocketTimeoutError
 from ethereumetl.utils import split_to_batches
 
 
@@ -74,7 +74,7 @@ class ExportBlocksJob(BaseJob):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except (Timeout, SocketTimeoutException):
+            except (Timeout, SocketTimeoutError):
                 # try exporting blocks one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)
@@ -145,7 +145,7 @@ class ExportErc20TransfersJob(BaseJob):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except (Timeout, SocketTimeoutException):
+            except (Timeout, SocketTimeoutError):
                 # try exporting one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)

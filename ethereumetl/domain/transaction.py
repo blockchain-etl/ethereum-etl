@@ -1,12 +1,13 @@
 class EthTransaction(object):
-    hash = None
-    nonce = None
-    block_hash = None
-    block_number = None
-    index = None
-    from_address = None
-    to_address = None
-    value = None
-    gas = None
-    gas_price = None
-    input = None
+    def __init__(self):
+        self.hash = None
+        self.nonce = None
+        self.block_hash = None
+        self.block_number = None
+        self.index = None
+        self.from_address = None
+        self.to_address = None
+        self.value = None
+        self.gas = None
+        self.gas_price = None
+        self.input = None

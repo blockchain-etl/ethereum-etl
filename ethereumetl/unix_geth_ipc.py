@@ -39,7 +39,7 @@ def recv_all(sock, timeout=10):
     start_time = time.time()
     while True:
         if time.time() - start_time > timeout:
-            raise SocketTimeoutException('Timeout while receiving data from socket')
+            raise SocketTimeoutError('Timeout while receiving data from socket')
 
         part = sock.recv(BUFFER_SIZE)
 
@@ -54,5 +54,5 @@ def recv_all(sock, timeout=10):
     return data
 
 
-class SocketTimeoutException(Exception):
+class SocketTimeoutError(Exception):
     pass
