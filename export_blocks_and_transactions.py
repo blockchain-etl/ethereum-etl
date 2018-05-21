@@ -32,7 +32,4 @@ job = ExportBlocksJob(
     blocks_output=args.blocks_output,
     transactions_output=args.transactions_output)
 
-start = time.time()
 job.run()
-end = time.time()
-print('Export blocks and transactions running time is {} seconds'.format(end - start))
