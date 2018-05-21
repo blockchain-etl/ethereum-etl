@@ -1,16 +1,17 @@
 import json
+import threading
 
 from web3.utils.threads import Timeout
 
+from ethereumetl.boundedexecutor import BoundedExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
 from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
-from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
-from ethereumetl.unix_geth_ipc import SocketTimeoutError
 from ethereumetl.utils import split_to_batches
 
 
@@ -39,13 +40,17 @@ class ExportBlocksJob(BaseJob):
             start_block,
             end_block,
             batch_size,
-            ipc_wrapper,
+            ipc_wrapper_factory,
+            max_workers=5,
+            max_workers_queue=5,
             blocks_output=None,
             transactions_output=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
-        self.ipc_wrapper = ipc_wrapper
+        self.ipc_wrapper_factory = ipc_wrapper_factory
+        self.max_workers = max_workers
+        self.max_workers_queue = max_workers_queue
         self.blocks_output = blocks_output
         self.transactions_output = transactions_output
 
@@ -63,7 +68,13 @@ class ExportBlocksJob(BaseJob):
         self.blocks_exporter = None
         self.transactions_exporter = None
 
+        self.executor = None
+        self.thread_local = threading.local()
+        self.futures = []
+
     def _start(self):
+        self.executor = BoundedExecutor(self.max_workers_queue, self.max_workers)
+
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
         self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
 
@@ -72,20 +83,40 @@ class ExportBlocksJob(BaseJob):
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            try:
-                self._export_batch(batch_start, batch_end)
-            except (Timeout, SocketTimeoutError):
-                # try exporting blocks one by one
-                for block_number in range(batch_start, batch_end + 1):
-                    self._export_batch(block_number, block_number)
+            def work():
+                self._export_batch_with_retries(batch_start, batch_end)
+
+            future = self.executor.submit(work)
+            self.futures.append(future)
+            self._check_completed_futures()
+
+    def _export_batch_with_retries(self, batch_start, batch_end):
+        try:
+            self._export_batch(batch_start, batch_end)
+        except Timeout:
+            # try exporting blocks one by one
+            for block_number in range(batch_start, batch_end + 1):
+                self._export_batch(block_number, block_number)
 
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        response = self.ipc_wrapper.make_request(json.dumps(blocks_rpc))
+        response = self._get_ipc_wrapper().make_request(json.dumps(blocks_rpc))
         for response_item in response:
             result = response_item['result']
             block = self.block_mapper.json_dict_to_block(result)
             self._export_block(block)
+
+    def _get_ipc_wrapper(self):
+        if getattr(self.thread_local, 'ipc_wrapper', None) is None:
+            self.thread_local.ipc_wrapper = self.ipc_wrapper_factory()
+        return self.thread_local.ipc_wrapper
+
+    def _check_completed_futures(self):
+        for future in self.futures.copy():
+            if future.done():
+                # Will throw an exception here if the future failed
+                future.result()
+                self.futures.remove(future)
 
     def _export_block(self, block):
         if self.export_blocks:
@@ -95,23 +126,11 @@ class ExportBlocksJob(BaseJob):
                 self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
 
     def _end(self):
+        self.executor.shutdown(wait=True)
+        self._check_completed_futures()
+        assert len(self.futures) == 0
         close_silently(self.blocks_output_file)
         close_silently(self.transactions_output_file)
-
-
-# Only works on Unix with geth, about 2 times faster. Sends a new-line delimited JSON RPC request batch, shuts down
-# the socket and reads the response until it gets an empty string from the other side.
-# Doesn't work in Parity as it interleaves responses with each other. On Windows shutdown is not supported.
-class UnixGethOptimizedExportBlocksJob(ExportBlocksJob):
-    def _export_batch(self, batch_start, batch_end):
-        blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        serialized_blocks_rpc = [json.dumps(block_rpc) for block_rpc in blocks_rpc]
-        response = self.ipc_wrapper.make_request('\n'.join(serialized_blocks_rpc))
-        for item in response.splitlines():
-            decoded_item = json.loads(item)
-            result = decoded_item['result']
-            block = self.block_mapper.json_dict_to_block(result)
-            self._export_block(block)
 
 
 class ExportErc20TransfersJob(BaseJob):
@@ -145,7 +164,7 @@ class ExportErc20TransfersJob(BaseJob):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except (Timeout, SocketTimeoutError):
+            except Timeout:
                 # try exporting one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)

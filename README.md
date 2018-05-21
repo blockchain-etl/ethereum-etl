@@ -146,8 +146,8 @@ Additional steps:
 
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-If you run geth on a unix-based OS try using `--strategy=unix-geth`, it will export the data ~2 times faster 
-due to the way IPC interaction is handled.
+You can tune `--batch-size`, `--max-workers`, `--max-workers-queue`, `--ipc-timeout` for performance.
+Call `> python export_blocks_and_transactions.py -h` for more details. 
 
 - Export ERC20 transfers:
 
@@ -162,6 +162,9 @@ Include `--tokens=<comma_separated_list_of_token_address>` to filter only certai
 > python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
 --output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
+
+You can tune `--batch-size`, `--ipc-timeout` for performance.
+Call `> python export_erc20_transfers.py -h` for more details. 
 
 ### Running Tests
 
@@ -316,6 +319,5 @@ I'm currently working on a SaaS solution for analysts and developers:
 - Support for internal transactions in the future
 - Support for API access in the future
 - Support for Bitcoin and other blockchains in the future
-- Users pay per query
 
-Contact me if you would like to join evge.medvedev@gmail.com
+Contact me if you would like to contribute evge.medvedev@gmail.com
