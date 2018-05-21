@@ -3,7 +3,7 @@ import json
 from web3.utils.threads import Timeout
 
 from ethereumetl.exporters import CsvItemExporter
-from ethereumetl.file_utils import get_file_handle
+from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
 from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
@@ -95,10 +95,8 @@ class ExportBlocksJob(BaseJob):
                 self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
 
     def _end(self):
-        if self.blocks_output_file is not None:
-            self.blocks_output_file.close()
-        if self.transactions_output_file is not None:
-            self.transactions_output_file.close()
+        close_silently(self.blocks_output_file)
+        close_silently(self.transactions_output_file)
 
 
 # Only works on Unix with geth, about 2 times faster. Sends a new-line delimited JSON RPC request batch, shuts down
@@ -173,5 +171,4 @@ class ExportErc20TransfersJob(BaseJob):
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
-        if self.output_file is not None:
-            self.output_file.close()
+        close_silently(self.output_file)

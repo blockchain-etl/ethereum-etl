@@ -27,6 +27,15 @@ def get_file_handle(filename, mode='w', binary=False):
     return fh
 
 
+def close_silently(file_handle):
+    if file_handle is None:
+        pass
+    try:
+        file_handle.close()
+    except OSError:
+        pass
+
+
 class NoopFile:
     def readable(self):
         pass
