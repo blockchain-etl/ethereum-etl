@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import time
 
 from ethereumetl.ipc import IPCWrapper
 from ethereumetl.jobs import ExportBlocksJob
