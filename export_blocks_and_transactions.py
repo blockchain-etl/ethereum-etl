@@ -11,7 +11,7 @@ parser.add_argument('-b', '--batch-size', default=100, type=int, help='The numbe
 parser.add_argument('-i', '--ipc-path', required=True, type=str, help='The full path to the ipc file.')
 parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
 parser.add_argument('--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('--max-workers-queue', default=5, type=int, help='The maximum number of workers waiting in queue.')
+parser.add_argument('--max-queue', default=5, type=int, help='The maximum number of tasks waiting in the queue.')
 parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not provided blocks will not be exported. '
                          'Use "-" for stdout')
@@ -27,7 +27,7 @@ job = ExportBlocksJob(
     batch_size=args.batch_size,
     ipc_wrapper_factory=lambda: IPCWrapper(args.ipc_path, args.ipc_timeout),
     max_workers=args.max_workers,
-    max_workers_queue=args.max_workers_queue,
+    max_queue=args.max_queue,
     blocks_output=args.blocks_output,
     transactions_output=args.transactions_output)
 
