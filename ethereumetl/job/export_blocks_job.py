@@ -53,6 +53,8 @@ class ExportBlocksJob(BaseJob):
         self.futures = []
 
     def _start(self):
+        # Using bounded executor prevents unlimited queue growth
+        # and allows monitoring in-progress futures and failing fast in case of error.
         self.executor = BoundedExecutor(self.max_workers_queue, self.max_workers)
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
@@ -73,7 +75,7 @@ class ExportBlocksJob(BaseJob):
     def _export_batch_with_retries(self, batch_start, batch_end):
         try:
             self._export_batch(batch_start, batch_end)
-        except Timeout:
+        except (Timeout, OSError):
             # try exporting blocks one by one
             for block_number in range(batch_start, batch_end + 1):
                 self._export_batch(block_number, block_number)

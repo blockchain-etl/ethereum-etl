@@ -306,6 +306,7 @@ so some ERC20 values will be null.
 ### TODOs
 
 1. Unit tests
+1. Rewrite export_all.sh in python
 1. Add HTTPProvider
 1. Error handling and logging
 

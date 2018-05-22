@@ -40,7 +40,7 @@ class ExportErc20TransfersJob(BaseJob):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
             try:
                 self._export_batch(batch_start, batch_end)
-            except Timeout:
+            except (Timeout, OSError):
                 # try exporting one by one
                 for block_number in range(batch_start, batch_end + 1):
                     self._export_batch(block_number, block_number)
