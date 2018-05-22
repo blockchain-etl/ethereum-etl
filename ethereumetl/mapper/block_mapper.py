@@ -4,7 +4,12 @@ from ethereumetl.utils import hex_to_dec
 
 
 class EthBlockMapper(object):
-    transaction_mapper = EthTransactionMapper()
+
+    def __init__(self, transaction_mapper: EthTransactionMapper = None):
+        if transaction_mapper is None:
+            self.transaction_mapper = EthTransactionMapper()
+        else:
+            self.transaction_mapper = transaction_mapper
 
     def json_dict_to_block(self, json_dict) -> EthBlock:
         block = EthBlock()
