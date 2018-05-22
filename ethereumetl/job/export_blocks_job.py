@@ -65,10 +65,7 @@ class ExportBlocksJob(BaseJob):
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            def work():
-                self._export_batch_with_retries(batch_start, batch_end)
-
-            future = self.executor.submit(work)
+            future = self.executor.submit(self._export_batch_with_retries, batch_start, batch_end)
             self.futures.append(future)
             self._check_completed_futures()
 
