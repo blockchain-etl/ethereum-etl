@@ -7,22 +7,22 @@
 Export blocks and transactions:
 
 ```bash
-> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
---ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv --transactions-output=transactions.csv
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Export ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
---output=erc20_transfers.csv
+> python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
+--output erc20_transfers.csv
 ```
 
 Export ERC20 transfers, filtered for the list of tokens:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
---output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
+> python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
+--output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -142,27 +142,27 @@ Additional steps:
 - Export blocks and transactions:
 
 ```bash
-> python export_blocks_and_transactions.py --start-block=0 --end-block=500000 \
---ipc-path=$HOME/Library/Ethereum/geth.ipc --blocks-output=blocks.csv --transactions-output=transactions.csv
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-You can tune `--batch-size`, `--max-workers`, `--max-workers-queue`, `--ipc-timeout` for performance.
+You can tune `--batch-size`, `--max-workers`, `--max-queue`, `--ipc-timeout` for performance.
 Call `> python export_blocks_and_transactions.py -h` for more details. 
 
 - Export ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 \
---ipc-path=$HOME/Library/Ethereum/geth.ipc --batch-size=100 --output=erc20_transfers.csv
+> python export_erc20_transfers.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --batch-size 100 --output erc20_transfers.csv
 ```
 
-Include `--tokens=<comma_separated_list_of_token_address>` to filter only certain tokens, e.g.
+Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 
 ```bash
-> python export_erc20_transfers.py --start-block=0 --end-block=500000 --ipc-path=$HOME/Library/Ethereum/geth.ipc \
---output=erc20_transfers.csv --tokens=0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0,0x06012c8cf97bead5deae237070f9587f8e7a266d
+> python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
+--output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 You can tune `--batch-size`, `--ipc-timeout` for performance.

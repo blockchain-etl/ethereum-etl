@@ -1,9 +1,8 @@
 import json
-import threading
 
 from web3.utils.threads import Timeout
 
-from ethereumetl.boundedexecutor import BoundedExecutor
+from ethereumetl.bounded_executor import BoundedExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.job.base_job import BaseJob
@@ -20,17 +19,17 @@ class ExportBlocksJob(BaseJob):
             start_block,
             end_block,
             batch_size,
-            ipc_wrapper_factory,
+            ipc_wrapper,
             max_workers=5,
-            max_workers_queue=5,
+            max_queue=5,
             blocks_output=None,
             transactions_output=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
-        self.ipc_wrapper_factory = ipc_wrapper_factory
+        self.ipc_wrapper = ipc_wrapper
         self.max_workers = max_workers
-        self.max_workers_queue = max_workers_queue
+        self.max_queue = max_queue
         self.blocks_output = blocks_output
         self.transactions_output = transactions_output
 
@@ -49,13 +48,12 @@ class ExportBlocksJob(BaseJob):
         self.transactions_exporter = None
 
         self.executor = None
-        self.thread_local = threading.local()
         self.futures = []
 
     def _start(self):
         # Using bounded executor prevents unlimited queue growth
-        # and allows monitoring in-progress futures and failing fast in case of error.
-        self.executor = BoundedExecutor(self.max_workers_queue, self.max_workers)
+        # and allows monitoring in-progress futures and failing fast in case of errors.
+        self.executor = BoundedExecutor(self.max_queue, self.max_workers)
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
         self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
@@ -65,10 +63,7 @@ class ExportBlocksJob(BaseJob):
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            def work():
-                self._export_batch_with_retries(batch_start, batch_end)
-
-            future = self.executor.submit(work)
+            future = self.executor.submit(self._export_batch_with_retries, batch_start, batch_end)
             self.futures.append(future)
             self._check_completed_futures()
 
@@ -82,16 +77,11 @@ class ExportBlocksJob(BaseJob):
 
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        response = self._get_ipc_wrapper().make_request(json.dumps(blocks_rpc))
+        response = self.ipc_wrapper.make_request(json.dumps(blocks_rpc))
         for response_item in response:
             result = response_item['result']
             block = self.block_mapper.json_dict_to_block(result)
             self._export_block(block)
-
-    def _get_ipc_wrapper(self):
-        if getattr(self.thread_local, 'ipc_wrapper', None) is None:
-            self.thread_local.ipc_wrapper = self.ipc_wrapper_factory()
-        return self.thread_local.ipc_wrapper
 
     def _check_completed_futures(self):
         for future in self.futures.copy():

@@ -4,16 +4,6 @@ import os
 
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
-@contextlib.contextmanager
-def smart_open(filename=None, mode='w', binary=False):
-    fh = get_file_handle(filename, mode, binary)
-
-    try:
-        yield fh
-    finally:
-        fh.close()
-
-
 def get_file_handle(filename, mode='w', binary=False):
     full_mode = mode + ('b' if binary else '')
     is_file = filename and filename != '-'
@@ -37,6 +27,12 @@ def close_silently(file_handle):
 
 
 class NoopFile:
+    def __enter__(self):
+        pass
+
+    def __exit__(self):
+        pass
+
     def readable(self):
         pass
 
@@ -44,12 +40,6 @@ class NoopFile:
         pass
 
     def seekable(self):
-        pass
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self):
         pass
 
     def close(self):
