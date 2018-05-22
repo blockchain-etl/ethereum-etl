@@ -1,5 +1,4 @@
 import json
-import threading
 
 from web3.utils.threads import Timeout
 
@@ -20,7 +19,7 @@ class ExportBlocksJob(BaseJob):
             start_block,
             end_block,
             batch_size,
-            ipc_wrapper_factory,
+            ipc_wrapper,
             max_workers=5,
             max_queue=5,
             blocks_output=None,
@@ -28,7 +27,7 @@ class ExportBlocksJob(BaseJob):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
-        self.ipc_wrapper_factory = ipc_wrapper_factory
+        self.ipc_wrapper = ipc_wrapper
         self.max_workers = max_workers
         self.max_queue = max_queue
         self.blocks_output = blocks_output
@@ -49,7 +48,6 @@ class ExportBlocksJob(BaseJob):
         self.transactions_exporter = None
 
         self.executor = None
-        self.thread_local = threading.local()
         self.futures = []
 
     def _start(self):
@@ -79,16 +77,11 @@ class ExportBlocksJob(BaseJob):
 
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
-        response = self._get_ipc_wrapper().make_request(json.dumps(blocks_rpc))
+        response = self.ipc_wrapper.make_request(json.dumps(blocks_rpc))
         for response_item in response:
             result = response_item['result']
             block = self.block_mapper.json_dict_to_block(result)
             self._export_block(block)
-
-    def _get_ipc_wrapper(self):
-        if getattr(self.thread_local, 'ipc_wrapper', None) is None:
-            self.thread_local.ipc_wrapper = self.ipc_wrapper_factory()
-        return self.thread_local.ipc_wrapper
 
     def _check_completed_futures(self):
         for future in self.futures.copy():

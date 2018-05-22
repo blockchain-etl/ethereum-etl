@@ -1,46 +1,60 @@
-# TODO: Read from file
+import json
+import os
+import threading
+
+import pytest
+
+from ethereumetl.ipc import ThreadLocalIPCWrapper
 from ethereumetl.job.export_blocks_job import ExportBlocksJob
+from ethereumetl.utils import hex_to_dec
+from tests.helpers import compare_files_ignore_line_order
 
 
 class MockIPCWrapper(object):
+
+    def __init__(self, directory):
+        self.directory = directory
+
     def make_request(self, text):
-        return [{
-            'result': {
-                'author': '0x0000000000000000000000000000000000000000',
-                'difficulty': '0x400000000',
-                'extraData': '0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa',
-                'gasLimit': '0x1388',
-                'gasUsed': '0x0',
-                'hash': '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3',
-                'logsBloom': '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-                'miner': '0x0000000000000000000000000000000000000000',
-                'mixHash': '0x0000000000000000000000000000000000000000000000000000000000000000',
-                'nonce': '0x0000000000000042',
-                'number': '0x0',
-                'parentHash': '0x0000000000000000000000000000000000000000000000000000000000000000',
-                'receiptsRoot': '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421',
-                'sha3Uncles': '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
-                'size': '0x21c',
-                'stateRoot': '0xd7f8974fb5ac78d9ac099b9ad5018bedc2ce0a72dad1827a1709da30580f0544',
-                'timestamp': '0x0',
-                'totalDifficulty': '0x400000000',
-                'transactions': [],
-                'transactionsRoot': '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421',
-                'uncles': []
-            }
-        }]
+        batch = json.loads(text)
+        ipc_response = []
+        for req in batch:
+            block_number = hex_to_dec(req['params'][0])
+            file_path = os.path.join(self.directory, 'ipc_response.' + str(block_number) + '.json')
+            if not os.path.exists(file_path):
+                raise ValueError('File does not exist: ' + file_path)
+            with open(file_path) as opened_file:
+                file_content = opened_file.read()
+            ipc_response.append(json.loads(file_content))
+        return ipc_response
 
 
-def test_export_blocks_job(tmpdir):
-    file = tmpdir.join('blocks.csv')
+@pytest.mark.parametrize("start_block,end_block,batch_size,fixture", [
+    (0, 0, 1, 'block_without_transactions'),
+    (47218, 47219, 1, 'blocks_with_transactions'),
+    (47218, 47219, 2, 'blocks_with_transactions')
+])
+def test_export_blocks_job(tmpdir, request, start_block, end_block, batch_size, fixture):
+    file_name = request.module.__file__
+    test_dir = os.path.dirname(file_name)
+    fixture_dir = os.path.join(test_dir, 'fixtures', fixture)
+
+    if not os.path.isdir(fixture_dir):
+        raise ValueError('Not a directory: ' + fixture_dir)
+
+    blocks_output_file = tmpdir.join('actual_blocks.csv')
+    transactions_output_file = tmpdir.join('actual_transactions.csv')
+
     job = ExportBlocksJob(
-        start_block=0, end_block=0, batch_size=1, ipc_wrapper_factory=lambda: MockIPCWrapper(),
-        blocks_output=file
+        start_block=start_block, end_block=end_block, batch_size=batch_size,
+        ipc_wrapper=ThreadLocalIPCWrapper(lambda: MockIPCWrapper(str(fixture_dir))),
+        blocks_output=blocks_output_file,
+        transactions_output=transactions_output_file
     )
     job.run()
 
-    expected_content = """block_number,block_hash,block_parent_hash,block_nonce,block_sha3_uncles,block_logs_bloom,block_transactions_root,block_state_root,block_miner,block_difficulty,block_total_difficulty,block_size,block_extra_data,block_gas_limit,block_gas_used,block_timestamp,block_transaction_count
-0,0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3,0x0000000000000000000000000000000000000000000000000000000000000000,0x0000000000000042,0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347,0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421,0xd7f8974fb5ac78d9ac099b9ad5018bedc2ce0a72dad1827a1709da30580f0544,0x0000000000000000000000000000000000000000,17179869184,17179869184,540,0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa,5000,0,0,0
-"""
-    actual_content = file.read()
-    assert expected_content == actual_content
+    compare_files_ignore_line_order(
+        os.path.join(str(fixture_dir), 'expected_blocks.csv'), blocks_output_file)
+
+    compare_files_ignore_line_order(
+        os.path.join(str(fixture_dir), 'expected_transactions.csv'), transactions_output_file)
