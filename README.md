@@ -307,6 +307,7 @@ so some ERC20 values will be null.
 
 1. Unit tests
 1. Rewrite export_all.sh in python
+1. Add thread executor to ExportErc20TransfersJob
 1. Add HTTPProvider
 1. Error handling and logging
 
