@@ -8,6 +8,15 @@ from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
 from ethereumetl.utils import split_to_batches
 
+FIELDS_TO_EXPORT = [
+    'erc20_token',
+    'erc20_from',
+    'erc20_to',
+    'erc20_value',
+    'erc20_tx_hash',
+    'erc20_block_number'
+]
+
 
 class ExportErc20TransfersJob(BaseJob):
     def __init__(
@@ -34,7 +43,7 @@ class ExportErc20TransfersJob(BaseJob):
 
     def _start(self):
         self.output_file = get_file_handle(self.output, binary=True)
-        self.exporter = CsvItemExporter(self.output_file)
+        self.exporter = CsvItemExporter(self.output_file, fields_to_export=FIELDS_TO_EXPORT)
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
