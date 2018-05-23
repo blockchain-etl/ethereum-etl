@@ -11,6 +11,40 @@ from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import split_to_batches
 
+BLOCK_FIELDS_TO_EXPORT = [
+    'block_number',
+    'block_hash',
+    'block_parent_hash',
+    'block_nonce',
+    'block_sha3_uncles',
+    'block_logs_bloom',
+    'block_transactions_root',
+    'block_state_root',
+    'block_miner',
+    'block_difficulty',
+    'block_total_difficulty',
+    'block_size',
+    'block_extra_data',
+    'block_gas_limit',
+    'block_gas_used',
+    'block_timestamp',
+    'block_transaction_count'
+]
+
+TRANSACTION_FIELDS_TO_EXPORT = [
+    'tx_hash',
+    'tx_nonce',
+    'tx_block_hash',
+    'tx_block_number',
+    'tx_index',
+    'tx_from',
+    'tx_to',
+    'tx_value',
+    'tx_gas',
+    'tx_gas_price',
+    'tx_input'
+]
+
 
 # Exports blocks and transactions
 class ExportBlocksJob(BaseJob):
@@ -56,10 +90,12 @@ class ExportBlocksJob(BaseJob):
         self.executor = BoundedExecutor(self.max_queue, self.max_workers)
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
-        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
+        self.blocks_exporter = CsvItemExporter(
+            self.blocks_output_file, fields_to_export=BLOCK_FIELDS_TO_EXPORT)
 
-        self.blocks_exporter = CsvItemExporter(self.blocks_output_file)
-        self.transactions_exporter = CsvItemExporter(self.transactions_output_file)
+        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
+        self.transactions_exporter = CsvItemExporter(
+            self.transactions_output_file, fields_to_export=TRANSACTION_FIELDS_TO_EXPORT)
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):

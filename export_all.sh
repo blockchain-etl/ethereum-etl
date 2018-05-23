@@ -64,12 +64,12 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     transactions_file=${full_output_dir}/transactions_${file_name_suffix}.csv
     log "Exporting blocks ${block_range} to ${blocks_file}"
     log "Exporting transactions from blocks ${block_range} to ${transactions_file}"
-    python export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path=${ipc_path} --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
+    python export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
     erc20_transfers_file=${full_output_dir}/erc20_transfers_${file_name_suffix}.csv
     log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
-    python export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path=${ipc_path} --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
+    python export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
     quit_if_returned_error
 
     end_time=$(date +%s)

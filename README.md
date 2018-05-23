@@ -149,7 +149,8 @@ Additional steps:
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
 You can tune `--batch-size`, `--max-workers`, `--max-queue`, `--ipc-timeout` for performance.
-Call `> python export_blocks_and_transactions.py -h` for more details. 
+
+Call `python export_blocks_and_transactions.py -h` for more details. 
 
 - Export ERC20 transfers:
 
@@ -166,7 +167,8 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 ```
 
 You can tune `--batch-size`, `--ipc-timeout` for performance.
-Call `> python export_erc20_transfers.py -h` for more details. 
+
+Call `python export_erc20_transfers.py -h` for more details. 
 
 ### Running Tests
 

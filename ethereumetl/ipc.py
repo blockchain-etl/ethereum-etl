@@ -29,6 +29,7 @@ class ThreadLocalIPCWrapper:
 
 # Mostly copied from web3.py/providers/ipc.py. Supports batch requests.
 # Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
+# Also see this optimization https://github.com/ethereum/web3.py/pull/849
 class IPCWrapper:
     _socket = None
 
