@@ -56,7 +56,6 @@ class ExportBlocksJob(BaseJob):
             batch_size,
             ipc_wrapper,
             max_workers=5,
-            max_queue=5,
             blocks_output=None,
             transactions_output=None):
         self.start_block = start_block
@@ -64,7 +63,6 @@ class ExportBlocksJob(BaseJob):
         self.batch_size = batch_size
         self.ipc_wrapper = ipc_wrapper
         self.max_workers = max_workers
-        self.max_queue = max_queue
         self.blocks_output = blocks_output
         self.transactions_output = transactions_output
 
@@ -87,7 +85,7 @@ class ExportBlocksJob(BaseJob):
     def _start(self):
         # Using bounded executor prevents unlimited queue growth
         # and allows monitoring in-progress futures and failing fast in case of errors.
-        self.executor = FailSafeExecutor(BoundedExecutor(self.max_queue, self.max_workers))
+        self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
         self.blocks_exporter = CsvItemExporter(

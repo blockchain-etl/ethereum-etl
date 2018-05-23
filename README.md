@@ -148,7 +148,7 @@ Additional steps:
 
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-You can tune `--batch-size`, `--max-workers`, `--max-queue`, `--ipc-timeout` for performance.
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_blocks_and_transactions.py -h` for more details. 
 
@@ -166,7 +166,7 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 --output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
-You can tune `--batch-size`, `--ipc-timeout` for performance.
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
 
@@ -311,7 +311,6 @@ so some ERC20 values will be null.
 
 1. Unit tests
 1. Rewrite export_all.sh in python
-1. Add thread executor to ExportErc20TransfersJob
 1. Add HTTPProvider
 1. Error handling and logging
 

@@ -1,5 +1,7 @@
 from web3.utils.threads import Timeout
 
+from ethereumetl.executor.bounded_executor import BoundedExecutor
+from ethereumetl.executor.fail_safe_executor import FailSafeExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.job.base_job import BaseJob
@@ -26,12 +28,14 @@ class ExportErc20TransfersJob(BaseJob):
             batch_size,
             web3,
             output,
+            max_workers=5,
             tokens=None):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
         self.web3 = web3
         self.output = output
+        self.max_workers = max_workers
         self.tokens = tokens
 
         self.receipt_log_mapper = EthReceiptLogMapper()
@@ -41,13 +45,19 @@ class ExportErc20TransfersJob(BaseJob):
         self.output_file = None
         self.exporter = None
 
+        self.executor: FailSafeExecutor = None
+
     def _start(self):
+        # Using bounded executor prevents unlimited queue growth
+        # and allows monitoring in-progress futures and failing fast in case of errors.
+        self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
+
         self.output_file = get_file_handle(self.output, binary=True)
         self.exporter = CsvItemExporter(self.output_file, fields_to_export=FIELDS_TO_EXPORT)
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            self._fail_safe_export_batch(batch_start, batch_end)
+            self.executor.submit(self._fail_safe_export_batch, batch_start, batch_end)
 
     def _fail_safe_export_batch(self, batch_start, batch_end):
         try:
@@ -78,4 +88,5 @@ class ExportErc20TransfersJob(BaseJob):
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
+        self.executor.shutdown()
         close_silently(self.output_file)
