@@ -13,20 +13,6 @@ except ImportError:
     JSONDecodeError = ValueError
 
 
-class ThreadLocalIPCWrapper:
-    def __init__(self, ipc_wrapper_factory):
-        self.ipc_wrapper_factory = ipc_wrapper_factory
-        self.thread_local = threading.local()
-
-    def make_request(self, text):
-        return self._get_ipc_wrapper().make_request(text)
-
-    def _get_ipc_wrapper(self):
-        if getattr(self.thread_local, 'ipc_wrapper', None) is None:
-            self.thread_local.ipc_wrapper = self.ipc_wrapper_factory()
-        return self.thread_local.ipc_wrapper
-
-
 # Mostly copied from web3.py/providers/ipc.py. Supports batch requests.
 # Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
 # Also see this optimization https://github.com/ethereum/web3.py/pull/849

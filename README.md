@@ -148,7 +148,7 @@ Additional steps:
 
 Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
 
-You can tune `--batch-size`, `--max-workers`, `--max-queue`, `--ipc-timeout` for performance.
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_blocks_and_transactions.py -h` for more details. 
 
@@ -166,14 +166,14 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 --output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
-You can tune `--batch-size`, `--ipc-timeout` for performance.
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
 
 ### Running Tests
 
 ```bash
-> pytest
+> pytest -vv
 ```
 
 ### Uploading to S3
@@ -186,16 +186,6 @@ Upload blocks, transactions, erc20_transfers:
 > aws s3 sync . s3://<your_bucket>/athena/lab1/transactions --region ap-southeast-1  --exclude "*" --include "*transactions_*.csv"
 > aws s3 sync . s3://<your_bucket>/athena/lab1/erc20_transfers --region ap-southeast-1  --exclude "*" --include "*erc20_transfers_*.csv"
 ```
-
-Change `--include` option to
-
-Upload first 1 million blocks: `--include "blocks_00*.csv"`
-
-Upload second 1 million blocks: `--include "blocks_01*.csv"`
-
-Upload transactions for first 1 million blocks: `--include "transactions_00*.csv"`
-
-Upload ERC20 transfers for first 1 million blocks: `--include "erc20_transfers_00*.csv"`
 
 ### Creating Tables in AWS Athena
 
@@ -311,7 +301,6 @@ so some ERC20 values will be null.
 
 1. Unit tests
 1. Rewrite export_all.sh in python
-1. Add thread executor to ExportErc20TransfersJob
 1. Add HTTPProvider
 1. Error handling and logging
 

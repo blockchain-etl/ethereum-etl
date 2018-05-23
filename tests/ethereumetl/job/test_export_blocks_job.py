@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from ethereumetl.ipc import ThreadLocalIPCWrapper
 from ethereumetl.job.export_blocks_job import ExportBlocksJob
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.utils import hex_to_dec
 from tests.helpers import compare_lines_ignore_order, read_file
 import tests.resources
@@ -41,7 +41,7 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
 
     job = ExportBlocksJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
-        ipc_wrapper=ThreadLocalIPCWrapper(lambda: MockIPCWrapper(resource_group)),
+        ipc_wrapper=ThreadLocalProxy(lambda: MockIPCWrapper(resource_group)),
         blocks_output=blocks_output_file,
         transactions_output=transactions_output_file
     )
