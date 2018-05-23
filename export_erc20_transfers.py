@@ -24,7 +24,7 @@ job = ExportErc20TransfersJob(
     start_block=args.start_block,
     end_block=args.end_block,
     batch_size=args.batch_size,
-    web3=Web3(ThreadLocalProxy(lambda: IPCProvider(args.ipc_path, timeout=args.ipc_timeout))),
+    web3=ThreadLocalProxy(lambda: Web3(IPCProvider(args.ipc_path, timeout=args.ipc_timeout))),
     output=args.output,
     max_workers=args.max_workers,
     tokens=args.tokens)

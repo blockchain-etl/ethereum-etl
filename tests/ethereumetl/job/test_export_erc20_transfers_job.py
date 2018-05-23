@@ -33,7 +33,7 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
 
     job = ExportErc20TransfersJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
-        web3=Web3(ThreadLocalProxy(lambda: MockIPCProvider(resource_group))),
+        web3=ThreadLocalProxy(lambda: Web3(MockIPCProvider(resource_group))),
         output=output_file
     )
     job.run()
