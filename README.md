@@ -187,16 +187,6 @@ Upload blocks, transactions, erc20_transfers:
 > aws s3 sync . s3://<your_bucket>/athena/lab1/erc20_transfers --region ap-southeast-1  --exclude "*" --include "*erc20_transfers_*.csv"
 ```
 
-Change `--include` option to
-
-Upload first 1 million blocks: `--include "blocks_00*.csv"`
-
-Upload second 1 million blocks: `--include "blocks_01*.csv"`
-
-Upload transactions for first 1 million blocks: `--include "transactions_00*.csv"`
-
-Upload ERC20 transfers for first 1 million blocks: `--include "erc20_transfers_00*.csv"`
-
 ### Creating Tables in AWS Athena
 
 Create database:
