@@ -173,7 +173,7 @@ Call `python export_erc20_transfers.py -h` for more details.
 ### Running Tests
 
 ```bash
-> pytest
+> pytest -vv
 ```
 
 ### Uploading to S3

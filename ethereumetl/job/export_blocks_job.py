@@ -2,7 +2,8 @@ import json
 
 from web3.utils.threads import Timeout
 
-from ethereumetl.bounded_executor import BoundedExecutor
+from ethereumetl.executor.bounded_executor import BoundedExecutor
+from ethereumetl.executor.fail_safe_executor import FailSafeExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.job.base_job import BaseJob
@@ -81,13 +82,12 @@ class ExportBlocksJob(BaseJob):
         self.blocks_exporter = None
         self.transactions_exporter = None
 
-        self.executor = None
-        self.futures = []
+        self.executor: FailSafeExecutor = None
 
     def _start(self):
         # Using bounded executor prevents unlimited queue growth
         # and allows monitoring in-progress futures and failing fast in case of errors.
-        self.executor = BoundedExecutor(self.max_queue, self.max_workers)
+        self.executor = FailSafeExecutor(BoundedExecutor(self.max_queue, self.max_workers))
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
         self.blocks_exporter = CsvItemExporter(
@@ -99,11 +99,9 @@ class ExportBlocksJob(BaseJob):
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            future = self.executor.submit(self._export_batch_with_retries, batch_start, batch_end)
-            self.futures.append(future)
-            self._check_completed_futures()
+            self.executor.submit(self._fail_safe_export_batch, batch_start, batch_end)
 
-    def _export_batch_with_retries(self, batch_start, batch_end):
+    def _fail_safe_export_batch(self, batch_start, batch_end):
         try:
             self._export_batch(batch_start, batch_end)
         except (Timeout, OSError):
@@ -119,13 +117,6 @@ class ExportBlocksJob(BaseJob):
             block = self.block_mapper.json_dict_to_block(result)
             self._export_block(block)
 
-    def _check_completed_futures(self):
-        for future in self.futures.copy():
-            if future.done():
-                # Will throw an exception here if the future failed
-                future.result()
-                self.futures.remove(future)
-
     def _export_block(self, block):
         if self.export_blocks:
             self.blocks_exporter.export_item(self.block_mapper.block_to_dict(block))
@@ -134,8 +125,6 @@ class ExportBlocksJob(BaseJob):
                 self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
 
     def _end(self):
-        self.executor.shutdown(wait=True)
-        self._check_completed_futures()
-        assert len(self.futures) == 0
+        self.executor.shutdown()
         close_silently(self.blocks_output_file)
         close_silently(self.transactions_output_file)

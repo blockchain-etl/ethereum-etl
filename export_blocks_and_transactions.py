@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 
-from ethereumetl.ipc import IPCWrapper, ThreadLocalIPCWrapper
+from ethereumetl.ipc import IPCWrapper
 from ethereumetl.job.export_blocks_job import ExportBlocksJob
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 parser = argparse.ArgumentParser(description='Export blocks and transactions.')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
@@ -25,7 +26,7 @@ job = ExportBlocksJob(
     start_block=args.start_block,
     end_block=args.end_block,
     batch_size=args.batch_size,
-    ipc_wrapper=ThreadLocalIPCWrapper(lambda: IPCWrapper(args.ipc_path, args.ipc_timeout)),
+    ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, args.ipc_timeout)),
     max_workers=args.max_workers,
     max_queue=args.max_queue,
     blocks_output=args.blocks_output,

@@ -47,12 +47,15 @@ class ExportErc20TransfersJob(BaseJob):
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            try:
-                self._export_batch(batch_start, batch_end)
-            except (Timeout, OSError):
-                # try exporting one by one
-                for block_number in range(batch_start, batch_end + 1):
-                    self._export_batch(block_number, block_number)
+            self._fail_safe_export_batch(batch_start, batch_end)
+
+    def _fail_safe_export_batch(self, batch_start, batch_end):
+        try:
+            self._export_batch(batch_start, batch_end)
+        except (Timeout, OSError):
+            # try exporting one by one
+            for block_number in range(batch_start, batch_end + 1):
+                self._export_batch(block_number, block_number)
 
     def _export_batch(self, batch_start, batch_end):
         filter_params = {
@@ -62,7 +65,7 @@ class ExportErc20TransfersJob(BaseJob):
         }
 
         if self.tokens is not None and len(self.tokens) > 0:
-            filter_params["address"] = self.tokens
+            filter_params['address'] = self.tokens
 
         event_filter = self.web3.eth.filter(filter_params)
         events = event_filter.get_all_entries()
