@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from ethereumetl.job.export_blocks_job import ExportBlocksJob
+from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.utils import hex_to_dec
 from tests.helpers import compare_lines_ignore_order, read_file

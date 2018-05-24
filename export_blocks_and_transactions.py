@@ -2,7 +2,7 @@
 import argparse
 
 from ethereumetl.ipc import IPCWrapper
-from ethereumetl.job.export_blocks_job import ExportBlocksJob
+from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 parser = argparse.ArgumentParser(description='Export blocks and transactions.')

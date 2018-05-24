@@ -2,14 +2,14 @@ import json
 
 from web3.utils.threads import Timeout
 
-from ethereumetl.executor.bounded_executor import BoundedExecutor
-from ethereumetl.executor.fail_safe_executor import FailSafeExecutor
+from ethereumetl.executors.bounded_executor import BoundedExecutor
+from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
-from ethereumetl.job.base_job import BaseJob
+from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
-from ethereumetl.mapper.block_mapper import EthBlockMapper
-from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
+from ethereumetl.mappers.block_mapper import EthBlockMapper
+from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import split_to_batches
 
 BLOCK_FIELDS_TO_EXPORT = [
@@ -57,7 +57,9 @@ class ExportBlocksJob(BaseJob):
             ipc_wrapper,
             max_workers=5,
             blocks_output=None,
-            transactions_output=None):
+            transactions_output=None,
+            block_fields_to_export=BLOCK_FIELDS_TO_EXPORT,
+            transaction_fields_to_export=TRANSACTION_FIELDS_TO_EXPORT):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
@@ -65,6 +67,8 @@ class ExportBlocksJob(BaseJob):
         self.max_workers = max_workers
         self.blocks_output = blocks_output
         self.transactions_output = transactions_output
+        self.block_fields_to_export = block_fields_to_export
+        self.transaction_fields_to_export = transaction_fields_to_export
 
         self.export_blocks = blocks_output is not None
         self.export_transactions = transactions_output is not None
@@ -89,11 +93,11 @@ class ExportBlocksJob(BaseJob):
 
         self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
         self.blocks_exporter = CsvItemExporter(
-            self.blocks_output_file, fields_to_export=BLOCK_FIELDS_TO_EXPORT)
+            self.blocks_output_file, fields_to_export=self.block_fields_to_export)
 
         self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
         self.transactions_exporter = CsvItemExporter(
-            self.transactions_output_file, fields_to_export=TRANSACTION_FIELDS_TO_EXPORT)
+            self.transactions_output_file, fields_to_export=self.transaction_fields_to_export)
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):

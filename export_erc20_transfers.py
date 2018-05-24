@@ -3,7 +3,7 @@ import argparse
 
 from web3 import IPCProvider, Web3
 
-from ethereumetl.job.export_erc20_transfers_job import ExportErc20TransfersJob
+from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 parser = argparse.ArgumentParser(

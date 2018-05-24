@@ -1,6 +1,5 @@
-import sys
-import contextlib
 import os
+import sys
 
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely

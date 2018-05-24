@@ -4,7 +4,7 @@ import pytest
 from web3 import Web3, IPCProvider
 
 import tests.resources
-from ethereumetl.job.export_erc20_transfers_job import ExportErc20TransfersJob
+from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import compare_lines_ignore_order, read_file
 
