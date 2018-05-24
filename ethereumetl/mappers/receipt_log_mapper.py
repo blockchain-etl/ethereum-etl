@@ -1,4 +1,4 @@
-from ethereumetl.domain.transaction_receipt_log import EthReceiptLog
+from ethereumetl.domain.receipt_log import EthReceiptLog
 
 
 class EthReceiptLogMapper(object):

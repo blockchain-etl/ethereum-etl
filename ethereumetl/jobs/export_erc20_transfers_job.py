@@ -1,12 +1,12 @@
 from web3.utils.threads import Timeout
 
-from ethereumetl.executor.bounded_executor import BoundedExecutor
-from ethereumetl.executor.fail_safe_executor import FailSafeExecutor
+from ethereumetl.executors.bounded_executor import BoundedExecutor
+from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
-from ethereumetl.job.base_job import BaseJob
-from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
-from ethereumetl.mapper.receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.jobs.base_job import BaseJob
+from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
+from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
 from ethereumetl.utils import split_to_batches
 
@@ -29,7 +29,8 @@ class ExportErc20TransfersJob(BaseJob):
             web3,
             output,
             max_workers=5,
-            tokens=None):
+            tokens=None,
+            fields_to_export=FIELDS_TO_EXPORT):
         self.start_block = start_block
         self.end_block = end_block
         self.batch_size = batch_size
@@ -37,6 +38,7 @@ class ExportErc20TransfersJob(BaseJob):
         self.output = output
         self.max_workers = max_workers
         self.tokens = tokens
+        self.fields_to_export = fields_to_export
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.erc20_transfer_mapper = EthErc20TransferMapper()
@@ -53,7 +55,7 @@ class ExportErc20TransfersJob(BaseJob):
         self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
 
         self.output_file = get_file_handle(self.output, binary=True)
-        self.exporter = CsvItemExporter(self.output_file, fields_to_export=FIELDS_TO_EXPORT)
+        self.exporter = CsvItemExporter(self.output_file, fields_to_export=self.fields_to_export)
 
     def _export(self):
         for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):

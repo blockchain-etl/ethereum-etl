@@ -1,4 +1,4 @@
-from ethereumetl.domain.transaction_receipt_log import EthReceiptLog
+from ethereumetl.domain.receipt_log import EthReceiptLog
 from ethereumetl.service.erc20_processor import EthErc20Processor
 
 erc20_processor = EthErc20Processor()

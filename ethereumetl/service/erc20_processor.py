@@ -3,7 +3,7 @@ from builtins import map
 from typing import Optional
 
 from ethereumetl.domain.erc20_transfer import EthErc20Transfer
-from ethereumetl.domain.transaction_receipt_log import EthReceiptLog
+from ethereumetl.domain.receipt_log import EthReceiptLog
 from ethereumetl.utils import chunk_string, hex_to_dec, to_normalized_address
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
