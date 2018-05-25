@@ -294,7 +294,7 @@ MSCK REPAIR TABLE erc20_transfers;
 ```
 
 Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
-so values greater than 8 bytes will be null.
+so integers greater than 8 bytes will be null.
 
 ### TODOs
 

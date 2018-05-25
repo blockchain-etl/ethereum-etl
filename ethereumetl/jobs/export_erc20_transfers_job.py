@@ -46,6 +46,7 @@ class ExportErc20TransfersJob(BatchExportJob):
         self.exporter = CsvItemExporter(self.output_file, fields_to_export=self.fields_to_export)
 
     def _export_batch(self, batch_start, batch_end):
+        # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
         filter_params = {
             'fromBlock': batch_start,
             'toBlock': batch_end,
