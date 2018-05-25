@@ -17,7 +17,7 @@ Export ERC20 transfers:
 --output erc20_transfers.csv
 ```
 
-Export ERC20 transfers, filtered for the list of tokens:
+Export ERC20 transfers, filtered by the list of tokens:
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
