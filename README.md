@@ -294,7 +294,7 @@ MSCK REPAIR TABLE erc20_transfers;
 ```
 
 Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
-so some ERC20 values will be null.
+so values greater than 8 bytes will be null.
 
 ### TODOs
 
