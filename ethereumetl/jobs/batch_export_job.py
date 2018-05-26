@@ -9,12 +9,24 @@ from ethereumetl.utils import split_to_batches
 class BatchExportJob(BaseJob):
     def __init__(
             self,
-            start,
-            end,
+            range_start,
+            range_end,
             batch_size,
             max_workers=5):
-        self.start = start
-        self.end = end
+        if range_start < 0 or range_end < 0:
+            raise ValueError('range_start and range_end must be greater or equal to 0')
+
+        if range_end < range_start:
+            raise ValueError('range_end must be greater or equal to range_start')
+
+        if batch_size <= 0:
+            raise ValueError('batch_size must be greater than 0')
+
+        if max_workers <= 0:
+            raise ValueError('max_workers must be greater than 0')
+
+        self.start = range_start
+        self.end = range_end
         self.batch_size = batch_size
         self.max_workers = max_workers
 
