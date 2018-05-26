@@ -17,7 +17,7 @@ Export ERC20 transfers:
 --output erc20_transfers.csv
 ```
 
-Export ERC20 transfers, filtered for the list of tokens:
+Export ERC20 transfers, filtered by the list of tokens:
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
@@ -294,7 +294,7 @@ MSCK REPAIR TABLE erc20_transfers;
 ```
 
 Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
-so some ERC20 values will be null.
+so integers greater than 8 bytes will be null.
 
 ### TODOs
 

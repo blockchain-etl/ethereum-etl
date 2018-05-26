@@ -1,14 +1,9 @@
-from web3.utils.threads import Timeout
-
-from ethereumetl.executors.bounded_executor import BoundedExecutor
-from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
-from ethereumetl.jobs.base_job import BaseJob
+from ethereumetl.jobs.batch_export_job import BatchExportJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
-from ethereumetl.utils import split_to_batches
 
 FIELDS_TO_EXPORT = [
     'erc20_token',
@@ -20,7 +15,7 @@ FIELDS_TO_EXPORT = [
 ]
 
 
-class ExportErc20TransfersJob(BaseJob):
+class ExportErc20TransfersJob(BatchExportJob):
     def __init__(
             self,
             start_block,
@@ -31,12 +26,9 @@ class ExportErc20TransfersJob(BaseJob):
             max_workers=5,
             tokens=None,
             fields_to_export=FIELDS_TO_EXPORT):
-        self.start_block = start_block
-        self.end_block = end_block
-        self.batch_size = batch_size
+        super().__init__(start_block, end_block, batch_size, max_workers)
         self.web3 = web3
         self.output = output
-        self.max_workers = max_workers
         self.tokens = tokens
         self.fields_to_export = fields_to_export
 
@@ -47,29 +39,14 @@ class ExportErc20TransfersJob(BaseJob):
         self.output_file = None
         self.exporter = None
 
-        self.executor: FailSafeExecutor = None
-
     def _start(self):
-        # Using bounded executor prevents unlimited queue growth
-        # and allows monitoring in-progress futures and failing fast in case of errors.
-        self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
+        super()._start()
 
         self.output_file = get_file_handle(self.output, binary=True)
         self.exporter = CsvItemExporter(self.output_file, fields_to_export=self.fields_to_export)
 
-    def _export(self):
-        for batch_start, batch_end in split_to_batches(self.start_block, self.end_block, self.batch_size):
-            self.executor.submit(self._fail_safe_export_batch, batch_start, batch_end)
-
-    def _fail_safe_export_batch(self, batch_start, batch_end):
-        try:
-            self._export_batch(batch_start, batch_end)
-        except (Timeout, OSError):
-            # try exporting one by one
-            for block_number in range(batch_start, batch_end + 1):
-                self._export_batch(block_number, block_number)
-
     def _export_batch(self, batch_start, batch_end):
+        # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
         filter_params = {
             'fromBlock': batch_start,
             'toBlock': batch_end,
@@ -90,5 +67,5 @@ class ExportErc20TransfersJob(BaseJob):
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
-        self.executor.shutdown()
+        super()._end()
         close_silently(self.output_file)
