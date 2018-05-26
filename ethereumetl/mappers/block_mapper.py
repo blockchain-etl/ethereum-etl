@@ -4,13 +4,13 @@ from ethereumetl.utils import hex_to_dec
 
 
 class EthBlockMapper(object):
-    def __init__(self, transaction_mapper: EthTransactionMapper = None):
+    def __init__(self, transaction_mapper=None):
         if transaction_mapper is None:
             self.transaction_mapper = EthTransactionMapper()
         else:
             self.transaction_mapper = transaction_mapper
 
-    def json_dict_to_block(self, json_dict) -> EthBlock:
+    def json_dict_to_block(self, json_dict):
         block = EthBlock()
         block.number = hex_to_dec(json_dict.get('number', None))
         block.hash = json_dict.get('hash', None)
@@ -39,7 +39,7 @@ class EthBlockMapper(object):
 
         return block
 
-    def block_to_dict(self, block: EthBlock):
+    def block_to_dict(self, block):
         return {
             'block_number': block.number,
             'block_hash': block.hash,

@@ -3,7 +3,7 @@ from ethereumetl.utils import hex_to_dec
 
 
 class EthTransactionMapper(object):
-    def json_dict_to_transaction(self, json_dict) -> EthTransaction:
+    def json_dict_to_transaction(self, json_dict):
         transaction = EthTransaction()
         transaction.hash = json_dict.get('hash', None)
         transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
@@ -18,7 +18,7 @@ class EthTransactionMapper(object):
         transaction.input = json_dict.get('input', None)
         return transaction
 
-    def transaction_to_dict(self, transaction: EthTransaction):
+    def transaction_to_dict(self, transaction):
         return {
             'tx_hash': transaction.hash,
             'tx_nonce': transaction.nonce,
