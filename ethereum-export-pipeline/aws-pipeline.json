@@ -1,82 +1,82 @@
 {
     "objects": [
         {
+            "id": "Default",
+            "name": "Default",
             "failureAndRerunMode": "CASCADE",
             "resourceRole": "DataPipelineDefaultResourceRole",
             "role": "DataPipelineDefaultRole",
             "pipelineLogUri": "s3://experiments.ampostech.com/",
-            "scheduleType": "ONDEMAND",
-            "name": "Default",
-            "id": "Default"
+            "scheduleType": "ondemand",
+            "maxActiveInstances": 5
         },
         {
-            "instanceType": "t2.medium",
-            "imageId": "ami-6fe8d413",
-            "region": "ap-southeast-1",
-            "name": "EC2ResourceInstance",
             "id": "EC2ResourceInstance",
             "type": "Ec2Resource",
+            "name": "EC2ResourceInstance",
+            "imageId": "ami-1fdae663",
+            "instanceType": "t2.medium",
+            "region": "ap-southeast-1",
             "terminateAfter": "60 Minutes",
             "securityGroups": [
                 "evgeny-test"
             ]
         },
         {
-            "output": {
-                "ref": "S3OutputLocation"
-            },
-            "stage": "true",
-            "name": "ExportActivity",
             "id": "ExportActivity",
-            "runsOn": {
-                "ref": "EC2ResourceInstance"
-            },
-            "workerGroup": "lab1",
+            "type": "ShellCommandActivity",
+            "name": "ExportActivity",
+            "command": "#{myShellCmd}",
             "scriptArgument": [
                 "#{myStartBlock}",
                 "#{myEndBlock}",
                 "#{myBatchSize}"
             ],
-            "type": "ShellCommandActivity",
-            "command": "#{myShellCmd}"
+            "runsOn": {
+                "ref": "EC2ResourceInstance"
+            },
+            "output": {
+                "ref": "S3OutputLocation"
+            },
+            "stage": "true"
         },
         {
-            "directoryPath": "#{myS3OutputLoc}/",
-            "name": "S3OutputLocation",
             "id": "S3OutputLocation",
-            "type": "S3DataNode"
+            "type": "S3DataNode",
+            "name": "S3OutputLocation",
+            "directoryPath": "#{myS3OutputLoc}/"
         }
     ],
     "parameters": [
         {
-            "description": "S3 output folder",
             "id": "myS3OutputLoc",
-            "type": "AWS::S3::ObjectKey"
+            "type": "AWS::S3::ObjectKey",
+            "description": "S3 output folder",
+            "default": "s3://experiments.ampostech.com"
         },
         {
-            "description": "Shell command to run",
             "id": "myShellCmd",
-            "type": "String"
+            "type": "String",
+            "description": "Shell command to run",
+            "default": "cd /home/ec2-user/ethereum-etl && bash -x export_all.sh -s $1 -e $2 -b $3 -i /home/ubuntu/.ethereum/geth.ipc -o ${OUTPUT1_STAGING_DIR}/pipeline"
         },
         {
-            "description": "Start block",
             "id": "myStartBlock",
-            "type": "String"
+            "type": "String",
+            "description": "Start block"
         },
         {
-            "description": "End block",
             "id": "myEndBlock",
-            "type": "String"
+            "type": "String",
+            "description": "End block"
         },
         {
-            "description": "Batch zise",
             "id": "myBatchSize",
-            "type": "String"
+            "type": "String",
+            "description": "Batch zise"
         }
     ],
     "values": {
-        "myShellCmd": "cd /home/ec2-user/ethereum-etl && bash -x export_all.sh -s $1 -e $2 -b $3 -i /home/ubuntu/.ethereum/geth.ipc -o ${OUTPUT1_STAGING_DIR}/pipeline",
-        "myS3OutputLoc": "s3://experiments.ampostech.com/",
         "myStartBlock": "0",
         "myEndBlock": "999999",
         "myBatchSize": "100000"
