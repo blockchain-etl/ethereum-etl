@@ -3,7 +3,7 @@ from ethereumetl.domain.receipt_log import EthReceiptLog
 
 class EthReceiptLogMapper(object):
 
-    def web3_dict_to_receipt_log(self, dict) -> EthReceiptLog:
+    def web3_dict_to_receipt_log(self, dict):
 
         receipt_log = EthReceiptLog()
 

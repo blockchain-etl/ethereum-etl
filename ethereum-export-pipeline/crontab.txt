@@ -1,0 +1,1 @@
+@reboot  /home/ubuntu/geth/start.sh >>/home/ubuntu/geth/crontab.log 2>&1

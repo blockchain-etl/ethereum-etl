@@ -1,9 +1,7 @@
 import logging
 from builtins import map
-from typing import Optional
 
 from ethereumetl.domain.erc20_transfer import EthErc20Transfer
-from ethereumetl.domain.receipt_log import EthReceiptLog
 from ethereumetl.utils import chunk_string, hex_to_dec, to_normalized_address
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
@@ -12,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class EthErc20Processor(object):
-    def filter_transfer_from_log(self, receipt_log: EthReceiptLog) -> Optional[EthErc20Transfer]:
+    def filter_transfer_from_log(self, receipt_log):
 
         topics = receipt_log.topics
         if len(topics) < 1:

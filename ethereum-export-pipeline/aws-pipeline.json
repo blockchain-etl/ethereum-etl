@@ -1,0 +1,84 @@
+{
+    "objects": [
+        {
+            "id": "Default",
+            "name": "Default",
+            "failureAndRerunMode": "CASCADE",
+            "resourceRole": "DataPipelineDefaultResourceRole",
+            "role": "DataPipelineDefaultRole",
+            "pipelineLogUri": "s3://experiments.ampostech.com/",
+            "scheduleType": "ondemand",
+            "maxActiveInstances": 5
+        },
+        {
+            "id": "EC2ResourceInstance",
+            "type": "Ec2Resource",
+            "name": "EC2ResourceInstance",
+            "imageId": "ami-1fdae663",
+            "instanceType": "t2.medium",
+            "region": "ap-southeast-1",
+            "terminateAfter": "60 Minutes",
+            "securityGroups": [
+                "evgeny-test"
+            ]
+        },
+        {
+            "id": "ExportActivity",
+            "type": "ShellCommandActivity",
+            "name": "ExportActivity",
+            "command": "#{myShellCmd}",
+            "scriptArgument": [
+                "#{myStartBlock}",
+                "#{myEndBlock}",
+                "#{myBatchSize}"
+            ],
+            "runsOn": {
+                "ref": "EC2ResourceInstance"
+            },
+            "output": {
+                "ref": "S3OutputLocation"
+            },
+            "stage": "true"
+        },
+        {
+            "id": "S3OutputLocation",
+            "type": "S3DataNode",
+            "name": "S3OutputLocation",
+            "directoryPath": "#{myS3OutputLoc}/"
+        }
+    ],
+    "parameters": [
+        {
+            "id": "myS3OutputLoc",
+            "type": "AWS::S3::ObjectKey",
+            "description": "S3 output folder",
+            "default": "s3://experiments.ampostech.com"
+        },
+        {
+            "id": "myShellCmd",
+            "type": "String",
+            "description": "Shell command to run",
+            "default": "cd /home/ec2-user/ethereum-etl && bash -x export_all.sh -s $1 -e $2 -b $3 -i /home/ubuntu/.ethereum/geth.ipc -o ${OUTPUT1_STAGING_DIR}/pipeline"
+        },
+        {
+            "id": "myStartBlock",
+            "type": "String",
+            "description": "Start block"
+        },
+        {
+            "id": "myEndBlock",
+            "type": "String",
+            "description": "End block"
+        },
+        {
+            "id": "myBatchSize",
+            "type": "String",
+            "description": "Batch zise"
+        }
+    ],
+    "values": {
+        "myStartBlock": "0",
+        "myEndBlock": "999999",
+        "myBatchSize": "100000"
+    }
+}
