@@ -19,6 +19,13 @@ S3Bucket = t.add_parameter(Parameter(
     Default="example.com"
 ))
 
+Command = t.add_parameter(Parameter(
+    "Command",
+    Description="Shell command that will be executed on workers",
+    Type="String",
+    Default="cd /home/ec2-user/ethereum-etl && bash -x export_all.sh -s $1 -e $2 -b $3 -i /home/ec2-user/.ethereum/geth.ipc -o ${OUTPUT1_STAGING_DIR}"
+))
+
 # The first million blocks are in a single partition
 # The next 3 million blocks are in 100k partitions
 # The next 1 million blocks are in 10k partitions
@@ -44,7 +51,7 @@ t.add_resource(Pipeline(
         ParameterObject(Id='myShellCmd', Attributes=[
             ParameterObjectAttribute(Key='type', StringValue='String'),
             ParameterObjectAttribute(Key='description', StringValue='S3 bucket'),
-            ParameterObjectAttribute(Key='default', StringValue='cd /home/ec2-user/ethereum-etl && bash -x export_all.sh -s $1 -e $2 -b $3 -i /home/ec2-user/.ethereum/geth.ipc -o ${OUTPUT1_STAGING_DIR}'),
+            ParameterObjectAttribute(Key='default', StringValue=Ref(Command)),
         ])
     ],
     PipelineObjects=
