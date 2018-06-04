@@ -207,8 +207,8 @@ CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
     block_transactions_root STRING,
     block_state_root STRING,
     block_miner STRING,
-    block_difficulty BIGINT,
-    block_total_difficulty BIGINT,
+    block_difficulty DECIMAL(38,0),
+    block_total_difficulty DECIMAL(38,0),
     block_size BIGINT,
     block_extra_data STRING,
     block_gas_limit BIGINT,
@@ -241,7 +241,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
     tx_index BIGINT, 
     tx_from STRING, 
     tx_to STRING, 
-    tx_value BIGINT, 
+    tx_value DECIMAL(38,0), 
     tx_gas BIGINT, 
     tx_gas_price BIGINT, 
     tx_input STRING  
@@ -267,7 +267,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
     erc20_token STRING, 
     erc20_from STRING, 
     erc20_to STRING, 
-    erc20_value BIGINT, 
+    erc20_value DECIMAL(38,0), 
     erc20_tx_hash STRING, 
     erc20_block_number BIGINT  
 )
@@ -293,8 +293,8 @@ MSCK REPAIR TABLE transactions;
 MSCK REPAIR TABLE erc20_transfers;
 ```
 
-Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
-so integers greater than 8 bytes will be null.
+Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
+so values greater than 38 decimals will be null.
 
 ### TODOs
 
