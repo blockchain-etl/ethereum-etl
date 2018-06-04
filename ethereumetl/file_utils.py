@@ -1,9 +1,13 @@
 import os
+import pathlib
 import sys
 
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
-def get_file_handle(filename, mode='w', binary=False):
+def get_file_handle(filename, mode='w', binary=False, create_parent_dirs=False):
+    if create_parent_dirs:
+        dirname = os.path.dirname(filename)
+        pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
     full_mode = mode + ('b' if binary else '')
     is_file = filename and filename != '-'
     if is_file:
