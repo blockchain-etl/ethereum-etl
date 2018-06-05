@@ -177,7 +177,7 @@ Call `python export_erc20_transfers.py -h` for more details.
 
 ### Uploading to S3
 
-Upload blocks, transactions, erc20_transfers:
+Upload the files to S3:
 
 ```bash
 > cd output
