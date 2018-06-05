@@ -40,7 +40,7 @@ block_sha3_uncles       | hex_string         |
 block_logs_bloom        | hex_string         |
 block_transactions_root | hex_string         |
 block_state_root        | hex_string         |
-block_miner             | hex_string         |
+block_miner             | address            |
 block_difficulty        | bigint             |
 block_total_difficulty  | bigint             |
 block_size              | bigint             |
@@ -59,8 +59,8 @@ tx_nonce            | bigint      |
 tx_block_hash       | hex_string  |
 tx_block_number     | bigint      |
 tx_index            | bigint      |
-tx_from             | hex_string  |
-tx_to               | hex_string  |
+tx_from             | address     |
+tx_to               | address     |
 tx_value            | bigint      |
 tx_gas              | bigint      |
 tx_gas_price        | bigint      |
@@ -70,12 +70,14 @@ tx_input            | hex_string  |
 
 Column              |    Type     |
 --------------------|--------------
-erc20_token         | hex_string  |
-erc20_from          | hex_string  |
-erc20_to            | hex_string  |
+erc20_token         | address     |
+erc20_from          | address     |
+erc20_to            | address     |
 erc20_value         | bigint      |
 erc20_tx_hash       | hex_string  |
 erc20_block_number  | bigint      |
+
+Note: for the `address` type all hex characters are lower-cased.
 
 ### Usage
 
