@@ -52,6 +52,6 @@ def word_to_address(param):
     if param is None:
         return None
     elif len(param) >= 40:
-        return '0x' + param[-40:]
+        return to_normalized_address('0x' + param[-40:])
     else:
-        return param
+        return to_normalized_address(param)
