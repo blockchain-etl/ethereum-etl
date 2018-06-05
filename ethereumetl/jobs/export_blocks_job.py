@@ -79,11 +79,11 @@ class ExportBlocksJob(BatchExportJob):
     def _start(self):
         super()._start()
 
-        self.blocks_output_file = get_file_handle(self.blocks_output, binary=True)
+        self.blocks_output_file = get_file_handle(self.blocks_output, binary=True, create_parent_dirs=True)
         self.blocks_exporter = CsvItemExporter(
             self.blocks_output_file, fields_to_export=self.block_fields_to_export)
 
-        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True)
+        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True, create_parent_dirs=True)
         self.transactions_exporter = CsvItemExporter(
             self.transactions_output_file, fields_to_export=self.transaction_fields_to_export)
 

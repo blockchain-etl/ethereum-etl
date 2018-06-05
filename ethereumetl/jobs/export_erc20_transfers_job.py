@@ -42,7 +42,7 @@ class ExportErc20TransfersJob(BatchExportJob):
     def _start(self):
         super()._start()
 
-        self.output_file = get_file_handle(self.output, binary=True)
+        self.output_file = get_file_handle(self.output, binary=True, create_parent_dirs=True)
         self.exporter = CsvItemExporter(self.output_file, fields_to_export=self.fields_to_export)
 
     def _export_batch(self, batch_start, batch_end):
