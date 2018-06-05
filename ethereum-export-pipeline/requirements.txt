@@ -1,3 +1,0 @@
-troposphere~=2.3.0
-pytest~=3.2.0
-pytest-mock~=1.10.0
