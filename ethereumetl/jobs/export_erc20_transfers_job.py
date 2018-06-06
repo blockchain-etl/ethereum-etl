@@ -11,6 +11,7 @@ FIELDS_TO_EXPORT = [
     'erc20_to',
     'erc20_value',
     'erc20_tx_hash',
+    'erc20_log_index',
     'erc20_block_number'
 ]
 
