@@ -309,7 +309,7 @@ so values greater than 38 decimals will be null.
 
 ### SQL for Blockchain
 
-I'm currently working on a SaaS solution for analysts and developers:
+I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:
 
 - Web console for running SQLs based on Redash http://demo.redash.io/
 - Built on top of AWS, cost efficient
@@ -317,5 +317,6 @@ I'm currently working on a SaaS solution for analysts and developers:
 - Support for internal transactions in the future
 - Support for API access in the future
 - Support for Bitcoin and other blockchains in the future
+- ERC20 token metrics in the future
 
 Contact me if you would like to contribute evge.medvedev@gmail.com
