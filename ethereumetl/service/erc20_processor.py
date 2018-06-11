@@ -33,6 +33,7 @@ class EthErc20Processor(object):
             erc20_transfer.erc20_to = word_to_address(topics_with_data[2])
             erc20_transfer.erc20_value = hex_to_dec(topics_with_data[3])
             erc20_transfer.erc20_tx_hash = receipt_log.transaction_hash
+            erc20_transfer.erc20_log_index = receipt_log.log_index
             erc20_transfer.erc20_block_number = receipt_log.block_number
             return erc20_transfer
 

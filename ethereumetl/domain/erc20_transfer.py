@@ -5,4 +5,5 @@ class EthErc20Transfer(object):
         self.erc20_to = None
         self.erc20_value = None
         self.erc20_tx_hash = None
+        self.erc20_log_index = None
         self.erc20_block_number = None

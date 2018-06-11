@@ -75,6 +75,7 @@ erc20_from          | address     |
 erc20_to            | address     |
 erc20_value         | bigint      |
 erc20_tx_hash       | hex_string  |
+erc20_log_index     | bigint      |
 erc20_block_number  | bigint      |
 
 Note: for the `address` type all hex characters are lower-cased.
@@ -275,6 +276,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
     erc20_to STRING, 
     erc20_value DECIMAL(38,0), 
     erc20_tx_hash STRING, 
+    erc20_log_index BIGINT, 
     erc20_block_number BIGINT  
 )
 PARTITIONED BY (start_block BIGINT, end_block BIGINT)
@@ -311,7 +313,7 @@ so values greater than 38 decimals will be null.
 
 ### SQL for Blockchain
 
-I'm currently working on a SaaS solution for analysts and developers:
+I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:
 
 - Web console for running SQLs based on Redash http://demo.redash.io/
 - Built on top of AWS, cost efficient
@@ -319,5 +321,6 @@ I'm currently working on a SaaS solution for analysts and developers:
 - Support for internal transactions in the future
 - Support for API access in the future
 - Support for Bitcoin and other blockchains in the future
+- ERC20 token metrics in the future
 
 Contact me if you would like to contribute evge.medvedev@gmail.com
