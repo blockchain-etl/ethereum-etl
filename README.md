@@ -329,7 +329,7 @@ PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 STORED AS PARQUET
 LOCATION 's3://<your_bucket>/ethereumetl/parquet/blocks';
   
-MSCK REPAIR TABLE blocks_parquet;
+MSCK REPAIR TABLE parquet_blocks;
 ```
 
 #### parquet_transactions
@@ -352,7 +352,7 @@ PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 STORED AS PARQUET
 LOCATION 's3://<your_bucket>/ethereumetl/parquet/transactions';
   
-MSCK REPAIR TABLE transactions_parquet;
+MSCK REPAIR TABLE parquet_transactions;
 ```
 
 #### parquet_erc20_transfers
@@ -371,7 +371,7 @@ PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 STORED AS PARQUET
 LOCATION 's3://<your_bucket>/ethereumetl/parquet/erc20_transfers';
 
-MSCK REPAIR TABLE erc20_transfers_parquet;
+MSCK REPAIR TABLE parquet_erc20_transfers;
 ```
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
