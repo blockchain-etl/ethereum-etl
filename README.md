@@ -297,6 +297,8 @@ MSCK REPAIR TABLE erc20_transfers;
 
 ### Tables for Parquet Files
 
+Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
+
 #### blocks_parquet
 
 ```sql
