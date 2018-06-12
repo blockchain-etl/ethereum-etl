@@ -303,10 +303,10 @@ MSCK REPAIR TABLE erc20_transfers;
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
 
-#### blocks_parquet
+#### parquet_blocks
 
 ```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS blocks_parquet (
+CREATE EXTERNAL TABLE IF NOT EXISTS parquet_blocks (
     block_number BIGINT,
     block_hash STRING,
     block_parent_hash STRING,
@@ -332,10 +332,10 @@ LOCATION 's3://<your_bucket>/ethereumetl/parquet/blocks';
 MSCK REPAIR TABLE blocks_parquet;
 ```
 
-#### transactions_parquet
+#### parquet_transactions
 
 ```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS transactions_parquet (
+CREATE EXTERNAL TABLE IF NOT EXISTS parquet_transactions (
     tx_hash STRING, 
     tx_nonce BIGINT, 
     tx_block_hash STRING,
@@ -355,10 +355,10 @@ LOCATION 's3://<your_bucket>/ethereumetl/parquet/transactions';
 MSCK REPAIR TABLE transactions_parquet;
 ```
 
-#### erc20_transfers_parquet
+#### parquet_erc20_transfers
 
 ```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers_parquet (
+CREATE EXTERNAL TABLE IF NOT EXISTS parquet_erc20_transfers (
     erc20_token STRING, 
     erc20_from STRING, 
     erc20_to STRING, 
