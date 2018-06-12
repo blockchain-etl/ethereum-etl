@@ -25,7 +25,7 @@ job = ExportBlocksJob(
     start_block=args.start_block,
     end_block=args.end_block,
     batch_size=args.batch_size,
-    ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, args.ipc_timeout)),
+    ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, timeout=args.ipc_timeout)),
     max_workers=args.max_workers,
     blocks_output=args.blocks_output,
     transactions_output=args.transactions_output)
