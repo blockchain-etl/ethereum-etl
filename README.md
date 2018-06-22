@@ -90,7 +90,7 @@ there is no need to wait until the full sync as the state is not needed.
 Install all dependencies:
 
 ```bash
-> pip install -r requirements.txt
+> pip install typing future argparse six web3
 ```
 
 Run in the terminal:
@@ -133,12 +133,6 @@ Export ERC20 transfers:
 ```
  
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
-
-### Running Tests
-
-```bash
-> pytest
-```
 
 ### Uploading to S3
 
@@ -267,9 +261,6 @@ MSCK REPAIR TABLE blocks;
 MSCK REPAIR TABLE transactions;
 MSCK REPAIR TABLE erc20_transfers;
 ```
-
-Note that BIGINT is 8-byte signed integer in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
-so some ERC20 values will be null.
 
 ### TODOs
 

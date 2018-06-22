@@ -6,6 +6,7 @@ from ethereumetl.mapper.block_mapper import EthBlockMapper
 from ethereumetl.mapper.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import smart_open
 
+# parser用来设定命令行的一些参数
 parser = argparse.ArgumentParser(
     description='Extract blocks and transactions from eth_getBlockByNumber JSON RPC output')
 parser.add_argument('--input', default=None, type=str, help='The input file. If not specified stdin is used.')
@@ -20,9 +21,11 @@ with smart_open(args.input, 'r') as input_file, \
         smart_open(args.blocks_output, binary=True) as blocks_output_file, \
         smart_open(args.transactions_output, binary=True) as tx_output_file:
     block_mapper = EthBlockMapper()
+    # mapper是在把数据进行转化
     tx_mapper = EthTransactionMapper()
 
     blocks_exporter = CsvItemExporter(blocks_output_file)
+    # 导出csv文件的类
     tx_exporter = CsvItemExporter(tx_output_file)
 
     for line in input_file:

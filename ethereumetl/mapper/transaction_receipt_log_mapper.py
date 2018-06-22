@@ -1,43 +1,46 @@
-from ethereumetl.domain.transaction_receipt_log import EthReceiptLog
+from ethereumetl.domain.transaction_receipt_log import EthTransactionReceiptLog
 from ethereumetl.utils import hex_to_dec
 
 
-class EthReceiptLogMapper(object):
-    def json_dict_to_receipt_log(self, json_dict) -> EthReceiptLog:
+class EthTransactionReceiptLogMapper(object):
 
-        receipt_log = EthReceiptLog()
+    def json_dict_to_transaction_receipt_log(self, json_dict):
+        # type: ({}) -> EthTransactionReceiptLog
 
-        receipt_log.log_index = hex_to_dec(json_dict.get('logIndex', None))
-        receipt_log.transaction_hash = json_dict.get('transactionHash', None)
-        receipt_log.block_hash = json_dict.get('blockHash', None)
-        receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        receipt_log.address = json_dict.get('address', None)
-        receipt_log.data = json_dict.get('data', None)
-        receipt_log.topics = json_dict.get('topics', None)
+        tx_receipt_log = EthTransactionReceiptLog()
 
-        return receipt_log
+        tx_receipt_log.log_index = hex_to_dec(json_dict.get('logIndex', None))
+        tx_receipt_log.transaction_hash = json_dict.get('transactionHash', None)
+        tx_receipt_log.block_hash = json_dict.get('blockHash', None)
+        tx_receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber', None))
+        tx_receipt_log.address = json_dict.get('address', None)
+        tx_receipt_log.data = json_dict.get('data', None)
+        tx_receipt_log.topics = json_dict.get('topics', None)
 
-    def web3_dict_to_transaction_receipt_log(self, dict) -> EthReceiptLog:
+        return tx_receipt_log
 
-        receipt_log = EthReceiptLog()
+    def web3_dict_to_transaction_receipt_log(self, dict):
+        # type: ({}) -> EthTransactionReceiptLog
 
-        receipt_log.log_index = dict.get('logIndex', None)
+        tx_receipt_log = EthTransactionReceiptLog()
+
+        tx_receipt_log.log_index = dict.get('logIndex', None)
 
         transaction_hash = dict.get('transactionHash', None)
         if transaction_hash is not None:
             transaction_hash = transaction_hash.hex()
-        receipt_log.transaction_hash = transaction_hash
+        tx_receipt_log.transaction_hash = transaction_hash
 
         block_hash = dict.get('blockHash', None)
         if block_hash is not None:
             block_hash = block_hash.hex()
-        receipt_log.block_hash = block_hash
+        tx_receipt_log.block_hash = block_hash
 
-        receipt_log.block_number = dict.get('blockNumber', None)
-        receipt_log.address = dict.get('address', None)
-        receipt_log.data = dict.get('data', None)
+        tx_receipt_log.block_number = dict.get('blockNumber', None)
+        tx_receipt_log.address = dict.get('address', None)
+        tx_receipt_log.data = dict.get('data', None)
 
         if 'topics' in dict:
-            receipt_log.topics = [topic.hex() for topic in dict['topics']]
+            tx_receipt_log.topics = list(map(lambda topic: topic.hex(), dict['topics']))
 
-        return receipt_log
+        return tx_receipt_log

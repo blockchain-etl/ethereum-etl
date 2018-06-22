@@ -10,3 +10,5 @@ class EthTransaction(object):
     gas = None
     gas_price = None
     input = None
+
+# 区块中transaction反反映，

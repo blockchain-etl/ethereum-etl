@@ -1,6 +1,5 @@
 import argparse
 import threading
-import time
 
 from ethereumetl.socket_utils import socket_exchange
 from ethereumetl.utils import smart_open, batch_readlines
@@ -17,10 +16,7 @@ parser.add_argument('--batch-size', default=100, type=int, help='The number of l
 args = parser.parse_args()
 
 with smart_open(args.input, 'r') as input_file, smart_open(args.output) as output_file:
-    start = time.time()
     for line_batch in batch_readlines(input_file, args.batch_size):
         response = socket_exchange(args.ipc_path, ''.join(line_batch), args.ipc_timeout)
         output_file.write(response)
-    end = time.time()
-    print('Running time is {} seconds'.format((end - start)))
 

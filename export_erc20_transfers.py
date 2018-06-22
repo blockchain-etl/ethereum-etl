@@ -4,7 +4,7 @@ from web3 import IPCProvider, Web3
 
 from ethereumetl.exporters import CsvItemExporter
 from ethereumetl.mapper.erc20_transfer_mapper import EthErc20TransferMapper
-from ethereumetl.mapper.transaction_receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.mapper.transaction_receipt_log_mapper import EthTransactionReceiptLogMapper
 from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
 from ethereumetl.utils import smart_open
 
@@ -21,7 +21,7 @@ args = parser.parse_args()
 
 
 with smart_open(args.output, binary=True) as output_file:
-    transaction_receipt_log_mapper = EthReceiptLogMapper()
+    transaction_receipt_log_mapper = EthTransactionReceiptLogMapper()
     erc20_transfer_mapper = EthErc20TransferMapper()
     erc20_processor = EthErc20Processor()
     exporter = CsvItemExporter(output_file)
@@ -41,7 +41,7 @@ with smart_open(args.output, binary=True) as output_file:
 
         for event in events:
             log = transaction_receipt_log_mapper.web3_dict_to_transaction_receipt_log(event)
-            erc20_transfer = erc20_processor.filter_transfer_from_log(log)
+            erc20_transfer = erc20_processor.filter_transfer_from_receipt_log(log)
             if erc20_transfer is not None:
                 exporter.export_item(erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
 

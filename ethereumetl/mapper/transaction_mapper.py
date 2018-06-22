@@ -1,24 +1,29 @@
 from ethereumetl.domain.transaction import EthTransaction
-from ethereumetl.utils import hex_to_dec
+from ethereumetl.utils import hex_to_dec, to_checksum_address
 
 
 class EthTransactionMapper(object):
-    def json_dict_to_transaction(self, json_dict) -> EthTransaction:
+
+    def json_dict_to_transaction(self, json_dict):
+        # type: ({}) -> EthTransaction
+
         transaction = EthTransaction()
         transaction.hash = json_dict.get('hash', None)
-        transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
+        transaction.nonce = hex_to_dec(json_dict.get('nonce', None)) #这里把0x变成了int？？
         transaction.block_hash = json_dict.get('blockHash', None)
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
         transaction.index = hex_to_dec(json_dict.get('transactionIndex', None))
-        transaction.from_address = json_dict.get('from', None)
-        transaction.to_address = json_dict.get('to', None)
+        transaction.from_address = to_checksum_address(json_dict.get('from', None))
+        transaction.to_address = to_checksum_address(json_dict.get('to', None))
         transaction.value = hex_to_dec(json_dict.get('value', None))
         transaction.gas = hex_to_dec(json_dict.get('gas', None))
         transaction.gas_price = hex_to_dec(json_dict.get('gasPrice', None))
         transaction.input = json_dict.get('input', None)
         return transaction
 
-    def transaction_to_dict(self, transaction: EthTransaction):
+    def transaction_to_dict(self, transaction):
+        # type: (EthTransaction) -> {}
+
         return {
             'tx_hash': transaction.hash,
             'tx_nonce': transaction.nonce,
