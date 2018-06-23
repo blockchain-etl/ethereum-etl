@@ -1,0 +1,46 @@
+[
+    {
+        "name": "tx_hash",
+        "type": "STRING"
+    },
+    {
+        "name": "tx_nonce",
+        "type": "INT64"
+    },
+    {
+        "name": "tx_block_hash",
+        "type": "STRING"
+    },
+    {
+        "name": "tx_block_number",
+        "type": "INT64"
+    },
+    {
+        "name": "tx_index",
+        "type": "INT64"
+    },
+    {
+        "name": "tx_from",
+        "type": "STRING"
+    },
+    {
+        "name": "tx_to",
+        "type": "STRING"
+    },
+    {
+        "name": "tx_value",
+        "type": "NUMERIC"
+    },
+    {
+        "name": "tx_gas",
+        "type": "INT64"
+    },
+    {
+        "name": "tx_gas_price",
+        "type": "INT64"
+    },
+    {
+        "name": "tx_input",
+        "type": "STRING"
+    }
+]

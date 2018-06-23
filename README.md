@@ -377,6 +377,27 @@ MSCK REPAIR TABLE parquet_erc20_transfers;
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
 
+### Upload Files to Google BigQuery
+
+Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
+
+Create a new Google Storage bucket and upload the files:
+
+```bash
+> cd output
+> gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export/blocks
+```
+
+Upload the files from the bucket to BigQuery:
+
+```bash
+> cd ethereum-etl
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum-data.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
+```
+
+
+
+
 ### TODOs
 
 1. Unit tests

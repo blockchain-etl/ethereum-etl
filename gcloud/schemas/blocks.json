@@ -1,0 +1,70 @@
+[
+    {
+        "name": "block_number",
+        "type": "INT64"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING"
+    },
+    {
+        "name": "block_parent_hash",
+        "type": "STRING"
+    },
+    {
+        "name": "block_nonce",
+        "type": "STRING"
+    },
+    {
+        "name": "block_sha3_uncles",
+        "type": "STRING"
+    },
+    {
+        "name": "block_logs_bloom",
+        "type": "STRING"
+    },
+    {
+        "name": "block_transactions_root",
+        "type": "STRING"
+    },
+    {
+        "name": "block_state_root",
+        "type": "STRING"
+    },
+    {
+        "name": "block_miner",
+        "type": "STRING"
+    },
+    {
+        "name": "block_difficulty",
+        "type": "NUMERIC"
+    },
+    {
+        "name": "block_total_difficulty",
+        "type": "NUMERIC"
+    },
+    {
+        "name": "block_size",
+        "type": "INT64"
+    },
+    {
+        "name": "block_extra_data",
+        "type": "STRING"
+    },
+    {
+        "name": "block_gas_limit",
+        "type": "INT64"
+    },
+    {
+        "name": "block_gas_used",
+        "type": "INT64"
+    },
+    {
+        "name": "block_timestamp",
+        "type": "INT64"
+    },
+    {
+        "name": "block_transaction_count",
+        "type": "INT64"
+    }
+]
