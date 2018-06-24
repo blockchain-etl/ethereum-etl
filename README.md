@@ -113,12 +113,12 @@ there is no need to wait until the full sync as the state is not needed.
     The result will be in the `output` subdirectory, partitioned in Hive style:
    
     ```bash
-    output/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
-    output/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
+    output/blocks/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
+    output/blocks/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
     ...
-    output/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
+    output/transactions/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
     ...
-    output/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
+    output/erc20_transfers/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
     ...
     ```
 
@@ -188,9 +188,7 @@ Upload the files to S3:
 
 ```bash
 > cd output
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/blocks --region ap-southeast-1  --exclude "*" --include "*blocks_*.csv"
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/transactions --region ap-southeast-1  --exclude "*" --include "*transactions_*.csv"
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/erc20_transfers --region ap-southeast-1  --exclude "*" --include "*erc20_transfers_*.csv"
+> aws s3 sync . s3://<your_bucket>/ethereumetl/export --region ap-southeast-1
 ```
 
 ### Creating Tables in AWS Athena
@@ -376,6 +374,31 @@ MSCK REPAIR TABLE parquet_erc20_transfers;
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
+
+### Upload Files to Google BigQuery
+
+Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
+
+Create a new Google Storage bucket and upload the files:
+
+```bash
+> cd output
+> gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
+```
+
+Create a new dataset called ethereum in BigQuery and load the files from the bucket:
+
+```bash
+> cd ethereum-etl
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./gcloud/schemas/transactions.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=1000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
+```
+
+Note that `--max_bad_records` is needed for erc20_transfers to avoid 
+'Error while reading data, error message: Could not parse '68032337690423899710659284523950357745' as numeric for field
+erc20_value (position 3) starting at location 52895 numeric overflow' 
+for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
 ### TODOs
 
