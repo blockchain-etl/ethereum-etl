@@ -386,14 +386,19 @@ Create a new Google Storage bucket and upload the files:
 > gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
 ```
 
-Upload the files from the bucket to BigQuery:
+Create a new dataset called ethereum in BigQuery and load the files from the bucket:
 
 ```bash
 > cd ethereum-etl
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./gcloud/schemas/transactions.json
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=1000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
 ```
+
+Note that `--max_bad_records` is needed for erc20_transfers to avoid 
+'Error while reading data, error message: Could not parse '68032337690423899710659284523950357745' as numeric for field
+erc20_value (position 3) starting at location 52895 numeric overflow' 
+for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
 ### TODOs
 
