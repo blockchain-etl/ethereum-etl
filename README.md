@@ -395,9 +395,6 @@ Upload the files from the bucket to BigQuery:
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
 ```
 
-
-
-
 ### TODOs
 
 1. Unit tests
