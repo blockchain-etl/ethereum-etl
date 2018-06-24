@@ -56,18 +56,25 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     block_range=${padded_batch_start_block}-${padded_batch_end_block}
     file_name_suffix=${padded_batch_start_block}_${padded_batch_end_block}
     # Hive style partitioning
-    full_output_dir=${output_dir}/start_block=${padded_batch_start_block}/end_block=${padded_batch_end_block}
+    partition_dir=/start_block=${padded_batch_start_block}/end_block=${padded_batch_end_block}
 
-    mkdir -p ${full_output_dir};
+    blocks_output_dir=${output_dir}/blocks${partition_dir}
+    mkdir -p ${blocks_output_dir};
 
-    blocks_file=${full_output_dir}/blocks_${file_name_suffix}.csv
-    transactions_file=${full_output_dir}/transactions_${file_name_suffix}.csv
+    transactions_output_dir=${output_dir}/transactions${partition_dir}
+    mkdir -p ${transactions_output_dir};
+
+    blocks_file=${blocks_output_dir}/blocks_${file_name_suffix}.csv
+    transactions_file=${transactions_output_dir}/transactions_${file_name_suffix}.csv
     log "Exporting blocks ${block_range} to ${blocks_file}"
     log "Exporting transactions from blocks ${block_range} to ${transactions_file}"
     python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
-    erc20_transfers_file=${full_output_dir}/erc20_transfers_${file_name_suffix}.csv
+    erc20_transfers_output_dir=${output_dir}/erc20_transfers${partition_dir}
+    mkdir -p ${erc20_transfers_output_dir};
+
+    erc20_transfers_file=${erc20_transfers_output_dir}/erc20_transfers_${file_name_suffix}.csv
     log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
     python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
     quit_if_returned_error

@@ -113,12 +113,12 @@ there is no need to wait until the full sync as the state is not needed.
     The result will be in the `output` subdirectory, partitioned in Hive style:
    
     ```bash
-    output/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
-    output/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
+    output/blocks/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
+    output/blocks/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
     ...
-    output/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
+    output/transactions/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
     ...
-    output/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
+    output/erc20_transfers/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
     ...
     ```
 
@@ -188,9 +188,7 @@ Upload the files to S3:
 
 ```bash
 > cd output
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/blocks --region ap-southeast-1  --exclude "*" --include "*blocks_*.csv"
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/transactions --region ap-southeast-1  --exclude "*" --include "*transactions_*.csv"
-> aws s3 sync . s3://<your_bucket>/ethereumetl/export/erc20_transfers --region ap-southeast-1  --exclude "*" --include "*erc20_transfers_*.csv"
+> aws s3 sync . s3://<your_bucket>/ethereumetl/export --region ap-southeast-1
 ```
 
 ### Creating Tables in AWS Athena
@@ -385,7 +383,7 @@ Create a new Google Storage bucket and upload the files:
 
 ```bash
 > cd output
-> gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export/blocks
+> gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
 ```
 
 Upload the files from the bucket to BigQuery:
