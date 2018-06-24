@@ -1,30 +1,37 @@
 [
     {
         "name": "erc20_token",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "ERC20 token address"
     },
     {
         "name": "erc20_from",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Address of the sender"
     },
     {
         "name": "erc20_to",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Address of the receiver"
     },
     {
         "name": "erc20_value",
-        "type": "NUMERIC"
+        "type": "NUMERIC",
+        "description": "Value transferred"
     },
     {
         "name": "erc20_tx_hash",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Transaction hash"
     },
     {
         "name": "erc20_log_index",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "Log index in the transaction receipt"
     },
     {
         "name": "erc20_block_number",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "The block number"
     }
 ]

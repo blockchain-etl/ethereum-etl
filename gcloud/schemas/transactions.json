@@ -1,46 +1,57 @@
 [
     {
         "name": "tx_hash",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Hash of the transaction"
     },
     {
         "name": "tx_nonce",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "The number of transactions made by the sender prior to this one"
     },
     {
         "name": "tx_block_hash",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Hash of the block where this transaction was in. null when its pending"
     },
     {
         "name": "tx_block_number",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "Block number where this transaction was in. null when its pending"
     },
     {
         "name": "tx_index",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "Integer of the transactions index position in the block. null when its pending"
     },
     {
         "name": "tx_from",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Address of the sender"
     },
     {
         "name": "tx_to",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "Address of the receiver. null when its a contract creation transaction"
     },
     {
         "name": "tx_value",
-        "type": "NUMERIC"
+        "type": "NUMERIC",
+        "description": "Value transferred in Wei"
     },
     {
         "name": "tx_gas",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "Gas provided by the sender"
     },
     {
         "name": "tx_gas_price",
-        "type": "INT64"
+        "type": "INT64",
+        "description": "Gas price provided by the sender in Wei"
     },
     {
         "name": "tx_input",
-        "type": "STRING"
+        "type": "STRING",
+        "description": "The data send along with the transaction"
     }
 ]

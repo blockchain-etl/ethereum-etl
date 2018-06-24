@@ -392,7 +392,9 @@ Upload the files from the bucket to BigQuery:
 
 ```bash
 > cd ethereum-etl
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum-data.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./gcloud/schemas/transactions.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
 ```
 
 
