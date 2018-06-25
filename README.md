@@ -387,9 +387,13 @@ so values greater than 38 decimals will be null.
 You can query the data that I exported in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
+To upload CSVs to BigQuery:
+
 - Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
 
-- Create a new Google Storage bucket and upload the files:
+- Create a new Google Storage bucket https://console.cloud.google.com/storage/browser
+
+- Upload the files:
 
 ```bash
 > cd output
