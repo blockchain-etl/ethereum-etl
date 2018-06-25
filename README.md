@@ -26,6 +26,14 @@ Export ERC20 transfers, filtered by the list of tokens:
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
 
+## Table of Content
+
+- [Schema](#schema)
+- [Exporting the Blockchain](#exporting-blockchain)
+- [Querying in AWS](#querying-aws)
+- [Querying in GCP](#querying-gcp)
+
+
 ## Schema
 
 `blocks.csv`
@@ -80,10 +88,7 @@ erc20_block_number  | bigint      |
 
 Note: for the `address` type all hex characters are lower-cased.
 
-### Usage
-
-If you want to export just a few thousand blocks and don't want to sync your own node 
-refer to https://github.com/medvedev1088/ethereum-scraper.
+## Exporting the Blockchain
 
 1. Install python 3.6 https://conda.io/miniconda.html
 
@@ -143,7 +148,7 @@ Additional steps:
     >  ./export_all.sh -s 0 -e 999999 -b 100000 -i '\\.\pipe\geth.ipc' -o output 
     ```
 
-#### Commands
+#### Command Reference
 
 - Export blocks and transactions:
 
@@ -176,28 +181,30 @@ You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
 
-### Running Tests
+#### Running Tests
 
 ```bash
 > pytest -vv
 ```
 
-### Uploading to S3
+## Querying in AWS
 
-Upload the files to S3:
+- Upload the files to S3:
 
 ```bash
 > cd output
 > aws s3 sync . s3://<your_bucket>/ethereumetl/export --region ap-southeast-1
 ```
 
-### Creating Tables in AWS Athena
+- Sign in to Athena https://console.aws.amazon.com/athena/home
 
-Create database:
+- Create a database:
 
 ```sql
 CREATE DATABASE ethereumetl;
 ```
+
+- Create the tables:
 
 #### blocks
 
@@ -375,18 +382,25 @@ MSCK REPAIR TABLE parquet_erc20_transfers;
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
 
-### Upload Files to Google BigQuery
+## Querying in GCP
 
-Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
+You can query the first 5.6 million blocks in this public dataset
+https://bigquery.cloud.google.com/dataset/ethereumetl:ethereum
 
-Create a new Google Storage bucket and upload the files:
+- Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
+
+- Create a new Google Storage bucket and upload the files:
 
 ```bash
 > cd output
 > gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
 ```
 
-Create a new dataset called ethereum in BigQuery and load the files from the bucket:
+- Sign in to BigQuery https://bigquery.cloud.google.com/ 
+
+- Create a new dataset called `ethereum`
+
+- Load the files from the bucket to BigQuery:
 
 ```bash
 > cd ethereum-etl
