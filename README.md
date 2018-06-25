@@ -29,9 +29,9 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 ## Table of Content
 
 - [Schema](#schema)
-- [Exporting the Blockchain](#exporting-blockchain)
-- [Querying in AWS](#querying-aws)
-- [Querying in GCP](#querying-gcp)
+- [Exporting the Blockchain](#exporting-the-blockchain)
+- [Querying in AWS](#querying-in-aws)
+- [Querying in GCP](#querying-in-gcp)
 
 
 ## Schema
