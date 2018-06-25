@@ -49,8 +49,8 @@ block_logs_bloom        | hex_string         |
 block_transactions_root | hex_string         |
 block_state_root        | hex_string         |
 block_miner             | address            |
-block_difficulty        | bigint             |
-block_total_difficulty  | bigint             |
+block_difficulty        | numeric            |
+block_total_difficulty  | numeric            |
 block_size              | bigint             |
 block_extra_data        | hex_string         |
 block_gas_limit         | bigint             |
@@ -69,7 +69,7 @@ tx_block_number     | bigint      |
 tx_index            | bigint      |
 tx_from             | address     |
 tx_to               | address     |
-tx_value            | bigint      |
+tx_value            | numeric     |
 tx_gas              | bigint      |
 tx_gas_price        | bigint      |
 tx_input            | hex_string  |
@@ -81,7 +81,7 @@ Column              |    Type     |
 erc20_token         | address     |
 erc20_from          | address     |
 erc20_to            | address     |
-erc20_value         | bigint      |
+erc20_value         | numeric     |
 erc20_tx_hash       | hex_string  |
 erc20_log_index     | bigint      |
 erc20_block_number  | bigint      |
@@ -384,8 +384,8 @@ so values greater than 38 decimals will be null.
 
 ## Querying in GCP
 
-You can query the first 5.6 million blocks in this public dataset
-https://bigquery.cloud.google.com/dataset/ethereumetl:ethereum
+You can query the data that I exported in the public BigQuery dataset
+https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
 - Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
 
