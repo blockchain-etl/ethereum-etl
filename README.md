@@ -221,7 +221,7 @@ Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
 
-## Querying in GCP
+## Querying in GCP BigQuery
 
 You can query the data that I exported in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
