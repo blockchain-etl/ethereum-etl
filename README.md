@@ -30,8 +30,8 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 - [Schema](#schema)
 - [Exporting the Blockchain](#exporting-the-blockchain)
-- [Querying in AWS](#querying-in-aws)
-- [Querying in GCP](#querying-in-gcp)
+- [Querying in AWS Athena](#querying-in-aws-athena)
+- [Querying in GCP BigQuery](#querying-in-gcp-bigquery)
 
 
 ## Schema
@@ -90,7 +90,7 @@ Note: for the `address` type all hex characters are lower-cased.
 
 ## Exporting the Blockchain
 
-1. Install python 3.6 https://conda.io/miniconda.html
+1. Install python 3.5+ https://www.python.org/downloads/
 
 1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
@@ -187,7 +187,7 @@ Call `python export_erc20_transfers.py -h` for more details.
 > pytest -vv
 ```
 
-## Querying in AWS
+## Querying in AWS Athena
 
 - Upload the files to S3:
 
@@ -205,179 +205,18 @@ CREATE DATABASE ethereumetl;
 ```
 
 - Create the tables:
-
-#### blocks
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
-    block_number BIGINT,
-    block_hash STRING,
-    block_parent_hash STRING,
-    block_nonce STRING,
-    block_sha3_uncles STRING,
-    block_logs_bloom STRING,
-    block_transactions_root STRING,
-    block_state_root STRING,
-    block_miner STRING,
-    block_difficulty DECIMAL(38,0),
-    block_total_difficulty DECIMAL(38,0),
-    block_size BIGINT,
-    block_extra_data STRING,
-    block_gas_limit BIGINT,
-    block_gas_used BIGINT,
-    block_timestamp BIGINT,
-    block_transaction_count BIGINT
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = ',',
-    'field.delim' = ',',
-    'escape.delim' = '\\'
-)
-STORED AS TEXTFILE
-LOCATION 's3://<your_bucket>/ethereumetl/export/blocks'
-TBLPROPERTIES (
-  'skip.header.line.count' = '1'
-);
-
-MSCK REPAIR TABLE blocks;
-```
-
-#### transactions
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
-    tx_hash STRING, 
-    tx_nonce BIGINT, 
-    tx_block_hash STRING,
-    tx_block_number BIGINT, 
-    tx_index BIGINT, 
-    tx_from STRING, 
-    tx_to STRING, 
-    tx_value DECIMAL(38,0), 
-    tx_gas BIGINT, 
-    tx_gas_price BIGINT, 
-    tx_input STRING  
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = ',',
-    'field.delim' = ',',
-    'escape.delim' = '\\'
-)
-STORED AS TEXTFILE
-LOCATION 's3://<your_bucket>/ethereumetl/export/transactions'
-TBLPROPERTIES (
-  'skip.header.line.count' = '1'
-);
-
-MSCK REPAIR TABLE transactions;
-```
-
-#### erc20_transfers
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS erc20_transfers (
-    erc20_token STRING, 
-    erc20_from STRING, 
-    erc20_to STRING, 
-    erc20_value DECIMAL(38,0), 
-    erc20_tx_hash STRING, 
-    erc20_log_index BIGINT, 
-    erc20_block_number BIGINT  
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = ',',
-    'field.delim' = ',',
-    'escape.delim' = '\\'
-)
-STORED AS TEXTFILE
-LOCATION 's3://<your_bucket>/ethereumetl/export/erc20_transfers'
-TBLPROPERTIES (
-  'skip.header.line.count' = '1'
-);
-
-MSCK REPAIR TABLE erc20_transfers;
-```
+  - blocks [cloud/aws/blocks.sql](./cloud/aws/blocks.sql)
+  - transactions [cloud/aws/transactions.sql](cloud/aws/transactions.sql)
+  - erc20_transfers [cloud/aws/erc20_transfers.sql](cloud/aws/erc20_transfers.sql)
 
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
 
-#### parquet_blocks
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS parquet_blocks (
-    block_number BIGINT,
-    block_hash STRING,
-    block_parent_hash STRING,
-    block_nonce STRING,
-    block_sha3_uncles STRING,
-    block_logs_bloom STRING,
-    block_transactions_root STRING,
-    block_state_root STRING,
-    block_miner STRING,
-    block_difficulty DECIMAL(38,0),
-    block_total_difficulty DECIMAL(38,0),
-    block_size BIGINT,
-    block_extra_data STRING,
-    block_gas_limit BIGINT,
-    block_gas_used BIGINT,
-    block_timestamp BIGINT,
-    block_transaction_count BIGINT
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-STORED AS PARQUET
-LOCATION 's3://<your_bucket>/ethereumetl/parquet/blocks';
-  
-MSCK REPAIR TABLE parquet_blocks;
-```
-
-#### parquet_transactions
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS parquet_transactions (
-    tx_hash STRING, 
-    tx_nonce BIGINT, 
-    tx_block_hash STRING,
-    tx_block_number BIGINT, 
-    tx_index BIGINT, 
-    tx_from STRING, 
-    tx_to STRING, 
-    tx_value DECIMAL(38,0), 
-    tx_gas BIGINT, 
-    tx_gas_price BIGINT, 
-    tx_input STRING  
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-STORED AS PARQUET
-LOCATION 's3://<your_bucket>/ethereumetl/parquet/transactions';
-  
-MSCK REPAIR TABLE parquet_transactions;
-```
-
-#### parquet_erc20_transfers
-
-```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS parquet_erc20_transfers (
-    erc20_token STRING, 
-    erc20_from STRING, 
-    erc20_to STRING, 
-    erc20_value DECIMAL(38,0), 
-    erc20_tx_hash STRING, 
-    erc20_log_index BIGINT, 
-    erc20_block_number BIGINT  
-)
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-STORED AS PARQUET
-LOCATION 's3://<your_bucket>/ethereumetl/parquet/erc20_transfers';
-
-MSCK REPAIR TABLE parquet_erc20_transfers;
-```
+- Create the tables:
+  - parquet_blocks [cloud/aws/parquet/parquet_blocks.sql](cloud/aws/parquet/parquet_blocks.sql)
+  - transactions [cloud/aws/parquet/parquet_transactions.sql](cloud/aws/parquet/parquet_transactions.sql)
+  - erc20_transfers [cloud/aws/parquet/parquet_erc20_transfers.sql](cloud/aws/parquet/parquet_erc20_transfers.sql)
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
@@ -408,9 +247,9 @@ To upload CSVs to BigQuery:
 
 ```bash
 > cd ethereum-etl
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./gcloud/schemas/blocks.json
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./gcloud/schemas/transactions.json
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=1000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./gcloud/schemas/erc20_transfers.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./cloud/gcp/schemas/blocks.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./cloud/gcp/schemas/transactions.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=1000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./cloud/gcp/schemas/erc20_transfers.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid 
