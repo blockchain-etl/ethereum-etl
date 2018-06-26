@@ -205,18 +205,18 @@ CREATE DATABASE ethereumetl;
 ```
 
 - Create the tables:
-  - blocks [cloud/aws/blocks.sql](./cloud/aws/blocks.sql)
-  - transactions [cloud/aws/transactions.sql](cloud/aws/transactions.sql)
-  - erc20_transfers [cloud/aws/erc20_transfers.sql](cloud/aws/erc20_transfers.sql)
+  - blocks: [cloud/aws/blocks.sql](./cloud/aws/blocks.sql)
+  - transactions: [cloud/aws/transactions.sql](cloud/aws/transactions.sql)
+  - erc20_transfers: [cloud/aws/erc20_transfers.sql](cloud/aws/erc20_transfers.sql)
 
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
 
 - Create the tables:
-  - parquet_blocks [cloud/aws/parquet/parquet_blocks.sql](cloud/aws/parquet/parquet_blocks.sql)
-  - transactions [cloud/aws/parquet/parquet_transactions.sql](cloud/aws/parquet/parquet_transactions.sql)
-  - erc20_transfers [cloud/aws/parquet/parquet_erc20_transfers.sql](cloud/aws/parquet/parquet_erc20_transfers.sql)
+  - parquet_blocks: [cloud/aws/parquet/parquet_blocks.sql](cloud/aws/parquet/parquet_blocks.sql)
+  - parquet_transactions: [cloud/aws/parquet/parquet_transactions.sql](cloud/aws/parquet/parquet_transactions.sql)
+  - parquet_erc20_transfers: [cloud/aws/parquet/parquet_erc20_transfers.sql](cloud/aws/parquet/parquet_erc20_transfers.sql)
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
