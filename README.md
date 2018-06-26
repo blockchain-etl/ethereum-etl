@@ -205,18 +205,18 @@ CREATE DATABASE ethereumetl;
 ```
 
 - Create the tables:
-  - blocks: [cloud/aws/blocks.sql](./cloud/aws/blocks.sql)
-  - transactions: [cloud/aws/transactions.sql](cloud/aws/transactions.sql)
-  - erc20_transfers: [cloud/aws/erc20_transfers.sql](cloud/aws/erc20_transfers.sql)
+  - blocks: [schemas/aws/blocks.sql](schemas/aws/blocks.sql)
+  - transactions: [schemas/aws/transactions.sql](schemas/aws/transactions.sql)
+  - erc20_transfers: [schemas/aws/erc20_transfers.sql](schemas/aws/erc20_transfers.sql)
 
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
 
 - Create the tables:
-  - parquet_blocks: [cloud/aws/parquet/parquet_blocks.sql](cloud/aws/parquet/parquet_blocks.sql)
-  - parquet_transactions: [cloud/aws/parquet/parquet_transactions.sql](cloud/aws/parquet/parquet_transactions.sql)
-  - parquet_erc20_transfers: [cloud/aws/parquet/parquet_erc20_transfers.sql](cloud/aws/parquet/parquet_erc20_transfers.sql)
+  - parquet_blocks: [schemas/aws/parquet/parquet_blocks.sql](schemas/aws/parquet/parquet_blocks.sql)
+  - parquet_transactions: [schemas/aws/parquet/parquet_transactions.sql](schemas/aws/parquet/parquet_transactions.sql)
+  - parquet_erc20_transfers: [schemas/aws/parquet/parquet_erc20_transfers.sql](schemas/aws/parquet/parquet_erc20_transfers.sql)
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
@@ -247,9 +247,9 @@ To upload CSVs to BigQuery:
 
 ```bash
 > cd ethereum-etl
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./cloud/gcp/schemas/blocks.json
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./cloud/gcp/schemas/transactions.json
-> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=1000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./cloud/gcp/schemas/erc20_transfers.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=5000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid 
