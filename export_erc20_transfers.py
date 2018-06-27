@@ -4,6 +4,7 @@ import argparse
 from web3 import IPCProvider, Web3
 
 from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
+from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 parser = argparse.ArgumentParser(
@@ -25,7 +26,7 @@ job = ExportErc20TransfersJob(
     end_block=args.end_block,
     batch_size=args.batch_size,
     web3=ThreadLocalProxy(lambda: Web3(IPCProvider(args.ipc_path, timeout=args.ipc_timeout))),
-    output=args.output,
+    item_exporter=export_erc20_transfers_job_item_exporter(args.output),
     max_workers=args.max_workers,
     tokens=args.tokens)
 
