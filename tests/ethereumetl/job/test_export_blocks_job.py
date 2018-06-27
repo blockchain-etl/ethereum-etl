@@ -37,6 +37,7 @@ class MockIPCWrapper(object):
 
 @pytest.mark.parametrize("start_block,end_block,batch_size,resource_group", [
     (0, 0, 1, 'block_without_transactions'),
+    (483920, 483920, 1, 'block_with_logs'),
     (47218, 47219, 1, 'blocks_with_transactions'),
     (47218, 47219, 2, 'blocks_with_transactions')
 ])
@@ -51,7 +52,7 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
         ipc_wrapper=ThreadLocalProxy(lambda: MockIPCWrapper(resource_group)),
         max_workers=5,
         item_exporter=export_blocks_job_item_exporter(
-            blocks_output_file, transactions_output_file, receipts_output_file
+            blocks_output_file, transactions_output_file, receipts_output_file, logs_output_file
         ),
         export_blocks=blocks_output_file is not None,
         export_transactions=transactions_output_file is not None,
