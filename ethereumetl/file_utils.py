@@ -5,7 +5,7 @@ import sys
 
 # https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
 def get_file_handle(filename, mode='w', binary=False, create_parent_dirs=False):
-    if create_parent_dirs:
+    if create_parent_dirs and filename is not None:
         dirname = os.path.dirname(filename)
         pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
     full_mode = mode + ('b' if binary else '')
