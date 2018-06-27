@@ -1,45 +1,12 @@
 import json
 
-from ethereumetl.exporters import CsvItemExporter
-from ethereumetl.file_utils import get_file_handle, close_silently
 from ethereumetl.jobs.batch_export_job import BatchExportJob
-from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
+from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc, \
+    generate_get_receipt_by_tx_hash_json_rpc
 from ethereumetl.mappers.block_mapper import EthBlockMapper
+from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.mappers.receipt_mapper import EthReceiptMapper
 from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
-
-BLOCK_FIELDS_TO_EXPORT = [
-    'block_number',
-    'block_hash',
-    'block_parent_hash',
-    'block_nonce',
-    'block_sha3_uncles',
-    'block_logs_bloom',
-    'block_transactions_root',
-    'block_state_root',
-    'block_miner',
-    'block_difficulty',
-    'block_total_difficulty',
-    'block_size',
-    'block_extra_data',
-    'block_gas_limit',
-    'block_gas_used',
-    'block_timestamp',
-    'block_transaction_count'
-]
-
-TRANSACTION_FIELDS_TO_EXPORT = [
-    'tx_hash',
-    'tx_nonce',
-    'tx_block_hash',
-    'tx_block_number',
-    'tx_index',
-    'tx_from',
-    'tx_to',
-    'tx_value',
-    'tx_gas',
-    'tx_gas_price',
-    'tx_input'
-]
 
 
 # Exports blocks and transactions
@@ -50,59 +17,77 @@ class ExportBlocksJob(BatchExportJob):
             end_block,
             batch_size,
             ipc_wrapper,
-            max_workers=5,
-            blocks_output=None,
-            transactions_output=None,
-            block_fields_to_export=BLOCK_FIELDS_TO_EXPORT,
-            transaction_fields_to_export=TRANSACTION_FIELDS_TO_EXPORT):
+            max_workers,
+            item_exporter,
+            export_blocks=True,
+            export_transactions=True,
+            export_receipts=False,
+            export_logs=False):
         super().__init__(start_block, end_block, batch_size, max_workers)
         self.ipc_wrapper = ipc_wrapper
-        self.blocks_output = blocks_output
-        self.transactions_output = transactions_output
-        self.block_fields_to_export = block_fields_to_export
-        self.transaction_fields_to_export = transaction_fields_to_export
 
-        self.export_blocks = blocks_output is not None
-        self.export_transactions = transactions_output is not None
-        if not self.export_blocks and not self.export_transactions:
-            raise ValueError('Either blocks_output or transactions_output must be provided')
+        self.item_exporter = item_exporter
+
+        self.export_blocks = export_blocks
+        self.export_transactions = export_transactions
+        self.export_receipts = export_receipts
+        self.export_logs = export_logs
+        if not self.export_blocks and not self.export_transactions and not self.export_receipts and not self.export_logs:
+            raise ValueError('At least one of export_blocks or export_transactions or ' +
+                             'export_receipts  or export_logs must be True')
 
         self.block_mapper = EthBlockMapper()
         self.transaction_mapper = EthTransactionMapper()
-
-        self.blocks_output_file = None
-        self.transactions_output_file = None
-
-        self.blocks_exporter = None
-        self.transactions_exporter = None
+        self.receipt_mapper = EthReceiptMapper()
+        self.receipt_log_mapper = EthReceiptLogMapper()
 
     def _start(self):
         super()._start()
-
-        self.blocks_output_file = get_file_handle(self.blocks_output, binary=True, create_parent_dirs=True)
-        self.blocks_exporter = CsvItemExporter(
-            self.blocks_output_file, fields_to_export=self.block_fields_to_export)
-
-        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True, create_parent_dirs=True)
-        self.transactions_exporter = CsvItemExporter(
-            self.transactions_output_file, fields_to_export=self.transaction_fields_to_export)
+        self.item_exporter.open()
 
     def _export_batch(self, batch_start, batch_end):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(batch_start, batch_end, self.export_transactions))
         response = self.ipc_wrapper.make_request(json.dumps(blocks_rpc))
-        for response_item in response:
-            result = response_item['result']
-            block = self.block_mapper.json_dict_to_block(result)
+        results = self._batch_rpc_response_to_results(response)
+        blocks = [self.block_mapper.json_dict_to_block(result) for result in results]
+
+        for block in blocks:
             self._export_block(block)
+
+        # Refactor this when receipts are added to blocks rpc https://github.com/ethereum/go-ethereum/issues/17044
+        if self.export_receipts:
+            tx_hashes = [tx.hash for block in blocks for tx in block.transactions]
+            self._export_receipts(tx_hashes)
+
+    def _batch_rpc_response_to_results(self, response):
+        for response_item in response:
+            yield response_item['result']
 
     def _export_block(self, block):
         if self.export_blocks:
-            self.blocks_exporter.export_item(self.block_mapper.block_to_dict(block))
+            self.item_exporter.export_item(self.block_mapper.block_to_dict(block))
         if self.export_transactions:
             for tx in block.transactions:
-                self.transactions_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
+                self.item_exporter.export_item(self.transaction_mapper.transaction_to_dict(tx))
+
+    def _export_receipts(self, tx_hashes):
+        if len(tx_hashes) == 0:
+            return
+
+        receipts_rpc = list(generate_get_receipt_by_tx_hash_json_rpc(tx_hashes))
+        response = self.ipc_wrapper.make_request(json.dumps(receipts_rpc))
+        results = self._batch_rpc_response_to_results(response)
+        receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
+        for receipt in receipts:
+            self._export_receipt(receipt)
+
+    def _export_receipt(self, receipt):
+        if self.export_receipts:
+            self.item_exporter.export_item(self.receipt_mapper.receipt_to_dict(receipt))
+            if self.export_logs:
+                for log in receipt.logs:
+                    self.item_exporter.export_item(self.receipt_log_mapper.receipt_log_to_dict(log))
 
     def _end(self):
         super()._end()
-        close_silently(self.blocks_output_file)
-        close_silently(self.transactions_output_file)
+        self.item_exporter.close()

@@ -5,6 +5,7 @@ from web3 import Web3, IPCProvider
 
 import tests.resources
 from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
+from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import compare_lines_ignore_order, read_file
 
@@ -34,7 +35,8 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
     job = ExportErc20TransfersJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
         web3=ThreadLocalProxy(lambda: Web3(MockIPCProvider(resource_group))),
-        output=output_file
+        item_exporter=export_erc20_transfers_job_item_exporter(output_file),
+        max_workers=5
     )
     job.run()
 
