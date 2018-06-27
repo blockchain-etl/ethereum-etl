@@ -1,5 +1,4 @@
-from ethereumetl.exporters import CsvItemExporter
-from ethereumetl.file_utils import get_file_handle, close_silently
+from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
 
 BLOCK_FIELDS_TO_EXPORT = [
     'block_number',
@@ -36,45 +35,14 @@ TRANSACTION_FIELDS_TO_EXPORT = [
 ]
 
 
-class ExportBlocksJobItemExporter:
-    def __init__(
-            self,
-            blocks_output=None,
-            transactions_output=None,
-            block_fields_to_export=BLOCK_FIELDS_TO_EXPORT,
-            transaction_fields_to_export=TRANSACTION_FIELDS_TO_EXPORT):
-        self.blocks_output = blocks_output
-        self.transactions_output = transactions_output
-        self.block_fields_to_export = block_fields_to_export
-        self.transaction_fields_to_export = transaction_fields_to_export
-
-        self.export_blocks = blocks_output is not None
-        self.export_transactions = transactions_output is not None
-
-        self.blocks_output_file = None
-        self.transactions_output_file = None
-
-        self.blocks_exporter = None
-        self.transactions_exporter = None
-
-    def open(self):
-        self.blocks_output_file = get_file_handle(self.blocks_output, binary=True, create_parent_dirs=True)
-        self.blocks_exporter = CsvItemExporter(
-            self.blocks_output_file, fields_to_export=self.block_fields_to_export)
-
-        self.transactions_output_file = get_file_handle(self.transactions_output, binary=True, create_parent_dirs=True)
-        self.transactions_exporter = CsvItemExporter(
-            self.transactions_output_file, fields_to_export=self.transaction_fields_to_export)
-
-    def export_item(self, item):
-        item_type = item.get('type', None)
-        if item_type == 'block':
-            self.blocks_exporter.export_item(item)
-        elif item_type == 'transaction':
-            self.transactions_exporter.export_item(item)
-        else:
-            raise ValueError('Unknown item time {}'.format(item_type))
-
-    def close(self):
-        close_silently(self.blocks_output_file)
-        close_silently(self.transactions_output_file)
+def export_blocks_job_item_exporter(blocks_output, transactions_output):
+    return CompositeItemExporter(
+        filename_mapping={
+            'block': blocks_output,
+            'transaction': transactions_output
+        },
+        field_mapping={
+            'block': BLOCK_FIELDS_TO_EXPORT,
+            'transaction': TRANSACTION_FIELDS_TO_EXPORT
+        }
+    )
