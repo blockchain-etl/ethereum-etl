@@ -20,6 +20,7 @@ class EthTransactionMapper(object):
 
     def transaction_to_dict(self, transaction):
         return {
+            'type': 'transaction',
             'tx_hash': transaction.hash,
             'tx_nonce': transaction.nonce,
             'tx_block_hash': transaction.block_hash,

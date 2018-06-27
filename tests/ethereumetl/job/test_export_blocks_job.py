@@ -3,6 +3,7 @@ import json
 import pytest
 
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
+from ethereumetl.jobs.export_blocks_job_item_exporter import ExportBlocksJobItemExporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.utils import hex_to_dec
 from tests.helpers import compare_lines_ignore_order, read_file
@@ -39,11 +40,18 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
     blocks_output_file = tmpdir.join('actual_blocks.csv')
     transactions_output_file = tmpdir.join('actual_transactions.csv')
 
+    item_exporter = ExportBlocksJobItemExporter(
+        blocks_output=blocks_output_file,
+        transactions_output=transactions_output_file
+    )
+
     job = ExportBlocksJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
         ipc_wrapper=ThreadLocalProxy(lambda: MockIPCWrapper(resource_group)),
-        blocks_output=blocks_output_file,
-        transactions_output=transactions_output_file
+        max_workers=5,
+        item_exporter=item_exporter,
+        export_blocks=blocks_output_file is not None,
+        export_transactions=transactions_output_file is not None
     )
     job.run()
 
