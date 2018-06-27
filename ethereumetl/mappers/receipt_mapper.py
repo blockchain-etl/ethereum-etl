@@ -27,10 +27,10 @@ class EthReceiptMapper(object):
         receipt.root = json_dict.get('root', None)
         receipt.status = hex_to_dec(json_dict.get('status', None))
 
-        # if 'logs' in json_dict:
-        #     receipt.logs = [
-        #         self.receipt_log_mapper.json_dict_to_receipt_log(log) for log in json_dict['logs']
-        #     ]
+        if 'logs' in json_dict:
+            receipt.logs = [
+                self.receipt_log_mapper.json_dict_to_receipt_log(log) for log in json_dict['logs']
+            ]
 
         return receipt
 

@@ -45,20 +45,33 @@ RECEIPT_FIELDS_TO_EXPORT = [
     'receipt_gas_used',
     'receipt_contract_address',
     'receipt_root',
-    'receipt_status',
+    'receipt_status'
+]
+
+LOG_FIELDS_TO_EXPORT = [
+    'log_index',
+    'log_transaction_index',
+    'log_transaction_hash',
+    'log_block_hash',
+    'log_block_number',
+    'log_address',
+    'log_data',
+    'log_topics'
 ]
 
 
-def export_blocks_job_item_exporter(blocks_output, transactions_output, receipt_output):
+def export_blocks_job_item_exporter(blocks_output=None, transactions_output=None, receipts_output=None, logs_output=None):
     return CompositeItemExporter(
         filename_mapping={
             'block': blocks_output,
             'transaction': transactions_output,
-            'receipt': receipt_output
+            'receipt': receipts_output,
+            'log': logs_output
         },
         field_mapping={
             'block': BLOCK_FIELDS_TO_EXPORT,
             'transaction': TRANSACTION_FIELDS_TO_EXPORT,
-            'receipt': RECEIPT_FIELDS_TO_EXPORT
+            'receipt': RECEIPT_FIELDS_TO_EXPORT,
+            'log': LOG_FIELDS_TO_EXPORT
         }
     )
