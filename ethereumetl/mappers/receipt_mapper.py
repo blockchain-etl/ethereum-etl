@@ -17,8 +17,6 @@ class EthReceiptMapper(object):
         receipt.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         receipt.block_hash = json_dict.get('blockHash', None)
         receipt.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        receipt.from_address = to_normalized_address(json_dict.get('from', None))
-        receipt.to_address = to_normalized_address(json_dict.get('to', None))
         receipt.cumulative_gas_used = hex_to_dec(json_dict.get('cumulativeGasUsed', None))
         receipt.gas_used = hex_to_dec(json_dict.get('gasUsed', None))
 
@@ -41,8 +39,6 @@ class EthReceiptMapper(object):
             'receipt_transaction_index': receipt.transaction_index,
             'receipt_block_hash': receipt.block_hash,
             'receipt_block_number': receipt.block_number,
-            'receipt_from_address': receipt.from_address,
-            'receipt_to_address': receipt.to_address,
             'receipt_cumulative_gas_used': receipt.cumulative_gas_used,
             'receipt_gas_used': receipt.gas_used,
             'receipt_contract_address': receipt.contract_address,

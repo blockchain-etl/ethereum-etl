@@ -86,6 +86,34 @@ erc20_tx_hash       | hex_string  |
 erc20_log_index     | bigint      |
 erc20_block_number  | bigint      |
 
+`receipts.csv`
+
+Column                       |    Type     |
+-----------------------------|--------------
+receipt_transaction_hash     | hex_string  |
+receipt_transaction_index    | bigint      |
+receipt_block_hash           | hex_string  |
+receipt_block_number         | bigint      |
+receipt_cumulative_gas_used  | bigint      |
+receipt_gas_used             | bigint      |
+receipt_contract_address     | address     |
+receipt_root                 | hex_string  |
+receipt_status               | bigint      |
+
+`logs.csv`
+
+Column                       |    Type     |
+-----------------------------|--------------
+log_index                    | bigint      |
+log_transaction_hash         | hex_string  |
+log_transaction_index        | bigint      |
+log_block_hash               | hex_string  |
+log_block_number             | bigint      |
+log_address                  | address     |
+log_data                     | hex_string  |
+log_topics                   | string      |
+
+
 Note: for the `address` type all hex characters are lower-cased.
 
 ## Exporting the Blockchain
@@ -150,14 +178,15 @@ Additional steps:
 
 #### Command Reference
 
-- Export blocks and transactions:
+- Export blocks, transactions, receipts, logs:
 
 ```bash
 > python export_blocks.py --start-block 0 --end-block 500000 \
---ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
+--ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv \
+--receipts-output receipts.csv --logs-output logs.csv 
 ```
 
-Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
+Omit `--<entity>-output` options if you don't want to export the corresponding entities.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 

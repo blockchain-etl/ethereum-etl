@@ -8,8 +8,8 @@ class EthReceiptLogMapper(object):
         receipt_log = EthReceiptLog()
 
         receipt_log.log_index = hex_to_dec(json_dict.get('logIndex', None))
-        receipt_log.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         receipt_log.transaction_hash = json_dict.get('transactionHash', None)
+        receipt_log.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         receipt_log.block_hash = json_dict.get('blockHash', None)
         receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber', None))
         receipt_log.address = json_dict.get('address', None)
@@ -47,8 +47,8 @@ class EthReceiptLogMapper(object):
         return {
             'type': 'log',
             'log_index': receipt_log.log_index,
-            'log_transaction_index': receipt_log.transaction_index,
             'log_transaction_hash': receipt_log.transaction_hash,
+            'log_transaction_index': receipt_log.transaction_index,
             'log_block_hash': receipt_log.block_hash,
             'log_block_number': receipt_log.block_number,
             'log_address': receipt_log.address,
