@@ -19,6 +19,9 @@ parser.add_argument('--blocks-output', default=None, type=str,
 parser.add_argument('--transactions-output', default=None, type=str,
                     help='The output file for transactions. If not provided transactions will not be exported. '
                          'Use "-" for stdout')
+parser.add_argument('--receipts-output', default=None, type=str,
+                    help='The output file for receipts. If not provided receipts will not be exported. '
+                         'Use "-" for stdout')
 
 args = parser.parse_args()
 
@@ -28,8 +31,9 @@ job = ExportBlocksJob(
     batch_size=args.batch_size,
     ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, timeout=args.ipc_timeout)),
     max_workers=args.max_workers,
-    item_exporter=export_blocks_job_item_exporter(args.blocks_output, args.transactions_output),
+    item_exporter=export_blocks_job_item_exporter(args.blocks_output, args.transactions_output, args.receipts_output),
     export_blocks=args.blocks_output is not None,
-    export_transactions=args.transactions_output is not None)
+    export_transactions=args.transactions_output is not None,
+    export_receipts=args.receipts_output is not None)
 
 job.run()
