@@ -6,7 +6,7 @@
 Export blocks and transactions:
 
 ```bash
-> python export_blocks.py --start-block 0 --end-block 500000 \
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
 --ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
@@ -181,16 +181,15 @@ Additional steps:
 - Export blocks, transactions, receipts, logs:
 
 ```bash
-> python export_blocks.py --start-block 0 --end-block 500000 \
---ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv \
---receipts-output receipts.csv --logs-output logs.csv 
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Omit `--<entity>-output` options if you don't want to export the corresponding entities.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_blocks.py -h` for more details. 
+Call `python export_blocks_and_transactions.py -h` for more details. 
 
 - Export ERC20 transfers:
 
