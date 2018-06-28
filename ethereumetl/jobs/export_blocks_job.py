@@ -8,6 +8,7 @@ from ethereumetl.utils import rpc_response_batch_to_results
 
 
 # Exports blocks and transactions
+# TODO: Use BatchWorkExecutor instead of inheriting BatchExportJob
 class ExportBlocksJob(BatchExportJob):
     def __init__(
             self,

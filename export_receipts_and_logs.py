@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 
+from ethereumetl.file_utils import smart_open
 from ethereumetl.ipc import IPCWrapper
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
@@ -21,9 +22,9 @@ parser.add_argument('--logs-output', default=None, type=str,
 
 args = parser.parse_args()
 
-with open(args.tx_hashes) as tx_hashes_file:
+with smart_open(args.tx_hashes, 'r') as tx_hashes_file:
     job = ExportReceiptsJob(
-        tx_hashes_iterator=tx_hashes_file,
+        tx_hashes_iterator=(tx_hash.strip() for tx_hash in tx_hashes_file),
         batch_size=args.batch_size,
         ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, timeout=args.ipc_timeout)),
         max_workers=args.max_workers,
