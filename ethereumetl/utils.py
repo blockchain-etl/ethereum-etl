@@ -32,6 +32,14 @@ def to_normalized_address(address):
     return address.lower()
 
 
+def rpc_response_batch_to_results(response):
+    for response_item in response:
+        result = response_item.get('result', None)
+        if result is None:
+            raise ValueError('result is null in response {}'.format(response_item))
+        yield result
+
+
 def batch_iterator(iterator, batch_size):
     current_batch = []
     for item in iterator:
@@ -49,3 +57,16 @@ def split_to_batches(start_incl, end_incl, batch_size):
     for batch_start in range(start_incl, end_incl + 1, batch_size):
         batch_end = min(batch_start + batch_size - 1, end_incl)
         yield batch_start, batch_end
+
+
+def dynamic_batch_iterator(iterator, batch_size_getter):
+    lst = []
+    batch_size = batch_size_getter()
+    for item in iterator:
+        lst.append(item)
+        if len(lst) == batch_size:
+            yield lst
+            lst = []
+            batch_size = batch_size_getter()
+    if len(lst) > 0:
+        yield lst

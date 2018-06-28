@@ -15,7 +15,7 @@ class CompositeItemExporter:
 
     def open(self):
         for item_type, filename in self.filename_mapping.items():
-            self.file_mapping[item_type] = get_file_handle(filename, binary=True, create_parent_dirs=True)
+            self.file_mapping[item_type] = get_file_handle(filename, binary=True)
             self.exporter_mapping[item_type] = CsvItemExporter(self.file_mapping[item_type],
                                                                fields_to_export=self.field_mapping[item_type])
 

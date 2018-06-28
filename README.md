@@ -6,7 +6,7 @@
 Export blocks and transactions:
 
 ```bash
-> python export_blocks.py --start-block 0 --end-block 500000 \
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
 --ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
@@ -158,6 +158,9 @@ there is no need to wait until the full sync as the state is not needed.
 Should work with geth and parity, on Linux, Mac, Windows. 
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
+If you see weird behaviour, e.g. wrong number of rows in the CSV files or corrupted files, 
+check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
+
 #### Reducing the Exporting Time
 
 Read this article https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
@@ -181,16 +184,15 @@ Additional steps:
 - Export blocks, transactions, receipts, logs:
 
 ```bash
-> python export_blocks.py --start-block 0 --end-block 500000 \
---ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv \
---receipts-output receipts.csv --logs-output logs.csv 
+> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Omit `--<entity>-output` options if you don't want to export the corresponding entities.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_blocks.py -h` for more details. 
+Call `python export_blocks_and_transactions.py -h` for more details. 
 
 - Export ERC20 transfers:
 
