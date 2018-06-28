@@ -1,7 +1,7 @@
 import json
 
 from ethereumetl.jobs.base_job import BaseJob
-from ethereumetl.jobs.batch_work_executor import BatchWorkExecutor
+from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.json_rpc_requests import generate_get_receipt_by_tx_hash_json_rpc
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.mappers.receipt_mapper import EthReceiptMapper
