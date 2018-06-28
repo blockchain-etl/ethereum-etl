@@ -158,6 +158,9 @@ there is no need to wait until the full sync as the state is not needed.
 Should work with geth and parity, on Linux, Mac, Windows. 
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
+If you see weird behaviour, e.g. wrong number of rows in the CSV files or corrupted files, 
+check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
+
 #### Reducing the Exporting Time
 
 Read this article https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2

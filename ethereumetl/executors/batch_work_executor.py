@@ -5,7 +5,7 @@ from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.utils import dynamic_batch_iterator
 
 
-# Executes the given work in batches, reducing the batch size in case of errors.
+# Executes the given work in batches, reducing the batch size exponentially in case of errors.
 class BatchWorkExecutor:
     def __init__(
             self,
