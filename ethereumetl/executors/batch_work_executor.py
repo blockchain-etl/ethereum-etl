@@ -11,14 +11,11 @@ class BatchWorkExecutor:
             self,
             starting_batch_size,
             max_workers,
-            retry_exception=None):
+            retry_exceptions=(Timeout, OSError)):
         self.batch_size = starting_batch_size
         self.max_workers = max_workers
         self.executor = None
-        if retry_exception is not None:
-            self.retry_exceptions = retry_exception
-        else:
-            self.retry_exceptions = [Timeout, OSError]
+        self.retry_exceptions = retry_exceptions
 
     def start(self):
         self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
