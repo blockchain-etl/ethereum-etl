@@ -30,6 +30,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 - [Schema](#schema)
 - [Exporting the Blockchain](#exporting-the-blockchain)
+  - [Command Reference](#command-reference)
 - [Querying in AWS Athena](#querying-in-aws-athena)
 - [Querying in GCP BigQuery](#querying-in-gcp-bigquery)
 
@@ -181,7 +182,7 @@ Additional steps:
 
 #### Command Reference
 
-- Export blocks and transactions:
+##### export_blocks_and_transactions.py
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
@@ -194,7 +195,7 @@ You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_blocks_and_transactions.py -h` for more details. 
 
-- Export ERC20 transfers:
+##### export_erc20_transfers.py
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 \
@@ -212,7 +213,7 @@ You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
 
-- Export receipts and logs:
+##### export_receipts_and_logs.py
 
 First extract transaction hashes from `transactions.csv`:
 
