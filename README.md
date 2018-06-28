@@ -181,14 +181,14 @@ Additional steps:
 
 #### Command Reference
 
-- Export blocks, transactions, receipts, logs:
+- Export blocks and transactions:
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
 --ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Omit `--<entity>-output` options if you don't want to export the corresponding entities.
+Omit `--blocks-output` or `--transactions-output` options if you want to export only transactions/blocks.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
@@ -211,6 +211,31 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
+
+- Export receipts and logs:
+
+First extract transaction hashes from `transactions.csv`:
+
+```bash
+> python extract_csv_column.py --input transactions.csv --column tx_hash --output tx_hashes.csv
+```
+
+Then export receipts and logs:
+
+```bash
+> python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
+--ipc-path ~/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
+```
+
+Omit `--receipts-output` or `--logs-output` options if you want to export only logs/receipts.
+
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
+
+Call `python export_receipts_and_logs.py -h` for more details. 
+
+Upvote this feature request https://github.com/ethereum/go-ethereum/issues/17044, 
+it will make receipts and logs export much faster.
+
 
 #### Running Tests
 
@@ -281,6 +306,8 @@ To upload CSVs to BigQuery:
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=5000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid 

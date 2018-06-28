@@ -28,7 +28,7 @@ class ExportReceiptsJob(BaseJob):
         self.export_receipts = export_receipts
         self.export_logs = export_logs
         if not self.export_receipts and not self.export_logs:
-            raise ValueError('At least one of export_receipts  or export_logs must be True')
+            raise ValueError('At least one of export_receipts or export_logs must be True')
 
         self.receipt_mapper = EthReceiptMapper()
         self.receipt_log_mapper = EthReceiptLogMapper()
