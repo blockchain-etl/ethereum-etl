@@ -35,6 +35,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
   - [receipts.csv](#receiptscsv)
   - [logs.csv](#logscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
+  - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
@@ -167,11 +168,12 @@ Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 If you see weird behaviour, e.g. wrong number of rows in the CSV files or corrupted files, 
 check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 
-#### Reducing the Exporting Time
+#### Export in 2 Hours
 
-Read this article https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
+You can use AWS Auto Scaling and Data Pipeline to reduce the exporting time to a few hours.
+Read this article for details https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
 
-#### Windows
+#### Running in Windows
 
 Additional steps:
 
