@@ -29,11 +29,11 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 ## Table of Content
 
 - [Schema](#schema)
-  - [blocks.csv](#blocks.csv)
-  - [transactions.csv](#transactions.csv)
-  - [erc20_transfers.csv](#erc20_transfers.csv)
-  - [receipts.csv](#receipts.csv)
-  - [logs.csv](#logs.csv)
+  - [blocks.csv](#blockscsv)
+  - [transactions.csv](#transactionscsv)
+  - [erc20_transfers.csv](#erc20_transferscsv)
+  - [receipts.csv](#receiptscsv)
+  - [logs.csv](#logscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Command Reference](#command-reference)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
