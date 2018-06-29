@@ -23,9 +23,6 @@ class ExportErc20TransfersJob(BatchExportJob):
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_processor = EthErc20Processor()
 
-        self.output_file = None
-        self.exporter = None
-
     def _start(self):
         super()._start()
         self.item_exporter.open()
