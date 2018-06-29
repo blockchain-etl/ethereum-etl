@@ -12,20 +12,6 @@ def chunk_string(string, length):
     return (string[0 + i:length + i] for i in range(0, len(string), length))
 
 
-def batch_readlines(file, batch_size):
-    current_batch_size = 0
-    batch = []
-    for line in file:
-        batch.append(line)
-        current_batch_size += 1
-        if current_batch_size == batch_size:
-            yield batch
-            batch = []
-            current_batch_size = 0
-    if current_batch_size != 0:
-        yield batch
-
-
 def to_normalized_address(address):
     if address is None or not isinstance(address, str):
         return address
@@ -38,18 +24,6 @@ def rpc_response_batch_to_results(response):
         if result is None:
             raise ValueError('result is null in response {}'.format(response_item))
         yield result
-
-
-def batch_iterator(iterator, batch_size):
-    current_batch = []
-    for item in iterator:
-        current_batch.append(item)
-        if len(current_batch) == batch_size:
-            yield current_batch
-            current_batch = []
-
-    if len(current_batch) != 0:
-        yield current_batch
 
 
 def split_to_batches(start_incl, end_incl, batch_size):
