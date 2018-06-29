@@ -14,6 +14,8 @@ class BatchWorkExecutor:
             retry_exceptions=(Timeout, OSError)):
         self.batch_size = starting_batch_size
         self.max_workers = max_workers
+        # Using bounded executor prevents unlimited queue growth
+        # and allows monitoring in-progress futures and failing fast in case of errors.
         self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
         self.retry_exceptions = retry_exceptions
 
