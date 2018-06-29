@@ -39,6 +39,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
   - [Command Reference](#command-reference)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
+  - [Public Dataset](#public-dataset)
 
 
 ## Schema
@@ -287,9 +288,6 @@ so values greater than 38 decimals will be null.
 
 ## Querying in Google BigQuery
 
-You can query the data that I exported in the public BigQuery dataset
-https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
-
 To upload CSVs to BigQuery:
 
 - Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
@@ -322,6 +320,11 @@ Note that `--max_bad_records` is needed for erc20_transfers to avoid
 'Error while reading data, error message: Could not parse '68032337690423899710659284523950357745' as numeric for field
 erc20_value (position 3) starting at location 52895 numeric overflow' 
 for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
+
+### Public Dataset
+
+You can query the data that I exported in the public BigQuery dataset
+https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
 ### TODOs
 
