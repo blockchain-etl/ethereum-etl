@@ -31,8 +31,8 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 - [Schema](#schema)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Command Reference](#command-reference)
-- [Querying in AWS Athena](#querying-in-aws-athena)
-- [Querying in GCP BigQuery](#querying-in-gcp-bigquery)
+- [Querying in Amazon Athena](#querying-in-amazon-athena)
+- [Querying in Google BigQuery](#querying-in-google-bigquery)
 
 
 ## Schema
@@ -244,7 +244,7 @@ it will make receipts and logs export much faster.
 > pytest -vv
 ```
 
-## Querying in AWS Athena
+## Querying in Amazon Athena
 
 - Upload the files to S3:
 
@@ -278,7 +278,7 @@ Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
 
-## Querying in GCP BigQuery
+## Querying in Google BigQuery
 
 You can query the data that I exported in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
