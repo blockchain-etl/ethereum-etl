@@ -13,15 +13,15 @@ Export blocks and transactions:
 Export ERC20 transfers:
 
 ```bash
-> python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
---output erc20_transfers.csv
+> python export_erc20_transfers.py --start-block 0 --end-block 500000 \
+--ipc-path ~/Library/Ethereum/geth.ipc --output erc20_transfers.csv
 ```
 
-Export ERC20 transfers, filtered by the list of tokens:
+Export receipts and logs:
 
 ```bash
-> python export_erc20_transfers.py --start-block 0 --end-block 500000 --ipc-path ~/Library/Ethereum/geth.ipc \
---output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
+> python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
+--ipc-path ~/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -29,6 +29,11 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 ## Table of Content
 
 - [Schema](#schema)
+  - [blocks.csv](#blocks.csv)
+  - [transactions.csv](#transactions.csv)
+  - [erc20_transfers.csv](#erc20_transfers.csv)
+  - [receipts.csv](#receipts.csv)
+  - [logs.csv](#logs.csv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Command Reference](#command-reference)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
@@ -37,7 +42,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 ## Schema
 
-`blocks.csv`
+### blocks.csv
 
 Column                  | Type               | Description |
 ------------------------|--------------------|--------------
@@ -59,7 +64,7 @@ block_gas_used          | bigint             | The total used gas by all transac
 block_timestamp         | bigint             | The unix timestamp for when the block was collated |
 block_transaction_count | bigint             | The number of transactions in the block |
 
-`transactions.csv`
+### transactions.csv
 
 Column              |    Type     | Description |
 --------------------|-------------|--------------
@@ -75,7 +80,7 @@ tx_gas              | bigint      | Gas provided by the sender |
 tx_gas_price        | bigint      | Gas price provided by the sender in Wei |
 tx_input            | hex_string  | The data send along with the transaction |
 
-`erc20_transfers.csv`
+### erc20_transfers.csv
 
 Column              |    Type     | Description |
 --------------------|-------------|--------------
@@ -87,7 +92,7 @@ erc20_tx_hash       | hex_string  | Transaction hash |
 erc20_log_index     | bigint      | Log index in the transaction receipt |
 erc20_block_number  | bigint      | The block number |
 
-`receipts.csv`
+### receipts.csv
 
 Column                       |    Type     | Description |
 -----------------------------|-------------|--------------
@@ -101,7 +106,7 @@ receipt_contract_address     | address     | The contract address created, if th
 receipt_root                 | hex_string  | 32 bytes of post-transaction stateroot (pre Byzantium) |
 receipt_status               | bigint      | Either 1 (success) or 0 (failure) |
 
-`logs.csv`
+### logs.csv
 
 Column                       |    Type     | Description |
 -----------------------------|-------------|--------------
