@@ -41,6 +41,7 @@ class EthBlockMapper(object):
 
     def block_to_dict(self, block):
         return {
+            'type': 'block',
             'block_number': block.number,
             'block_hash': block.hash,
             'block_parent_hash': block.parent_hash,

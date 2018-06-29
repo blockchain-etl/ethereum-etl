@@ -30,6 +30,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 - [Schema](#schema)
 - [Exporting the Blockchain](#exporting-the-blockchain)
+  - [Command Reference](#command-reference)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
 
@@ -38,53 +39,81 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 `blocks.csv`
 
-Column                  | Type               |
-------------------------|---------------------
-block_number            | bigint             |
-block_hash              | hex_string         |
-block_parent_hash       | hex_string         |
-block_nonce             | hex_string         |
-block_sha3_uncles       | hex_string         |
-block_logs_bloom        | hex_string         |
-block_transactions_root | hex_string         |
-block_state_root        | hex_string         |
-block_miner             | address            |
-block_difficulty        | numeric            |
-block_total_difficulty  | numeric            |
-block_size              | bigint             |
-block_extra_data        | hex_string         |
-block_gas_limit         | bigint             |
-block_gas_used          | bigint             |
-block_timestamp         | bigint             |
-block_transaction_count | bigint             |
+Column                  | Type               | Description |
+------------------------|--------------------|--------------
+block_number            | bigint             | The block number |
+block_hash              | hex_string         | Hash of the block |
+block_parent_hash       | hex_string         | Hash of the parent block |
+block_nonce             | hex_string         | Hash of the generated proof-of-work |
+block_sha3_uncles       | hex_string         | SHA3 of the uncles data in the block |
+block_logs_bloom        | hex_string         | The bloom filter for the logs of the block. null when its pending block |
+block_transactions_root | hex_string         | The root of the transaction trie of the block |
+block_state_root        | hex_string         | The root of the final state trie of the block |
+block_miner             | address            | The address of the beneficiary to whom the mining rewards were given |
+block_difficulty        | numeric            | Integer of the difficulty for this block |
+block_total_difficulty  | numeric            | Integer of the total difficulty of the chain until this block |
+block_size              | bigint             | The size of this block in bytes |
+block_extra_data        | hex_string         | The extra data field of this block |
+block_gas_limit         | bigint             | The maximum gas allowed in this block |
+block_gas_used          | bigint             | The total used gas by all transactions in this block |
+block_timestamp         | bigint             | The unix timestamp for when the block was collated |
+block_transaction_count | bigint             | The number of transactions in the block |
 
 `transactions.csv`
 
-Column              |    Type     |
---------------------|--------------
-tx_hash             | hex_string  |
-tx_nonce            | bigint      |
-tx_block_hash       | hex_string  |
-tx_block_number     | bigint      |
-tx_index            | bigint      |
-tx_from             | address     |
-tx_to               | address     |
-tx_value            | numeric     |
-tx_gas              | bigint      |
-tx_gas_price        | bigint      |
-tx_input            | hex_string  |
+Column              |    Type     | Description |
+--------------------|-------------|--------------
+tx_hash             | hex_string  | Hash of the transaction |
+tx_nonce            | bigint      | The number of transactions made by the sender prior to this one |
+tx_block_hash       | hex_string  | Hash of the block where this transaction was in. null when its pending |
+tx_block_number     | bigint      | Block number where this transaction was in. null when its pending |
+tx_index            | bigint      | Integer of the transactions index position in the block. null when its pending |
+tx_from             | address     | Address of the sender |
+tx_to               | address     | Address of the receiver. null when its a contract creation transaction |
+tx_value            | numeric     | Value transferred in Wei |
+tx_gas              | bigint      | Gas provided by the sender |
+tx_gas_price        | bigint      | Gas price provided by the sender in Wei |
+tx_input            | hex_string  | The data send along with the transaction |
 
 `erc20_transfers.csv`
 
-Column              |    Type     |
---------------------|--------------
-erc20_token         | address     |
-erc20_from          | address     |
-erc20_to            | address     |
-erc20_value         | numeric     |
-erc20_tx_hash       | hex_string  |
-erc20_log_index     | bigint      |
-erc20_block_number  | bigint      |
+Column              |    Type     | Description |
+--------------------|-------------|--------------
+erc20_token         | address     | ERC20 token address |
+erc20_from          | address     | Address of the sender |
+erc20_to            | address     | Address of the receiver |
+erc20_value         | numeric     | Value transferred |
+erc20_tx_hash       | hex_string  | Transaction hash |
+erc20_log_index     | bigint      | Log index in the transaction receipt |
+erc20_block_number  | bigint      | The block number |
+
+`receipts.csv`
+
+Column                       |    Type     | Description |
+-----------------------------|-------------|--------------
+receipt_transaction_hash     | hex_string  | Hash of the transaction |
+receipt_transaction_index    | bigint      | Integer of the transactions index position in the block |
+receipt_block_hash           | hex_string  | Hash of the block where this transaction was in |
+receipt_block_number         | bigint      | Block number where this transaction was in |
+receipt_cumulative_gas_used  | bigint      | The total amount of gas used when this transaction was executed in the block |
+receipt_gas_used             | bigint      | The amount of gas used by this specific transaction alone |
+receipt_contract_address     | address     | The contract address created, if the transaction was a contract creation, otherwise null |
+receipt_root                 | hex_string  | 32 bytes of post-transaction stateroot (pre Byzantium) |
+receipt_status               | bigint      | Either 1 (success) or 0 (failure) |
+
+`logs.csv`
+
+Column                       |    Type     | Description |
+-----------------------------|-------------|--------------
+log_index                    | bigint      | Integer of the log index position in the block. null when its pending log |
+log_transaction_hash         | hex_string  | Hash of the transactions this log was created from. null when its pending log |
+log_transaction_index        | bigint      | Integer of the transactions index position log was created from |
+log_block_hash               | hex_string  | Hash of the block where this log was in. null when its pending |
+log_block_number             | bigint      | The block number where this log was in |
+log_address                  | address     | Address from which this log originated |
+log_data                     | hex_string  | Contains one or more 32 Bytes non-indexed arguments of the log |
+log_topics                   | string      | Pipe-separated (&#124; character) string of indexed log arguments (0 to 4 32-byte hex strings). (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256)), except you declared the event with the anonymous specifier.) |
+
 
 Note: for the `address` type all hex characters are lower-cased.
 
@@ -130,6 +159,9 @@ there is no need to wait until the full sync as the state is not needed.
 Should work with geth and parity, on Linux, Mac, Windows. 
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
+If you see weird behaviour, e.g. wrong number of rows in the CSV files or corrupted files, 
+check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
+
 #### Reducing the Exporting Time
 
 Read this article https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
@@ -150,20 +182,20 @@ Additional steps:
 
 #### Command Reference
 
-- Export blocks and transactions:
+##### export_blocks_and_transactions.py
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
 --ipc-path ~/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Omit `--blocks-output` or `--transactions-output` options if you don't want to export blocks/transactions.
+Omit `--blocks-output` or `--transactions-output` options if you want to export only transactions/blocks.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_blocks_and_transactions.py -h` for more details. 
 
-- Export ERC20 transfers:
+##### export_erc20_transfers.py
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 \
@@ -180,6 +212,31 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
 Call `python export_erc20_transfers.py -h` for more details. 
+
+##### export_receipts_and_logs.py
+
+First extract transaction hashes from `transactions.csv`:
+
+```bash
+> python extract_csv_column.py --input transactions.csv --column tx_hash --output tx_hashes.csv
+```
+
+Then export receipts and logs:
+
+```bash
+> python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
+--ipc-path ~/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
+```
+
+Omit `--receipts-output` or `--logs-output` options if you want to export only logs/receipts.
+
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
+
+Call `python export_receipts_and_logs.py -h` for more details. 
+
+Upvote this feature request https://github.com/ethereum/go-ethereum/issues/17044, 
+it will make receipts and logs export much faster.
+
 
 #### Running Tests
 
@@ -250,6 +307,8 @@ To upload CSVs to BigQuery:
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=5000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid 

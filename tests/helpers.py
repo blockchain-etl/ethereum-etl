@@ -1,3 +1,6 @@
+import os
+
+
 def compare_lines_ignore_order(expected, actual):
     expected_lines = expected.splitlines()
     actual_lines = actual.splitlines()
@@ -8,5 +11,7 @@ def compare_lines_ignore_order(expected, actual):
 
 
 def read_file(path):
+    if not os.path.exists(path):
+        return ''
     with open(path) as file:
         return file.read()

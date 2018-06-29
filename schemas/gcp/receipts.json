@@ -1,0 +1,47 @@
+[
+    {
+        "name": "receipt_transaction_hash",
+        "type": "STRING",
+        "description": "Hash of the transaction"
+    },
+    {
+        "name": "receipt_transaction_index",
+        "type": "INT64",
+        "description": "Integer of the transactions index position in the block"
+    },
+    {
+        "name": "receipt_block_hash",
+        "type": "STRING",
+        "description": "Hash of the block where this transaction was in"
+    },
+    {
+        "name": "receipt_block_number",
+        "type": "INT64",
+        "description": "Block number where this transaction was in"
+    },
+    {
+        "name": "receipt_cumulative_gas_used",
+        "type": "INT64",
+        "description": "The total amount of gas used when this transaction was executed in the block"
+    },
+    {
+        "name": "receipt_gas_used",
+        "type": "INT64",
+        "description": "The amount of gas used by this specific transaction alone"
+    },
+    {
+        "name": "receipt_contract_address",
+        "type": "address",
+        "description": "The contract address created, if the transaction was a contract creation, otherwise null"
+    },
+    {
+        "name": "receipt_root",
+        "type": "STRING",
+        "description": "32 bytes of post-transaction stateroot (pre Byzantium)"
+    },
+    {
+        "name": "receipt_status",
+        "type": "INT64",
+        "description": "Either 1 (success) or 0 (failure)"
+    }
+]
