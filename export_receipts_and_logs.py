@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 with smart_open(args.tx_hashes, 'r') as tx_hashes_file:
     job = ExportReceiptsJob(
-        tx_hashes_iterator=(tx_hash.strip() for tx_hash in tx_hashes_file),
+        tx_hashes_iterable=(tx_hash.strip() for tx_hash in tx_hashes_file),
         batch_size=args.batch_size,
         ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, timeout=args.ipc_timeout)),
         max_workers=args.max_workers,

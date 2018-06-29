@@ -12,7 +12,7 @@ from ethereumetl.utils import rpc_response_batch_to_results
 class ExportReceiptsJob(BaseJob):
     def __init__(
             self,
-            tx_hashes_iterator,
+            tx_hashes_iterable,
             batch_size,
             ipc_wrapper,
             max_workers,
@@ -20,7 +20,7 @@ class ExportReceiptsJob(BaseJob):
             export_receipts=True,
             export_logs=True):
         self.ipc_wrapper = ipc_wrapper
-        self.tx_hashes_iterator = tx_hashes_iterator
+        self.tx_hashes_iterable = tx_hashes_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
@@ -35,10 +35,9 @@ class ExportReceiptsJob(BaseJob):
 
     def _start(self):
         self.item_exporter.open()
-        self.batch_work_executor.start()
 
     def _export(self):
-        self.batch_work_executor.execute(self.tx_hashes_iterator, self._export_receipts)
+        self.batch_work_executor.execute(self.tx_hashes_iterable, self._export_receipts)
 
     def _export_receipts(self, tx_hashes):
         receipts_rpc = list(generate_get_receipt_by_tx_hash_json_rpc(tx_hashes))
@@ -56,5 +55,5 @@ class ExportReceiptsJob(BaseJob):
                 self.item_exporter.export_item(self.receipt_log_mapper.receipt_log_to_dict(log))
 
     def _end(self):
-        self.batch_work_executor.end()
+        self.batch_work_executor.shutdown()
         self.item_exporter.close()

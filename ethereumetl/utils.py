@@ -59,14 +59,14 @@ def split_to_batches(start_incl, end_incl, batch_size):
         yield batch_start, batch_end
 
 
-def dynamic_batch_iterator(iterator, batch_size_getter):
-    lst = []
+def dynamic_batch_iterator(iterable, batch_size_getter):
+    batch = []
     batch_size = batch_size_getter()
-    for item in iterator:
-        lst.append(item)
-        if len(lst) == batch_size:
-            yield lst
-            lst = []
+    for item in iterable:
+        batch.append(item)
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
             batch_size = batch_size_getter()
-    if len(lst) > 0:
-        yield lst
+    if len(batch) > 0:
+        yield batch
