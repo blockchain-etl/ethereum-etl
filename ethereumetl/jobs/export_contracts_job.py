@@ -6,7 +6,7 @@ from ethereumetl.json_rpc_requests import generate_get_code_json_rpc
 from ethereumetl.mappers.contract_mapper import EthContractMapper
 
 
-# Exports contracts code
+# Exports contracts bytecode
 class ExportContractsJob(BaseJob):
     def __init__(
             self,

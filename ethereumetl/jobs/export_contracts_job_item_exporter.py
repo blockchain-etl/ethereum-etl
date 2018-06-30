@@ -2,7 +2,7 @@ from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
     'contract_address',
-    'contract_code'
+    'contract_bytecode'
 ]
 
 

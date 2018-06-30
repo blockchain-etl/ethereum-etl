@@ -8,7 +8,7 @@ from ethereumetl.jobs.export_contracts_job_item_exporter import export_contracts
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 parser = argparse.ArgumentParser(
-    description='Exports contracts code using eth_getCode JSON RPC APIs.')
+    description='Exports contracts bytecode using eth_getCode JSON RPC APIs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 parser.add_argument('-c', '--contract-addresses', type=str,
                     help='The file containing contract addresses, one per line.')
