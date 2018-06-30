@@ -20,8 +20,10 @@ parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in
 args = parser.parse_args()
 
 with smart_open(args.contract_addresses, 'r') as contract_addresses_file:
+    contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
+                          if contract_address.strip())
     job = ExportContractsJob(
-        contract_addresses_iterable=(contract_address.strip() for contract_address in contract_addresses_file),
+        contract_addresses_iterable=contract_addresses,
         batch_size=args.batch_size,
         ipc_wrapper=ThreadLocalProxy(lambda: IPCWrapper(args.ipc_path, timeout=args.ipc_timeout)),
         item_exporter=export_contracts_job_item_exporter(args.output),
