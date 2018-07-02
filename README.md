@@ -34,6 +34,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
   - [erc20_transfers.csv](#erc20_transferscsv)
   - [receipts.csv](#receiptscsv)
   - [logs.csv](#logscsv)
+  - [contracts.csv](#contractscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
@@ -120,6 +121,13 @@ log_block_number             | bigint      | The block number where this log was
 log_address                  | address     | Address from which this log originated |
 log_data                     | hex_string  | Contains one or more 32 Bytes non-indexed arguments of the log |
 log_topics                   | string      | Pipe-separated (&#124; character) string of indexed log arguments (0 to 4 32-byte hex strings). (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256)), except you declared the event with the anonymous specifier.) |
+
+### contracts.csv
+
+Column                       |    Type     | Description |
+-----------------------------|-------------|--------------
+contract_address             | address     | Address of the contract |
+contract_bytecode            | hex_string  | Bytecode of the contract |
 
 
 Note: for the `address` type all hex characters are lower-cased.
@@ -314,6 +322,7 @@ To upload CSVs to BigQuery:
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 --max_bad_records=5000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
+> bq --location=asia-northeast1 load --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid 
@@ -322,7 +331,7 @@ erc20_value (position 3) starting at location 52895 numeric overflow'
 for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereumetl:ethereum.blocks_join_transactions_join_receipts ./schemas/gcp/blocks_join_transactions_join_receipts.json 
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereumetl:ethereum.blocks_join_transactions_join_receipts ./schemas/gcp/blocks_join_transactions_join_receipts.json 
 > SELECT_SQL=$(cat ./schemas/gcp/blocks_join_transactions_join_receipts.sql | tr '\n' ' ')
 > bq --location=asia-northeast1 query --replace --destination_table ethereumetl:ethereum.blocks_join_transactions_join_receipts --use_legacy_sql=false "$SELECT_SQL" 
 ```

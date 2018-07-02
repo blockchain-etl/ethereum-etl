@@ -83,6 +83,11 @@
         "description": "The unix timestamp for when the block was collated"
     },
     {
+        "name": "block_timestamp_partition",
+        "type": "TIMESTAMP",
+        "description": "The timestamp for when the block was collated"
+    },
+    {
         "name": "block_transaction_count",
         "type": "INT64",
         "description": "The number of transactions in the block"

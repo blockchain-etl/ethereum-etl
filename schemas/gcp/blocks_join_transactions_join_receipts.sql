@@ -15,6 +15,7 @@ SELECT
   blocks.block_gas_limit,
   blocks.block_gas_used,
   blocks.block_timestamp,
+  TIMESTAMP_SECONDS(blocks.block_timestamp) as block_timestamp_partition,
   blocks.block_transaction_count,
   transactions.tx_hash,
   transactions.tx_nonce,
