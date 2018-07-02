@@ -321,6 +321,12 @@ Note that `--max_bad_records` is needed for erc20_transfers to avoid
 erc20_value (position 3) starting at location 52895 numeric overflow' 
 for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
+```bash
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereumetl:ethereum.blocks_join_transactions_join_receipts ./schemas/gcp/blocks_join_transactions_join_receipts.json 
+> SELECT_SQL=$(cat ./schemas/gcp/blocks_join_transactions_join_receipts.sql | tr '\n' ' ')
+> bq --location=asia-northeast1 query --replace --destination_table ethereumetl:ethereum.blocks_join_transactions_join_receipts --use_legacy_sql=false "$SELECT_SQL" 
+```
+
 ### Public Dataset
 
 You can query the data that I exported in the public BigQuery dataset
