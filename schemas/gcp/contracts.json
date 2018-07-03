@@ -1,0 +1,13 @@
+[
+    {
+        "name": "contract_address",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Address of the contract"
+    },
+    {
+        "name": "contract_bytecode",
+        "type": "STRING",
+        "description": "Bytecode of the contract"
+    }
+]

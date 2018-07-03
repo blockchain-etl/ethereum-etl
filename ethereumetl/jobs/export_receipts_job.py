@@ -2,7 +2,7 @@ import json
 
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.json_rpc_requests import generate_get_receipt_by_tx_hash_json_rpc
+from ethereumetl.json_rpc_requests import generate_get_receipt_json_rpc
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.mappers.receipt_mapper import EthReceiptMapper
 from ethereumetl.utils import rpc_response_batch_to_results
@@ -40,7 +40,7 @@ class ExportReceiptsJob(BaseJob):
         self.batch_work_executor.execute(self.tx_hashes_iterable, self._export_receipts)
 
     def _export_receipts(self, tx_hashes):
-        receipts_rpc = list(generate_get_receipt_by_tx_hash_json_rpc(tx_hashes))
+        receipts_rpc = list(generate_get_receipt_json_rpc(tx_hashes))
         response = self.ipc_wrapper.make_request(json.dumps(receipts_rpc))
         results = rpc_response_batch_to_results(response)
         receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
