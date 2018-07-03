@@ -1,8 +1,8 @@
 SELECT
   blocks.block_timestamp,
   TIMESTAMP_SECONDS(blocks.block_timestamp) as block_timestamp_partition,
-  transactions.tx_block_hash,
-  transactions.tx_block_number,
+  blocks.block_hash,
+  blocks.block_number,
   transactions.tx_hash,
   transactions.tx_nonce,
   transactions.tx_index,
