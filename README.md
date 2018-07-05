@@ -141,7 +141,8 @@ Note: for the `address` type all hex characters are lower-cased.
 1. Start geth. 
 Make sure it downloaded the blocks that you need by executing `eth.syncing` in the JS console.
 You can export blocks below `currentBlock`, 
-there is no need to wait until the full sync as the state is not needed.
+there is no need to wait until the full sync as the state is not needed (unless you also need contracts bytecode 
+and token details).
 
 1. Clone Ethereum ETL and install the dependencies:
 
