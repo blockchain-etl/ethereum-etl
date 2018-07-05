@@ -139,7 +139,7 @@ Note: for the `address` type all hex characters are lower-cased.
 1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
 1. Start geth. 
-Make sure it downloaded the blocks that you need by executing `eth.synching` in the JS console.
+Make sure it downloaded the blocks that you need by executing `eth.syncing` in the JS console.
 You can export blocks below `currentBlock`, 
 there is no need to wait until the full sync as the state is not needed.
 
