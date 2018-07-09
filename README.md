@@ -17,7 +17,7 @@ Export ERC20 transfers:
 --ipc-path ~/Library/Ethereum/geth.ipc --output erc20_transfers.csv
 ```
 
-Export receipts and logs:
+Export receipts and logs (Follow [Command Reference](#command-reference)):
 
 ```bash
 > python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
@@ -138,9 +138,9 @@ Note: for the `address` type all hex characters are lower-cased.
 
 1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
-1. Start geth. 
+1. Start geth.
 Make sure it downloaded the blocks that you need by executing `eth.syncing` in the JS console.
-You can export blocks below `currentBlock`, 
+You can export blocks below `currentBlock`,
 there is no need to wait until the full sync as the state is not needed.
 
 1. Clone Ethereum ETL and install the dependencies:
@@ -156,11 +156,11 @@ there is no need to wait until the full sync as the state is not needed.
     ```bash
     > ./export_all.sh -h
     Usage: ./export_all.sh -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]
-    > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output 
+    > ./export_all.sh -s 0 -e 5499999 -b 100000 -i ~/Library/Ethereum/geth.ipc -o output
     ```
-    
+
     The result will be in the `output` subdirectory, partitioned in Hive style:
-   
+
     ```bash
     output/blocks/start_block=00000000/end_block=00099999/blocks_00000000_00099999.csv
     output/blocks/start_block=00100000/end_block=00199999/blocks_00100000_00199999.csv
@@ -171,10 +171,10 @@ there is no need to wait until the full sync as the state is not needed.
     ...
     ```
 
-Should work with geth and parity, on Linux, Mac, Windows. 
+Should work with geth and parity, on Linux, Mac, Windows.
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
-If you see weird behaviour, e.g. wrong number of rows in the CSV files or corrupted files, 
+If you see weird behavior, e.g. wrong number of rows in the CSV files or corrupted files,
 check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 
 #### Export in 2 Hours
@@ -193,7 +193,7 @@ Additional steps:
 1. Run in Git Bash:
 
     ```bash
-    >  ./export_all.sh -s 0 -e 999999 -b 100000 -i '\\.\pipe\geth.ipc' -o output 
+    >  ./export_all.sh -s 0 -e 999999 -b 100000 -i '\\.\pipe\geth.ipc' -o output
     ```
 
 #### Command Reference
@@ -209,7 +209,7 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_blocks_and_transactions.py -h` for more details. 
+Call `python export_blocks_and_transactions.py -h` for more details.
 
 ##### export_erc20_transfers.py
 
@@ -227,7 +227,7 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_erc20_transfers.py -h` for more details. 
+Call `python export_erc20_transfers.py -h` for more details.
 
 ##### export_receipts_and_logs.py
 
@@ -248,9 +248,9 @@ Omit `--receipts-output` or `--logs-output` options if you want to export only l
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_receipts_and_logs.py -h` for more details. 
+Call `python export_receipts_and_logs.py -h` for more details.
 
-Upvote this feature request https://github.com/ethereum/go-ethereum/issues/17044, 
+Upvote this feature request https://github.com/ethereum/go-ethereum/issues/17044,
 it will make receipts and logs export much faster.
 
 
@@ -309,7 +309,7 @@ To upload CSVs to BigQuery:
 > gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
 ```
 
-- Sign in to BigQuery https://bigquery.cloud.google.com/ 
+- Sign in to BigQuery https://bigquery.cloud.google.com/
 
 - Create a new dataset called `ethereum`
 
@@ -325,15 +325,15 @@ To upload CSVs to BigQuery:
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
 ```
 
-Note that `--max_bad_records` is needed for erc20_transfers to avoid 
+Note that `--max_bad_records` is needed for erc20_transfers to avoid
 'Error while reading data, error message: Could not parse '68032337690423899710659284523950357745' as numeric for field
-erc20_value (position 3) starting at location 52895 numeric overflow' 
+erc20_value (position 3) starting at location 52895 numeric overflow'
 for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereumetl:ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json 
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereumetl:ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
 > SELECT_SQL=$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')
-> bq --location=US query --replace --destination_table ethereumetl:ethereum.transactions_join_receipts --use_legacy_sql=false "$SELECT_SQL" 
+> bq --location=US query --replace --destination_table ethereumetl:ethereum.transactions_join_receipts --use_legacy_sql=false "$SELECT_SQL"
 ```
 
 ### Public Dataset
