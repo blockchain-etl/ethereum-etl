@@ -15,7 +15,7 @@ parser.add_argument('-c', '--contract-addresses', type=str,
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc socket file.')
-parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
+parser.add_argument('--ipc-timeout', default=60, type=int, help='The timeout in seconds for ipc calls.')
 
 args = parser.parse_args()
 
