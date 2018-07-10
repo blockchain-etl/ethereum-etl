@@ -408,6 +408,7 @@ To upload CSVs to BigQuery:
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid
@@ -415,10 +416,18 @@ Note that `--max_bad_records` is needed for erc20_transfers to avoid
 erc20_value (position 3) starting at location 52895 numeric overflow'
 for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
 
+Join `transactions` and `receipts`:
+
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereumetl:ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
-> SELECT_SQL=$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')
-> bq --location=US query --replace --destination_table ethereumetl:ethereum.transactions_join_receipts --use_legacy_sql=false "$SELECT_SQL"
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
+> bq --location=US query --replace --destination_table ethereum.transactions_join_receipts --use_legacy_sql=false "$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')"
+```
+
+Deduplicate `erc20_tokens`:
+
+```bash
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereum.erc20_tokens ./schemas/gcp/erc20_tokens.json
+> bq --location=US query --replace --destination_table ethereum.erc20_tokens --use_legacy_sql=false "$(cat ./schemas/gcp/erc20_tokens_deduplicate.sql | tr '\n' ' ')"
 ```
 
 ### Public Dataset
