@@ -140,9 +140,9 @@ erc20_token_name             | string      | The name of the ERC20 token |
 erc20_token_decimals         | bigint      | The number of decimals the token uses - e.g. 8, means to divide the token amount by 100000000 to get its user representation |
 erc20_token_total_supply     | numeric     | The total token supply |
 
-Note: for `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_token_total_supply` 
-columns in `erc20_tokens.csv` the values starting with `Error: ` mean the corresponding ERC20 function call
-resulted in an error, e.g. `Error: BadFunctionCallOutput - Could not decode contract function call symbol return data b'' for output_types ['string']`
+Note: `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_token_total_supply` 
+columns in `erc20_tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
+or implements it incorrectly (e.g. wrong return type). 
 
 Note: for the `address` type all hex characters are lower-cased.
 
