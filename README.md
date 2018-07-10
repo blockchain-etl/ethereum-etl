@@ -35,6 +35,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
   - [receipts.csv](#receiptscsv)
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
+  - [erc20_tokens.csv](#erc20_tokenscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
@@ -129,6 +130,19 @@ Column                       |    Type     | Description |
 contract_address             | address     | Address of the contract |
 contract_bytecode            | hex_string  | Bytecode of the contract |
 
+### erc20_tokens.csv
+
+Column                       |    Type     | Description |
+-----------------------------|-------------|--------------
+erc20_token_address          | address     | The address of the ERC20 token |
+erc20_token_symbol           | string      | The symbol of the ERC20 token |
+erc20_token_name             | string      | The name of the ERC20 token |
+erc20_token_decimals         | bigint      | The number of decimals the token uses - e.g. 8, means to divide the token amount by 100000000 to get its user representation |
+erc20_token_total_supply     | numeric     | The total token supply |
+
+Note: for `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_token_total_supply` 
+columns in `erc20_tokens.csv` the values starting with `Error: ` mean the corresponding ERC20 function call
+resulted in an error, e.g. `Error: BadFunctionCallOutput - Could not decode contract function call symbol return data b'' for output_types ['string']`
 
 Note: for the `address` type all hex characters are lower-cased.
 
