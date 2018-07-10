@@ -59,5 +59,5 @@ class NoopFile:
     def close(self):
         pass
 
-    def write(self):
+    def write(self, bytes):
         pass

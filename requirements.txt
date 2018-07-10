@@ -1,4 +1,4 @@
 web3~=4.3.0
+ethtoken~=0.0.1a3
 typing
 pytest~=3.2.0
-pytest-mock~=1.10.0
