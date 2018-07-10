@@ -3,10 +3,7 @@ from ethereumetl.file_utils import get_file_handle, close_silently
 
 
 class CompositeItemExporter:
-    def __init__(
-            self,
-            filename_mapping,
-            field_mapping):
+    def __init__(self, filename_mapping, field_mapping):
         self.filename_mapping = filename_mapping
         self.field_mapping = field_mapping
 
