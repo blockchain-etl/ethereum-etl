@@ -324,7 +324,7 @@ First extract token addresses from `erc20_transfers.csv`
 (Exported with [export_erc20_transfers.py](#export_erc20_transferspy)):
 
 ```bash
-> python extract_csv_column.py --input erc20_transfers.csv --column erc20_token | sort | uniq > erc20_token_addresses.csv
+> python extract_csv_column.py -i erc20_transfers.csv -c erc20_token -o - | sort | uniq > erc20_token_addresses.csv
 ```
 
 Then export ERC20 tokens:
