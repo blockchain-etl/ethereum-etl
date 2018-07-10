@@ -17,7 +17,7 @@ Export ERC20 transfers:
 --ipc-path ~/Library/Ethereum/geth.ipc --output erc20_transfers.csv
 ```
 
-Export receipts and logs (Follow [Command Reference](#command-reference)):
+Export receipts and logs ([Reference](#export_receipts_and_logspy)):
 
 ```bash
 > python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
@@ -215,6 +215,41 @@ Additional steps:
 
 #### Command Reference
 
+All the commands accept `-h` parameter for help, e.g.:
+
+```bash
+> python export_blocks_and_transactions.py -h
+
+usage: export_blocks_and_transactions.py [-h] [-s START_BLOCK] -e END_BLOCK
+                                         [-b BATCH_SIZE] --ipc-path IPC_PATH
+                                         [--ipc-timeout IPC_TIMEOUT]
+                                         [-w MAX_WORKERS]
+                                         [--blocks-output BLOCKS_OUTPUT]
+                                         [--transactions-output TRANSACTIONS_OUTPUT]
+
+Export blocks and transactions.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s START_BLOCK, --start-block START_BLOCK
+                        Start block
+  -e END_BLOCK, --end-block END_BLOCK
+                        End block
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        The number of blocks to export at a time.
+  --ipc-path IPC_PATH   The full path to the ipc file.
+  --ipc-timeout IPC_TIMEOUT
+                        The timeout in seconds for ipc calls.
+  -w MAX_WORKERS, --max-workers MAX_WORKERS
+                        The maximum number of workers.
+  --blocks-output BLOCKS_OUTPUT
+                        The output file for blocks. If not provided blocks
+                        will not be exported. Use "-" for stdout
+  --transactions-output TRANSACTIONS_OUTPUT
+                        The output file for transactions. If not provided
+                        transactions will not be exported. Use "-" for stdout
+```
+
 ##### export_blocks_and_transactions.py
 
 ```bash
@@ -225,8 +260,6 @@ Additional steps:
 Omit `--blocks-output` or `--transactions-output` options if you want to export only transactions/blocks.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
-
-Call `python export_blocks_and_transactions.py -h` for more details.
 
 ##### export_erc20_transfers.py
 
@@ -244,11 +277,10 @@ Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_erc20_transfers.py -h` for more details.
-
 ##### export_receipts_and_logs.py
 
-First extract transaction hashes from `transactions.csv`:
+First extract transaction hashes from `transactions.csv` 
+(Exported with [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)):
 
 ```bash
 > python extract_csv_column.py --input transactions.csv --column tx_hash --output tx_hashes.csv
@@ -265,11 +297,47 @@ Omit `--receipts-output` or `--logs-output` options if you want to export only l
 
 You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
 
-Call `python export_receipts_and_logs.py -h` for more details.
-
-Upvote this feature request https://github.com/ethereum/go-ethereum/issues/17044,
+Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
+##### export_contracts.py
+
+First extract contract addresses from `receipts.csv`
+(Exported with [export_receipts_and_logs.py](#export_receipts_and_logspy)):
+
+```bash
+> python extract_csv_column.py --input receipts.csv --column receipt_contract_address --output contract_addresses.csv
+```
+
+Then export contracts:
+
+```bash
+> python export_contracts.py --contract-addresses contract_addresses.csv \
+--ipc-path ~/Library/Ethereum/geth.ipc --output contracts.csv
+```
+
+You can tune `--batch-size`, `--max-workers`, `--ipc-timeout` for performance.
+
+##### export_erc20_tokens.py
+
+First extract token addresses from `erc20_transfers.csv` 
+(Exported with [export_erc20_transfers.py](#export_erc20_transferspy)):
+
+```bash
+> python extract_csv_column.py --input erc20_transfers.csv --column erc20_token | sort | uniq > erc20_token_addresses.csv
+```
+
+Then export ERC20 tokens:
+
+```bash
+> python export_erc20_tokens.py --token-addresses erc20_token_addresses.csv \
+--ipc-path ~/Library/Ethereum/geth.ipc --output erc20_tokens.csv
+```
+
+You can tune `--max-workers`, `--ipc-timeout` for performance.
+
+Note that there will be duplicate tokens across different partitions, 
+which need to be deduplicated (see Querying in Google BigQuery section).
 
 #### Running Tests
 
