@@ -49,6 +49,8 @@ class ExportErc20TokensJob(BaseJob):
             return func.call()
         except BadFunctionCallOutput as ex:
             return "Error: BadFunctionCallOutput - {}".format(str(ex))
+        except OverflowError as ex:
+            return "Error: OverflowError - {}".format(str(ex))
 
     def _end(self):
         self.batch_work_executor.shutdown()
