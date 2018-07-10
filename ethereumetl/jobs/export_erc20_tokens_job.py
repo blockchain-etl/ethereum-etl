@@ -29,10 +29,10 @@ class ExportErc20TokensJob(BaseJob):
         checksum_address = self.web3.toChecksumAddress(token_address)
         contract = self.web3.eth.contract(address=checksum_address, abi=EIP20_ABI)
 
-        symbol = self._call_function(contract.functions.symbol())
-        name = self._call_function(contract.functions.name())
-        decimals = self._call_function(contract.functions.decimals())
-        total_supply = self._call_function(contract.functions.totalSupply())
+        symbol = self._call_contract_function(contract.functions.symbol())
+        name = self._call_contract_function(contract.functions.name())
+        decimals = self._call_contract_function(contract.functions.decimals())
+        total_supply = self._call_contract_function(contract.functions.totalSupply())
 
         token = EthErc20Token()
         token.erc20_token_address = token_address
@@ -44,11 +44,14 @@ class ExportErc20TokensJob(BaseJob):
         token_dict = self.erc20_token_mapper.erc20_token_to_dict(token)
         self.item_exporter.export_item(token_dict)
 
-    def _call_function(self, func):
+    def _call_contract_function(self, func):
         try:
             return func.call()
+        # BadFunctionCallOutput exception can happen if the token doesn't implement a particular function
+        # or was self-destructed
         except BadFunctionCallOutput as ex:
             return "Error: BadFunctionCallOutput - {}".format(str(ex))
+        # OverflowError exception can happen if the return type of the function doesn't match the expected type
         except OverflowError as ex:
             return "Error: OverflowError - {}".format(str(ex))
 
