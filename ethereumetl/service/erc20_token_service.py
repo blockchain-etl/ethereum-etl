@@ -1,12 +1,12 @@
 from ethtoken.abi import EIP20_ABI
+from web3.exceptions import BadFunctionCallOutput
 
 from ethereumetl.domain.erc20_token import EthErc20Token
 
 
 class EthErc20TokenService(object):
-    def __init__(self, web3, ignore_errors=()):
+    def __init__(self, web3):
         self._web3 = web3
-        self._ignore_errors = ignore_errors
 
     def get_token(self, token_address):
         checksum_address = self._web3.toChecksumAddress(token_address)
@@ -32,7 +32,7 @@ class EthErc20TokenService(object):
         # OverflowError exception happens if the return type of the function doesn't match the expected type
         result = call_contract_function(
             func=func,
-            ignore_errors=self._ignore_errors,
+            ignore_errors=(BadFunctionCallOutput, OverflowError),
             default_value=None)
 
         return clean_user_provided_content(result)
