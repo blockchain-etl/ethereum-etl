@@ -1,7 +1,7 @@
 from ethereumetl.jobs.batch_export_job import BatchExportJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
-from ethereumetl.service.erc20_processor import EthErc20Processor, TRANSFER_EVENT_TOPIC
+from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor, TRANSFER_EVENT_TOPIC
 
 
 class ExportErc20TransfersJob(BatchExportJob):
@@ -21,7 +21,7 @@ class ExportErc20TransfersJob(BatchExportJob):
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.erc20_transfer_mapper = EthErc20TransferMapper()
-        self.erc20_processor = EthErc20Processor()
+        self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
     def _start(self):
         super()._start()
@@ -42,7 +42,7 @@ class ExportErc20TransfersJob(BatchExportJob):
         events = event_filter.get_all_entries()
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
-            erc20_transfer = self.erc20_processor.filter_transfer_from_log(log)
+            erc20_transfer = self.erc20_transfer_extractor.filter_transfer_from_log(log)
             if erc20_transfer is not None:
                 self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
 
