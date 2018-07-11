@@ -411,7 +411,7 @@ To upload CSVs to BigQuery:
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
 ```
 
 Note that `--max_bad_records` is needed for erc20_transfers to avoid
