@@ -19,6 +19,7 @@ class ExportErc20TokensJob(BaseJob):
         # or was self-destructed
         # OverflowError exception happens if the return type of the function doesn't match the expected type
         self.ignore_errors = (BadFunctionCallOutput, OverflowError)
+        self.result_mapper = clean_user_provided_content
 
     def _start(self):
         self.item_exporter.open()
@@ -34,10 +35,10 @@ class ExportErc20TokensJob(BaseJob):
         checksum_address = self.web3.toChecksumAddress(token_address)
         contract = self.web3.eth.contract(address=checksum_address, abi=EIP20_ABI)
 
-        symbol = call_contract_function(contract.functions.symbol(), self.ignore_errors)
-        name = call_contract_function(contract.functions.name(), self.ignore_errors)
-        decimals = call_contract_function(contract.functions.decimals(), self.ignore_errors)
-        total_supply = call_contract_function(contract.functions.totalSupply(), self.ignore_errors)
+        symbol = self._call_contract_function(contract.functions.symbol())
+        name = self._call_contract_function(contract.functions.name())
+        decimals = self._call_contract_function(contract.functions.decimals())
+        total_supply = self._call_contract_function(contract.functions.totalSupply())
 
         token = EthErc20Token()
         token.erc20_token_address = token_address
@@ -49,16 +50,43 @@ class ExportErc20TokensJob(BaseJob):
         token_dict = self.erc20_token_mapper.erc20_token_to_dict(token)
         self.item_exporter.export_item(token_dict)
 
+    def _call_contract_function(self, func):
+        return call_contract_function(
+            func=func,
+            ignore_errors=self.ignore_errors,
+            default_value=None,
+            result_mapper=self.result_mapper)
+
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
 
 
-def call_contract_function(func, ignore_errors, default_value=None):
+def call_contract_function(func, ignore_errors, default_value=None, result_mapper=None):
     try:
-        return func.call()
+        result = func.call()
+        return result_mapper(result) if result_mapper is not None else result
     except Exception as ex:
         if type(ex) in ignore_errors:
             return default_value
         else:
             raise ex
+
+
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
+NUMERIC_MAX_VALUE = 99999999999999999999999999999
+ASCII_0 = 0
+
+
+def clean_user_provided_content(content):
+    if isinstance(content, str):
+        # This prevents this error in BigQuery
+        # Error while reading data, error message: Error detected while parsing row starting at position: 9999.
+        # Error: Bad character (ASCII 0) encountered.
+        return content.translate({ASCII_0: None})
+    elif isinstance(content, int):
+        # NUMERIC type in BigQuery is 16 bytes
+        # https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
+        return content if content <= NUMERIC_MAX_VALUE else None
+    else:
+        return content

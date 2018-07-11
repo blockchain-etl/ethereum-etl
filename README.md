@@ -339,6 +339,9 @@ You can tune `--max-workers`, `--ipc-timeout` for performance.
 Note that there will be duplicate tokens across different partitions, 
 which need to be deduplicated (see Querying in Google BigQuery section).
 
+Upvote this pull request to make erc20_tokens export faster 
+https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
+
 #### Running Tests
 
 ```bash
@@ -446,11 +449,9 @@ https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300
 
 I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:
 
-- Web console for running SQLs based on Redash http://demo.redash.io/
 - Built on top of AWS, cost efficient
 - Can provide access to raw CSV data if needed
 - Support for internal transactions in the future
-- Support for API access in the future
 - Support for Bitcoin and other blockchains in the future
 - ERC20 token metrics in the future
 
