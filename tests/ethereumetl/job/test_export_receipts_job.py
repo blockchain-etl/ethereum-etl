@@ -14,19 +14,22 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.parametrize("batch_size,resource_group", [
-    (1, 'receipts_with_logs'),
-    (2, 'receipts_with_logs')
+DEFAULT_TX_HASHES = ['0x04cbcb236043d8fb7839e07bbc7f5eed692fb2ca55d897f1101eac3e3ad4fab8',
+                     '0x463d53f0ad57677a3b430a007c1c31d15d62c37fab5eee598551697c297c235c',
+                     '0x05287a561f218418892ab053adfb3d919860988b19458c570c5c30f51c146f02',
+                     '0xcea6f89720cc1d2f46cc7a935463ae0b99dd5fad9c91bb7357de5421511cee49']
+
+
+@pytest.mark.parametrize("batch_size,tx_hashes,resource_group", [
+    (1, DEFAULT_TX_HASHES, 'receipts_with_logs'),
+    (2, DEFAULT_TX_HASHES, 'receipts_with_logs')
 ])
-def test_export_blocks_job(tmpdir, batch_size, resource_group):
+def test_export_receipts_job(tmpdir, batch_size, tx_hashes, resource_group):
     receipts_output_file = tmpdir.join('actual_receipts.csv')
     logs_output_file = tmpdir.join('actual_logs.csv')
 
     job = ExportReceiptsJob(
-        tx_hashes_iterable=['0x04cbcb236043d8fb7839e07bbc7f5eed692fb2ca55d897f1101eac3e3ad4fab8',
-                            '0x463d53f0ad57677a3b430a007c1c31d15d62c37fab5eee598551697c297c235c',
-                            '0x05287a561f218418892ab053adfb3d919860988b19458c570c5c30f51c146f02',
-                            '0xcea6f89720cc1d2f46cc7a935463ae0b99dd5fad9c91bb7357de5421511cee49'],
+        tx_hashes_iterable=tx_hashes,
         batch_size=batch_size,
         ipc_wrapper=ThreadLocalProxy(lambda: MockIPCWrapper(lambda file: read_resource(resource_group, file))),
         max_workers=5,

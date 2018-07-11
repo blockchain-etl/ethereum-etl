@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Export receipts and logs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
 parser.add_argument('-t', '--tx-hashes', type=str, help='The file containing transaction hashes, one per line.')
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc file.')
-parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
+parser.add_argument('--ipc-timeout', default=60, type=int, help='The timeout in seconds for ipc calls.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('--receipts-output', default=None, type=str,
                     help='The output file for receipts. If not provided receipts will not be exported. '

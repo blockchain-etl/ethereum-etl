@@ -17,6 +17,6 @@ SELECT
   receipts.receipt_contract_address,
   receipts.receipt_root,
   receipts.receipt_status
-FROM `ethereumetl.ethereum.blocks` AS blocks
-  JOIN `ethereumetl.ethereum.transactions` AS transactions ON blocks.block_number = transactions.tx_block_number
-  JOIN `ethereumetl.ethereum.receipts` AS receipts ON transactions.tx_hash = receipts.receipt_transaction_hash
+FROM `ethereum.blocks` AS blocks
+  JOIN `ethereum.transactions` AS transactions ON blocks.block_number = transactions.tx_block_number
+  JOIN `ethereum.receipts` AS receipts ON transactions.tx_hash = receipts.receipt_transaction_hash

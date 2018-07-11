@@ -11,7 +11,7 @@ parser.add_argument('-s', '--start-block', default=0, type=int, help='Start bloc
 parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
 parser.add_argument('--ipc-path', required=True, type=str, help='The full path to the ipc file.')
-parser.add_argument('--ipc-timeout', default=300, type=int, help='The timeout in seconds for ipc calls.')
+parser.add_argument('--ipc-timeout', default=60, type=int, help='The timeout in seconds for ipc calls.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not provided blocks will not be exported. '

@@ -29,7 +29,7 @@ class MockIPCProvider(IPCProvider):
 @pytest.mark.parametrize("start_block,end_block,batch_size,resource_group", [
     (483920, 483920, 1, 'block_with_transfers')
 ])
-def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_group):
+def test_export_erc20_transfers_job(tmpdir, start_block, end_block, batch_size, resource_group):
     output_file = tmpdir.join('erc20_transfers.csv')
 
     job = ExportErc20TransfersJob(
