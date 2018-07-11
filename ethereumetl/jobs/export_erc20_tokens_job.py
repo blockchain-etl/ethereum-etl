@@ -51,21 +51,22 @@ class ExportErc20TokensJob(BaseJob):
         self.item_exporter.export_item(token_dict)
 
     def _call_contract_function(self, func):
-        return call_contract_function(
+        result = call_contract_function(
             func=func,
             ignore_errors=self.ignore_errors,
-            default_value=None,
-            result_mapper=self.result_mapper)
+            default_value=None)
+
+        return self.result_mapper(result)
 
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
 
 
-def call_contract_function(func, ignore_errors, default_value=None, result_mapper=None):
+def call_contract_function(func, ignore_errors, default_value=None):
     try:
         result = func.call()
-        return result_mapper(result) if result_mapper is not None else result
+        return result
     except Exception as ex:
         if type(ex) in ignore_errors:
             return default_value
