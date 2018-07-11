@@ -5,8 +5,9 @@ from ethereumetl.domain.erc20_token import EthErc20Token
 
 
 class EthErc20TokenService(object):
-    def __init__(self, web3):
+    def __init__(self, web3, function_call_result_transformer=None):
         self._web3 = web3
+        self._function_call_result_transformer = function_call_result_transformer
 
     def get_token(self, token_address):
         checksum_address = self._web3.toChecksumAddress(token_address)
@@ -35,7 +36,10 @@ class EthErc20TokenService(object):
             ignore_errors=(BadFunctionCallOutput, OverflowError),
             default_value=None)
 
-        return clean_user_provided_content(result)
+        if self._function_call_result_transformer is not None:
+            return self._function_call_result_transformer(result)
+        else:
+            return result
 
 
 def call_contract_function(func, ignore_errors, default_value=None):
@@ -47,22 +51,3 @@ def call_contract_function(func, ignore_errors, default_value=None):
             return default_value
         else:
             raise ex
-
-
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
-NUMERIC_MAX_VALUE = 99999999999999999999999999999
-ASCII_0 = 0
-
-
-def clean_user_provided_content(content):
-    if isinstance(content, str):
-        # This prevents this error in BigQuery
-        # Error while reading data, error message: Error detected while parsing row starting at position: 9999.
-        # Error: Bad character (ASCII 0) encountered.
-        return content.translate({ASCII_0: None})
-    elif isinstance(content, int):
-        # NUMERIC type in BigQuery is 16 bytes
-        # https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
-        return content if content <= NUMERIC_MAX_VALUE else None
-    else:
-        return content

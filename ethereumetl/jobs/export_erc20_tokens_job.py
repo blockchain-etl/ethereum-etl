@@ -10,7 +10,7 @@ class ExportErc20TokensJob(BaseJob):
         self.token_addresses_iterable = token_addresses_iterable
         self.batch_work_executor = BatchWorkExecutor(1, max_workers)
 
-        self.erc20_token_service = EthErc20TokenService(web3)
+        self.erc20_token_service = EthErc20TokenService(web3, clean_user_provided_content)
         self.erc20_token_mapper = EthErc20TokenMapper()
 
     def _start(self):
@@ -31,3 +31,22 @@ class ExportErc20TokensJob(BaseJob):
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
+
+
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
+BIG_QUERY_NUMERIC_MAX_VALUE = 99999999999999999999999999999
+ASCII_0 = 0
+
+
+def clean_user_provided_content(content):
+    if isinstance(content, str):
+        # This prevents this error in BigQuery
+        # Error while reading data, error message: Error detected while parsing row starting at position: 9999.
+        # Error: Bad character (ASCII 0) encountered.
+        return content.translate({ASCII_0: None})
+    elif isinstance(content, int):
+        # NUMERIC type in BigQuery is 16 bytes
+        # https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#numeric-type
+        return content if content <= BIG_QUERY_NUMERIC_MAX_VALUE else None
+    else:
+        return content
