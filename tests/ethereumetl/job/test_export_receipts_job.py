@@ -24,7 +24,7 @@ DEFAULT_TX_HASHES = ['0x04cbcb236043d8fb7839e07bbc7f5eed692fb2ca55d897f1101eac3e
     (1, DEFAULT_TX_HASHES, 'receipts_with_logs'),
     (2, DEFAULT_TX_HASHES, 'receipts_with_logs')
 ])
-def test_export_blocks_job(tmpdir, batch_size, tx_hashes, resource_group):
+def test_export_receipts_job(tmpdir, batch_size, tx_hashes, resource_group):
     receipts_output_file = tmpdir.join('actual_receipts.csv')
     logs_output_file = tmpdir.join('actual_logs.csv')
 

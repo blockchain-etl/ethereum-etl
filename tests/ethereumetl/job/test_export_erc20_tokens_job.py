@@ -34,7 +34,7 @@ class MockIPCProvider(IPCProvider):
 @pytest.mark.parametrize("token_addresses,resource_group", [
     (['0xf763be8b3263c268e9789abfb3934564a7b80054'], 'token_with_invalid_data')
 ])
-def test_export_blocks_job(tmpdir, token_addresses, resource_group):
+def test_export_erc20_tokens_job(tmpdir, token_addresses, resource_group):
     output_file = tmpdir.join('erc20_tokens.csv')
 
     job = ExportErc20TokensJob(
