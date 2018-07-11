@@ -15,12 +15,6 @@ class ExportErc20TokensJob(BaseJob):
         self.batch_work_executor = BatchWorkExecutor(1, max_workers)
         self.erc20_token_mapper = EthErc20TokenMapper()
 
-        # BadFunctionCallOutput exception happens if the token doesn't implement a particular function
-        # or was self-destructed
-        # OverflowError exception happens if the return type of the function doesn't match the expected type
-        self.ignore_errors = (BadFunctionCallOutput, OverflowError)
-        self.result_mapper = clean_user_provided_content
-
     def _start(self):
         self.item_exporter.open()
 
@@ -51,12 +45,15 @@ class ExportErc20TokensJob(BaseJob):
         self.item_exporter.export_item(token_dict)
 
     def _call_contract_function(self, func):
+        # BadFunctionCallOutput exception happens if the token doesn't implement a particular function
+        # or was self-destructed
+        # OverflowError exception happens if the return type of the function doesn't match the expected type
         result = call_contract_function(
             func=func,
-            ignore_errors=self.ignore_errors,
+            ignore_errors=(BadFunctionCallOutput, OverflowError),
             default_value=None)
 
-        return self.result_mapper(result)
+        return clean_user_provided_content(result)
 
     def _end(self):
         self.batch_work_executor.shutdown()
