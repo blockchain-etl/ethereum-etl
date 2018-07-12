@@ -9,7 +9,7 @@ TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a
 logger = logging.getLogger(__name__)
 
 
-class EthErc20Processor(object):
+class EthErc20TransferExtractor(object):
     def filter_transfer_from_log(self, receipt_log):
 
         topics = receipt_log.topics
