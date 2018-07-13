@@ -1,7 +1,6 @@
 class EthService(object):
     def __init__(self, web3):
         self._web3 = web3
-        self._request_count = 0
 
     def get_block_range_for_timestamps(self, timestamp_start, timestamp_end):
         start_blocks = self.get_block_number_bounds_for_timestamp(timestamp_start)
@@ -12,10 +11,8 @@ class EthService(object):
     def get_block_number_bounds_for_timestamp(self, timestamp):
         start_block = self._web3.eth.getBlock(1)
         end_block = self._web3.eth.getBlock('latest')
-        self._request_count = self._request_count + 2
 
         result = self._get_block_number_bounds_for_timestamp_recursive(timestamp, start_block, end_block)
-        print('request count', self._request_count)
         return result
 
     def _get_block_number_bounds_for_timestamp_recursive(self, timestamp, start_block, end_block):
@@ -27,7 +24,7 @@ class EthService(object):
                              .format(timestamp, start_number, end_number, start_timestamp, end_timestamp))
 
         if timestamp == start_timestamp:
-            return start_timestamp, start_timestamp
+            return start_number, start_number
         elif timestamp == end_timestamp:
             return end_number, end_number
         elif (end_number - start_number) <= 1:
@@ -41,27 +38,11 @@ class EthService(object):
             # TODO: Optimize it by using gradient decent
             middle_number = start_number + int((end_number - start_number) / 2)
             middle_block = self._web3.eth.getBlock(middle_number)
-            self._request_count = self._request_count + 1
             middle_timestamp = middle_block.timestamp
 
-            all_points = [(start_timestamp, start_block), (middle_timestamp, middle_block), (end_timestamp, end_block)]
-
-            sorted_points = sorted(all_points, key=lambda x: x[0])
-
-            for (first_timestamp, first_block), (second_timestamp, second_block) in pairwise(sorted_points):
-                if first_timestamp <= timestamp <= second_timestamp:
-                    new_block_range = first_block, second_block
-                    break
+            if middle_timestamp < timestamp:
+                new_block_range = middle_block, end_block
             else:
-                raise ValueError('Something is wrong')
+                new_block_range = start_block, middle_block
 
-            return self._get_block_number_bounds_for_timestamp_recursive(timestamp, new_block_range[0],
-                                                                         new_block_range[1])
-
-
-import itertools
-def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
+            return self._get_block_number_bounds_for_timestamp_recursive(timestamp, *new_block_range)
