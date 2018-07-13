@@ -2,6 +2,7 @@ class EthService(object):
     def __init__(self, web3):
         self._web3 = web3
         self._request_count = 0
+        self.cached_points = []
 
     def get_block_range_for_timestamps(self, start_timestamp, end_timestamp):
         if start_timestamp > end_timestamp:
@@ -26,68 +27,70 @@ class EthService(object):
         return start_block, end_block
 
     def get_block_number_bounds_for_timestamp(self, timestamp):
-        start_block = self._web3.eth.getBlock(1)
-        end_block = self._web3.eth.getBlock('latest')
-        self._request_count = self._request_count + 2
+        bounds = find_bounds(timestamp, self.cached_points)
+        if bounds is None:
+            bounds = self._get_point_for_block(1), self._get_point_for_block('latest')
 
-        result = self._get_block_number_bounds_for_timestamp_recursive(timestamp, start_block, end_block)
+        result = self._get_bounds_for_points_recursive(timestamp, *bounds)
         print(self._request_count)
         return result
 
-    def _get_block_number_bounds_for_timestamp_recursive(self, timestamp, start_block, end_block):
-        start_number, end_number = start_block.number, end_block.number
-        start_timestamp, end_timestamp = start_block.timestamp, end_block.timestamp
-
-        if timestamp < start_timestamp or timestamp > end_timestamp:
+    def _get_bounds_for_points_recursive(self, x, start, end):
+        if x < start.x or x > end.x:
             raise OutOfBounds('timestamp {} is out of bounds for blocks {}-{}, timestamps {}-{}'
-                              .format(timestamp, start_number, end_number, start_timestamp, end_timestamp))
+                              .format(x, start.y, end.y, start.x, end.x))
 
-        if timestamp == start_timestamp:
-            return start_number, start_number
-        elif timestamp == end_timestamp:
-            return end_number, end_number
-        elif (end_number - start_number) <= 1:
-            return start_number, end_number
+        if x == start.x:
+            return start.y, start.y
+        elif x == end.x:
+            return end.y, end.y
+        elif (end.y - start.y) <= 1:
+            return start.y, end.y
         else:
-            assert start_timestamp <= timestamp <= end_timestamp
+            assert start.x <= x <= end.x
             # Block numbers must increase strictly monotonically
-            assert start_timestamp < end_timestamp
+            assert start.x < end.x
 
-            estimation1_number = interpolate((start_timestamp, start_number), (end_timestamp, end_number), timestamp)
-            estimation1_number = bound_exclusive(estimation1_number, (start_number, end_number))
-            estimation1_block = self._web3.eth.getBlock(estimation1_number)
-            self._request_count = self._request_count + 1
-            estimation1_timestamp = estimation1_block.timestamp
+            estimation1_y = interpolate(start, end, x)
+            estimation1_y = bound_exclusive(estimation1_y, (start.y, end.y))
+            estimation1 = self._get_point_for_block(estimation1_y)
 
-            if timestamp > estimation1_timestamp:
-                points = ((start_timestamp, start_number), (estimation1_timestamp, estimation1_number))
+            if x > estimation1.x:
+                points = (start, estimation1)
             else:
-                points = ((estimation1_timestamp, estimation1_number), (end_timestamp, end_number))
+                points = (estimation1, end)
 
-            estimation2_number = interpolate(*points, timestamp)
-            estimation2_number = bound_exclusive(estimation2_number, (start_number, end_number))
-            estimation2_block = self._web3.eth.getBlock(estimation2_number)
-            self._request_count = self._request_count + 1
-            estimation2_timestamp = estimation2_block.timestamp
+            estimation2_y = interpolate(*points, x)
+            estimation2_y = bound_exclusive(estimation2_y, (start.y, end.y))
+            estimation2 = self._get_point_for_block(estimation2_y)
 
-            all_points = [(start_timestamp, start_block), (estimation1_timestamp, estimation1_block),
-                          (estimation2_timestamp, estimation2_block), (end_timestamp, end_block)]
+            all_points = [start, estimation1, estimation2, end]
 
-            sorted_points = sorted(all_points, key=lambda x: x[0])
+            bounds = find_bounds(x, all_points)
+            if bounds is None:
+                raise ValueError('Unable to find bounds for points {} and x {}'.format(points, x))
 
-            for (first_timestamp, first_block), (second_timestamp, second_block) in pairwise(sorted_points):
-                if first_timestamp <= timestamp <= second_timestamp:
-                    new_block_range = first_block, second_block
-                    break
-            else:
-                raise ValueError('Something is wrong')
+            return self._get_bounds_for_points_recursive(x, *bounds)
 
-            return self._get_block_number_bounds_for_timestamp_recursive(timestamp, *new_block_range)
+    def _get_point_for_block(self, block_identifier):
+        block = self._web3.eth.getBlock(block_identifier)
+        self._request_count = self._request_count + 1
+        point = Point(block.timestamp, block.number)
+        self.cached_points.append(point)
+        return point
+
+
+def find_bounds(x, points):
+    sorted_points = sorted(points, key=lambda point: point.x)
+    for point1, point2 in pairwise(sorted_points):
+        if point1.x <= x <= point2.x:
+            return point1, point2
+    return None
 
 
 def interpolate(point1, point2, x):
-    x1, y1 = point1
-    x2, y2 = point2
+    x1, y1 = point1.x, point1.y
+    x2, y2 = point2.x, point2.y
     if x1 == x2:
         raise ValueError('The x coordinate for points is the same')
     y = int((x - x1) * (y2 - y1) / (x2 - x1) + y1)
@@ -118,3 +121,12 @@ def pairwise(iterable):
 
 class OutOfBounds(Exception):
     pass
+
+
+class Point(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return '({},{})'.format(self.x, self.y)
