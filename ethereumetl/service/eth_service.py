@@ -1,6 +1,7 @@
 class EthService(object):
     def __init__(self, web3):
         self._web3 = web3
+        self._request_count = 0
 
     def get_block_range_for_timestamps(self, start_timestamp, end_timestamp):
         if start_timestamp > end_timestamp:
@@ -27,8 +28,10 @@ class EthService(object):
     def get_block_number_bounds_for_timestamp(self, timestamp):
         start_block = self._web3.eth.getBlock(1)
         end_block = self._web3.eth.getBlock('latest')
+        self._request_count = self._request_count + 2
 
         result = self._get_block_number_bounds_for_timestamp_recursive(timestamp, start_block, end_block)
+        print(self._request_count)
         return result
 
     def _get_block_number_bounds_for_timestamp_recursive(self, timestamp, start_block, end_block):
@@ -50,18 +53,67 @@ class EthService(object):
             # Block numbers must increase strictly monotonically
             assert start_timestamp < end_timestamp
 
-            # Uses dichotomy method, complexity log(n) where n is the number of blocks
-            # TODO: Optimize it by using gradient decent
-            middle_number = start_number + int((end_number - start_number) / 2)
-            middle_block = self._web3.eth.getBlock(middle_number)
-            middle_timestamp = middle_block.timestamp
+            estimation1_number = interpolate((start_timestamp, start_number), (end_timestamp, end_number), timestamp)
+            estimation1_number = bound_exclusive(estimation1_number, (start_number, end_number))
+            estimation1_block = self._web3.eth.getBlock(estimation1_number)
+            self._request_count = self._request_count + 1
+            estimation1_timestamp = estimation1_block.timestamp
 
-            if middle_timestamp < timestamp:
-                new_block_range = middle_block, end_block
+            if timestamp > estimation1_timestamp:
+                points = ((start_timestamp, start_number), (estimation1_timestamp, estimation1_number))
             else:
-                new_block_range = start_block, middle_block
+                points = ((estimation1_timestamp, estimation1_number), (end_timestamp, end_number))
+
+            estimation2_number = interpolate(*points, timestamp)
+            estimation2_number = bound_exclusive(estimation2_number, (start_number, end_number))
+            estimation2_block = self._web3.eth.getBlock(estimation2_number)
+            self._request_count = self._request_count + 1
+            estimation2_timestamp = estimation2_block.timestamp
+
+            all_points = [(start_timestamp, start_block), (estimation1_timestamp, estimation1_block),
+                          (estimation2_timestamp, estimation2_block), (end_timestamp, end_block)]
+
+            sorted_points = sorted(all_points, key=lambda x: x[0])
+
+            for (first_timestamp, first_block), (second_timestamp, second_block) in pairwise(sorted_points):
+                if first_timestamp <= timestamp <= second_timestamp:
+                    new_block_range = first_block, second_block
+                    break
+            else:
+                raise ValueError('Something is wrong')
 
             return self._get_block_number_bounds_for_timestamp_recursive(timestamp, *new_block_range)
+
+
+def interpolate(point1, point2, x):
+    x1, y1 = point1
+    x2, y2 = point2
+    if x1 == x2:
+        raise ValueError('The x coordinate for points is the same')
+    y = int((x - x1) * (y2 - y1) / (x2 - x1) + y1)
+    return y
+
+
+def bound_exclusive(x, bounds):
+    x1, x2 = bounds
+    if x1 > x2:
+        x, x2 = x2, x1
+    if x <= x1:
+        return x1 + 1
+    elif x >= x2:
+        return x2 - 1
+    else:
+        return x
+
+
+import itertools
+
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
 
 class OutOfBounds(Exception):
