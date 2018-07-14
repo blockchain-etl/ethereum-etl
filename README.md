@@ -215,6 +215,12 @@ Additional steps:
 
 #### Command Reference
 
+- [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)
+- [export_erc20_transfers.py](#export_erc20_transferspy)
+- [export_receipts_and_logs.py](#export_receipts_and_logspy)
+- [export_contracts.py](#export_contractspy)
+- [export_erc20_tokens.py](#export_erc20_tokenspy)
+
 All the commands accept `-h` parameter for help, e.g.:
 
 ```bash
