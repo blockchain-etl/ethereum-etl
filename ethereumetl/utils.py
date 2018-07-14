@@ -1,3 +1,6 @@
+import itertools
+
+
 def hex_to_dec(hex_string):
     if hex_string is None:
         return None
@@ -44,3 +47,10 @@ def dynamic_batch_iterator(iterable, batch_size_getter):
             batch_size = batch_size_getter()
     if len(batch) > 0:
         yield batch
+
+
+def pairwise(iterable):
+    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
