@@ -1,8 +1,16 @@
+from datetime import datetime, timezone
+
+
 class EthService(object):
     def __init__(self, web3):
         self._web3 = web3
         self._request_count = 0
         self.cached_points = []
+
+    def get_block_range_for_date(self, date):
+        start_datetime = datetime.combine(date, datetime.min.time(), tzinfo=timezone.utc)
+        end_datetime = datetime.combine(date, datetime.max.time(), tzinfo=timezone.utc)
+        return self.get_block_range_for_timestamps(start_datetime.timestamp(), end_datetime.timestamp())
 
     def get_block_range_for_timestamps(self, start_timestamp, end_timestamp):
         if start_timestamp > end_timestamp:
