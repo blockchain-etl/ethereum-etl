@@ -15,6 +15,29 @@ eth_service = EthService(web3)
 
 @skip
 def test_get_block_range_for_date():
-    start_block, end_block = eth_service.get_block_range_for_date(date(2017, 1, 1))
-    assert start_block == 2912407
-    assert end_block == 2918517
+    blocks = eth_service.get_block_range_for_date(date(2015, 7, 30))
+    assert blocks == (0, 6911)
+
+    blocks = eth_service.get_block_range_for_date(date(2015, 7, 31))
+    assert blocks == (6912, 13774)
+
+    blocks = eth_service.get_block_range_for_date(date(2017, 1, 1))
+    assert blocks == (2912407, 2918517)
+
+    blocks = eth_service.get_block_range_for_date(date(2017, 1, 2))
+    assert blocks == (2918518, 2924575)
+
+    blocks = eth_service.get_block_range_for_date(date(2018, 6, 10))
+    assert blocks == (5761663, 5767303)
+
+
+@skip
+@pytest.mark.xfail
+def test_get_block_range_for_date_fail_too_early():
+    eth_service.get_block_range_for_date(date(2015, 7, 29))
+
+
+@skip
+@pytest.mark.xfail
+def test_get_block_range_for_date_fail_too_late():
+    eth_service.get_block_range_for_date(date(2030, 1, 1))
