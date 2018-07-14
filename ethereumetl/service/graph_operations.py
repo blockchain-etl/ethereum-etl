@@ -28,9 +28,9 @@ class GraphOperations(object):
         elif (end.x - start.x) <= 1:
             return start.x, end.x
         else:
-            assert start.y <= y <= end.y
-            # y must increase strictly monotonically
-            assert start.y < end.y
+            assert start.y < y < end.y
+            if start.y >= end.y:
+                raise ValueError('y must increase strictly monotonically')
 
             # Find the 1st estimation by linear interpolation from start and end points.
             # If the 1st estimation is below the needed y coordinate (graph is concave),
