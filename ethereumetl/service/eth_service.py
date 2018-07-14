@@ -43,66 +43,66 @@ class EthService(object):
         print(self._request_count)
         return result
 
-    def _get_bounds_for_points_recursive(self, x, start, end):
-        if x < start.x or x > end.x:
+    def _get_bounds_for_points_recursive(self, y, start, end):
+        if y < start.y or y > end.y:
             raise OutOfBounds('timestamp {} is out of bounds for blocks {}-{}, timestamps {}-{}'
-                              .format(x, start.y, end.y, start.x, end.x))
+                              .format(y, start.x, end.x, start.y, end.y))
 
-        if x == start.x:
-            return start.y, start.y
-        elif x == end.x:
-            return end.y, end.y
-        elif (end.y - start.y) <= 1:
-            return start.y, end.y
+        if y == start.y:
+            return start.x, start.x
+        elif y == end.y:
+            return end.x, end.x
+        elif (end.x - start.x) <= 1:
+            return start.x, end.x
         else:
-            assert start.x <= x <= end.x
+            assert start.y <= y <= end.y
             # Block numbers must increase strictly monotonically
-            assert start.x < end.x
+            assert start.y < end.y
 
-            estimation1_y = interpolate(start, end, x)
-            estimation1_y = bound_exclusive(estimation1_y, (start.y, end.y))
-            estimation1 = self._get_point_for_block(estimation1_y)
+            estimation1_x = interpolate(start, end, y)
+            estimation1_x = bound_exclusive(estimation1_x, (start.x, end.x))
+            estimation1 = self._get_point_for_block(estimation1_x)
 
-            if x > estimation1.x:
+            if y > estimation1.y:
                 points = (start, estimation1)
             else:
                 points = (estimation1, end)
 
-            estimation2_y = interpolate(*points, x)
-            estimation2_y = bound_exclusive(estimation2_y, (start.y, end.y))
-            estimation2 = self._get_point_for_block(estimation2_y)
+            estimation2_x = interpolate(*points, y)
+            estimation2_x = bound_exclusive(estimation2_x, (start.x, end.x))
+            estimation2 = self._get_point_for_block(estimation2_x)
 
             all_points = [start, estimation1, estimation2, end]
 
-            bounds = find_bounds(x, all_points)
+            bounds = find_bounds(y, all_points)
             if bounds is None:
-                raise ValueError('Unable to find bounds for points {} and x {}'.format(points, x))
+                raise ValueError('Unable to find bounds for points {} and x {}'.format(points, y))
 
-            return self._get_bounds_for_points_recursive(x, *bounds)
+            return self._get_bounds_for_points_recursive(y, *bounds)
 
     def _get_point_for_block(self, block_identifier):
         block = self._web3.eth.getBlock(block_identifier)
         self._request_count = self._request_count + 1
-        point = Point(block.timestamp, block.number)
+        point = Point(block.number, block.timestamp)
         self.cached_points.append(point)
         return point
 
 
-def find_bounds(x, points):
-    sorted_points = sorted(points, key=lambda point: point.x)
+def find_bounds(y, points):
+    sorted_points = sorted(points, key=lambda point: point.y)
     for point1, point2 in pairwise(sorted_points):
-        if point1.x <= x <= point2.x:
+        if point1.y <= y <= point2.y:
             return point1, point2
     return None
 
 
-def interpolate(point1, point2, x):
+def interpolate(point1, point2, y):
     x1, y1 = point1.x, point1.y
     x2, y2 = point2.x, point2.y
     if x1 == x2:
         raise ValueError('The x coordinate for points is the same')
-    y = int((x - x1) * (y2 - y1) / (x2 - x1) + y1)
-    return y
+    x = int((y - y1) * (x2 - x1) / (y2 - y1) + x1)
+    return x
 
 
 def bound_exclusive(x, bounds):
