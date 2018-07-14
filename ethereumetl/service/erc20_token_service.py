@@ -1,7 +1,7 @@
-from ethtoken.abi import EIP20_ABI
 from web3.exceptions import BadFunctionCallOutput
 
 from ethereumetl.domain.erc20_token import EthErc20Token
+from ethereumetl.erc20_abi import ERC20_ABI
 
 
 class EthErc20TokenService(object):
@@ -11,7 +11,7 @@ class EthErc20TokenService(object):
 
     def get_token(self, token_address):
         checksum_address = self._web3.toChecksumAddress(token_address)
-        contract = self._web3.eth.contract(address=checksum_address, abi=EIP20_ABI)
+        contract = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI)
 
         symbol = self._call_contract_function(contract.functions.symbol())
         name = self._call_contract_function(contract.functions.name())
