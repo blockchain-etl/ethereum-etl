@@ -5,7 +5,7 @@ from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.file_utils import smart_open
 
 parser = argparse.ArgumentParser(description='Extracts a single column from a given csv file.')
-parser.add_argument('-i', '--input', default=None, type=str, help='The input file. If not specified stdin is used.')
+parser.add_argument('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('-c', '--column', required=True, type=str, help='The csv column name to extract.')
 
