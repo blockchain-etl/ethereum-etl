@@ -7,7 +7,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.service.eth_service import EthService
 from ethereumetl.web3_utils import get_provider_from_uri
 
-parser = argparse.ArgumentParser(description='Extracts a single column from a given csv file.')
+parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given date.')
 parser.add_argument('-p', '--provider-uri', default=None, type=str,
                     help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc. or https://mainnet.infura.io/')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')

@@ -87,8 +87,8 @@ def find_best_bounds(y, points):
 def interpolate(point1, point2, y):
     x1, y1 = point1.x, point1.y
     x2, y2 = point2.x, point2.y
-    if x1 == x2:
-        raise ValueError('The x coordinate for points is the same')
+    if y1 == y2:
+        raise ValueError('The y coordinate for points is the same {}, {}'.format(point1, point2))
     x = int((y - y1) * (x2 - x1) / (y2 - y1) + x1)
     return x
 
