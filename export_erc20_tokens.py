@@ -29,7 +29,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_erc20_tokens_job import ExportErc20TokensJob
 from ethereumetl.jobs.export_erc20_tokens_job_item_exporter import export_erc20_tokens_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.web3_utils import get_provider_from_uri
+from ethereumetl.providers.auto import get_provider_from_uri
 
 parser = argparse.ArgumentParser(description='Exports ERC20 tokens.')
 parser.add_argument('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')

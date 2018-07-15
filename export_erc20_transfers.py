@@ -28,7 +28,7 @@ from web3 import Web3
 from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
 from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.web3_utils import get_provider_from_uri
+from ethereumetl.providers.auto import get_provider_from_uri
 
 parser = argparse.ArgumentParser(
     description='Exports ERC20 transfers using eth_newFilter and eth_getFilterLogs JSON RPC APIs.')

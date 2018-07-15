@@ -25,7 +25,7 @@ from urllib.parse import urlparse
 
 from web3 import IPCProvider, HTTPProvider
 
-from ethereumetl.ipc import BatchIPCProvider
+from ethereumetl.providers.ipc import BatchIPCProvider
 from ethereumetl.providers.rpc import BatchHTTPProvider
 
 DEFAULT_IPC_TIMEOUT = 60

@@ -27,7 +27,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.web3_utils import get_batch_provider_from_uri
+from ethereumetl.providers.auto import get_batch_provider_from_uri
 
 parser = argparse.ArgumentParser(description='Export receipts and logs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')

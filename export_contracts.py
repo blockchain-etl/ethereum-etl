@@ -27,7 +27,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_contracts_job_item_exporter import export_contracts_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.web3_utils import get_batch_provider_from_uri
+from ethereumetl.providers.auto import get_batch_provider_from_uri
 
 parser = argparse.ArgumentParser(
     description='Exports contracts bytecode using eth_getCode JSON RPC APIs.')

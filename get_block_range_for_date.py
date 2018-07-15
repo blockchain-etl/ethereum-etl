@@ -28,7 +28,7 @@ from web3 import Web3
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.service.eth_service import EthService
-from ethereumetl.web3_utils import get_provider_from_uri
+from ethereumetl.providers.auto import get_provider_from_uri
 
 parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given date.')
 parser.add_argument('-p', '--provider-uri', default=None, type=str,
