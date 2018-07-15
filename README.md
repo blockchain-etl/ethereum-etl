@@ -220,6 +220,7 @@ Additional steps:
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
 - [export_erc20_tokens.py](#export_erc20_tokenspy)
+- [get_block_range_for_date.py](#get_block_range_for_datepy)
 
 All the commands accept `-h` parameter for help, e.g.:
 
@@ -347,6 +348,13 @@ which need to be deduplicated (see Querying in Google BigQuery section).
 
 Upvote this pull request to make erc20_tokens export faster 
 https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
+
+##### get_block_range_for_date.py
+
+```bash
+> python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io/ --date 2018-01-01
+4832686,4838611
+```
 
 #### Running Tests
 
