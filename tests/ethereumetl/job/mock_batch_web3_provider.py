@@ -26,7 +26,7 @@ import json
 from ethereumetl.utils import hex_to_dec
 
 
-class MockIPCWrapper(object):
+class MockBatchWeb3Provider(object):
     def __init__(self, read_resource):
         self.read_resource = read_resource
 

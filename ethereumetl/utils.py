@@ -48,7 +48,7 @@ def rpc_response_batch_to_results(response):
     for response_item in response:
         result = response_item.get('result', None)
         if result is None:
-            raise ValueError('result is null in response {}'.format(response_item))
+            raise ValueError('result is None in response {}'.format(response_item))
         yield result
 
 

@@ -32,7 +32,8 @@ from ethereumetl.web3_utils import get_provider_from_uri
 
 parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given date.')
 parser.add_argument('-p', '--provider-uri', default=None, type=str,
-                    help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc. or https://mainnet.infura.io/')
+                    help='The URI of the web3 provider e.g. '
+                         'file:///$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 parser.add_argument('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
                     help='The date e.g. 2018-01-01.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
