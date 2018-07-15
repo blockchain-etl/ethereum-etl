@@ -47,7 +47,10 @@ class EthService(object):
         except OutOfBoundsError:
             start_block_bounds = (0, 0)
 
-        end_block_bounds = self._graph_operations.get_bounds_for_y_coordinate(end_timestamp)
+        try:
+            end_block_bounds = self._graph_operations.get_bounds_for_y_coordinate(end_timestamp)
+        except OutOfBoundsError as e:
+            raise OutOfBoundsError('The existing blocks do not completely cover the given time range') from e
 
         if start_block_bounds == end_block_bounds and start_block_bounds[0] != start_block_bounds[1]:
             raise ValueError('The given timestamp range does not cover any blocks')
