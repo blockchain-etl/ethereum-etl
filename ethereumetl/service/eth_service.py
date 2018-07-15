@@ -32,6 +32,7 @@ class EthService(object):
         start_block = start_block_bounds[1]
         end_block = end_block_bounds[0]
 
+        # The genesis block has timestamp 0 but we include it with the 1st block.
         if start_block == 1:
             start_block = 0
 
@@ -43,6 +44,7 @@ class BlockTimestampGraph(object):
         self._web3 = web3
 
     def get_first_point(self):
+        # Ignore the genesis block as its timestamp is 0
         return block_to_point(self._web3.eth.getBlock(1))
 
     def get_last_point(self):
