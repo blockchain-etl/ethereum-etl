@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 
-def generate_get_block_by_number_json_rpc(start_block, end_block, include_transactions):
-    for idx, block_number in enumerate(range(start_block, end_block + 1)):
+def generate_get_block_by_number_json_rpc(block_numbers, include_transactions):
+    for idx, block_number in enumerate(block_numbers):
         yield generate_json_rpc(
             method='eth_getBlockByNumber',
             params=[hex(block_number), include_transactions],

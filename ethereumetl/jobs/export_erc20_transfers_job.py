@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.batch_export_job import BatchExportJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor, TRANSFER_EVENT_TOPIC
+from ethereumetl.utils import validate_range
 
 
-class ExportErc20TransfersJob(BatchExportJob):
+class ExportErc20TransfersJob(BaseJob):
     def __init__(
             self,
             start_block,
@@ -37,24 +37,35 @@ class ExportErc20TransfersJob(BatchExportJob):
             item_exporter,
             max_workers,
             tokens=None):
-        super().__init__(start_block, end_block, batch_size, max_workers)
+        validate_range(start_block, end_block)
+        self.start_block = start_block
+        self.end_block = end_block
+
         self.web3 = web3
         self.tokens = tokens
         self.item_exporter = item_exporter
+
+        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
     def _start(self):
-        super()._start()
         self.item_exporter.open()
 
-    def _export_batch(self, batch_start, batch_end):
+    def _export(self):
+        self.batch_work_executor.execute(
+            range(self.start_block, self.end_block + 1),
+            self._export_batch
+        )
+
+    def _export_batch(self, block_number_batch):
+        assert len(block_number_batch) > 0
         # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
         filter_params = {
-            'fromBlock': batch_start,
-            'toBlock': batch_end,
+            'fromBlock': block_number_batch[0],
+            'toBlock': block_number_batch[-1],
             'topics': [TRANSFER_EVENT_TOPIC]
         }
 
@@ -72,5 +83,5 @@ class ExportErc20TransfersJob(BatchExportJob):
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
-        super()._end()
+        self.batch_work_executor.shutdown()
         self.item_exporter.close()
