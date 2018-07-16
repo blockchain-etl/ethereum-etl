@@ -150,6 +150,10 @@ Note: for the `address` type all hex characters are lower-cased.
 
 1. Install python 3.5+ https://www.python.org/downloads/
 
+1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
+For that use `-p https://mainnet.infura.io/` option for the commands below. If you need ERC20 transfers or want to
+export the data ~40 times faster, you will need to set up a local Ethereum node:
+
 1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
 1. Start geth.
