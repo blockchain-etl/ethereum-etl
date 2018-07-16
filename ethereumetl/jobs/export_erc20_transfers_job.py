@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 
+from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
+from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor, TRANSFER_EVENT_TOPIC
