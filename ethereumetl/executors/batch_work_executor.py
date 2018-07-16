@@ -21,16 +21,19 @@
 # SOFTWARE.
 
 
-from web3.utils.threads import Timeout
+from web3.utils.threads import Timeout as Web3Timeout
+from requests.exceptions import Timeout as RequestsTimeout, HTTPError, TooManyRedirects
 
 from ethereumetl.executors.bounded_executor import BoundedExecutor
 from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.utils import dynamic_batch_iterator
 
+RETRY_EXCEPTIONS = (ConnectionError, HTTPError, RequestsTimeout, TooManyRedirects, Web3Timeout, OSError)
+
 
 # Executes the given work in batches, reducing the batch size exponentially in case of errors.
 class BatchWorkExecutor:
-    def __init__(self, starting_batch_size, max_workers, retry_exceptions=(Timeout, OSError)):
+    def __init__(self, starting_batch_size, max_workers, retry_exceptions=RETRY_EXCEPTIONS):
         self.batch_size = starting_batch_size
         self.max_workers = max_workers
         # Using bounded executor prevents unlimited queue growth
