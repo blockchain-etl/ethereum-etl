@@ -34,7 +34,7 @@ parser.add_argument('-e', '--end-block', required=True, type=int, help='End bloc
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
 parser.add_argument('-p', '--provider-uri', required=True, type=str,
                     help='The URI of the web3 provider e.g. '
-                         'file:///$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
+                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('--blocks-output', default=None, type=str,
                     help='The output file for blocks. If not provided blocks will not be exported. '
