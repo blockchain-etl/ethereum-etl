@@ -49,20 +49,14 @@ class BatchWorkExecutor:
     def _fail_safe_execute(self, work_handler, batch):
         try:
             work_handler(batch)
-        except Exception as ex:
-            if type(ex) in self.retry_exceptions:
-                batch_size = self.batch_size
-                # If can't reduce the batch size further then raise
-                if batch_size == 1:
-                    raise ex
-                # Reduce the batch size. Subsequent batches will be 2 times smaller
-                if batch_size == len(batch):
-                    self.batch_size = max(1, int(batch_size / 2))
-                # For the failed batch try handling items one by one
-                for item in batch:
-                    work_handler([item])
-            else:
-                raise ex
+        except self.retry_exceptions:
+            batch_size = self.batch_size
+            # Reduce the batch size. Subsequent batches will be 2 times smaller
+            if batch_size == len(batch) and batch_size > 1:
+                self.batch_size = max(1, int(batch_size / 2))
+            # For the failed batch try handling items one by one
+            for item in batch:
+                work_handler([item])
 
     def shutdown(self):
         self.executor.shutdown()
