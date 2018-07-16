@@ -1,6 +1,6 @@
-# MIT License
+# The MIT License (MIT)
 #
-# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
+# Copyright (c) 2016 Piper Merriam
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,25 @@
 # SOFTWARE.
 
 
-import json
+from web3 import HTTPProvider
+from web3.utils.request import make_post_request
 
-from ethereumetl.utils import hex_to_dec
 
-
-class MockIPCWrapper(object):
-    def __init__(self, read_resource):
-        self.read_resource = read_resource
+# Mostly copied from web3.py/providers/rpc.py. Supports batch requests.
+# Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
+class BatchHTTPProvider(HTTPProvider):
 
     def make_request(self, text):
-        batch = json.loads(text)
-        ipc_response = []
-        for req in batch:
-            if req['method'] == 'eth_getBlockByNumber':
-                block_number = hex_to_dec(req['params'][0])
-                file_name = 'ipc_response.block.' + str(block_number) + '.json'
-            else:
-                tx_hash = req['params'][0]
-                file_name = 'ipc_response.receipt.' + str(tx_hash) + '.json'
-            file_content = self.read_resource(file_name)
-            ipc_response.append(json.loads(file_content))
-        return ipc_response
+        self.logger.debug("Making request HTTP. URI: %s, Request: %s",
+                          self.endpoint_uri, text)
+        request_data = text.encode('utf-8')
+        raw_response = make_post_request(
+            self.endpoint_uri,
+            request_data,
+            **self.get_request_kwargs()
+        )
+        response = self.decode_rpc_response(raw_response)
+        self.logger.debug("Getting response HTTP. URI: %s, "
+                          "Request: %s, Response: %s",
+                          self.endpoint_uri, text, response)
+        return response

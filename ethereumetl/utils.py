@@ -44,11 +44,22 @@ def to_normalized_address(address):
     return address.lower()
 
 
+def validate_range(range_start_incl, range_end_incl):
+    if range_start_incl < 0 or range_end_incl < 0:
+        raise ValueError('range_start and range_end must be greater or equal to 0')
+
+    if range_end_incl < range_start_incl:
+        raise ValueError('range_end must be greater or equal to range_start')
+
+
 def rpc_response_batch_to_results(response):
     for response_item in response:
         result = response_item.get('result', None)
         if result is None:
-            raise ValueError('result is null in response {}'.format(response_item))
+            error_message = 'result is None in response {}.'.format(response_item)
+            if response_item.get('error', None) is None:
+                error_message = error_message + ' Make sure Ethereum node is synced.'
+            raise ValueError(error_message)
         yield result
 
 

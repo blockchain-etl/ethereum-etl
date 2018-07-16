@@ -21,18 +21,23 @@
 # SOFTWARE.
 
 
-from web3.utils.threads import Timeout
+from web3.utils.threads import Timeout as Web3Timeout
+from requests.exceptions import Timeout as RequestsTimeout, HTTPError, TooManyRedirects
 
 from ethereumetl.executors.bounded_executor import BoundedExecutor
 from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
 from ethereumetl.utils import dynamic_batch_iterator
 
+RETRY_EXCEPTIONS = (ConnectionError, HTTPError, RequestsTimeout, TooManyRedirects, Web3Timeout, OSError)
+
 
 # Executes the given work in batches, reducing the batch size exponentially in case of errors.
 class BatchWorkExecutor:
-    def __init__(self, starting_batch_size, max_workers, retry_exceptions=(Timeout, OSError)):
+    def __init__(self, starting_batch_size, max_workers, retry_exceptions=RETRY_EXCEPTIONS):
         self.batch_size = starting_batch_size
         self.max_workers = max_workers
+        # Using bounded executor prevents unlimited queue growth
+        # and allows monitoring in-progress futures and failing fast in case of errors.
         self.executor = FailSafeExecutor(BoundedExecutor(1, self.max_workers))
         self.retry_exceptions = retry_exceptions
 
@@ -44,20 +49,14 @@ class BatchWorkExecutor:
     def _fail_safe_execute(self, work_handler, batch):
         try:
             work_handler(batch)
-        except Exception as ex:
-            if type(ex) in self.retry_exceptions:
-                batch_size = self.batch_size
-                # If can't reduce the batch size further then raise
-                if batch_size == 1:
-                    raise ex
-                # Reduce the batch size. Subsequent batches will be 2 times smaller
-                if batch_size == len(batch):
-                    self.batch_size = max(1, int(batch_size / 2))
-                # For the failed batch try handling items one by one
-                for item in batch:
-                    work_handler([item])
-            else:
-                raise ex
+        except self.retry_exceptions:
+            batch_size = self.batch_size
+            # Reduce the batch size. Subsequent batches will be 2 times smaller
+            if batch_size == len(batch) and batch_size > 1:
+                self.batch_size = max(1, int(batch_size / 2))
+            # For the failed batch try handling items one by one
+            for item in batch:
+                work_handler([item])
 
     def shutdown(self):
         self.executor.shutdown()

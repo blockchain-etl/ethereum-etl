@@ -35,10 +35,10 @@ class ExportContractsJob(BaseJob):
             self,
             contract_addresses_iterable,
             batch_size,
-            ipc_wrapper,
+            batch_web3_provider,
             max_workers,
             item_exporter):
-        self.ipc_wrapper = ipc_wrapper
+        self.batch_web3_provider = batch_web3_provider
         self.contract_addresses_iterable = contract_addresses_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
@@ -54,7 +54,7 @@ class ExportContractsJob(BaseJob):
 
     def _export_contracts(self, contract_addresses):
         contracts_code_rpc = list(generate_get_code_json_rpc(contract_addresses))
-        response_batch= self.ipc_wrapper.make_request(json.dumps(contracts_code_rpc))
+        response_batch= self.batch_web3_provider.make_request(json.dumps(contracts_code_rpc))
 
         contracts = []
         for response in response_batch:
