@@ -21,37 +21,25 @@
 # SOFTWARE.
 
 
-def generate_get_block_by_number_json_rpc(block_numbers, include_transactions):
-    for idx, block_number in enumerate(block_numbers):
-        yield generate_json_rpc(
-            method='eth_getBlockByNumber',
-            params=[hex(block_number), include_transactions],
-            request_id=idx
-        )
+import json
+
+from ethereumetl.utils import hex_to_dec
 
 
-def generate_get_receipt_json_rpc(tx_hashes):
-    for idx, tx_hash in enumerate(tx_hashes):
-        yield generate_json_rpc(
-            method='eth_getTransactionReceipt',
-            params=[tx_hash],
-            request_id=idx
-        )
+class MockBatchWeb3Provider(object):
+    def __init__(self, read_resource):
+        self.read_resource = read_resource
 
-
-def generate_get_code_json_rpc(contract_addresses, block='latest'):
-    for idx, contract_address in enumerate(contract_addresses):
-        yield generate_json_rpc(
-            method='eth_getCode',
-            params=[contract_address, hex(block) if isinstance(block, int) else block],
-            request_id=idx
-        )
-
-
-def generate_json_rpc(method, params, request_id=1):
-    return {
-        'jsonrpc': '2.0',
-        'method': method,
-        'params': params,
-        'id': request_id,
-    }
+    def make_request(self, text):
+        batch = json.loads(text)
+        ipc_response = []
+        for req in batch:
+            if req['method'] == 'eth_getBlockByNumber':
+                block_number = hex_to_dec(req['params'][0])
+                file_name = 'ipc_response.block.' + str(block_number) + '.json'
+            else:
+                tx_hash = req['params'][0]
+                file_name = 'ipc_response.receipt.' + str(tx_hash) + '.json'
+            file_content = self.read_resource(file_name)
+            ipc_response.append(json.loads(file_content))
+        return ipc_response

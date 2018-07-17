@@ -39,9 +39,9 @@ quit_if_returned_error() {
     fi
 }
 
-usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -i <ipc_path> [-o <output_dir>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir>]" 1>&2; exit 1; }
 
-while getopts ":s:e:b:i:o:" opt; do
+while getopts ":s:e:b:p:o:" opt; do
     case "${opt}" in
         s)
             start_block=${OPTARG}
@@ -52,8 +52,8 @@ while getopts ":s:e:b:i:o:" opt; do
         b)
             batch_size=${OPTARG}
             ;;
-        i)
-            ipc_path=${OPTARG}
+        p)
+            provider_uri=${OPTARG}
             ;;
         o)
             output_dir=${OPTARG}
@@ -65,7 +65,7 @@ while getopts ":s:e:b:i:o:" opt; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${start_block}" ] || [ -z "${end_block}" ] || [ -z "${batch_size}" ] || [ -z "${ipc_path}" ]; then
+if [ -z "${start_block}" ] || [ -z "${end_block}" ] || [ -z "${batch_size}" ] || [ -z "${provider_uri}" ]; then
     usage
 fi
 
@@ -91,7 +91,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     transactions_file=${transactions_output_dir}/transactions_${file_name_suffix}.csv
     log "Exporting blocks ${block_range} to ${blocks_file}"
     log "Exporting transactions from blocks ${block_range} to ${transactions_file}"
-    python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
+    python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
     erc20_transfers_output_dir=${output_dir}/erc20_transfers${partition_dir}
@@ -99,7 +99,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     erc20_transfers_file=${erc20_transfers_output_dir}/erc20_transfers_${file_name_suffix}.csv
     log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
-    python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --ipc-path="${ipc_path}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
+    python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
     quit_if_returned_error
 
     end_time=$(date +%s)

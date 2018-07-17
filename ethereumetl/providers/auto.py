@@ -25,7 +25,11 @@ from urllib.parse import urlparse
 
 from web3 import IPCProvider, HTTPProvider
 
+from ethereumetl.providers.ipc import BatchIPCProvider
+from ethereumetl.providers.rpc import BatchHTTPProvider
+
 DEFAULT_IPC_TIMEOUT = 60
+DEFAULT_HTTP_REQUEST_KWARGS = {'timeout': 60}
 
 
 def get_provider_from_uri(uri_string):
@@ -33,6 +37,16 @@ def get_provider_from_uri(uri_string):
     if uri.scheme == 'file':
         return IPCProvider(uri.path, timeout=DEFAULT_IPC_TIMEOUT)
     elif uri.scheme == 'http' or uri.scheme == 'https':
-        return HTTPProvider(uri_string)
+        return HTTPProvider(uri_string, request_kwargs=DEFAULT_HTTP_REQUEST_KWARGS)
+    else:
+        raise ValueError('Unknown uri scheme {}'.format(uri_string))
+
+
+def get_batch_provider_from_uri(uri_string):
+    uri = urlparse(uri_string)
+    if uri.scheme == 'file':
+        return BatchIPCProvider(uri.path, timeout=DEFAULT_IPC_TIMEOUT)
+    elif uri.scheme == 'http' or uri.scheme == 'https':
+        return BatchHTTPProvider(uri_string, DEFAULT_HTTP_REQUEST_KWARGS)
     else:
         raise ValueError('Unknown uri scheme {}'.format(uri_string))
