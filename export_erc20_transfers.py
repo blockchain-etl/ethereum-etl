@@ -39,7 +39,7 @@ parser.add_argument('-o', '--output', default='-', type=str, help='The output fi
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('-p', '--provider-uri', required=True, type=str,
                     help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc')
+                         'file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
 parser.add_argument('-t', '--tokens', default=None, type=str, nargs='+',
                     help='The list of token addresses to filter by.')
 
