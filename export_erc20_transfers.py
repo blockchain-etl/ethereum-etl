@@ -23,7 +23,9 @@
 
 import argparse
 
+import re
 from web3 import Web3
+from web3 import HTTPProvider
 
 from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
 from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
@@ -45,11 +47,17 @@ parser.add_argument('-t', '--tokens', default=None, type=str, nargs='+',
 
 args = parser.parse_args()
 
+tlp = None
+if re.compile('^https?://').match(args.provider_uri) == None:
+    tlp = ThreadLocalProxy(lambda: Web3(HTTPProvider(args.provider_uri)))
+else:
+    tlp = ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri)))
+
 job = ExportErc20TransfersJob(
     start_block=args.start_block,
     end_block=args.end_block,
     batch_size=args.batch_size,
-    web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
+    web3=tlp,
     item_exporter=export_erc20_transfers_job_item_exporter(args.output),
     max_workers=args.max_workers,
     tokens=args.tokens)
