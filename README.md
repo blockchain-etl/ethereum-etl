@@ -3,14 +3,14 @@
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/medvedev1088/ethereum-etl.png)](https://travis-ci.org/medvedev1088/ethereum-etl)
 
-Export blocks and transactions:
+Export blocks and transactions ([Reference](#export_blocks_and_transactionspy)):
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
+--provider-uri https://mainnet.infura.io/ --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 transfers:
+Export ERC20 transfers ([Reference](#export_erc20_transferspy)):
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 \
@@ -21,7 +21,7 @@ Export receipts and logs ([Reference](#export_receipts_and_logspy)):
 
 ```bash
 > python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
+--provider-uri https://mainnet.infura.io/ --receipts-output receipts.csv --logs-output logs.csv
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -148,7 +148,7 @@ Note: for the `address` type all hex characters are lower-cased.
 
 ## Exporting the Blockchain
 
-1. Install python 3.5+ https://www.python.org/downloads/
+1. Install python 3.5 or 3.6 https://www.python.org/downloads/
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
 For that use `-p https://mainnet.infura.io/` option for the commands below. If you need ERC20 transfers or want to
@@ -252,6 +252,8 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### export_erc20_transfers.py
+
+The API used in this command is not supported by Infura, so you will need a local node.
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 \
