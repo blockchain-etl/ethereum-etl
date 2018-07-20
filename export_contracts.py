@@ -27,7 +27,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_contracts_job_item_exporter import export_contracts_job_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.providers.auto import get_batch_provider_from_uri
+from ethereumetl.providers.auto import get_provider_from_uri
 
 parser = argparse.ArgumentParser(
     description='Exports contracts bytecode using eth_getCode JSON RPC APIs.')
@@ -48,7 +48,7 @@ with smart_open(args.contract_addresses, 'r') as contract_addresses_file:
     job = ExportContractsJob(
         contract_addresses_iterable=contract_addresses,
         batch_size=args.batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: get_batch_provider_from_uri(args.provider_uri)),
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
         item_exporter=export_contracts_job_item_exporter(args.output),
         max_workers=args.max_workers)
 
