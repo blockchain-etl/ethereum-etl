@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser(description='Export blocks and transactions.')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
 parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
-parser.add_argument('-p', '--provider-uri', required=True, type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')

@@ -36,7 +36,7 @@ parser.add_argument('-c', '--contract-addresses', type=str,
                     help='The file containing contract addresses, one per line.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-p', '--provider-uri', required=True, type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 
