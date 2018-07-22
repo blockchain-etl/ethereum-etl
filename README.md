@@ -140,7 +140,7 @@ erc20_token_name             | string      |
 erc20_token_decimals         | bigint      |
 erc20_token_total_supply     | numeric     |
 
-You can find column descriptions in [schemas/gsp](schemas/gcp)
+You can find column descriptions in [schemas/gcp](schemas/gcp)
 
 Note: `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_token_total_supply` 
 columns in `erc20_tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
