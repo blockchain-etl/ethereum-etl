@@ -81,6 +81,8 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     # Hive style partitioning
     partition_dir=/start_block=${padded_batch_start_block}/end_block=${padded_batch_end_block}
 
+    ### blocks_and_transactions
+
     blocks_output_dir=${output_dir}/blocks${partition_dir}
     mkdir -p ${blocks_output_dir};
 
@@ -94,6 +96,8 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
+    ### erc20_transfers
+
     erc20_transfers_output_dir=${output_dir}/erc20_transfers${partition_dir}
     mkdir -p ${erc20_transfers_output_dir};
 
@@ -102,10 +106,12 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
     quit_if_returned_error
 
+    ### receipts_and_logs
+
     tx_hashes_output_dir=${output_dir}/tx_hashes${partision_dir}
     mkdir -p ${tx_hashes_output_dir};
     
-    tx_hashes_file=${tx_hashes_output_dir}/tx_hases_${file_name_suffix}.csv
+    tx_hashes_file=${tx_hashes_output_dir}/tx_hashes_${file_name_suffix}.csv
     log "Extracting tx_hash column from transaction file ${transactions_file}"
     python3 extract_csv_column.py --input ${transactions_file} --output ${tx_hashes_file} --column "tx_hash"
     quit_if_returned_error
@@ -121,7 +127,9 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     log "Exporting receipts and logs from blocks ${block_range} to ${receipts_file} and ${logs_file}"
     python3 export_receipts_and_logs.py --tx-hashes ${tx_hashes_file} --provider-uri="${provider_uri}"  --receipts-output=${receipts_file} --logs-output=${logs_file}
     quit_if_returned_error
-    
+
+    ### contracts
+
     contract_addresses_output_dir=${output_dir}/contract_addresses${partition_dir}
     mkdir -p ${contract_addresses_output_dir}
     
@@ -137,6 +145,8 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     log "Exporting contracts from blocks ${block_range} to ${contracts_file}"
     python3 export_contracts.py --contract-addresses ${contract_addresses_file} --provider-uri="${provider_uri}" --output=${contracts_file}
     quit_if_returned_error
+
+    ### erc20_tokens
 
     erc20_token_addresses_output_dir=${output_dir}/erc20_token_addresses${partition_dir}
     mkdir -p ${erc20_token_addresses_output_dir}
