@@ -102,6 +102,58 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
     quit_if_returned_error
 
+    tx_hashes_output_dir=${output_dir}/tx_hashes${partision_dir}
+    mkdir -p ${tx_hashes_output_dir};
+    
+    tx_hashes_file=${tx_hashes_output_dir}/tx_hases_${file_name_suffix}.csv
+    log "Extracting tx_hash column from transaction file ${transactions_file}"
+    python3 extract_csv_column.py --input ${transactions_file} --output ${tx_hashes_file} --column "tx_hash"
+    quit_if_returned_error
+
+    receipts_output_dir=${output_dir}/receipts${partition_dir}
+    mkdir -p ${receipts_output_dir};
+
+    logs_output_dir=${output_dir}/logs${partition_dir}
+    mkdir -p ${logs_output_dir};
+
+    receipts_file=${receipts_output_dir}/receipts_${file_name_suffix}.csv
+    logs_file=${logs_output_dir}/logs_${file_name_suffix}.csv
+    log "Exporting receipts and logs from blocks ${block_range} to ${receipts_file} and ${logs_file}"
+    python3 export_receipts_and_logs.py --tx-hashes ${tx_hashes_file} --provider-uri="${provider_uri}"  --receipts-output=${receipts_file} --logs-output=${logs_file}
+    quit_if_returned_error
+    
+    contract_addresses_output_dir=${output_dir}/contract_addresses${partition_dir}
+    mkdir -p ${contract_addresses_output_dir}
+    
+    contract_addresses_file=${contract_addresses_output_dir}/contract_addresses_{$file_name_suffix}.csv
+    log "Extracting receipt_contract_address from receipt file ${receipts_file}"
+    python3 extract_csv_column.py --input ${receipts_file} --column receipt_contract_address --output contract_addresses_file
+    quit_if_returned_error
+
+    contracts_output_dir=${output_dir}/contracts${partition_dir}
+    mkdir -p ${contracts_output_dir};
+    
+    contracts_file=${contracts_output_dir}/contracts_${file_name_suffix}.csv
+    log "Exporting contracts from blocks ${block_range} to ${contracts_file}"
+    python3 export_contracts.py --contract-addresses ${contract_addresses_file} --provider-uri="${provider_uri}" --output=${contracts_file}
+    quit_if_returned_error
+
+    erc20_token_addresses_output_dir=${output_dir}/erc20_token_addresses${partition_dir}
+    mkdir -p ${erc20_token_addresses_output_dir}
+    
+    erc20_token_addresses_file=${erc20_token_addresses_output_dir}/erc20_token_addresses_${erc20_token_addresses}
+    log "Extracting erc20_token_address from erc20_token_transfers file ${erc20_transfers_file}"
+    python3 extract_csv_column.py -i ${erc20_transfers_file} -c erc20_token -o - | sort | uniq > ${erc20_token_addresses_file}
+    quit_if_returned_error
+    
+    erc20_tokens_output_dir=${output_dir}/erc20_tokens${partition_dir}
+    mkdir -p ${erc20_tokens_output_dir}
+    
+    erc20_tokens_file=${erc20_tokens_output_dir}/erc20_tokens_${file_name_suffix}.csv
+    log "Exporting erc20_tokens from blocks ${block_range} to ${erc20_tokens_file}"
+    python3 export_erc20_tokens.py --token-addresses ${erc20_tokens_addresses_file} --provider-uri="${provider_uri}" --output=${erc20_tokens_file}
+    quit_if_returned_error
+
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
 
