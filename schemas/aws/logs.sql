@@ -21,4 +21,4 @@ TBLPROPERTIES (
   'skip.header.line.count' = '1'
 );
 
-MSCK REPAIR TABLE blocks;
+MSCK REPAIR TABLE logs;

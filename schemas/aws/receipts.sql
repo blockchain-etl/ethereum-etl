@@ -22,4 +22,4 @@ TBLPROPERTIES (
   'skip.header.line.count' = '1'
 );
 
-MSCK REPAIR TABLE transactions;
+MSCK REPAIR TABLE receipts;
