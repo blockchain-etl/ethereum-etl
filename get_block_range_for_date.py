@@ -31,7 +31,7 @@ from ethereumetl.service.eth_service import EthService
 from ethereumetl.providers.auto import get_provider_from_uri
 
 parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given date.')
-parser.add_argument('-p', '--provider-uri', default=None, type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 parser.add_argument('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
@@ -47,4 +47,4 @@ eth_service = EthService(web3)
 start_block, end_block = eth_service.get_block_range_for_date(args.date)
 
 with smart_open(args.output, 'w') as output_file:
-    output_file.write('{},{}'.format(start_block, end_block))
+    output_file.write('{},{}\n'.format(start_block, end_block))
