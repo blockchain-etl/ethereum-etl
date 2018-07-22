@@ -41,7 +41,7 @@ def get_provider_from_uri(uri_string, batch=False):
             return IPCProvider(uri.path, timeout=DEFAULT_IPC_TIMEOUT)
     elif uri.scheme == 'http' or uri.scheme == 'https':
         if batch:
-            return BatchHTTPProvider(uri_string, DEFAULT_HTTP_REQUEST_KWARGS)
+            return BatchHTTPProvider(uri_string, request_kwargs=DEFAULT_HTTP_REQUEST_KWARGS)
         else:
             return HTTPProvider(uri_string, request_kwargs=DEFAULT_HTTP_REQUEST_KWARGS)
     else:
