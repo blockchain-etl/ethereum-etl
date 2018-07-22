@@ -53,7 +53,7 @@ class BatchWorkExecutor:
             batch_size = self.batch_size
             # Reduce the batch size. Subsequent batches will be 2 times smaller
             if batch_size == len(batch) and batch_size > 1:
-                self.batch_size = max(1, int(batch_size / 2))
+                self.batch_size = int(batch_size / 2)
             # For the failed batch try handling items one by one
             for item in batch:
                 work_handler([item])
