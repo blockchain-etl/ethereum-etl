@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import logging
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
@@ -53,6 +53,9 @@ class ExportErc20TransfersJob(BaseJob):
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
+        self.transfers_exported = False
+        self.logger = logging.getLogger('ExportErc20TransfersJob')
+
     def _start(self):
         self.item_exporter.open()
 
@@ -82,9 +85,12 @@ class ExportErc20TransfersJob(BaseJob):
             erc20_transfer = self.erc20_transfer_extractor.filter_transfer_from_log(log)
             if erc20_transfer is not None:
                 self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
+                self.transfers_exported = True
 
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
+        if not self.transfers_exported:
+            self.logger.info('No transfers have been exported. The blocks for the given range don''t have transfers.')
