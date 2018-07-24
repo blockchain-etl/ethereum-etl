@@ -27,8 +27,11 @@ from datetime import datetime
 from web3 import Web3
 
 from ethereumetl.file_utils import smart_open
+from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.service.eth_service import EthService
 from ethereumetl.providers.auto import get_provider_from_uri
+
+logging_basic_config()
 
 parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given date.')
 parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,

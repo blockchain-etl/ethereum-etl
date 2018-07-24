@@ -25,8 +25,11 @@ import argparse
 
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_blocks_job_item_exporter import export_blocks_job_item_exporter
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
+
+logging_basic_config()
 
 parser = argparse.ArgumentParser(description='Export blocks and transactions.')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
