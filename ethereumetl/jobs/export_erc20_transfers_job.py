@@ -21,6 +21,7 @@
 # SOFTWARE.
 import logging
 
+from ethereumetl.atomic_counter import AtomicCounter
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
@@ -53,7 +54,7 @@ class ExportErc20TransfersJob(BaseJob):
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
-        self.transfers_exported = False
+        self.transfer_counter = AtomicCounter()
         self.logger = logging.getLogger('ExportErc20TransfersJob')
 
     def _start(self):
@@ -85,12 +86,11 @@ class ExportErc20TransfersJob(BaseJob):
             erc20_transfer = self.erc20_transfer_extractor.filter_transfer_from_log(log)
             if erc20_transfer is not None:
                 self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
-                self.transfers_exported = True
+                self.transfer_counter.increment()
 
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
-        if not self.transfers_exported:
-            self.logger.info('No transfers have been exported. The blocks for the given range don''t have transfers.')
+        self.logger.info('Transfers exported: {}'.format(self.transfer_counter.increment() - 1))
