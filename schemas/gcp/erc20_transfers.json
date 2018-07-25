@@ -16,8 +16,8 @@
     },
     {
         "name": "erc20_value",
-        "type": "NUMERIC",
-        "description": "Value transferred"
+        "type": "STRING",
+        "description": "Value transferred / id of the token transferred"
     },
     {
         "name": "erc20_tx_hash",
