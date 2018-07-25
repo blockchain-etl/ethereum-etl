@@ -23,6 +23,7 @@
 
 import argparse
 import csv
+import json
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.exporters.erc20_transfers_item_exporter import erc20_transfers_item_exporter
@@ -41,9 +42,12 @@ parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximu
 args = parser.parse_args()
 
 with smart_open(args.logs, 'r') as logs_file:
-    logs_csv_reader = csv.DictReader(logs_file)
+    if args.logs.endswith('.json'):
+        logs_reader = (json.loads(line) for line in logs_file)
+    else:
+        logs_reader = csv.DictReader(logs_file)
     job = ExtractErc20TransfersJob(
-        logs_iterable=logs_csv_reader,
+        logs_iterable=logs_reader,
         batch_size=args.batch_size,
         max_workers=args.max_workers,
         item_exporter=erc20_transfers_item_exporter(args.output))

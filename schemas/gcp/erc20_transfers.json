@@ -17,7 +17,7 @@
     {
         "name": "erc20_value",
         "type": "STRING",
-        "description": "Value transferred / id of the token transferred"
+        "description": "Value transferred (ERC20) / id of the token transferred (ERC721)"
     },
     {
         "name": "erc20_tx_hash",

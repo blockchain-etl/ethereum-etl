@@ -19,9 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
 
-from ethereumetl.atomic_counter import AtomicCounter
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
@@ -45,9 +43,6 @@ class ExtractErc20TransfersJob(BaseJob):
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
-        self.transfer_counter = AtomicCounter()
-        self.logger = logging.getLogger('ExtractErc20TransfersJob')
-
     def _start(self):
         self.item_exporter.open()
 
@@ -63,9 +58,7 @@ class ExtractErc20TransfersJob(BaseJob):
         erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
         if erc20_transfer is not None:
             self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
-            self.transfer_counter.increment()
 
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
-        self.logger.info('Transfers exported: {}'.format(self.transfer_counter.increment() - 1))

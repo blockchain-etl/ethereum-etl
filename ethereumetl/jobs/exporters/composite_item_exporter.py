@@ -19,9 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
 
-
-from ethereumetl.exporters import CsvItemExporter
+from ethereumetl.atomic_counter import AtomicCounter
+from ethereumetl.exporters import CsvItemExporter, JsonLinesItemExporter
 from ethereumetl.file_utils import get_file_handle, close_silently
 
 
@@ -32,12 +33,22 @@ class CompositeItemExporter:
 
         self.file_mapping = {}
         self.exporter_mapping = {}
+        self.counter_mapping = {}
+
+        self.logger = logging.getLogger('CompositeItemExporter')
 
     def open(self):
         for item_type, filename in self.filename_mapping.items():
-            self.file_mapping[item_type] = get_file_handle(filename, binary=True)
-            self.exporter_mapping[item_type] = CsvItemExporter(self.file_mapping[item_type],
-                                                               fields_to_export=self.field_mapping[item_type])
+            file = get_file_handle(filename, binary=True)
+            fields = self.field_mapping[item_type]
+            self.file_mapping[item_type] = file
+            if str(filename).endswith('.json'):
+                item_exporter = JsonLinesItemExporter(file, fields_to_export=fields)
+            else:
+                item_exporter = CsvItemExporter(file, fields_to_export=fields)
+            self.exporter_mapping[item_type] = item_exporter
+
+            self.counter_mapping[item_type] = AtomicCounter()
 
     def export_item(self, item):
         item_type = item.get('type', None)
@@ -49,6 +60,10 @@ class CompositeItemExporter:
             raise ValueError('Exporter for item type {} not found'.format(item_type))
         exporter.export_item(item)
 
+        self.counter_mapping[item_type].increment()
+
     def close(self):
-        for file in self.file_mapping.values():
+        for item_type, file in self.file_mapping.items():
             close_silently(file)
+            counter = self.counter_mapping[item_type]
+            self.logger.info('{} items exported: {}'.format(item_type, counter.increment() - 1))
