@@ -83,7 +83,7 @@ class ExportErc20TransfersJob(BaseJob):
         events = event_filter.get_all_entries()
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
-            erc20_transfer = self.erc20_transfer_extractor.filter_transfer_from_log(log)
+            erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
             if erc20_transfer is not None:
                 self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
                 self.transfer_counter.increment()

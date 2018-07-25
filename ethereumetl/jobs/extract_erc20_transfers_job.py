@@ -60,7 +60,7 @@ class ExtractErc20TransfersJob(BaseJob):
 
     def _extract_transfer(self, log_dict):
         log = self.receipt_log_mapper.dict_to_receipt_log(log_dict)
-        erc20_transfer = self.erc20_transfer_extractor.filter_transfer_from_log(log)
+        erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
         if erc20_transfer is not None:
             self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
             self.transfer_counter.increment()
