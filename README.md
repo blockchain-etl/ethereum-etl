@@ -386,6 +386,10 @@ CREATE DATABASE ethereumetl;
   - blocks: [schemas/aws/blocks.sql](schemas/aws/blocks.sql)
   - transactions: [schemas/aws/transactions.sql](schemas/aws/transactions.sql)
   - erc20_transfers: [schemas/aws/erc20_transfers.sql](schemas/aws/erc20_transfers.sql)
+  - contracts: [schemas/aws/contracts.sql](schemas/aws/contracts.sql)
+  - receipts: [schemas/aws/receipts.sql](schemas/aws/receipts.sql)
+  - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
+  - erc20_tokens: [schemas/aws/erc20_tokens.sql](schemas/aws/erc20_tokens.sql)
 
 ### Tables for Parquet Files
 
