@@ -26,7 +26,7 @@ from ethereumetl.progress_logger import ProgressLogger
 
 def test_progress_logger():
     logger_mock = LoggerMock()
-    progress_logger = ProgressLogger(logger=logger_mock)
+    progress_logger = ProgressLogger(logger=logger_mock, log_item_step=1000)
 
     progress_logger.start()
     [progress_logger.track(100) for _ in range(100)]
@@ -40,7 +40,7 @@ def test_progress_logger():
 
 def test_progress_logger_with_total_items():
     logger_mock = LoggerMock()
-    progress_logger = ProgressLogger(logger=logger_mock)
+    progress_logger = ProgressLogger(logger=logger_mock, log_percentage_step=5)
 
     progress_logger.start(total_items=1234)
     [progress_logger.track(99) for _ in range(100)]

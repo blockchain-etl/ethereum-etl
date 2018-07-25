@@ -28,15 +28,15 @@ from ethereumetl.atomic_counter import AtomicCounter
 
 # Thread safe progress logger.
 class ProgressLogger:
-    def __init__(self, name='work', logger=None):
+    def __init__(self, name='work', logger=None, log_percentage_step=10, log_item_step=5000):
         self.name = name
         self.total_items = None
 
         self.start_time = None
         self.end_time = None
         self.counter = AtomicCounter()
-        self.log_percentage_step = 5
-        self.log_items_step = 1000
+        self.log_percentage_step = log_percentage_step
+        self.log_items_step = log_item_step
         if logger is not None:
             self.logger = logger
         else:
