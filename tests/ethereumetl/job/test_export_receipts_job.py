@@ -25,7 +25,7 @@ import pytest
 
 import tests.resources
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
+from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.ethereumetl.job.mock_batch_web3_provider import MockBatchWeb3Provider
 from tests.helpers import compare_lines_ignore_order, read_file
@@ -43,29 +43,31 @@ DEFAULT_TX_HASHES = ['0x04cbcb236043d8fb7839e07bbc7f5eed692fb2ca55d897f1101eac3e
                      '0xcea6f89720cc1d2f46cc7a935463ae0b99dd5fad9c91bb7357de5421511cee49']
 
 
-@pytest.mark.parametrize("batch_size,tx_hashes,resource_group", [
-    (1, DEFAULT_TX_HASHES, 'receipts_with_logs'),
-    (2, DEFAULT_TX_HASHES, 'receipts_with_logs')
+@pytest.mark.parametrize("batch_size,tx_hashes,output_format,resource_group", [
+    (1, DEFAULT_TX_HASHES, 'csv', 'receipts_with_logs'),
+    (2, DEFAULT_TX_HASHES, 'csv', 'receipts_with_logs'),
+    (2, DEFAULT_TX_HASHES, 'json', 'receipts_with_logs')
 ])
-def test_export_receipts_job(tmpdir, batch_size, tx_hashes, resource_group):
-    receipts_output_file = tmpdir.join('actual_receipts.csv')
-    logs_output_file = tmpdir.join('actual_logs.csv')
+def test_export_receipts_job(tmpdir, batch_size, tx_hashes, output_format, resource_group):
+    receipts_output_file = tmpdir.join('actual_receipts.' + output_format)
+    logs_output_file = tmpdir.join('actual_logs.' + output_format)
 
     job = ExportReceiptsJob(
         tx_hashes_iterable=tx_hashes,
         batch_size=batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: MockBatchWeb3Provider(lambda file: read_resource(resource_group, file))),
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: MockBatchWeb3Provider(lambda file: read_resource(resource_group, file))),
         max_workers=5,
-        item_exporter=export_receipts_job_item_exporter(receipts_output_file, logs_output_file),
+        item_exporter=receipts_and_logs_item_exporter(receipts_output_file, logs_output_file),
         export_receipts=receipts_output_file is not None,
         export_logs=logs_output_file is not None
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_receipts.csv'), read_file(receipts_output_file)
+        read_resource(resource_group, 'expected_receipts.' + output_format), read_file(receipts_output_file)
     )
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_logs.csv'), read_file(logs_output_file)
+        read_resource(resource_group, 'expected_logs.' + output_format), read_file(logs_output_file)
     )

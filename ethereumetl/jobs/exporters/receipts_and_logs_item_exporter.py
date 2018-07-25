@@ -21,25 +21,40 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
-FIELDS_TO_EXPORT = [
-    'erc20_token',
-    'erc20_from',
-    'erc20_to',
-    'erc20_value',
-    'erc20_tx_hash',
-    'erc20_log_index',
-    'erc20_block_number'
+RECEIPT_FIELDS_TO_EXPORT = [
+    'receipt_transaction_hash',
+    'receipt_transaction_index',
+    'receipt_block_hash',
+    'receipt_block_number',
+    'receipt_cumulative_gas_used',
+    'receipt_gas_used',
+    'receipt_contract_address',
+    'receipt_root',
+    'receipt_status'
+]
+
+LOG_FIELDS_TO_EXPORT = [
+    'log_index',
+    'log_transaction_hash',
+    'log_transaction_index',
+    'log_block_hash',
+    'log_block_number',
+    'log_address',
+    'log_data',
+    'log_topics'
 ]
 
 
-def export_erc20_transfers_job_item_exporter(erc20_transfer_output):
+def receipts_and_logs_item_exporter(receipts_output=None, logs_output=None):
     return CompositeItemExporter(
         filename_mapping={
-            'erc20_transfer': erc20_transfer_output
+            'receipt': receipts_output,
+            'log': logs_output
         },
         field_mapping={
-            'erc20_transfer': FIELDS_TO_EXPORT
+            'receipt': RECEIPT_FIELDS_TO_EXPORT,
+            'log': LOG_FIELDS_TO_EXPORT
         }
     )

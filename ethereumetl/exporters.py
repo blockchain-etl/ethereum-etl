@@ -32,6 +32,8 @@ Item Exporters are used to export/serialize items into different formats.
 
 import csv
 import io
+import threading
+from json import JSONEncoder
 
 import six
 
@@ -109,6 +111,7 @@ class CsvItemExporter(BaseItemExporter):
         self.csv_writer = csv.writer(self.stream, **kwargs)
         self._headers_not_written = True
         self._join_multivalued = join_multivalued
+        self._write_headers_lock = threading.Lock()
 
     def serialize_field(self, field, name, value):
         serializer = field.get('serializer', self._join_if_needed)
@@ -123,9 +126,12 @@ class CsvItemExporter(BaseItemExporter):
         return value
 
     def export_item(self, item):
+        # Double-checked locking (safe in Python because of GIL) https://en.wikipedia.org/wiki/Double-checked_locking
         if self._headers_not_written:
-            self._headers_not_written = False
-            self._write_headers_and_set_fields_to_export(item)
+            with self._write_headers_lock:
+                if self._headers_not_written:
+                    self._write_headers_and_set_fields_to_export(item)
+                    self._headers_not_written = False
 
         fields = self._get_serialized_fields(item, default_value='',
                                              include_empty=True)
@@ -150,6 +156,20 @@ class CsvItemExporter(BaseItemExporter):
                     self.fields_to_export = list(item.fields.keys())
             row = list(self._build_row(self.fields_to_export))
             self.csv_writer.writerow(row)
+
+
+class JsonLinesItemExporter(BaseItemExporter):
+
+    def __init__(self, file, **kwargs):
+        self._configure(kwargs, dont_fail=True)
+        self.file = file
+        kwargs.setdefault('ensure_ascii', not self.encoding)
+        self.encoder = JSONEncoder(**kwargs)
+
+    def export_item(self, item):
+        itemdict = dict(self._get_serialized_fields(item))
+        data = self.encoder.encode(itemdict) + '\n'
+        self.file.write(to_bytes(data, self.encoding))
 
 
 def to_native_str(text, encoding=None, errors='strict'):

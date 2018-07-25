@@ -25,14 +25,17 @@ import argparse
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
+from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
+from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.providers.auto import get_batch_provider_from_uri
+from ethereumetl.providers.auto import get_provider_from_uri
+
+logging_basic_config()
 
 parser = argparse.ArgumentParser(description='Export receipts and logs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
 parser.add_argument('-t', '--tx-hashes', type=str, help='The file containing transaction hashes, one per line.')
-parser.add_argument('-p', '--provider-uri', required=True, type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
@@ -49,9 +52,9 @@ with smart_open(args.tx_hashes, 'r') as tx_hashes_file:
     job = ExportReceiptsJob(
         tx_hashes_iterable=(tx_hash.strip() for tx_hash in tx_hashes_file),
         batch_size=args.batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: get_batch_provider_from_uri(args.provider_uri)),
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
         max_workers=args.max_workers,
-        item_exporter=export_receipts_job_item_exporter(args.receipts_output, args.logs_output),
+        item_exporter=receipts_and_logs_item_exporter(args.receipts_output, args.logs_output),
         export_receipts=args.receipts_output is not None,
         export_logs=args.logs_output is not None)
 

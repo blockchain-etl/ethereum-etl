@@ -38,7 +38,7 @@ def test_filter_transfer_from_receipt_log():
                   '0x0000000000000000000000000000000000000000000000000000000000000000']
     log.transaction_hash = '0xd62a74c7b04e8e0539398f6ba6a5eb11ad8aa862e77f0af718f0fad19b0b0480'
 
-    erc20_transfer = erc20_transfer_extractor.filter_transfer_from_log(log)
+    erc20_transfer = erc20_transfer_extractor.extract_transfer_from_log(log)
 
     assert erc20_transfer.erc20_token == '0x25c6413359059694a7fca8e599ae39ce1c944da2'
     assert erc20_transfer.erc20_from == '0xe9eeaec75883f0e389a78e2260bfac1776df2f1d'

@@ -76,5 +76,27 @@ class EthReceiptLogMapper(object):
             'log_block_number': receipt_log.block_number,
             'log_address': receipt_log.address,
             'log_data': receipt_log.data,
-            'log_topics': '|'.join(receipt_log.topics)
+            'log_topics': receipt_log.topics
         }
+
+    def dict_to_receipt_log(self, dict):
+        receipt_log = EthReceiptLog()
+
+        receipt_log.log_index = dict.get('log_index')
+        receipt_log.transaction_hash = dict.get('log_transaction_hash')
+        receipt_log.transaction_index = dict.get('log_transaction_index')
+        receipt_log.block_hash = dict.get('log_block_hash')
+        receipt_log.block_number = dict.get('log_block_number')
+        receipt_log.address = dict.get('log_address')
+        receipt_log.data = dict.get('log_data')
+
+        topics = dict.get('log_topics')
+        if isinstance(topics, str):
+            if len(topics.strip()) == 0:
+                receipt_log.topics = []
+            else:
+                receipt_log.topics = topics.strip().split(',')
+        else:
+            receipt_log.topics = topics
+
+        return receipt_log

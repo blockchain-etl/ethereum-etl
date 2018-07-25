@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
     'erc20_token_address',
@@ -32,7 +32,7 @@ FIELDS_TO_EXPORT = [
 ]
 
 
-def export_erc20_tokens_job_item_exporter(erc20_tokens_output):
+def erc20_tokens_item_exporter(erc20_tokens_output):
     return CompositeItemExporter(
         filename_mapping={
             'erc20_token': erc20_tokens_output
