@@ -21,20 +21,51 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
-FIELDS_TO_EXPORT = [
-    'contract_address',
-    'contract_bytecode'
+BLOCK_FIELDS_TO_EXPORT = [
+    'block_number',
+    'block_hash',
+    'block_parent_hash',
+    'block_nonce',
+    'block_sha3_uncles',
+    'block_logs_bloom',
+    'block_transactions_root',
+    'block_state_root',
+    'block_miner',
+    'block_difficulty',
+    'block_total_difficulty',
+    'block_size',
+    'block_extra_data',
+    'block_gas_limit',
+    'block_gas_used',
+    'block_timestamp',
+    'block_transaction_count'
+]
+
+TRANSACTION_FIELDS_TO_EXPORT = [
+    'tx_hash',
+    'tx_nonce',
+    'tx_block_hash',
+    'tx_block_number',
+    'tx_index',
+    'tx_from',
+    'tx_to',
+    'tx_value',
+    'tx_gas',
+    'tx_gas_price',
+    'tx_input'
 ]
 
 
-def export_contracts_job_item_exporter(contracts_output):
+def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None):
     return CompositeItemExporter(
         filename_mapping={
-            'contract': contracts_output
+            'block': blocks_output,
+            'transaction': transactions_output
         },
         field_mapping={
-            'contract': FIELDS_TO_EXPORT
+            'block': BLOCK_FIELDS_TO_EXPORT,
+            'transaction': TRANSACTION_FIELDS_TO_EXPORT
         }
     )

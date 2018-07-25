@@ -25,7 +25,7 @@ import pytest
 
 import tests.resources
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
+from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.ethereumetl.job.mock_batch_web3_provider import MockBatchWeb3Provider
 from tests.helpers import compare_lines_ignore_order, read_file
@@ -56,7 +56,7 @@ def test_export_receipts_job(tmpdir, batch_size, tx_hashes, resource_group):
         batch_size=batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: MockBatchWeb3Provider(lambda file: read_resource(resource_group, file))),
         max_workers=5,
-        item_exporter=export_receipts_job_item_exporter(receipts_output_file, logs_output_file),
+        item_exporter=receipts_and_logs_item_exporter(receipts_output_file, logs_output_file),
         export_receipts=receipts_output_file is not None,
         export_logs=logs_output_file is not None
     )

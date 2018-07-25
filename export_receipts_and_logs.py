@@ -25,7 +25,7 @@ import argparse
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.export_receipts_job_item_exporter import export_receipts_job_item_exporter
+from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
@@ -54,7 +54,7 @@ with smart_open(args.tx_hashes, 'r') as tx_hashes_file:
         batch_size=args.batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
         max_workers=args.max_workers,
-        item_exporter=export_receipts_job_item_exporter(args.receipts_output, args.logs_output),
+        item_exporter=receipts_and_logs_item_exporter(args.receipts_output, args.logs_output),
         export_receipts=args.receipts_output is not None,
         export_logs=args.logs_output is not None)
 

@@ -25,7 +25,7 @@ import argparse
 import csv
 
 from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
+from ethereumetl.jobs.exporters.erc20_transfers_item_exporter import erc20_transfers_item_exporter
 from ethereumetl.jobs.extract_erc20_transfers_job import ExtractErc20TransfersJob
 from ethereumetl.logging_utils import logging_basic_config
 
@@ -46,6 +46,6 @@ with smart_open(args.logs, 'r') as logs_file:
         logs_iterable=logs_csv_reader,
         batch_size=args.batch_size,
         max_workers=args.max_workers,
-        item_exporter=export_erc20_transfers_job_item_exporter(args.output))
+        item_exporter=erc20_transfers_item_exporter(args.output))
 
     job.run()

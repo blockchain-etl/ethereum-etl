@@ -26,7 +26,7 @@ import io
 import pytest
 
 import tests.resources
-from ethereumetl.jobs.export_erc20_transfers_job_item_exporter import export_erc20_transfers_job_item_exporter
+from ethereumetl.jobs.exporters.erc20_transfers_item_exporter import erc20_transfers_item_exporter
 from ethereumetl.jobs.extract_erc20_transfers_job import ExtractErc20TransfersJob
 from tests.helpers import compare_lines_ignore_order, read_file
 
@@ -48,7 +48,7 @@ def test_export_erc20_transfers_job(tmpdir, resource_group):
     job = ExtractErc20TransfersJob(
         logs_iterable=logs_csv_reader,
         batch_size=2,
-        item_exporter=export_erc20_transfers_job_item_exporter(output_file),
+        item_exporter=erc20_transfers_item_exporter(output_file),
         max_workers=5
     )
     job.run()
