@@ -20,27 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import itertools
 import logging
 from datetime import datetime
+
+from ethereumetl.atomic_counter import AtomicCounter
 
 
 # Thread safe progress logger.
 class ProgressLogger:
-    def __init__(self, name='work'):
+    def __init__(self, name='work', logger=None):
         self.name = name
         self.total_items = None
-        self.logger = logging.getLogger('ProgressLogger')
+
         self.start_time = None
         self.end_time = None
-        self.counter = itertools.count()
+        self.counter = AtomicCounter()
         self.log_percentage_step = 5
         self.log_items_step = 1000
+        if logger is not None:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger('ProgressLogger')
 
     def start(self, total_items=None):
         self.total_items = total_items
         self.start_time = datetime.now()
-        next(self.counter)
         start_message = 'Started {}.'.format(self.name)
         if self.total_items is not None:
             start_message = start_message + ' Items to process: {}.'.format(self.total_items)
@@ -48,7 +52,7 @@ class ProgressLogger:
 
     # Check race conditions
     def track(self, item_count=1):
-        processed_items = atomic_increment(self.counter, item_count)
+        processed_items = self.counter.increment(item_count)
         processed_items_before = processed_items - item_count
 
         track_message = None
@@ -59,7 +63,8 @@ class ProgressLogger:
             percentage = processed_items * 100 / self.total_items
             percentage_before = processed_items_before * 100 / self.total_items
             if int(percentage_before / self.log_percentage_step) != int(percentage / self.log_percentage_step):
-                track_message = '{} items processed. Progress is {}%.'.format(processed_items, int(percentage))
+                track_message = '{} items processed. Progress is {}%'.format(processed_items, int(percentage)) + \
+                                ('!!!' if int(percentage) > 100 else '.')
 
         if track_message is not None:
             self.logger.info(track_message)
@@ -70,14 +75,8 @@ class ProgressLogger:
             self.end_time = datetime.now()
             duration = self.end_time - self.start_time
 
-        finish_message = 'Finished {}. Total items processed: {}.'.format(self.name, next(self.counter) - 1)
+        finish_message = 'Finished {}. Total items processed: {}.'.format(self.name, self.counter.increment() - 1)
         if duration is not None:
             finish_message = finish_message + ' Took {}.'.format(str(duration))
 
         self.logger.info(finish_message)
-
-
-# https://stackoverflow.com/a/27062830/1580227
-def atomic_increment(counter, increment):
-    assert increment > 0
-    return [next(counter) for _ in range(0, increment)][-1]

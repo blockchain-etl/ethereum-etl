@@ -20,44 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-import json
+import csv
+import io
 
 import pytest
-from web3 import Web3, IPCProvider
 
 import tests.resources
-from ethereumetl.jobs.export_erc20_transfers_job import ExportErc20TransfersJob
 from ethereumetl.jobs.exporters.erc20_transfers_item_exporter import erc20_transfers_item_exporter
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.jobs.extract_erc20_transfers_job import ExtractErc20TransfersJob
 from tests.helpers import compare_lines_ignore_order, read_file
 
-RESOURCE_GROUP = 'test_export_erc20_transfers_job'
+RESOURCE_GROUP = 'test_extract_erc20_transfers_job'
 
 
 def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-class MockIPCProvider(IPCProvider):
-    def __init__(self, resource_group):
-        self.resource_group = resource_group
-
-    def make_request(self, method, params):
-        file_name = method + '.json'
-        file_content = read_resource(self.resource_group, file_name)
-        return json.loads(file_content)
-
-
-@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group", [
-    (483920, 483920, 1, 'block_with_transfers')
+@pytest.mark.parametrize('resource_group', [
+    'logs'
 ])
-def test_export_erc20_transfers_job(tmpdir, start_block, end_block, batch_size, resource_group):
+def test_export_erc20_transfers_job(tmpdir, resource_group):
     output_file = tmpdir.join('erc20_transfers.csv')
 
-    job = ExportErc20TransfersJob(
-        start_block=start_block, end_block=end_block, batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(MockIPCProvider(resource_group))),
+    logs_content = read_resource(resource_group, 'logs.csv')
+    logs_csv_reader = csv.DictReader(io.StringIO(logs_content))
+    job = ExtractErc20TransfersJob(
+        logs_iterable=logs_csv_reader,
+        batch_size=2,
         item_exporter=erc20_transfers_item_exporter(output_file),
         max_workers=5
     )

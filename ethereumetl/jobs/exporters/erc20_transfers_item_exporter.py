@@ -21,20 +21,25 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.composite_item_exporter import CompositeItemExporter
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
-    'contract_address',
-    'contract_bytecode'
+    'erc20_token',
+    'erc20_from',
+    'erc20_to',
+    'erc20_value',
+    'erc20_tx_hash',
+    'erc20_log_index',
+    'erc20_block_number'
 ]
 
 
-def export_contracts_job_item_exporter(contracts_output):
+def erc20_transfers_item_exporter(erc20_transfer_output):
     return CompositeItemExporter(
         filename_mapping={
-            'contract': contracts_output
+            'erc20_transfer': erc20_transfer_output
         },
         field_mapping={
-            'contract': FIELDS_TO_EXPORT
+            'erc20_transfer': FIELDS_TO_EXPORT
         }
     )

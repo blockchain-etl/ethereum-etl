@@ -24,7 +24,7 @@
 import argparse
 
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
-from ethereumetl.jobs.export_blocks_job_item_exporter import export_blocks_job_item_exporter
+from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -54,7 +54,7 @@ job = ExportBlocksJob(
     batch_size=args.batch_size,
     batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
     max_workers=args.max_workers,
-    item_exporter=export_blocks_job_item_exporter(args.blocks_output, args.transactions_output),
+    item_exporter=blocks_and_transactions_item_exporter(args.blocks_output, args.transactions_output),
     export_blocks=args.blocks_output is not None,
     export_transactions=args.transactions_output is not None)
 

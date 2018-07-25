@@ -439,13 +439,6 @@ Deduplicate `erc20_tokens`:
 You can query the data that I exported in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
-### TODOs
-
-1. Unit tests
-1. Rewrite export_all.sh in python
-1. Add HTTPProvider
-1. Error handling and logging
-
 ### SQL for Blockchain
 
 I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:

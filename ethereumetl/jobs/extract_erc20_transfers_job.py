@@ -26,69 +26,44 @@ from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
-from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor, TRANSFER_EVENT_TOPIC
-from ethereumetl.utils import validate_range
+from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor
 
 
-class ExportErc20TransfersJob(BaseJob):
+class ExtractErc20TransfersJob(BaseJob):
     def __init__(
             self,
-            start_block,
-            end_block,
+            logs_iterable,
             batch_size,
-            web3,
-            item_exporter,
             max_workers,
-            tokens=None):
-        validate_range(start_block, end_block)
-        self.start_block = start_block
-        self.end_block = end_block
-
-        self.web3 = web3
-        self.tokens = tokens
-        self.item_exporter = item_exporter
+            item_exporter):
+        self.logs_iterable = logs_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.item_exporter = item_exporter
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.erc20_transfer_mapper = EthErc20TransferMapper()
         self.erc20_transfer_extractor = EthErc20TransferExtractor()
 
         self.transfer_counter = AtomicCounter()
-        self.logger = logging.getLogger('ExportErc20TransfersJob')
+        self.logger = logging.getLogger('ExtractErc20TransfersJob')
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
-        self.batch_work_executor.execute(
-            range(self.start_block, self.end_block + 1),
-            self._export_batch,
-            total_items=self.end_block - self.start_block + 1
-        )
+        self.batch_work_executor.execute(self.logs_iterable, self._extract_transfers)
 
-    def _export_batch(self, block_number_batch):
-        assert len(block_number_batch) > 0
-        # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
-        filter_params = {
-            'fromBlock': block_number_batch[0],
-            'toBlock': block_number_batch[-1],
-            'topics': [TRANSFER_EVENT_TOPIC]
-        }
+    def _extract_transfers(self, log_dicts):
+        for log_dict in log_dicts:
+            self._extract_transfer(log_dict)
 
-        if self.tokens is not None and len(self.tokens) > 0:
-            filter_params['address'] = self.tokens
-
-        event_filter = self.web3.eth.filter(filter_params)
-        events = event_filter.get_all_entries()
-        for event in events:
-            log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
-            erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
-            if erc20_transfer is not None:
-                self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
-                self.transfer_counter.increment()
-
-        self.web3.eth.uninstallFilter(event_filter.filter_id)
+    def _extract_transfer(self, log_dict):
+        log = self.receipt_log_mapper.dict_to_receipt_log(log_dict)
+        erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
+        if erc20_transfer is not None:
+            self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
+            self.transfer_counter.increment()
 
     def _end(self):
         self.batch_work_executor.shutdown()

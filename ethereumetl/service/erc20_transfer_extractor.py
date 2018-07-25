@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 class EthErc20TransferExtractor(object):
-    def filter_transfer_from_log(self, receipt_log):
+    def extract_transfer_from_log(self, receipt_log):
 
         topics = receipt_log.topics
         if len(topics) < 1:
