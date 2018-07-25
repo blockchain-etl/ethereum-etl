@@ -40,6 +40,7 @@
     {
         "name": "log_topics",
         "type": "STRING",
-        "description": "Pipe-separated (| character) string of indexed log arguments (0 to 4 32-byte hex strings). (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256)), except you declared the event with the anonymous specifier.)"
+        "mode": "REPEATED",
+        "description": "Indexed log arguments (0 to 4 32-byte hex strings). (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256)), except you declared the event with the anonymous specifier.)"
     }
 ]

@@ -223,6 +223,7 @@ Additional steps:
 
 - [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)
 - [export_erc20_transfers.py](#export_erc20_transferspy)
+- [extract_erc20_transfers.py](#extract_erc20_transferspy)
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
 - [export_erc20_tokens.py](#export_erc20_tokenspy)
@@ -242,6 +243,8 @@ usage: export_blocks_and_transactions.py [-h] [-s START_BLOCK] -e END_BLOCK
 Export blocks and transactions.
 ```
 
+For the `--output` parameters the supported types are csv and json. The format type is inferred from the output file name.
+
 ##### export_blocks_and_transactions.py
 
 ```bash
@@ -255,7 +258,8 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### export_erc20_transfers.py
 
-The API used in this command is not supported by Infura, so you will need a local node.
+The API used in this command is not supported by Infura, so you will need a local node. 
+If you want to use Infura for exporting ERC20 transfers refer to [extract_erc20_transfers.py](#extract_erc20_transferspy)
 
 ```bash
 > python export_erc20_transfers.py --start-block 0 --end-block 500000 \
@@ -293,6 +297,18 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
+
+##### extract_erc20_transfers.py
+
+First export receipt logs with [export_receipts_and_logs.py](#export_receipts_and_logspy).
+
+Then extract transfers from the logs.csv file:
+
+```bash
+> python extract_erc20_transfers.py --logs logs.csv --output erc20_transfers.csv
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### export_contracts.py
 
@@ -408,17 +424,14 @@ To upload CSVs to BigQuery:
 > cd ethereum-etl
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --max_bad_records=5000 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.csv ./schemas/gcp/logs.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/logs.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
 ```
 
-Note that `--max_bad_records` is needed for erc20_transfers to avoid
-'Error while reading data, error message: Could not parse '68032337690423899710659284523950357745' as numeric for field
-erc20_value (position 3) starting at location 52895 numeric overflow'
-for [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) transfers.
+Note that NEWLINE_DELIMITED_JSON is used for logs to support REPEATED mode for the `topics` column.
 
 Join `transactions` and `receipts`:
 

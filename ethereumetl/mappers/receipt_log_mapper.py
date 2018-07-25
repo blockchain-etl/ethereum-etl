@@ -76,7 +76,7 @@ class EthReceiptLogMapper(object):
             'log_block_number': receipt_log.block_number,
             'log_address': receipt_log.address,
             'log_data': receipt_log.data,
-            'log_topics': '|'.join(receipt_log.topics)
+            'log_topics': receipt_log.topics
         }
 
     def dict_to_receipt_log(self, dict):
@@ -92,7 +92,10 @@ class EthReceiptLogMapper(object):
 
         topics = dict.get('log_topics')
         if isinstance(topics, str):
-            receipt_log.topics = topics.split('|')
+            if len(topics.strip()) == 0:
+                receipt_log.topics = []
+            else:
+                receipt_log.topics = topics.strip().split(',')
         else:
             receipt_log.topics = topics
 

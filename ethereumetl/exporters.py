@@ -33,6 +33,7 @@ Item Exporters are used to export/serialize items into different formats.
 import csv
 import io
 import threading
+from json import JSONEncoder
 
 import six
 
@@ -155,6 +156,20 @@ class CsvItemExporter(BaseItemExporter):
                     self.fields_to_export = list(item.fields.keys())
             row = list(self._build_row(self.fields_to_export))
             self.csv_writer.writerow(row)
+
+
+class JsonLinesItemExporter(BaseItemExporter):
+
+    def __init__(self, file, **kwargs):
+        self._configure(kwargs, dont_fail=True)
+        self.file = file
+        kwargs.setdefault('ensure_ascii', not self.encoding)
+        self.encoder = JSONEncoder(**kwargs)
+
+    def export_item(self, item):
+        itemdict = dict(self._get_serialized_fields(item))
+        data = self.encoder.encode(itemdict) + '\n'
+        self.file.write(to_bytes(data, self.encoding))
 
 
 def to_native_str(text, encoding=None, errors='strict'):
