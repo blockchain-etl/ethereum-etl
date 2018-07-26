@@ -50,7 +50,7 @@ class ProgressLogger:
             start_message = start_message + ' Items to process: {}.'.format(self.total_items)
         self.logger.info(start_message)
 
-    # Check race conditions
+    # A race condition is possible where a message for the same percentage is printed twice, but it's a minor issue
     def track(self, item_count=1):
         processed_items = self.counter.increment(item_count)
         processed_items_before = processed_items - item_count
