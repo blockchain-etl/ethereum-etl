@@ -26,17 +26,20 @@ from ethereum_dasm.evmdasm import EVMCode
 
 class EthContractService:
 
-    def __init__(self):
-        self._evm_dasm = EVMCode()
-
     def get_function_sighashes(self, bytecode):
-        disassembled_code = self._evm_dasm.disassemble(bytecode)
-        basic_blocks = list(self._evm_dasm.basicblocks(disassembled_code))
-        if basic_blocks and len(basic_blocks) > 0:
-            init_block = basic_blocks[0]
-            instructions = init_block.instructions
-            push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
-            return sorted(list(set('0x' + inst.operand for inst in push4_instructions)))
+        evm_dasm = EVMCode()
+        bytecode = clean_bytecode(bytecode)
+        if bytecode is not None:
+            disassembled_code = evm_dasm.disassemble(bytecode)
+
+            basic_blocks = list(evm_dasm.basicblocks(disassembled_code))
+            if basic_blocks and len(basic_blocks) > 0:
+                init_block = basic_blocks[0]
+                instructions = init_block.instructions
+                push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
+                return sorted(list(set('0x' + inst.operand for inst in push4_instructions)))
+            else:
+                return []
         else:
             return []
 
@@ -57,6 +60,15 @@ class EthContractService:
         return c.implements('ownerOf(uint256)') and \
                c.implements('balanceOf(address)') and \
                c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
+
+
+def clean_bytecode(bytecode):
+    if bytecode == '0x':
+        return None
+    elif bytecode.startswith('0x'):
+        return bytecode[2:]
+    else:
+        return bytecode
 
 
 def get_function_sighash(signature):
