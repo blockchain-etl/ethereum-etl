@@ -32,17 +32,17 @@ class MockBatchWeb3Provider(object):
 
     def make_request(self, text):
         batch = json.loads(text)
-        ipc_response = []
+        web3_response = []
         for req in batch:
             if req['method'] == 'eth_getBlockByNumber':
                 block_number = hex_to_dec(req['params'][0])
-                file_name = 'ipc_response.block.' + str(block_number) + '.json'
+                file_name = 'web3_response.block.' + str(block_number) + '.json'
             elif req['method'] == 'eth_getCode':
                 contract_address = req['params'][0]
-                file_name = 'ipc_response.code.' + str(contract_address) + '.json'
+                file_name = 'web3_response.code.' + str(contract_address) + '.json'
             else:
                 tx_hash = req['params'][0]
-                file_name = 'ipc_response.receipt.' + str(tx_hash) + '.json'
+                file_name = 'web3_response.receipt.' + str(tx_hash) + '.json'
             file_content = self.read_resource(file_name)
-            ipc_response.append(json.loads(file_content))
-        return ipc_response
+            web3_response.append(json.loads(file_content))
+        return web3_response

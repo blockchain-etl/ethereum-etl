@@ -39,7 +39,7 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-class MockIPCProvider(IPCProvider):
+class MockWeb3Provider(IPCProvider):
     def __init__(self, resource_group):
         self.resource_group = resource_group
 
@@ -57,7 +57,7 @@ def test_export_erc20_transfers_job(tmpdir, start_block, end_block, batch_size, 
 
     job = ExportErc20TransfersJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(MockIPCProvider(resource_group))),
+        web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
         item_exporter=erc20_transfers_item_exporter(output_file),
         max_workers=5
     )
