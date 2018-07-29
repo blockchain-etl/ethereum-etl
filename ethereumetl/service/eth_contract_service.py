@@ -40,25 +40,23 @@ class EthContractService:
         else:
             return []
 
+    # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
+    # Fuzzy matching either transfer(address,uint256) or transferFrom(address,address,uint256) for consistency
+    # with ERC721 (see below)
+    def is_erc20_contract(self, function_sighashes):
+        c = ContractWrapper(function_sighashes)
+        return c.implements('totalSupply()') and \
+               c.implements('balanceOf(address)') and \
+               c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
 
-# https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-# Fuzzy matching either transfer(address,uint256) or transferFrom(address,address,uint256) for consistency
-# with ERC721 (see below)
-def is_erc20_contract(function_sighashes):
-    c = ContractWrapper(function_sighashes)
-    return c.implements('totalSupply()') and \
-           c.implements('balanceOf(address)') and \
-           c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
-
-
-# https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
-# In the standard only transferFrom(address,address,uint256) is defined, but many contracts implement
-# only transfer(address,uint256) so this function makes a fuzzy check.
-def is_erc721_contract(function_sighashes):
-    c = ContractWrapper(function_sighashes)
-    return c.implements('ownerOf(uint256)') and \
-           c.implements('balanceOf(address)') and \
-           c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
+    # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
+    # In the standard only transferFrom(address,address,uint256) is defined, but many contracts implement
+    # only transfer(address,uint256) so this function makes a fuzzy check.
+    def is_erc721_contract(self, function_sighashes):
+        c = ContractWrapper(function_sighashes)
+        return c.implements('ownerOf(uint256)') and \
+               c.implements('balanceOf(address)') and \
+               c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
 
 
 def get_function_sighash(signature):

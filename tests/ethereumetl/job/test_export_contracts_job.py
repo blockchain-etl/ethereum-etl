@@ -21,53 +21,41 @@
 # SOFTWARE.
 
 
-import json
-
 import pytest
-from web3 import Web3, IPCProvider
 
 import tests.resources
-from ethereumetl.jobs.export_erc20_tokens_job import ExportErc20TokensJob
-from ethereumetl.jobs.exporters.erc20_tokens_item_exporter import erc20_tokens_item_exporter
+from ethereumetl.jobs.export_contracts_job import ExportContractsJob
+from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from tests.ethereumetl.job.mock_batch_web3_provider import MockBatchWeb3Provider
 from tests.helpers import compare_lines_ignore_order, read_file
 
-RESOURCE_GROUP = 'test_export_erc20_tokens_job'
+RESOURCE_GROUP = 'test_export_contracts_job'
 
 
 def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-class MockWeb3Provider(IPCProvider):
-    def __init__(self, resource_group):
-        self.resource_group = resource_group
-
-    def make_request(self, method, params):
-        if method == 'eth_call':
-            to = params[0]['to']
-            data = params[0]['data']
-            file_name = '{}_{}_{}.json'.format(method, to, data)
-        else:
-            file_name = method + '.json'
-        file_content = read_resource(self.resource_group, file_name)
-        return json.loads(file_content)
+CONTRACT_ADDRESSES_UNDER_TEST = ['0x06012c8cf97bead5deae237070f9587f8e7a266d']
 
 
-@pytest.mark.parametrize("token_addresses,resource_group", [
-    (['0xf763be8b3263c268e9789abfb3934564a7b80054'], 'token_with_invalid_data')
+@pytest.mark.parametrize("batch_size,contract_addresses,output_format,resource_group", [
+    (1, CONTRACT_ADDRESSES_UNDER_TEST, 'json', 'erc721_contract')
 ])
-def test_export_erc20_tokens_job(tmpdir, token_addresses, resource_group):
-    output_file = tmpdir.join('erc20_tokens.csv')
+def test_export_contracts_job(tmpdir, batch_size, contract_addresses, output_format, resource_group):
+    contracts_output_file = tmpdir.join('actual_contracts.' + output_format)
 
-    job = ExportErc20TokensJob(
-        token_addresses_iterable=token_addresses,
-        web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
-        item_exporter=erc20_tokens_item_exporter(output_file),
-        max_workers=5
+    job = ExportContractsJob(
+        contract_addresses_iterable=CONTRACT_ADDRESSES_UNDER_TEST,
+        batch_size=batch_size,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: MockBatchWeb3Provider(lambda file: read_resource(resource_group, file))),
+        max_workers=5,
+        item_exporter=contracts_item_exporter(contracts_output_file)
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_erc20_tokens.csv'), read_file(output_file)
+        read_resource(resource_group, 'expected_contracts.' + output_format), read_file(contracts_output_file)
     )

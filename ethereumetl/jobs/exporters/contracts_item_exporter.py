@@ -25,7 +25,10 @@ from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExpo
 
 FIELDS_TO_EXPORT = [
     'contract_address',
-    'contract_bytecode'
+    'contract_bytecode',
+    'function_sighashes',
+    'is_erc20',
+    'is_erc721'
 ]
 
 

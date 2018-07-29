@@ -37,6 +37,9 @@ class MockBatchWeb3Provider(object):
             if req['method'] == 'eth_getBlockByNumber':
                 block_number = hex_to_dec(req['params'][0])
                 file_name = 'ipc_response.block.' + str(block_number) + '.json'
+            elif req['method'] == 'eth_getCode':
+                contract_address = req['params'][0]
+                file_name = 'ipc_response.code.' + str(contract_address) + '.json'
             else:
                 tx_hash = req['params'][0]
                 file_name = 'ipc_response.receipt.' + str(tx_hash) + '.json'

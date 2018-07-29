@@ -23,7 +23,7 @@
 
 import pytest
 
-from ethereumetl.service.eth_contract_service import is_erc20_contract, is_erc721_contract, EthContractService
+from ethereumetl.service.eth_contract_service import EthContractService
 
 
 @pytest.mark.parametrize("bytecode,expected_sighashes,is_erc20,is_erc721", [
@@ -52,5 +52,5 @@ def test_get_function_sighashes(bytecode, expected_sighashes, is_erc20, is_erc72
     eth_contract_service = EthContractService()
     sighashes = eth_contract_service.get_function_sighashes(bytecode)
     assert expected_sighashes == sighashes
-    assert is_erc20_contract(sighashes) == is_erc20
-    assert is_erc721_contract(sighashes) == is_erc721
+    assert eth_contract_service.is_erc20_contract(sighashes) == is_erc20
+    assert eth_contract_service.is_erc721_contract(sighashes) == is_erc721
