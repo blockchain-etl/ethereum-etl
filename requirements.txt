@@ -1,3 +1,4 @@
 web3~=4.4.1
+eth-utils~=1.0.3
 pytest~=3.2.0
 python-dateutil~=2.7.0
