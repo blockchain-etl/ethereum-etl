@@ -28,8 +28,10 @@ from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.json_rpc_requests import generate_get_code_json_rpc
 from ethereumetl.mappers.contract_mapper import EthContractMapper
 
-
 # Exports contracts bytecode
+from ethereumetl.service.eth_contract_service import EthContractService
+
+
 class ExportContractsJob(BaseJob):
     def __init__(
             self,
@@ -44,6 +46,7 @@ class ExportContractsJob(BaseJob):
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
 
+        self.contract_service = EthContractService()
         self.contract_mapper = EthContractMapper()
 
     def _start(self):
@@ -54,7 +57,7 @@ class ExportContractsJob(BaseJob):
 
     def _export_contracts(self, contract_addresses):
         contracts_code_rpc = list(generate_get_code_json_rpc(contract_addresses))
-        response_batch= self.batch_web3_provider.make_request(json.dumps(contracts_code_rpc))
+        response_batch = self.batch_web3_provider.make_request(json.dumps(contracts_code_rpc))
 
         contracts = []
         for response in response_batch:
@@ -63,10 +66,22 @@ class ExportContractsJob(BaseJob):
             result = response['result']
 
             contract_address = contract_addresses[request_id]
-            contracts.append(self.contract_mapper.rpc_result_to_receipt(contract_address, result))
+            contract = self._get_contract(contract_address, result)
+            contracts.append(contract)
 
         for contract in contracts:
             self.item_exporter.export_item(self.contract_mapper.contract_to_dict(contract))
+
+    def _get_contract(self, contract_address, rpc_result):
+        contract = self.contract_mapper.rpc_result_to_contract(contract_address, rpc_result)
+        bytecode = contract.bytecode
+        function_sighashes = self.contract_service.get_function_sighashes(bytecode)
+
+        contract.function_sighashes = function_sighashes
+        contract.is_erc20 = self.contract_service.is_erc20_contract(function_sighashes)
+        contract.is_erc721 = self.contract_service.is_erc721_contract(function_sighashes)
+
+        return contract
 
     def _end(self):
         self.batch_work_executor.shutdown()
