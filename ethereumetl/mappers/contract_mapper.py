@@ -38,7 +38,7 @@ class EthContractMapper(object):
             'type': 'contract',
             'contract_address': contract.address,
             'contract_bytecode': contract.bytecode,
-            'function_sighashes': contract.function_sighashes,
-            'is_erc20': contract.is_erc20,
-            'is_erc721': contract.is_erc721
+            'contract_function_sighashes': contract.function_sighashes,
+            'contract_is_erc20': contract.is_erc20,
+            'contract_is_erc721': contract.is_erc721
         }

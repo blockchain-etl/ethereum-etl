@@ -129,6 +129,9 @@ Column                       |    Type     |
 -----------------------------|-------------|
 contract_address             | address     |
 contract_bytecode            | hex_string  |
+contract_function_sighashes  | string      |
+contract_is_erc20            | boolean     |
+contract_is_erc721           | boolean     |
 
 ### erc20_tokens.csv
 
@@ -146,7 +149,8 @@ Note: `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_t
 columns in `erc20_tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
 or implements it incorrectly (e.g. wrong return type). 
 
-Note: for the `address` type all hex characters are lower-cased.
+Note: for the `address` type all hex characters are lower-cased. 
+`boolean` type can have 2 values: `True` or `False`.
 
 ## Exporting the Blockchain
 
@@ -431,11 +435,11 @@ To upload CSVs to BigQuery:
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/logs.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.csv ./schemas/gcp/contracts.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/contracts.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
 ```
 
-Note that NEWLINE_DELIMITED_JSON is used for logs to support REPEATED mode for the `topics` column.
+Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the columns with lists.
 
 Join `transactions` and `receipts`:
 
