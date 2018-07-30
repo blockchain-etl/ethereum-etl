@@ -87,4 +87,4 @@ class ContractWrapper:
         result = False
         for function_signature in function_signatures:
             result = result or self.implements(function_signature)
-            return result
+        return result
