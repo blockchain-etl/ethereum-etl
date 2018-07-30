@@ -60,7 +60,9 @@ class CompositeItemExporter:
             raise ValueError('Exporter for item type {} not found'.format(item_type))
         exporter.export_item(item)
 
-        self.counter_mapping[item_type].increment()
+        counter = self.counter_mapping[item_type]
+        if counter is not None:
+            counter.increment()
 
     def close(self):
         for item_type, file in self.file_mapping.items():
