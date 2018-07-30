@@ -84,7 +84,4 @@ class ContractWrapper:
         return sighash in self.sighashes
 
     def implements_any_of(self, *function_signatures):
-        result = False
-        for function_signature in function_signatures:
-            result = result or self.implements(function_signature)
-        return result
+        return any(self.implements(function_signature) for function_signature in function_signatures)
