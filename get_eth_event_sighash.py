@@ -30,9 +30,9 @@ from ethereumetl.logging_utils import logging_basic_config
 
 logging_basic_config()
 
-parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the function signature.')
-parser.add_argument('-f', '--function-signature', default='Transfer(address,address,uint256)', type=str,
-                    help='Function signature')
+parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the event signature.')
+parser.add_argument('-e', '--event-signature', default='Transfer(address,address,uint256)', type=str,
+                    help='Event signature, e.g. Transfer(address,address,uint256)')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
 args = parser.parse_args()
