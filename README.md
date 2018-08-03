@@ -366,6 +366,7 @@ https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
 #### Running Tests
 
 ```bash
+> export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
 
