@@ -27,7 +27,7 @@ from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtract
 erc20_transfer_extractor = EthErc20TransferExtractor()
 
 
-def test_filter_transfer_from_receipt_log():
+def test_extract_transfer_from_receipt_log():
     log = EthReceiptLog()
     log.address = '0x25c6413359059694A7FCa8e599Ae39Ce1C944Da2'
     log.block_number = 1061946
