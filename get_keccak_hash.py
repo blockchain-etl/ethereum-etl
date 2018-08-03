@@ -31,13 +31,13 @@ from ethereumetl.logging_utils import logging_basic_config
 logging_basic_config()
 
 parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the event signature.')
-parser.add_argument('-e', '--event-signature', default='Transfer(address,address,uint256)', type=str,
-                    help='Event signature, e.g. Transfer(address,address,uint256)')
+parser.add_argument('-i', '--input-string', default='Transfer(address,address,uint256)', type=str,
+                    help='String to hash, e.g. Transfer(address,address,uint256)')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
 args = parser.parse_args()
 
-sighash = keccak(text=args.function_signature.replace(' ', ''))
+hash = keccak(text=args.input_string)
 
 with smart_open(args.output, 'w') as output_file:
-    output_file.write('0x{}\n'.format(sighash.hex()))
+    output_file.write('0x{}\n'.format(hash.hex()))
