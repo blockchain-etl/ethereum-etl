@@ -50,7 +50,10 @@ class EthContractService:
         c = ContractWrapper(function_sighashes)
         return c.implements('totalSupply()') and \
                c.implements('balanceOf(address)') and \
-               c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
+               c.implements('transfer(address,uint256)') and \
+               c.implements('transferFrom(address,address,uint256)') and \
+               c.implements('approve(address,uint256)') and \
+               c.implements('allowance(address,address)')
 
     # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
     # In the standard only transferFrom(address,address,uint256) is defined, but many contracts implement
