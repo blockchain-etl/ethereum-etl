@@ -70,7 +70,7 @@
     {
         "name": "input",
         "type": "STRING",
-        "description": "The data send along with the transaction"
+        "description": "The data sent along with the transaction"
     },
     {
         "name": "receipt_cumulative_gas_used",
