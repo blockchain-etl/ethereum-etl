@@ -44,5 +44,5 @@ def test_extract_transfer_from_receipt_log():
     assert token_transfer.from_address == '0xe9eeaec75883f0e389a78e2260bfac1776df2f1d'
     assert token_transfer.to_address == '0x0000000000000000000000000000000000000000'
     assert token_transfer.value == 115792089237316195423570985008687907853269984665640564039457584007913129638936
-    assert token_transfer.tx_hash == '0xd62a74c7b04e8e0539398f6ba6a5eb11ad8aa862e77f0af718f0fad19b0b0480'
+    assert token_transfer.transaction_hash == '0xd62a74c7b04e8e0539398f6ba6a5eb11ad8aa862e77f0af718f0fad19b0b0480'
     assert token_transfer.block_number == 1061946

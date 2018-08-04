@@ -1,15 +1,15 @@
 CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
-    tx_hash STRING,
-    tx_nonce BIGINT,
-    tx_block_hash STRING,
-    tx_block_number BIGINT,
-    tx_index BIGINT,
-    tx_from STRING,
-    tx_to STRING,
-    tx_value DECIMAL(38,0),
-    tx_gas BIGINT,
-    tx_gas_price BIGINT,
-    tx_input STRING
+    hash STRING,
+    nonce BIGINT,
+    block_hash STRING,
+    block_number BIGINT,
+    index BIGINT,
+    from_address STRING,
+    to_address STRING,
+    value DECIMAL(38,0),
+    gas BIGINT,
+    gas_price BIGINT,
+    input STRING
 )
 PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'

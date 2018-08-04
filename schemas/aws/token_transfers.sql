@@ -3,7 +3,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS token_transfers (
     from_address STRING,
     to_address STRING,
     value DECIMAL(38,0),
-    tx_hash STRING,
+    transaction_hash STRING,
     log_index BIGINT,
     block_number BIGINT
 )

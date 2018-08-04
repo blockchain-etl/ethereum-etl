@@ -20,7 +20,7 @@ Export ERC20 transfers ([Reference](#export_token_transferspy)):
 Export receipts and logs ([Reference](#export_receipts_and_logspy)):
 
 ```bash
-> python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
+> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.csv \
 --provider-uri https://mainnet.infura.io/ --receipts-output receipts.csv --logs-output logs.csv
 ```
 
@@ -72,17 +72,17 @@ transaction_count | bigint             |
 
 Column              |    Type     |
 --------------------|-------------|
-tx_hash             | hex_string  |
-tx_nonce            | bigint      |
-tx_block_hash       | hex_string  |
-tx_block_number     | bigint      |
-tx_index            | bigint      |
-tx_from             | address     |
-tx_to               | address     |
-tx_value            | numeric     |
-tx_gas              | bigint      |
-tx_gas_price        | bigint      |
-tx_input            | hex_string  |
+hash             | hex_string  |
+nonce            | bigint      |
+block_hash       | hex_string  |
+block_number     | bigint      |
+index            | bigint      |
+from_address     | address     |
+to_address       | address     |
+value            | numeric     |
+gas              | bigint      |
+gas_price        | bigint      |
+input            | hex_string  |
 
 ### token_transfers.csv
 
@@ -92,7 +92,7 @@ token_address       | address     |
 from_address        | address     |
 to_address          | address     |
 value               | numeric     |
-tx_hash             | hex_string  |
+transaction_hash    | hex_string  |
 log_index           | bigint      |
 block_number        | bigint      |
 
@@ -285,13 +285,13 @@ First extract transaction hashes from `transactions.csv`
 (Exported with [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)):
 
 ```bash
-> python extract_csv_column.py --input transactions.csv --column tx_hash --output tx_hashes.csv
+> python extract_csv_column.py --input transactions.csv --column transaction_hash --output transaction_hashes.csv
 ```
 
 Then export receipts and logs:
 
 ```bash
-> python export_receipts_and_logs.py --tx-hashes tx_hashes.csv \
+> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.csv \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
 ```
 

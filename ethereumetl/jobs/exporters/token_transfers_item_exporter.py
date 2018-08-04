@@ -28,7 +28,7 @@ FIELDS_TO_EXPORT = [
     'from_address',
     'to_address',
     'value',
-    'tx_hash',
+    'transaction_hash',
     'log_index',
     'block_number'
 ]

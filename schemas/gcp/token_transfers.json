@@ -20,7 +20,7 @@
         "description": "Value transferred (ERC20) / id of the token transferred (ERC721)"
     },
     {
-        "name": "tx_hash",
+        "name": "transaction_hash",
         "type": "STRING",
         "mode": "REQUIRED",
         "description": "Transaction hash"

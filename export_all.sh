@@ -106,12 +106,12 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     ### receipts_and_logs
 
-    tx_hashes_output_dir=${output_dir}/tx_hashes${partision_dir}
-    mkdir -p ${tx_hashes_output_dir};
+    transaction_hashes_output_dir=${output_dir}/transaction_hashes${partision_dir}
+    mkdir -p ${transaction_hashes_output_dir};
     
-    tx_hashes_file=${tx_hashes_output_dir}/tx_hashes_${file_name_suffix}.csv
-    log "Extracting tx_hash column from transaction file ${transactions_file}"
-    python3 extract_csv_column.py --input ${transactions_file} --output ${tx_hashes_file} --column "tx_hash"
+    transaction_hashes_file=${transaction_hashes_output_dir}/transaction_hashes_${file_name_suffix}.csv
+    log "Extracting transaction_hash column from transaction file ${transactions_file}"
+    python3 extract_csv_column.py --input ${transactions_file} --output ${transaction_hashes_file} --column "transaction_hash"
     quit_if_returned_error
 
     receipts_output_dir=${output_dir}/receipts${partition_dir}
@@ -123,7 +123,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     receipts_file=${receipts_output_dir}/receipts_${file_name_suffix}.csv
     logs_file=${logs_output_dir}/logs_${file_name_suffix}.csv
     log "Exporting receipts and logs from blocks ${block_range} to ${receipts_file} and ${logs_file}"
-    python3 export_receipts_and_logs.py --tx-hashes ${tx_hashes_file} --provider-uri="${provider_uri}"  --receipts-output=${receipts_file} --logs-output=${logs_file}
+    python3 export_receipts_and_logs.py --transaction-hashes ${transaction_hashes_file} --provider-uri="${provider_uri}"  --receipts-output=${receipts_file} --logs-output=${logs_file}
     quit_if_returned_error
 
     ### contracts

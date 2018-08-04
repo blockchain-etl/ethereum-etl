@@ -27,6 +27,6 @@ class EthTokenTransfer(object):
         self.from_address = None
         self.to_address = None
         self.value = None
-        self.tx_hash = None
+        self.transaction_hash = None
         self.log_index = None
         self.block_number = None

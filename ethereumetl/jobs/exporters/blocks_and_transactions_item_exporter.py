@@ -44,17 +44,17 @@ BLOCK_FIELDS_TO_EXPORT = [
 ]
 
 TRANSACTION_FIELDS_TO_EXPORT = [
-    'tx_hash',
-    'tx_nonce',
-    'tx_block_hash',
-    'tx_block_number',
-    'tx_index',
-    'tx_from',
-    'tx_to',
-    'tx_value',
-    'tx_gas',
-    'tx_gas_price',
-    'tx_input'
+    'hash',
+    'nonce',
+    'block_hash',
+    'block_number',
+    'index',
+    'from_address',
+    'to_address',
+    'value',
+    'gas',
+    'gas_price',
+    'input'
 ]
 
 
