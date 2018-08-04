@@ -62,7 +62,8 @@ class EthContractService:
         c = ContractWrapper(function_sighashes)
         return c.implements('ownerOf(uint256)') and \
                c.implements('balanceOf(address)') and \
-               c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)')
+               c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)') and \
+               c.implements('approve(address,uint256)')
 
 
 def clean_bytecode(bytecode):
