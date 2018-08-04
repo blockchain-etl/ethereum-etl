@@ -32,7 +32,7 @@ class EthTransactionMapper(object):
         transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
         transaction.block_hash = json_dict.get('blockHash', None)
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        transaction.index = hex_to_dec(json_dict.get('transactionIndex', None))
+        transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         transaction.from_address = to_normalized_address(json_dict.get('from', None))
         transaction.to_address = to_normalized_address(json_dict.get('to', None))
         transaction.value = hex_to_dec(json_dict.get('value', None))
@@ -44,15 +44,15 @@ class EthTransactionMapper(object):
     def transaction_to_dict(self, transaction):
         return {
             'type': 'transaction',
-            'tx_hash': transaction.hash,
-            'tx_nonce': transaction.nonce,
-            'tx_block_hash': transaction.block_hash,
-            'tx_block_number': transaction.block_number,
-            'tx_index': transaction.index,
-            'tx_from': transaction.from_address,
-            'tx_to': transaction.to_address,
-            'tx_value': transaction.value,
-            'tx_gas': transaction.gas,
-            'tx_gas_price': transaction.gas_price,
-            'tx_input': transaction.input,
+            'hash': transaction.hash,
+            'nonce': transaction.nonce,
+            'block_hash': transaction.block_hash,
+            'block_number': transaction.block_number,
+            'transaction_index': transaction.transaction_index,
+            'from_address': transaction.from_address,
+            'to_address': transaction.to_address,
+            'value': transaction.value,
+            'gas': transaction.gas,
+            'gas_price': transaction.gas_price,
+            'input': transaction.input,
         }

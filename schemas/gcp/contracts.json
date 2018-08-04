@@ -1,28 +1,28 @@
 [
     {
-        "name": "contract_address",
+        "name": "address",
         "type": "STRING",
         "mode": "REQUIRED",
         "description": "Address of the contract"
     },
     {
-        "name": "contract_bytecode",
+        "name": "bytecode",
         "type": "STRING",
         "description": "Bytecode of the contract"
     },
     {
-        "name": "contract_function_sighashes",
+        "name": "function_sighashes",
         "type": "STRING",
         "mode": "REPEATED",
         "description": "4-byte function signature hashes"
     },
     {
-        "name": "contract_is_erc20",
+        "name": "is_erc20",
         "type": "BOOLEAN",
         "description": "Whether this contract is an ERC20 contract"
     },
     {
-        "name": "contract_is_erc721",
+        "name": "is_erc721",
         "type": "BOOLEAN",
         "description": "Whether this contract is an ERC721 contract"
     }

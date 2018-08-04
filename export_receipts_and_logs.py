@@ -34,7 +34,7 @@ logging_basic_config()
 
 parser = argparse.ArgumentParser(description='Export receipts and logs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
-parser.add_argument('-t', '--tx-hashes', type=str, help='The file containing transaction hashes, one per line.')
+parser.add_argument('-t', '--transaction-hashes', type=str, help='The file containing transaction hashes, one per line.')
 parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
@@ -48,9 +48,9 @@ parser.add_argument('--logs-output', default=None, type=str,
 
 args = parser.parse_args()
 
-with smart_open(args.tx_hashes, 'r') as tx_hashes_file:
+with smart_open(args.transaction_hashes, 'r') as transaction_hashes_file:
     job = ExportReceiptsJob(
-        tx_hashes_iterable=(tx_hash.strip() for tx_hash in tx_hashes_file),
+        transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),
         batch_size=args.batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
         max_workers=args.max_workers,

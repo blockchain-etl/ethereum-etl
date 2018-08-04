@@ -35,7 +35,7 @@ from ethereumetl.utils import rpc_response_batch_to_results
 class ExportReceiptsJob(BaseJob):
     def __init__(
             self,
-            tx_hashes_iterable,
+            transaction_hashes_iterable,
             batch_size,
             batch_web3_provider,
             max_workers,
@@ -43,7 +43,7 @@ class ExportReceiptsJob(BaseJob):
             export_receipts=True,
             export_logs=True):
         self.batch_web3_provider = batch_web3_provider
-        self.tx_hashes_iterable = tx_hashes_iterable
+        self.transaction_hashes_iterable = transaction_hashes_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
@@ -60,10 +60,10 @@ class ExportReceiptsJob(BaseJob):
         self.item_exporter.open()
 
     def _export(self):
-        self.batch_work_executor.execute(self.tx_hashes_iterable, self._export_receipts)
+        self.batch_work_executor.execute(self.transaction_hashes_iterable, self._export_receipts)
 
-    def _export_receipts(self, tx_hashes):
-        receipts_rpc = list(generate_get_receipt_json_rpc(tx_hashes))
+    def _export_receipts(self, transaction_hashes):
+        receipts_rpc = list(generate_get_receipt_json_rpc(transaction_hashes))
         response = self.batch_web3_provider.make_request(json.dumps(receipts_rpc))
         results = rpc_response_batch_to_results(response)
         receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]

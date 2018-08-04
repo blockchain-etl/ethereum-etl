@@ -31,6 +31,7 @@ class EthBlock(object):
         self.logs_bloom = None
         self.transactions_root = None
         self.state_root = None
+        self.receipts_root = None
         self.miner = None
         self.difficulty = None
         self.total_difficulty = None

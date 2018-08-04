@@ -58,13 +58,13 @@ class EthReceiptMapper(object):
     def receipt_to_dict(self, receipt):
         return {
             'type': 'receipt',
-            'receipt_transaction_hash': receipt.transaction_hash,
-            'receipt_transaction_index': receipt.transaction_index,
-            'receipt_block_hash': receipt.block_hash,
-            'receipt_block_number': receipt.block_number,
-            'receipt_cumulative_gas_used': receipt.cumulative_gas_used,
-            'receipt_gas_used': receipt.gas_used,
-            'receipt_contract_address': receipt.contract_address,
-            'receipt_root': receipt.root,
-            'receipt_status': receipt.status
+            'transaction_hash': receipt.transaction_hash,
+            'transaction_index': receipt.transaction_index,
+            'block_hash': receipt.block_hash,
+            'block_number': receipt.block_number,
+            'cumulative_gas_used': receipt.cumulative_gas_used,
+            'gas_used': receipt.gas_used,
+            'contract_address': receipt.contract_address,
+            'root': receipt.root,
+            'status': receipt.status
         }

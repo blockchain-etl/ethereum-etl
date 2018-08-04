@@ -43,6 +43,7 @@ class EthBlockMapper(object):
         block.logs_bloom = json_dict.get('logsBloom', None)
         block.transactions_root = json_dict.get('transactionsRoot', None)
         block.state_root = json_dict.get('stateRoot', None)
+        block.receipts_root = json_dict.get('receiptsRoot', None)
         block.miner = to_normalized_address(json_dict.get('miner', None))
         block.difficulty = hex_to_dec(json_dict.get('difficulty', None))
         block.total_difficulty = hex_to_dec(json_dict.get('totalDifficulty', None))
@@ -65,21 +66,22 @@ class EthBlockMapper(object):
     def block_to_dict(self, block):
         return {
             'type': 'block',
-            'block_number': block.number,
-            'block_hash': block.hash,
-            'block_parent_hash': block.parent_hash,
-            'block_nonce': block.nonce,
-            'block_sha3_uncles': block.sha3_uncles,
-            'block_logs_bloom': block.logs_bloom,
-            'block_transactions_root': block.transactions_root,
-            'block_state_root': block.state_root,
-            'block_miner': block.miner,
-            'block_difficulty': block.difficulty,
-            'block_total_difficulty': block.total_difficulty,
-            'block_size': block.size,
-            'block_extra_data': block.extra_data,
-            'block_gas_limit': block.gas_limit,
-            'block_gas_used': block.gas_used,
-            'block_timestamp': block.timestamp,
-            'block_transaction_count': block.transaction_count,
+            'number': block.number,
+            'hash': block.hash,
+            'parent_hash': block.parent_hash,
+            'nonce': block.nonce,
+            'sha3_uncles': block.sha3_uncles,
+            'logs_bloom': block.logs_bloom,
+            'transactions_root': block.transactions_root,
+            'state_root': block.state_root,
+            'receipts_root': block.receipts_root,
+            'miner': block.miner,
+            'difficulty': block.difficulty,
+            'total_difficulty': block.total_difficulty,
+            'size': block.size,
+            'extra_data': block.extra_data,
+            'gas_limit': block.gas_limit,
+            'gas_used': block.gas_used,
+            'timestamp': block.timestamp,
+            'transaction_count': block.transaction_count,
         }
