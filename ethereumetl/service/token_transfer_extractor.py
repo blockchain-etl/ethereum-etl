@@ -24,7 +24,7 @@
 import logging
 from builtins import map
 
-from ethereumetl.domain.erc20_transfer import EthErc20Transfer
+from ethereumetl.domain.token_transfer import EthTokenTransfer
 from ethereumetl.utils import chunk_string, hex_to_dec, to_normalized_address
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
@@ -32,7 +32,7 @@ TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a
 logger = logging.getLogger(__name__)
 
 
-class EthErc20TransferExtractor(object):
+class EthTokenTransferExtractor(object):
     def extract_transfer_from_log(self, receipt_log):
 
         topics = receipt_log.topics
@@ -50,15 +50,15 @@ class EthErc20TransferExtractor(object):
                                .format(receipt_log.log_index, receipt_log.transaction_hash))
                 return None
 
-            erc20_transfer = EthErc20Transfer()
-            erc20_transfer.erc20_token = to_normalized_address(receipt_log.address)
-            erc20_transfer.erc20_from = word_to_address(topics_with_data[1])
-            erc20_transfer.erc20_to = word_to_address(topics_with_data[2])
-            erc20_transfer.erc20_value = hex_to_dec(topics_with_data[3])
-            erc20_transfer.erc20_tx_hash = receipt_log.transaction_hash
-            erc20_transfer.erc20_log_index = receipt_log.log_index
-            erc20_transfer.erc20_block_number = receipt_log.block_number
-            return erc20_transfer
+            token_transfer = EthTokenTransfer()
+            token_transfer.erc20_token = to_normalized_address(receipt_log.address)
+            token_transfer.erc20_from = word_to_address(topics_with_data[1])
+            token_transfer.erc20_to = word_to_address(topics_with_data[2])
+            token_transfer.erc20_value = hex_to_dec(topics_with_data[3])
+            token_transfer.erc20_tx_hash = receipt_log.transaction_hash
+            token_transfer.erc20_log_index = receipt_log.log_index
+            token_transfer.erc20_block_number = receipt_log.block_number
+            return token_transfer
 
         return None
 

@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS parquet_erc20_transfers (
+CREATE EXTERNAL TABLE IF NOT EXISTS parquet_token_transfers (
     erc20_token STRING,
     erc20_from STRING,
     erc20_to STRING,
@@ -9,6 +9,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS parquet_erc20_transfers (
 )
 PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 STORED AS PARQUET
-LOCATION 's3://<your_bucket>/ethereumetl/parquet/erc20_transfers';
+LOCATION 's3://<your_bucket>/ethereumetl/parquet/token_transfers';
 
-MSCK REPAIR TABLE parquet_erc20_transfers;
+MSCK REPAIR TABLE parquet_token_transfers;

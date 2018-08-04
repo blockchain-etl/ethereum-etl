@@ -20,39 +20,49 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import csv
-import io
+
+import json
 
 import pytest
+from web3 import Web3, IPCProvider
 
 import tests.resources
-from ethereumetl.jobs.exporters.erc20_transfers_item_exporter import erc20_transfers_item_exporter
-from ethereumetl.jobs.extract_erc20_transfers_job import ExtractErc20TransfersJob
+from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
+from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import compare_lines_ignore_order, read_file
 
-RESOURCE_GROUP = 'test_extract_erc20_transfers_job'
+RESOURCE_GROUP = 'test_export_token_transfers_job'
 
 
 def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.parametrize('resource_group', [
-    'logs'
-])
-def test_export_erc20_transfers_job(tmpdir, resource_group):
-    output_file = tmpdir.join('erc20_transfers.csv')
+class MockWeb3Provider(IPCProvider):
+    def __init__(self, resource_group):
+        self.resource_group = resource_group
 
-    logs_content = read_resource(resource_group, 'logs.csv')
-    logs_csv_reader = csv.DictReader(io.StringIO(logs_content))
-    job = ExtractErc20TransfersJob(
-        logs_iterable=logs_csv_reader,
-        batch_size=2,
-        item_exporter=erc20_transfers_item_exporter(output_file),
+    def make_request(self, method, params):
+        file_name = method + '.json'
+        file_content = read_resource(self.resource_group, file_name)
+        return json.loads(file_content)
+
+
+@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group", [
+    (483920, 483920, 1, 'block_with_transfers')
+])
+def test_export_token_transfers_job(tmpdir, start_block, end_block, batch_size, resource_group):
+    output_file = tmpdir.join('token_transfers.csv')
+
+    job = ExportTokenTransfersJob(
+        start_block=start_block, end_block=end_block, batch_size=batch_size,
+        web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
+        item_exporter=token_transfers_item_exporter(output_file),
         max_workers=5
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_erc20_transfers.csv'), read_file(output_file)
+        read_resource(resource_group, 'expected_token_transfers.csv'), read_file(output_file)
     )

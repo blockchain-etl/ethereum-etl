@@ -21,12 +21,15 @@
 # SOFTWARE.
 
 
-class EthErc20Transfer(object):
-    def __init__(self):
-        self.erc20_token = None
-        self.erc20_from = None
-        self.erc20_to = None
-        self.erc20_value = None
-        self.erc20_tx_hash = None
-        self.erc20_log_index = None
-        self.erc20_block_number = None
+class EthTokenTransferMapper(object):
+    def token_transfer_to_dict(self, token_transfer):
+        return {
+            'type': 'token_transfer',
+            'erc20_token': token_transfer.erc20_token,
+            'erc20_from': token_transfer.erc20_from,
+            'erc20_to': token_transfer.erc20_to,
+            'erc20_value': token_transfer.erc20_value,
+            'erc20_tx_hash': token_transfer.erc20_tx_hash,
+            'erc20_log_index': token_transfer.erc20_log_index,
+            'erc20_block_number': token_transfer.erc20_block_number,
+        }

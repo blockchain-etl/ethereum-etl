@@ -21,15 +21,25 @@
 # SOFTWARE.
 
 
-class EthErc20TransferMapper(object):
-    def erc20_transfer_to_dict(self, erc20_transfer):
-        return {
-            'type': 'erc20_transfer',
-            'erc20_token': erc20_transfer.erc20_token,
-            'erc20_from': erc20_transfer.erc20_from,
-            'erc20_to': erc20_transfer.erc20_to,
-            'erc20_value': erc20_transfer.erc20_value,
-            'erc20_tx_hash': erc20_transfer.erc20_tx_hash,
-            'erc20_log_index': erc20_transfer.erc20_log_index,
-            'erc20_block_number': erc20_transfer.erc20_block_number,
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+
+FIELDS_TO_EXPORT = [
+    'erc20_token',
+    'erc20_from',
+    'erc20_to',
+    'erc20_value',
+    'erc20_tx_hash',
+    'erc20_log_index',
+    'erc20_block_number'
+]
+
+
+def token_transfers_item_exporter(token_transfer_output):
+    return CompositeItemExporter(
+        filename_mapping={
+            'token_transfer': token_transfer_output
+        },
+        field_mapping={
+            'token_transfer': FIELDS_TO_EXPORT
         }
+    )

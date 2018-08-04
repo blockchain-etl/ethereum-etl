@@ -10,11 +10,11 @@ Export blocks and transactions ([Reference](#export_blocks_and_transactionspy)):
 --provider-uri https://mainnet.infura.io/ --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 transfers ([Reference](#export_erc20_transferspy)):
+Export ERC20 transfers ([Reference](#export_token_transferspy)):
 
 ```bash
-> python export_erc20_transfers.py --start-block 0 --end-block 500000 \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --output erc20_transfers.csv
+> python export_token_transfers.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
 Export receipts and logs ([Reference](#export_receipts_and_logspy)):
@@ -31,7 +31,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 - [Schema](#schema)
   - [blocks.csv](#blockscsv)
   - [transactions.csv](#transactionscsv)
-  - [erc20_transfers.csv](#erc20_transferscsv)
+  - [token_transfers.csv](#token_transferscsv)
   - [receipts.csv](#receiptscsv)
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
@@ -84,7 +84,7 @@ tx_gas              | bigint      |
 tx_gas_price        | bigint      |
 tx_input            | hex_string  |
 
-### erc20_transfers.csv
+### token_transfers.csv
 
 Column              |    Type     |
 --------------------|-------------|
@@ -194,7 +194,7 @@ there is no need to wait until the full sync as the state is not needed.
     ...
     output/transactions/start_block=00000000/end_block=00099999/transactions_00000000_00099999.csv
     ...
-    output/erc20_transfers/start_block=00000000/end_block=00099999/erc20_transfers_00000000_00099999.csv
+    output/token_transfers/start_block=00000000/end_block=00099999/token_transfers_00000000_00099999.csv
     ...
     ```
 
@@ -226,8 +226,8 @@ Additional steps:
 #### Command Reference
 
 - [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)
-- [export_erc20_transfers.py](#export_erc20_transferspy)
-- [extract_erc20_transfers.py](#extract_erc20_transferspy)
+- [export_token_transfers.py](#export_token_transferspy)
+- [extract_token_transfers.py](#extract_token_transferspy)
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
 - [export_erc20_tokens.py](#export_erc20_tokenspy)
@@ -260,21 +260,21 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_erc20_transfers.py
+##### export_token_transfers.py
 
 The API used in this command is not supported by Infura, so you will need a local node. 
-If you want to use Infura for exporting ERC20 transfers refer to [extract_erc20_transfers.py](#extract_erc20_transferspy)
+If you want to use Infura for exporting ERC20 transfers refer to [extract_token_transfers.py](#extract_token_transferspy)
 
 ```bash
-> python export_erc20_transfers.py --start-block 0 --end-block 500000 \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output erc20_transfers.csv
+> python export_token_transfers.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output token_transfers.csv
 ```
 
 Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
 
 ```bash
-> python export_erc20_transfers.py --start-block 0 --end-block 500000 --provider-uri file://$HOME/Library/Ethereum/geth.ipc \
---output erc20_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
+> python export_token_transfers.py --start-block 0 --end-block 500000 --provider-uri file://$HOME/Library/Ethereum/geth.ipc \
+--output token_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
@@ -302,14 +302,14 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-##### extract_erc20_transfers.py
+##### extract_token_transfers.py
 
 First export receipt logs with [export_receipts_and_logs.py](#export_receipts_and_logspy).
 
 Then extract transfers from the logs.csv file:
 
 ```bash
-> python extract_erc20_transfers.py --logs logs.csv --output erc20_transfers.csv
+> python extract_token_transfers.py --logs logs.csv --output token_transfers.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
@@ -334,11 +334,11 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### export_erc20_tokens.py
 
-First extract token addresses from `erc20_transfers.csv` 
-(Exported with [export_erc20_transfers.py](#export_erc20_transferspy)):
+First extract token addresses from `token_transfers.csv` 
+(Exported with [export_token_transfers.py](#export_token_transferspy)):
 
 ```bash
-> python extract_csv_column.py -i erc20_transfers.csv -c erc20_token -o - | sort | uniq > erc20_token_addresses.csv
+> python extract_csv_column.py -i token_transfers.csv -c erc20_token -o - | sort | uniq > erc20_token_addresses.csv
 ```
 
 Then export ERC20 tokens:
@@ -390,7 +390,7 @@ CREATE DATABASE ethereumetl;
 - Create the tables:
   - blocks: [schemas/aws/blocks.sql](schemas/aws/blocks.sql)
   - transactions: [schemas/aws/transactions.sql](schemas/aws/transactions.sql)
-  - erc20_transfers: [schemas/aws/erc20_transfers.sql](schemas/aws/erc20_transfers.sql)
+  - token_transfers: [schemas/aws/token_transfers.sql](schemas/aws/token_transfers.sql)
   - contracts: [schemas/aws/contracts.sql](schemas/aws/contracts.sql)
   - receipts: [schemas/aws/receipts.sql](schemas/aws/receipts.sql)
   - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
@@ -403,7 +403,7 @@ Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev
 - Create the tables:
   - parquet_blocks: [schemas/aws/parquet/parquet_blocks.sql](schemas/aws/parquet/parquet_blocks.sql)
   - parquet_transactions: [schemas/aws/parquet/parquet_transactions.sql](schemas/aws/parquet/parquet_transactions.sql)
-  - parquet_erc20_transfers: [schemas/aws/parquet/parquet_erc20_transfers.sql](schemas/aws/parquet/parquet_erc20_transfers.sql)
+  - parquet_token_transfers: [schemas/aws/parquet/parquet_token_transfers.sql](schemas/aws/parquet/parquet_token_transfers.sql)
 
 Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal
 so values greater than 38 decimals will be null.
@@ -433,7 +433,7 @@ To upload CSVs to BigQuery:
 > cd ethereum-etl
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.erc20_transfers gs://<your_bucket>/ethereumetl/export/erc20_transfers/*.csv ./schemas/gcp/erc20_transfers.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./schemas/gcp/token_transfers.json
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/logs.json
 > bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/contracts.json

@@ -22,13 +22,13 @@
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
-from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
+from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
-from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor, TRANSFER_EVENT_TOPIC
+from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor, TRANSFER_EVENT_TOPIC
 from ethereumetl.utils import validate_range
 
 
-class ExportErc20TransfersJob(BaseJob):
+class ExportTokenTransfersJob(BaseJob):
     def __init__(
             self,
             start_block,
@@ -49,8 +49,8 @@ class ExportErc20TransfersJob(BaseJob):
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
 
         self.receipt_log_mapper = EthReceiptLogMapper()
-        self.erc20_transfer_mapper = EthErc20TransferMapper()
-        self.erc20_transfer_extractor = EthErc20TransferExtractor()
+        self.token_transfer_mapper = EthTokenTransferMapper()
+        self.token_transfer_extractor = EthTokenTransferExtractor()
 
     def _start(self):
         self.item_exporter.open()
@@ -78,9 +78,9 @@ class ExportErc20TransfersJob(BaseJob):
         events = event_filter.get_all_entries()
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
-            erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
-            if erc20_transfer is not None:
-                self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
+            token_transfer = self.token_transfer_extractor.extract_transfer_from_log(log)
+            if token_transfer is not None:
+                self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
         self.web3.eth.uninstallFilter(event_filter.filter_id)
 

@@ -96,14 +96,14 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_blocks_batch_size} --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
-    ### erc20_transfers
+    ### token_transfers
 
-    erc20_transfers_output_dir=${output_dir}/erc20_transfers${partition_dir}
-    mkdir -p ${erc20_transfers_output_dir};
+    token_transfers_output_dir=${output_dir}/token_transfers${partition_dir}
+    mkdir -p ${token_transfers_output_dir};
 
-    erc20_transfers_file=${erc20_transfers_output_dir}/erc20_transfers_${file_name_suffix}.csv
-    log "Exporting ERC20 transfers from blocks ${block_range} to ${erc20_transfers_file}"
-    python3 export_erc20_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_erc20_batch_size} --output=${erc20_transfers_file}
+    token_transfers_file=${token_transfers_output_dir}/token_transfers_${file_name_suffix}.csv
+    log "Exporting ERC20 transfers from blocks ${block_range} to ${token_transfers_file}"
+    python3 export_token_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --batch-size=${export_erc20_batch_size} --output=${token_transfers_file}
     quit_if_returned_error
 
     ### receipts_and_logs
@@ -152,8 +152,8 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     mkdir -p ${erc20_token_addresses_output_dir}
     
     erc20_token_addresses_file=${erc20_token_addresses_output_dir}/erc20_token_addresses_${file_name_suffix}
-    log "Extracting erc20_token_address from erc20_token_transfers file ${erc20_transfers_file}"
-    python3 extract_csv_column.py -i ${erc20_transfers_file} -c erc20_token -o - | sort | uniq > ${erc20_token_addresses_file}
+    log "Extracting erc20_token_address from erc20_token_transfers file ${token_transfers_file}"
+    python3 extract_csv_column.py -i ${token_transfers_file} -c erc20_token -o - | sort | uniq > ${erc20_token_addresses_file}
     quit_if_returned_error
     
     erc20_tokens_output_dir=${output_dir}/erc20_tokens${partition_dir}

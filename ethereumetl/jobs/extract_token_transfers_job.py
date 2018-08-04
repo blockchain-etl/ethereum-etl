@@ -22,12 +22,12 @@
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
-from ethereumetl.mappers.erc20_transfer_mapper import EthErc20TransferMapper
+from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
-from ethereumetl.service.erc20_transfer_extractor import EthErc20TransferExtractor
+from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor
 
 
-class ExtractErc20TransfersJob(BaseJob):
+class ExtractTokenTransfersJob(BaseJob):
     def __init__(
             self,
             logs_iterable,
@@ -40,8 +40,8 @@ class ExtractErc20TransfersJob(BaseJob):
         self.item_exporter = item_exporter
 
         self.receipt_log_mapper = EthReceiptLogMapper()
-        self.erc20_transfer_mapper = EthErc20TransferMapper()
-        self.erc20_transfer_extractor = EthErc20TransferExtractor()
+        self.token_transfer_mapper = EthTokenTransferMapper()
+        self.token_transfer_extractor = EthTokenTransferExtractor()
 
     def _start(self):
         self.item_exporter.open()
@@ -55,9 +55,9 @@ class ExtractErc20TransfersJob(BaseJob):
 
     def _extract_transfer(self, log_dict):
         log = self.receipt_log_mapper.dict_to_receipt_log(log_dict)
-        erc20_transfer = self.erc20_transfer_extractor.extract_transfer_from_log(log)
-        if erc20_transfer is not None:
-            self.item_exporter.export_item(self.erc20_transfer_mapper.erc20_transfer_to_dict(erc20_transfer))
+        token_transfer = self.token_transfer_extractor.extract_transfer_from_log(log)
+        if token_transfer is not None:
+            self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
     def _end(self):
         self.batch_work_executor.shutdown()
