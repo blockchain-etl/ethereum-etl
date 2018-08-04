@@ -43,6 +43,7 @@ class EthBlockMapper(object):
         block.logs_bloom = json_dict.get('logsBloom', None)
         block.transactions_root = json_dict.get('transactionsRoot', None)
         block.state_root = json_dict.get('stateRoot', None)
+        block.receipts_root = json_dict.get('receiptsRoot', None)
         block.miner = to_normalized_address(json_dict.get('miner', None))
         block.difficulty = hex_to_dec(json_dict.get('difficulty', None))
         block.total_difficulty = hex_to_dec(json_dict.get('totalDifficulty', None))
@@ -73,6 +74,7 @@ class EthBlockMapper(object):
             'logs_bloom': block.logs_bloom,
             'transactions_root': block.transactions_root,
             'state_root': block.state_root,
+            'receipts_root': block.receipts_root,
             'miner': block.miner,
             'difficulty': block.difficulty,
             'total_difficulty': block.total_difficulty,

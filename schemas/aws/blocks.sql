@@ -7,6 +7,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
     logs_bloom STRING,
     transactions_root STRING,
     state_root STRING,
+    receipts_root STRING,
     miner STRING,
     difficulty DECIMAL(38,0),
     total_difficulty DECIMAL(38,0),

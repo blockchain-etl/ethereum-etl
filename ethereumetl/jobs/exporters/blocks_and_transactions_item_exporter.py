@@ -32,6 +32,7 @@ BLOCK_FIELDS_TO_EXPORT = [
     'logs_bloom',
     'transactions_root',
     'state_root',
+    'receipts_root',
     'miner',
     'difficulty',
     'total_difficulty',

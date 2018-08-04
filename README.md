@@ -58,6 +58,7 @@ sha3_uncles       | hex_string         |
 logs_bloom        | hex_string         |
 transactions_root | hex_string         |
 state_root        | hex_string         |
+receipts_root     | hex_string         |
 miner             | address            |
 difficulty        | numeric            |
 total_difficulty  | numeric            |
