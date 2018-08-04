@@ -106,12 +106,12 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     ### receipts_and_logs
 
-    transaction_hashes_output_dir=${output_dir}/transaction_hashes${partision_dir}
+    transaction_hashes_output_dir=${output_dir}/transaction_hashes${partition_dir}
     mkdir -p ${transaction_hashes_output_dir};
     
     transaction_hashes_file=${transaction_hashes_output_dir}/transaction_hashes_${file_name_suffix}.csv
-    log "Extracting transaction_hash column from transaction file ${transactions_file}"
-    python3 extract_csv_column.py --input ${transactions_file} --output ${transaction_hashes_file} --column "transaction_hash"
+    log "Extracting hash column from transaction file ${transactions_file}"
+    python3 extract_csv_column.py --input ${transactions_file} --output ${transaction_hashes_file} --column "hash"
     quit_if_returned_error
 
     receipts_output_dir=${output_dir}/receipts${partition_dir}
