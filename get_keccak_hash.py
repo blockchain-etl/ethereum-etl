@@ -21,30 +21,23 @@
 # SOFTWARE.
 
 
-import json
+import argparse
 
-from ethereumetl.utils import hex_to_dec
+from eth_utils import keccak
 
+from ethereumetl.file_utils import smart_open
+from ethereumetl.logging_utils import logging_basic_config
 
-class MockBatchWeb3Provider(object):
-    def __init__(self, read_resource):
-        self.read_resource = read_resource
+logging_basic_config()
 
-    def make_request(self, text):
-        batch = json.loads(text)
-        web3_response = []
-        for req in batch:
-            if req['method'] == 'eth_getBlockByNumber':
-                block_number = hex_to_dec(req['params'][0])
-                file_name = 'web3_response.block.' + str(block_number) + '.json'
-            elif req['method'] == 'eth_getCode':
-                contract_address = req['params'][0]
-                file_name = 'web3_response.code.' + str(contract_address) + '.json'
-            elif req['method'] == 'eth_getTransactionReceipt':
-                tx_hash = req['params'][0]
-                file_name = 'web3_response.receipt.' + str(tx_hash) + '.json'
-            else:
-                raise ValueError('Request method {} is unexpected'.format(req['method']))
-            file_content = self.read_resource(file_name)
-            web3_response.append(json.loads(file_content))
-        return web3_response
+parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the given string.')
+parser.add_argument('-i', '--input-string', default='Transfer(address,address,uint256)', type=str,
+                    help='String to hash, e.g. Transfer(address,address,uint256)')
+parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+
+args = parser.parse_args()
+
+hash = keccak(text=args.input_string)
+
+with smart_open(args.output, 'w') as output_file:
+    output_file.write('0x{}\n'.format(hash.hex()))

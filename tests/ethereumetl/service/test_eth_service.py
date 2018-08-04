@@ -21,20 +21,16 @@
 # SOFTWARE.
 
 
-import os
-
 import pytest
 from dateutil.parser import parse
 from web3 import HTTPProvider, Web3
 
 from ethereumetl.service.eth_service import EthService
 from ethereumetl.service.graph_operations import OutOfBoundsError
-
-run_slow_tests = os.environ.get('ETHEREUM_ETL_RUN_SLOW_TESTS', None) == '1'
-skip_slow_tests = pytest.mark.skipif(not run_slow_tests, reason='Slow running tests')
+from tests.helpers import skip_if_slow_tests_disabled
 
 
-@skip_slow_tests
+@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("date,expected_start_block,expected_end_block", [
     ('2015-07-30', 0, 6911),
     ('2015-07-31', 6912, 13774),
@@ -49,7 +45,7 @@ def test_get_block_range_for_date(date, expected_start_block, expected_end_block
     assert blocks == (expected_start_block, expected_end_block)
 
 
-@skip_slow_tests
+@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("date", [
     '2015-07-29',
     '2030-01-01'
@@ -61,7 +57,7 @@ def test_get_block_range_for_date_fail(date):
         eth_service.get_block_range_for_date(parsed_date)
 
 
-@skip_slow_tests
+@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("start_timestamp,end_timestamp,expected_start_block,expected_end_block", [
     (1438270128, 1438270128, 10, 10),
     (1438270128, 1438270129, 10, 10)
@@ -72,7 +68,7 @@ def test_get_block_range_for_timestamps(start_timestamp, end_timestamp, expected
     assert blocks == (expected_start_block, expected_end_block)
 
 
-@skip_slow_tests
+@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("start_timestamp,end_timestamp", [
     (1438270129, 1438270131)
 ])

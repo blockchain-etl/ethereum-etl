@@ -23,6 +23,8 @@
 
 import os
 
+import pytest
+
 
 def compare_lines_ignore_order(expected, actual):
     expected_lines = expected.splitlines()
@@ -38,3 +40,8 @@ def read_file(path):
         return ''
     with open(path) as file:
         return file.read()
+
+
+run_slow_tests_variable = os.environ.get('ETHEREUM_ETL_RUN_SLOW_TESTS', 'False')
+run_slow_tests = run_slow_tests_variable.lower() in ['1', 'true', 'yes']
+skip_if_slow_tests_disabled = pytest.mark.skipif(not run_slow_tests, reason='Skipping slow running tests')

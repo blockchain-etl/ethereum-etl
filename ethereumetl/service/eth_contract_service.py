@@ -63,7 +63,7 @@ class EthContractService:
 
 
 def clean_bytecode(bytecode):
-    if bytecode == '0x':
+    if bytecode is None or bytecode == '0x':
         return None
     elif bytecode.startswith('0x'):
         return bytecode[2:]
