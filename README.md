@@ -100,15 +100,15 @@ block_number        | bigint      |
 
 Column                       |    Type     |
 -----------------------------|-------------|
-receipt_transaction_hash     | hex_string  |
-receipt_transaction_index    | bigint      |
-receipt_block_hash           | hex_string  |
-receipt_block_number         | bigint      |
-receipt_cumulative_gas_used  | bigint      |
-receipt_gas_used             | bigint      |
-receipt_contract_address     | address     |
-receipt_root                 | hex_string  |
-receipt_status               | bigint      |
+transaction_hash             | hex_string  |
+transaction_index            | bigint      |
+block_hash                   | hex_string  |
+block_number                 | bigint      |
+cumulative_gas_used          | bigint      |
+gas_used                     | bigint      |
+contract_address             | address     |
+root                         | hex_string  |
+status                       | bigint      |
 
 ### logs.csv
 
@@ -320,7 +320,7 @@ First extract contract addresses from `receipts.csv`
 (Exported with [export_receipts_and_logs.py](#export_receipts_and_logspy)):
 
 ```bash
-> python extract_csv_column.py --input receipts.csv --column receipt_contract_address --output contract_addresses.csv
+> python extract_csv_column.py --input receipts.csv --column contract_address --output contract_addresses.csv
 ```
 
 Then export contracts:

@@ -132,8 +132,8 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     mkdir -p ${contract_addresses_output_dir}
     
     contract_addresses_file=${contract_addresses_output_dir}/contract_addresses_${file_name_suffix}.csv
-    log "Extracting receipt_contract_address from receipt file ${receipts_file}"
-    python3 extract_csv_column.py --input ${receipts_file} --column receipt_contract_address --output ${contract_addresses_file}
+    log "Extracting contract_address from receipt file ${receipts_file}"
+    python3 extract_csv_column.py --input ${receipts_file} --column contract_address --output ${contract_addresses_file}
     quit_if_returned_error
 
     contracts_output_dir=${output_dir}/contracts${partition_dir}

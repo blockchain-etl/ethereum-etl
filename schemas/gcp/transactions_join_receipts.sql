@@ -12,11 +12,11 @@ SELECT
   transactions.gas,
   transactions.gas_price,
   transactions.input,
-  receipts.receipt_cumulative_gas_used,
-  receipts.receipt_gas_used,
-  receipts.receipt_contract_address,
-  receipts.receipt_root,
-  receipts.receipt_status
+  receipts.cumulative_gas_used,
+  receipts.gas_used,
+  receipts.contract_address,
+  receipts.root,
+  receipts.status
 FROM `ethereum.blocks` AS blocks
   JOIN `ethereum.transactions` AS transactions ON blocks.number = transactions.block_number
-  JOIN `ethereum.receipts` AS receipts ON transactions.hash = receipts.receipt_transaction_hash
+  JOIN `ethereum.receipts` AS receipts ON transactions.hash = receipts.transaction_hash
