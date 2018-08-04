@@ -70,27 +70,27 @@ class EthReceiptLogMapper(object):
         return {
             'type': 'log',
             'log_index': receipt_log.log_index,
-            'log_transaction_hash': receipt_log.transaction_hash,
-            'log_transaction_index': receipt_log.transaction_index,
-            'log_block_hash': receipt_log.block_hash,
-            'log_block_number': receipt_log.block_number,
-            'log_address': receipt_log.address,
-            'log_data': receipt_log.data,
-            'log_topics': receipt_log.topics
+            'transaction_hash': receipt_log.transaction_hash,
+            'transaction_index': receipt_log.transaction_index,
+            'block_hash': receipt_log.block_hash,
+            'block_number': receipt_log.block_number,
+            'address': receipt_log.address,
+            'data': receipt_log.data,
+            'topics': receipt_log.topics
         }
 
     def dict_to_receipt_log(self, dict):
         receipt_log = EthReceiptLog()
 
         receipt_log.log_index = dict.get('log_index')
-        receipt_log.transaction_hash = dict.get('log_transaction_hash')
-        receipt_log.transaction_index = dict.get('log_transaction_index')
-        receipt_log.block_hash = dict.get('log_block_hash')
-        receipt_log.block_number = dict.get('log_block_number')
-        receipt_log.address = dict.get('log_address')
-        receipt_log.data = dict.get('log_data')
+        receipt_log.transaction_hash = dict.get('transaction_hash')
+        receipt_log.transaction_index = dict.get('transaction_index')
+        receipt_log.block_hash = dict.get('block_hash')
+        receipt_log.block_number = dict.get('block_number')
+        receipt_log.address = dict.get('address')
+        receipt_log.data = dict.get('data')
 
-        topics = dict.get('log_topics')
+        topics = dict.get('topics')
         if isinstance(topics, str):
             if len(topics.strip()) == 0:
                 receipt_log.topics = []

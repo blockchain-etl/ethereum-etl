@@ -1,6 +1,9 @@
 CREATE EXTERNAL TABLE IF NOT EXISTS contracts (
-    contract_address STRING,
-    contract_bytecode STRING
+    address STRING,
+    bytecode STRING,
+    function_sighashes STRING,
+    is_erc20 BOOLEAN,
+    is_erc721 BOOLEAN
 )
 PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'

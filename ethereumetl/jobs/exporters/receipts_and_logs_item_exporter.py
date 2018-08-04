@@ -24,26 +24,26 @@
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 RECEIPT_FIELDS_TO_EXPORT = [
-    'receipt_transaction_hash',
-    'receipt_transaction_index',
-    'receipt_block_hash',
-    'receipt_block_number',
-    'receipt_cumulative_gas_used',
-    'receipt_gas_used',
-    'receipt_contract_address',
-    'receipt_root',
-    'receipt_status'
+    'transaction_hash',
+    'transaction_index',
+    'block_hash',
+    'block_number',
+    'cumulative_gas_used',
+    'gas_used',
+    'contract_address',
+    'root',
+    'status'
 ]
 
 LOG_FIELDS_TO_EXPORT = [
     'log_index',
-    'log_transaction_hash',
-    'log_transaction_index',
-    'log_block_hash',
-    'log_block_number',
-    'log_address',
-    'log_data',
-    'log_topics'
+    'transaction_hash',
+    'transaction_index',
+    'block_hash',
+    'block_number',
+    'address',
+    'data',
+    'topics'
 ]
 
 
