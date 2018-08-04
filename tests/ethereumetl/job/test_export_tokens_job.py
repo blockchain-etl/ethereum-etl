@@ -27,12 +27,12 @@ import pytest
 from web3 import Web3, IPCProvider
 
 import tests.resources
-from ethereumetl.jobs.export_erc20_tokens_job import ExportErc20TokensJob
-from ethereumetl.jobs.exporters.erc20_tokens_item_exporter import erc20_tokens_item_exporter
+from ethereumetl.jobs.export_tokens_job import ExportTokensJob
+from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.helpers import compare_lines_ignore_order, read_file
 
-RESOURCE_GROUP = 'test_export_erc20_tokens_job'
+RESOURCE_GROUP = 'test_export_tokens_job'
 
 
 def read_resource(resource_group, file_name):
@@ -57,17 +57,17 @@ class MockWeb3Provider(IPCProvider):
 @pytest.mark.parametrize("token_addresses,resource_group", [
     (['0xf763be8b3263c268e9789abfb3934564a7b80054'], 'token_with_invalid_data')
 ])
-def test_export_erc20_tokens_job(tmpdir, token_addresses, resource_group):
-    output_file = tmpdir.join('erc20_tokens.csv')
+def test_export_tokens_job(tmpdir, token_addresses, resource_group):
+    output_file = tmpdir.join('tokens.csv')
 
-    job = ExportErc20TokensJob(
+    job = ExportTokensJob(
         token_addresses_iterable=token_addresses,
         web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
-        item_exporter=erc20_tokens_item_exporter(output_file),
+        item_exporter=tokens_item_exporter(output_file),
         max_workers=5
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_erc20_tokens.csv'), read_file(output_file)
+        read_resource(resource_group, 'expected_tokens.csv'), read_file(output_file)
     )

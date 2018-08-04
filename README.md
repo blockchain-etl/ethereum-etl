@@ -35,7 +35,7 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
   - [receipts.csv](#receiptscsv)
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
-  - [erc20_tokens.csv](#erc20_tokenscsv)
+  - [tokens.csv](#tokenscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
@@ -88,13 +88,13 @@ tx_input            | hex_string  |
 
 Column              |    Type     |
 --------------------|-------------|
-erc20_token         | address     |
-erc20_from          | address     |
-erc20_to            | address     |
-erc20_value         | numeric     |
-erc20_tx_hash       | hex_string  |
-erc20_log_index     | bigint      |
-erc20_block_number  | bigint      |
+token_address       | address     |
+from_address        | address     |
+to_address          | address     |
+value               | numeric     |
+tx_hash             | hex_string  |
+log_index           | bigint      |
+block_number        | bigint      |
 
 ### receipts.csv
 
@@ -133,20 +133,20 @@ contract_function_sighashes  | string      |
 contract_is_erc20            | boolean     |
 contract_is_erc721           | boolean     |
 
-### erc20_tokens.csv
+### tokens.csv
 
 Column                       |    Type     |
 -----------------------------|-------------|
-erc20_token_address          | address     |
-erc20_token_symbol           | string      |
-erc20_token_name             | string      |
-erc20_token_decimals         | bigint      |
-erc20_token_total_supply     | numeric     |
+address                      | address     |
+symbol                       | string      |
+name                         | string      |
+decimals                     | bigint      |
+total_supply                 | numeric     |
 
 You can find column descriptions in [schemas/gcp](schemas/gcp)
 
-Note: `erc20_token_symbol`, `erc20_token_name`, `erc20_token_decimals`, `erc20_token_total_supply` 
-columns in `erc20_tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
+Note: `symbol`, `name`, `decimals`, `total_supply` 
+columns in `tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
 or implements it incorrectly (e.g. wrong return type). 
 
 Note: for the `address` type all hex characters are lower-cased. 
@@ -230,7 +230,7 @@ Additional steps:
 - [extract_token_transfers.py](#extract_token_transferspy)
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
-- [export_erc20_tokens.py](#export_erc20_tokenspy)
+- [export_tokens.py](#export_tokenspy)
 - [get_block_range_for_date.py](#get_block_range_for_datepy)
 
 All the commands accept `-h` parameter for help, e.g.:
@@ -332,20 +332,20 @@ Then export contracts:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_erc20_tokens.py
+##### export_tokens.py
 
 First extract token addresses from `token_transfers.csv` 
 (Exported with [export_token_transfers.py](#export_token_transferspy)):
 
 ```bash
-> python extract_csv_column.py -i token_transfers.csv -c erc20_token -o - | sort | uniq > erc20_token_addresses.csv
+> python extract_csv_column.py -i token_transfers.csv -c token_address -o - | sort | uniq > token_addresses.csv
 ```
 
 Then export ERC20 tokens:
 
 ```bash
-> python export_erc20_tokens.py --token-addresses erc20_token_addresses.csv \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --output erc20_tokens.csv
+> python export_tokens.py --token-addresses token_addresses.csv \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output tokens.csv
 ```
 
 You can tune `--max-workers` for performance.
@@ -353,7 +353,7 @@ You can tune `--max-workers` for performance.
 Note that there will be duplicate tokens across different partitions, 
 which need to be deduplicated (see Querying in Google BigQuery section).
 
-Upvote this pull request to make erc20_tokens export faster 
+Upvote this pull request to make tokens export faster 
 https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
 
 ##### get_block_range_for_date.py
@@ -394,7 +394,7 @@ CREATE DATABASE ethereumetl;
   - contracts: [schemas/aws/contracts.sql](schemas/aws/contracts.sql)
   - receipts: [schemas/aws/receipts.sql](schemas/aws/receipts.sql)
   - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
-  - erc20_tokens: [schemas/aws/erc20_tokens.sql](schemas/aws/erc20_tokens.sql)
+  - tokens: [schemas/aws/tokens.sql](schemas/aws/tokens.sql)
 
 ### Tables for Parquet Files
 
@@ -437,7 +437,7 @@ To upload CSVs to BigQuery:
 > bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
 > bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/logs.json
 > bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/contracts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.erc20_tokens_duplicates gs://<your_bucket>/ethereumetl/export/erc20_tokens/*.csv ./schemas/gcp/erc20_tokens.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./schemas/gcp/tokens.json
 ```
 
 Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the columns with lists.
@@ -449,11 +449,11 @@ Join `transactions` and `receipts`:
 > bq --location=US query --replace --destination_table ethereum.transactions_join_receipts --use_legacy_sql=false "$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')"
 ```
 
-Deduplicate `erc20_tokens`:
+Deduplicate `tokens`:
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereum.erc20_tokens ./schemas/gcp/erc20_tokens.json
-> bq --location=US query --replace --destination_table ethereum.erc20_tokens --use_legacy_sql=false "$(cat ./schemas/gcp/erc20_tokens_deduplicate.sql | tr '\n' ' ')"
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereum.tokens ./schemas/gcp/tokens.json
+> bq --location=US query --replace --destination_table ethereum.tokens --use_legacy_sql=false "$(cat ./schemas/gcp/tokens_deduplicate.sql | tr '\n' ' ')"
 ```
 
 ### Public Dataset

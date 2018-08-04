@@ -51,13 +51,13 @@ class EthTokenTransferExtractor(object):
                 return None
 
             token_transfer = EthTokenTransfer()
-            token_transfer.erc20_token = to_normalized_address(receipt_log.address)
-            token_transfer.erc20_from = word_to_address(topics_with_data[1])
-            token_transfer.erc20_to = word_to_address(topics_with_data[2])
-            token_transfer.erc20_value = hex_to_dec(topics_with_data[3])
-            token_transfer.erc20_tx_hash = receipt_log.transaction_hash
-            token_transfer.erc20_log_index = receipt_log.log_index
-            token_transfer.erc20_block_number = receipt_log.block_number
+            token_transfer.token_address = to_normalized_address(receipt_log.address)
+            token_transfer.from_address = word_to_address(topics_with_data[1])
+            token_transfer.to_address = word_to_address(topics_with_data[2])
+            token_transfer.value = hex_to_dec(topics_with_data[3])
+            token_transfer.tx_hash = receipt_log.transaction_hash
+            token_transfer.log_index = receipt_log.log_index
+            token_transfer.block_number = receipt_log.block_number
             return token_transfer
 
         return None

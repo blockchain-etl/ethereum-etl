@@ -23,11 +23,11 @@
 
 from web3.exceptions import BadFunctionCallOutput
 
-from ethereumetl.domain.erc20_token import EthErc20Token
+from ethereumetl.domain.token import EthToken
 from ethereumetl.erc20_abi import ERC20_ABI
 
 
-class EthErc20TokenService(object):
+class EthTokenService(object):
     def __init__(self, web3, function_call_result_transformer=None):
         self._web3 = web3
         self._function_call_result_transformer = function_call_result_transformer
@@ -41,12 +41,12 @@ class EthErc20TokenService(object):
         decimals = self._call_contract_function(contract.functions.decimals())
         total_supply = self._call_contract_function(contract.functions.totalSupply())
 
-        token = EthErc20Token()
-        token.erc20_token_address = token_address
-        token.erc20_token_symbol = symbol
-        token.erc20_token_name = name
-        token.erc20_token_decimals = decimals
-        token.erc20_token_total_supply = total_supply
+        token = EthToken()
+        token.address = token_address
+        token.symbol = symbol
+        token.name = name
+        token.decimals = decimals
+        token.total_supply = total_supply
 
         return token
 

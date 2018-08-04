@@ -26,8 +26,8 @@ import argparse
 from web3 import Web3
 
 from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.export_erc20_tokens_job import ExportErc20TokensJob
-from ethereumetl.jobs.exporters.erc20_tokens_item_exporter import erc20_tokens_item_exporter
+from ethereumetl.jobs.export_tokens_job import ExportTokensJob
+from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
@@ -45,10 +45,10 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/'
 args = parser.parse_args()
 
 with smart_open(args.token_addresses, 'r') as token_addresses_file:
-    job = ExportErc20TokensJob(
+    job = ExportTokensJob(
         token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),
         web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
-        item_exporter=erc20_tokens_item_exporter(args.output),
+        item_exporter=tokens_item_exporter(args.output),
         max_workers=args.max_workers)
 
     job.run()

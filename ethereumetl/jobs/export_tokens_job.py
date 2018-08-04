@@ -23,18 +23,18 @@
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
-from ethereumetl.mappers.erc20_token_mapper import EthErc20TokenMapper
-from ethereumetl.service.erc20_token_service import EthErc20TokenService
+from ethereumetl.mappers.token_mapper import EthTokenMapper
+from ethereumetl.service.token_service import EthTokenService
 
 
-class ExportErc20TokensJob(BaseJob):
+class ExportTokensJob(BaseJob):
     def __init__(self, web3, item_exporter, token_addresses_iterable, max_workers):
         self.item_exporter = item_exporter
         self.token_addresses_iterable = token_addresses_iterable
         self.batch_work_executor = BatchWorkExecutor(1, max_workers)
 
-        self.erc20_token_service = EthErc20TokenService(web3, clean_user_provided_content)
-        self.erc20_token_mapper = EthErc20TokenMapper()
+        self.token_service = EthTokenService(web3, clean_user_provided_content)
+        self.token_mapper = EthTokenMapper()
 
     def _start(self):
         self.item_exporter.open()
@@ -47,8 +47,8 @@ class ExportErc20TokensJob(BaseJob):
             self._export_token(token_address)
 
     def _export_token(self, token_address):
-        token = self.erc20_token_service.get_token(token_address)
-        token_dict = self.erc20_token_mapper.erc20_token_to_dict(token)
+        token = self.token_service.get_token(token_address)
+        token_dict = self.token_mapper.token_to_dict(token)
         self.item_exporter.export_item(token_dict)
 
     def _end(self):

@@ -23,10 +23,10 @@
 
 class EthTokenTransfer(object):
     def __init__(self):
-        self.erc20_token = None
-        self.erc20_from = None
-        self.erc20_to = None
-        self.erc20_value = None
-        self.erc20_tx_hash = None
-        self.erc20_log_index = None
-        self.erc20_block_number = None
+        self.token_address = None
+        self.from_address = None
+        self.to_address = None
+        self.value = None
+        self.tx_hash = None
+        self.log_index = None
+        self.block_number = None

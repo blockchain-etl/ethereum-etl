@@ -21,10 +21,13 @@
 # SOFTWARE.
 
 
-class EthErc20Token(object):
-    def __init__(self):
-        self.erc20_token_address = None
-        self.erc20_token_symbol = None
-        self.erc20_token_name = None
-        self.erc20_token_decimals = None
-        self.erc20_token_total_supply = None
+class EthTokenMapper(object):
+    def token_to_dict(self, token):
+        return {
+            'type': 'token',
+            'address': token.address,
+            'symbol': token.symbol,
+            'name': token.name,
+            'decimals': token.decimals,
+            'total_supply': token.total_supply
+        }

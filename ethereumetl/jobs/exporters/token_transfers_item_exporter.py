@@ -24,13 +24,13 @@
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
-    'erc20_token',
-    'erc20_from',
-    'erc20_to',
-    'erc20_value',
-    'erc20_tx_hash',
-    'erc20_log_index',
-    'erc20_block_number'
+    'token_address',
+    'from_address',
+    'to_address',
+    'value',
+    'tx_hash',
+    'log_index',
+    'block_number'
 ]
 
 

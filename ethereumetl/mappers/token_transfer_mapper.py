@@ -25,11 +25,11 @@ class EthTokenTransferMapper(object):
     def token_transfer_to_dict(self, token_transfer):
         return {
             'type': 'token_transfer',
-            'erc20_token': token_transfer.erc20_token,
-            'erc20_from': token_transfer.erc20_from,
-            'erc20_to': token_transfer.erc20_to,
-            'erc20_value': token_transfer.erc20_value,
-            'erc20_tx_hash': token_transfer.erc20_tx_hash,
-            'erc20_log_index': token_transfer.erc20_log_index,
-            'erc20_block_number': token_transfer.erc20_block_number,
+            'token_address': token_transfer.token_address,
+            'from_address': token_transfer.from_address,
+            'to_address': token_transfer.to_address,
+            'value': token_transfer.value,
+            'tx_hash': token_transfer.tx_hash,
+            'log_index': token_transfer.log_index,
+            'block_number': token_transfer.block_number,
         }
