@@ -24,11 +24,11 @@
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
-    'contract_address',
-    'contract_bytecode',
-    'contract_function_sighashes',
-    'contract_is_erc20',
-    'contract_is_erc721'
+    'address',
+    'bytecode',
+    'function_sighashes',
+    'is_erc20',
+    'is_erc721'
 ]
 
 

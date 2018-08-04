@@ -127,11 +127,11 @@ topics                   | string      |
 
 Column                       |    Type     |
 -----------------------------|-------------|
-contract_address             | address     |
-contract_bytecode            | hex_string  |
-contract_function_sighashes  | string      |
-contract_is_erc20            | boolean     |
-contract_is_erc721           | boolean     |
+address                      | address     |
+bytecode                     | hex_string  |
+function_sighashes           | string      |
+is_erc20                     | boolean     |
+is_erc721                    | boolean     |
 
 ### tokens.csv
 
