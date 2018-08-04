@@ -3,7 +3,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
     nonce BIGINT,
     block_hash STRING,
     block_number BIGINT,
-    index BIGINT,
+    transaction_index BIGINT,
     from_address STRING,
     to_address STRING,
     value DECIMAL(38,0),

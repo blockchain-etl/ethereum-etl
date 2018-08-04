@@ -5,7 +5,7 @@ SELECT
   blocks.number,
   transactions.hash,
   transactions.nonce,
-  transactions.index,
+  transactions.transaction_index,
   transactions.from_address,
   transactions.to_address,
   transactions.value,

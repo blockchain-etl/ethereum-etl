@@ -76,7 +76,7 @@ hash             | hex_string  |
 nonce            | bigint      |
 block_hash       | hex_string  |
 block_number     | bigint      |
-index            | bigint      |
+transaction_index| bigint      |
 from_address     | address     |
 to_address       | address     |
 value            | numeric     |

@@ -48,7 +48,7 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'nonce',
     'block_hash',
     'block_number',
-    'index',
+    'transaction_index',
     'from_address',
     'to_address',
     'value',

@@ -32,7 +32,7 @@ class EthTransactionMapper(object):
         transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
         transaction.block_hash = json_dict.get('blockHash', None)
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        transaction.index = hex_to_dec(json_dict.get('transactionIndex', None))
+        transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         transaction.from_address = to_normalized_address(json_dict.get('from', None))
         transaction.to_address = to_normalized_address(json_dict.get('to', None))
         transaction.value = hex_to_dec(json_dict.get('value', None))
@@ -48,7 +48,7 @@ class EthTransactionMapper(object):
             'nonce': transaction.nonce,
             'block_hash': transaction.block_hash,
             'block_number': transaction.block_number,
-            'index': transaction.index,
+            'transaction_index': transaction.transaction_index,
             'from_address': transaction.from_address,
             'to_address': transaction.to_address,
             'value': transaction.value,
