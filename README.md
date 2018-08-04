@@ -50,23 +50,23 @@ Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ether
 
 Column                  | Type               |
 ------------------------|--------------------|
-block_number            | bigint             |
-block_hash              | hex_string         |
-block_parent_hash       | hex_string         |
-block_nonce             | hex_string         |
-block_sha3_uncles       | hex_string         |
-block_logs_bloom        | hex_string         |
-block_transactions_root | hex_string         |
-block_state_root        | hex_string         |
-block_miner             | address            |
-block_difficulty        | numeric            |
-block_total_difficulty  | numeric            |
-block_size              | bigint             |
-block_extra_data        | hex_string         |
-block_gas_limit         | bigint             |
-block_gas_used          | bigint             |
-block_timestamp         | bigint             |
-block_transaction_count | bigint             |
+number            | bigint             |
+hash              | hex_string         |
+parent_hash       | hex_string         |
+nonce             | hex_string         |
+sha3_uncles       | hex_string         |
+logs_bloom        | hex_string         |
+transactions_root | hex_string         |
+state_root        | hex_string         |
+miner             | address            |
+difficulty        | numeric            |
+total_difficulty  | numeric            |
+size              | bigint             |
+extra_data        | hex_string         |
+gas_limit         | bigint             |
+gas_used          | bigint             |
+timestamp         | bigint             |
+transaction_count | bigint             |
 
 ### transactions.csv
 
@@ -445,7 +445,7 @@ Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the column
 Join `transactions` and `receipts`:
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field block_timestamp_partition ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
+> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field timestamp_partition ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
 > bq --location=US query --replace --destination_table ethereum.transactions_join_receipts --use_legacy_sql=false "$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')"
 ```
 

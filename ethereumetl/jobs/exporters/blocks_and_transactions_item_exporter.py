@@ -24,23 +24,23 @@
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 BLOCK_FIELDS_TO_EXPORT = [
-    'block_number',
-    'block_hash',
-    'block_parent_hash',
-    'block_nonce',
-    'block_sha3_uncles',
-    'block_logs_bloom',
-    'block_transactions_root',
-    'block_state_root',
-    'block_miner',
-    'block_difficulty',
-    'block_total_difficulty',
-    'block_size',
-    'block_extra_data',
-    'block_gas_limit',
-    'block_gas_used',
-    'block_timestamp',
-    'block_transaction_count'
+    'number',
+    'hash',
+    'parent_hash',
+    'nonce',
+    'sha3_uncles',
+    'logs_bloom',
+    'transactions_root',
+    'state_root',
+    'miner',
+    'difficulty',
+    'total_difficulty',
+    'size',
+    'extra_data',
+    'gas_limit',
+    'gas_used',
+    'timestamp',
+    'transaction_count'
 ]
 
 TRANSACTION_FIELDS_TO_EXPORT = [
