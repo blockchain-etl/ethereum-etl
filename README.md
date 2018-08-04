@@ -115,13 +115,13 @@ status                       | bigint      |
 Column                       |    Type     |
 -----------------------------|-------------|
 log_index                    | bigint      |
-log_transaction_hash         | hex_string  |
-log_transaction_index        | bigint      |
-log_block_hash               | hex_string  |
-log_block_number             | bigint      |
-log_address                  | address     |
-log_data                     | hex_string  |
-log_topics                   | string      |
+transaction_hash         | hex_string  |
+transaction_index        | bigint      |
+block_hash               | hex_string  |
+block_number             | bigint      |
+address                  | address     |
+data                     | hex_string  |
+topics                   | string      |
 
 ### contracts.csv
 

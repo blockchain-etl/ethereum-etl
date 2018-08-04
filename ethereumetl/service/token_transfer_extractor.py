@@ -36,7 +36,7 @@ class EthTokenTransferExtractor(object):
     def extract_transfer_from_log(self, receipt_log):
 
         topics = receipt_log.topics
-        if len(topics) < 1:
+        if topics is None or len(topics) < 1:
             logger.warning("Topics are empty in log {} of transaction {}".format(receipt_log.log_index,
                                                                                  receipt_log.transaction_hash))
             return None

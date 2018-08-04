@@ -37,13 +37,13 @@ RECEIPT_FIELDS_TO_EXPORT = [
 
 LOG_FIELDS_TO_EXPORT = [
     'log_index',
-    'log_transaction_hash',
-    'log_transaction_index',
-    'log_block_hash',
-    'log_block_number',
-    'log_address',
-    'log_data',
-    'log_topics'
+    'transaction_hash',
+    'transaction_index',
+    'block_hash',
+    'block_number',
+    'address',
+    'data',
+    'topics'
 ]
 
 
