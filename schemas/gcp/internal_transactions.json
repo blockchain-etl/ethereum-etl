@@ -1,0 +1,85 @@
+[
+    {
+        "name": "internal_tx_block_number",
+        "type": "INT64",
+        "mode": "REQUIRED",
+        "description": "Block number which included parent of this internal transaction",
+        "_comment"   : "Can be made available via joins"
+    },
+    {
+        "name": "internal_tx_block_timestamp",
+        "type": "INT64",
+        "mode": "REQUIRED",
+        "description": "The unix timestamp for when the block was collated"
+    },
+    {
+        "name": "internal_tx_hash",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Hash of the transaction"
+    },
+    {
+        "name": "internal_tx_from",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Address of the sender"
+    },
+    {
+        "name": "internal_tx_to",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Address of the receiver"
+    },
+    {
+        "name": "internal_tx_value",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Value transferred in Wei"
+    },
+    {
+        "name": "internal_tx_contract_address",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Address of the contract which initiated the transaction"
+    },
+    {
+        "name": "internal_tx_input",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "The data send along with the transaction"
+    },
+    {
+        "name": "internal_tx_type",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Type of internal transaction: CREATE, SELFDESTRUCT, CALL, CALLCODE, DELEGATECALL, STATICCALL"
+    },
+    {
+        "name": "internal_tx_gas",
+        "type": "STRING",
+        "description": "Gas available for the internal transaction"
+    },
+    {
+        "name": "internal_tx_gas_used",
+        "type": "STRING",
+        "description": "Gas used by the internal transaction"
+    },
+    {
+        "name": "internal_tx_trace_id",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "The level of nesting of an internal transaction"
+    },
+    {
+        "name": "internal_tx_is_error",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "internal_tx_err_code",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    }
+]
