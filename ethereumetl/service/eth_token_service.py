@@ -24,7 +24,7 @@
 from web3.exceptions import BadFunctionCallOutput
 
 from ethereumetl.domain.token import EthToken
-from ethereumetl.erc20_abi import ERC20_ABI
+from ethereumetl.erc20_abi import ERC20_ABI, BYTES32_ERC20_ABI
 
 
 class EthTokenService(object):
@@ -40,6 +40,15 @@ class EthTokenService(object):
         name = self._call_contract_function(contract.functions.name())
         decimals = self._call_contract_function(contract.functions.decimals())
         total_supply = self._call_contract_function(contract.functions.totalSupply())
+
+        bytes32_contract = self._web3.eth.contract(address=checksum_address, abi=BYTES32_ERC20_ABI)
+        if symbol is None:
+            symbol = self._call_contract_function(bytes32_contract.functions.symbol())
+            symbol = self._convert_bytes32_to_string(symbol)
+
+        if name is None:
+            name = self._call_contract_function(bytes32_contract.functions.name())
+            name = self._convert_bytes32_to_string(name)
 
         token = EthToken()
         token.address = token_address
@@ -63,6 +72,15 @@ class EthTokenService(object):
             return self._function_call_result_transformer(result)
         else:
             return result
+
+    def _convert_bytes32_to_string(self, bytes_data):
+        if bytes_data is None:
+            return None
+        string_data = bytes_data.decode("utf-8")
+        if self._function_call_result_transformer is not None:
+            return self._function_call_result_transformer(string_data)
+        else:
+            return string_data
 
 
 def call_contract_function(func, ignore_errors, default_value=None):

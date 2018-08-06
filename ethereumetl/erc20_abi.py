@@ -22,6 +22,7 @@
 
 
 import json
+from copy import deepcopy
 
 ERC20_ABI = json.loads('''
 [
@@ -242,3 +243,16 @@ ERC20_ABI = json.loads('''
     }
 ]
 ''')
+
+
+def replace_output_type(func, new_output_type, output_name=''):
+    copy = deepcopy(func)
+    outputs = copy['outputs']
+    for output in outputs:
+        if output['name'] == output_name:
+            output['type'] = new_output_type
+    return copy
+
+
+BYTES32_ERC20_ABI = [replace_output_type(func, 'bytes32') if func['name'] in ['symbol', 'name'] else func
+                     for func in ERC20_ABI]
