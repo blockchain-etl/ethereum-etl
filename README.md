@@ -20,7 +20,7 @@ Export ERC20 and ERC721 transfers ([Reference](#export_token_transferspy)):
 Export receipts and logs ([Reference](#export_receipts_and_logspy)):
 
 ```bash
-> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.csv \
+> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.txt \
 --provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
 ```
 
@@ -293,13 +293,13 @@ First extract transaction hashes from `transactions.csv`
 (Exported with [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)):
 
 ```bash
-> python extract_csv_column.py --input transactions.csv --column transaction_hash --output transaction_hashes.csv
+> python extract_csv_column.py --input transactions.csv --column transaction_hash --output transaction_hashes.txt
 ```
 
 Then export receipts and logs:
 
 ```bash
-> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.csv \
+> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
 ```
 
@@ -328,13 +328,13 @@ First extract contract addresses from `receipts.csv`
 (Exported with [export_receipts_and_logs.py](#export_receipts_and_logspy)):
 
 ```bash
-> python extract_csv_column.py --input receipts.csv --column contract_address --output contract_addresses.csv
+> python extract_csv_column.py --input receipts.csv --column contract_address --output contract_addresses.txt
 ```
 
 Then export contracts:
 
 ```bash
-> python export_contracts.py --contract-addresses contract_addresses.csv \
+> python export_contracts.py --contract-addresses contract_addresses.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output contracts.csv
 ```
 
@@ -346,13 +346,21 @@ First extract token addresses from `token_transfers.csv`
 (Exported with [export_token_transfers.py](#export_token_transferspy)):
 
 ```bash
-> python extract_csv_column.py -i token_transfers.csv -c token_address -o - | sort | uniq > token_addresses.csv
+> python extract_csv_column.py -i token_transfers.csv -c token_address | sort | uniq > token_addresses.txt
 ```
 
-Then export ERC20 tokens:
+Alternatively extract token addresses from `contracts.json` 
+(Exported with [export_contracts.py](#export_contractspy)):
 
 ```bash
-> python export_tokens.py --token-addresses token_addresses.csv \
+> python filter_items.py -i contracts.json -p "item['is_erc20'] or item['is_erc721']" | \
+python extract_field.py -f address -o token_addresses.txt
+```
+
+Then export ERC20 / ERC721 tokens:
+
+```bash
+> python export_tokens.py --token-addresses token_addresses.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output tokens.csv
 ```
 
