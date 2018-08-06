@@ -24,7 +24,7 @@
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.token_mapper import EthTokenMapper
-from ethereumetl.service.token_service import EthTokenService
+from ethereumetl.service.eth_token_service import EthTokenService
 
 
 class ExportTokensJob(BaseJob):
