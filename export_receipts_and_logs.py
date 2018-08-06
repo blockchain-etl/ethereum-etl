@@ -35,9 +35,9 @@ logging_basic_config()
 parser = argparse.ArgumentParser(description='Export receipts and logs.')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
 parser.add_argument('-t', '--transaction-hashes', type=str, help='The file containing transaction hashes, one per line.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
                     help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
+                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 parser.add_argument('--receipts-output', default=None, type=str,
                     help='The output file for receipts. If not provided receipts will not be exported. '

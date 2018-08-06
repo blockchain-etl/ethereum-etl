@@ -79,5 +79,5 @@ def test_get_block_range_for_timestamps_fail(start_timestamp, end_timestamp):
 
 
 def get_new_eth_service():
-    web3 = Web3(HTTPProvider('https://mainnet.infura.io/'))
+    web3 = Web3(HTTPProvider('https://mainnet.infura.io'))
     return EthService(web3)

@@ -21,15 +21,14 @@
 # SOFTWARE.
 
 
-import json
-
 import pytest
-from web3 import Web3, IPCProvider
+from web3 import Web3
 
 import tests.resources
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file
 
 RESOURCE_GROUP = 'test_export_token_transfers_job'
@@ -39,25 +38,17 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-class MockWeb3Provider(IPCProvider):
-    def __init__(self, resource_group):
-        self.resource_group = resource_group
-
-    def make_request(self, method, params):
-        file_name = method + '.json'
-        file_content = read_resource(self.resource_group, file_name)
-        return json.loads(file_content)
-
-
-@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group", [
-    (483920, 483920, 1, 'block_with_transfers')
+@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group,web3_provider_type", [
+    (483920, 483920, 1, 'block_with_transfers', 'mock')
 ])
-def test_export_token_transfers_job(tmpdir, start_block, end_block, batch_size, resource_group):
+def test_export_token_transfers_job(tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type):
     output_file = tmpdir.join('token_transfers.csv')
 
     job = ExportTokenTransfersJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
+        web3=ThreadLocalProxy(
+            lambda: Web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
+        ),
         item_exporter=token_transfers_item_exporter(output_file),
         max_workers=5
     )

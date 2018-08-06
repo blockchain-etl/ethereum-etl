@@ -22,33 +22,21 @@
 
 
 import argparse
-
-from web3 import Web3
+import json
 
 from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.export_tokens_job import ExportTokensJob
-from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.providers.auto import get_provider_from_uri
 
-logging_basic_config()
-
-parser = argparse.ArgumentParser(description='Exports ERC20 tokens.')
-parser.add_argument('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')
+parser = argparse.ArgumentParser(description='Extracts a single column from a given csv file.')
+parser.add_argument('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+parser.add_argument('-p', '--predicate', required=True, type=str,
+                    help='Predicate in Python code e.g. "item[\'is_erc20\']".')
 
 args = parser.parse_args()
 
-with smart_open(args.token_addresses, 'r') as token_addresses_file:
-    job = ExportTokensJob(
-        token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),
-        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
-        item_exporter=tokens_item_exporter(args.output),
-        max_workers=args.max_workers)
-
-    job.run()
+# TODO: Add support for CSV
+with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
+    for line in input_file:
+        item = json.loads(line)
+        if eval(args.predicate, globals(), {'item': item}):
+            output_file.write(json.dumps(item) + '\n')
