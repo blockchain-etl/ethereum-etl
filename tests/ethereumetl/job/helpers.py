@@ -9,7 +9,7 @@ def get_web3_provider(provider_type, read_resource_lambda=None):
             raise ValueError('read_resource_lambda must not be None for provider type mock'.format(provider_type))
         provider = ThreadLocalProxy(lambda: MockBatchWeb3Provider(read_resource_lambda))
     elif provider_type == 'infura':
-        provider = ThreadLocalProxy(lambda: BatchHTTPProvider('https://mainnet.infura.io/'))
+        provider = ThreadLocalProxy(lambda: BatchHTTPProvider('https://mainnet.infura.io'))
     else:
         raise ValueError('Provider type {} is unexpected'.format(provider_type))
     return provider

@@ -38,9 +38,9 @@ parser = argparse.ArgumentParser(description='Exports ERC20 tokens.')
 parser.add_argument('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io/', type=str,
+parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
                     help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io/')
+                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 
 args = parser.parse_args()
 

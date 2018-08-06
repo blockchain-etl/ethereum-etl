@@ -7,10 +7,10 @@ Export blocks and transactions ([Reference](#export_blocks_and_transactionspy)):
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
---provider-uri https://mainnet.infura.io/ --blocks-output blocks.csv --transactions-output transactions.csv
+--provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 transfers ([Reference](#export_token_transferspy)):
+Export ERC20 and ERC721 transfers ([Reference](#export_token_transferspy)):
 
 ```bash
 > python export_token_transfers.py --start-block 0 --end-block 500000 \
@@ -21,7 +21,14 @@ Export receipts and logs ([Reference](#export_receipts_and_logspy)):
 
 ```bash
 > python export_receipts_and_logs.py --transaction-hashes transaction_hashes.csv \
---provider-uri https://mainnet.infura.io/ --receipts-output receipts.csv --logs-output logs.csv
+--provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
+```
+
+Export ERC20 and ERC721 token details ([Reference](#export_tokenspy)):
+
+```bash
+> python export_tokens.py --token-addresses token_addresses.csv \
+--provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
 Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
@@ -158,7 +165,7 @@ Note: for the `address` type all hex characters are lower-cased.
 1. Install python 3.5 or 3.6 https://www.python.org/downloads/
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
-For that use `-p https://mainnet.infura.io/` option for the commands below. If you need ERC20 transfers or want to
+For that use `-p https://mainnet.infura.io` option for the commands below. If you need ERC20 transfers or want to
 export the data ~40 times faster, you will need to set up a local Ethereum node:
 
 1. Install geth https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
@@ -360,7 +367,7 @@ https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
 ##### get_block_range_for_date.py
 
 ```bash
-> python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io/ --date 2018-01-01
+> python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io --date 2018-01-01
 4832686,4838611
 ```
 
