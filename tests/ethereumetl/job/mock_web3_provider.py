@@ -32,7 +32,7 @@ class MockWeb3Provider(IPCProvider):
 
     def make_request(self, method, params):
         if method == 'eth_call':
-            to = params[0]['to']
+            to = params[0]['to'].lower()
             data = params[0]['data']
             file_name = '{}_{}_{}.json'.format(method, to, data)
         else:
