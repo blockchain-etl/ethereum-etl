@@ -21,16 +21,15 @@
 # SOFTWARE.
 
 
-import json
-
 import pytest
-from web3 import Web3, IPCProvider
+from web3 import Web3
 
 import tests.resources
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from tests.helpers import compare_lines_ignore_order, read_file
+from tests.ethereumetl.job.helpers import get_web3_provider
+from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
 RESOURCE_GROUP = 'test_export_tokens_job'
 
@@ -39,30 +38,21 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-class MockWeb3Provider(IPCProvider):
-    def __init__(self, resource_group):
-        self.resource_group = resource_group
-
-    def make_request(self, method, params):
-        if method == 'eth_call':
-            to = params[0]['to']
-            data = params[0]['data']
-            file_name = '{}_{}_{}.json'.format(method, to, data)
-        else:
-            file_name = method + '.json'
-        file_content = read_resource(self.resource_group, file_name)
-        return json.loads(file_content)
-
-
-@pytest.mark.parametrize("token_addresses,resource_group", [
-    (['0xf763be8b3263c268e9789abfb3934564a7b80054'], 'token_with_invalid_data')
+@pytest.mark.parametrize("token_addresses,resource_group,web3_provider_type", [
+    (['0xf763be8b3263c268e9789abfb3934564a7b80054'], 'token_with_invalid_data', 'mock'),
+    (['0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0'], 'token_with_alternative_return_type', 'mock'),
+    skip_if_slow_tests_disabled(
+        (['0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0'], 'token_with_alternative_return_type', 'infura')
+    )
 ])
-def test_export_tokens_job(tmpdir, token_addresses, resource_group):
+def test_export_tokens_job(tmpdir, token_addresses, resource_group, web3_provider_type):
     output_file = tmpdir.join('tokens.csv')
 
     job = ExportTokensJob(
         token_addresses_iterable=token_addresses,
-        web3=ThreadLocalProxy(lambda: Web3(MockWeb3Provider(resource_group))),
+        web3=ThreadLocalProxy(
+            lambda: Web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
+        ),
         item_exporter=tokens_item_exporter(output_file),
         max_workers=5
     )

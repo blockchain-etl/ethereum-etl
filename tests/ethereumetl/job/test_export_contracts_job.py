@@ -26,6 +26,7 @@ import pytest
 import tests.resources
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
@@ -47,11 +48,12 @@ def test_export_contracts_job(tmpdir, batch_size, contract_addresses, output_for
                               web3_provider_type):
     contracts_output_file = tmpdir.join('actual_contracts.' + output_format)
 
-    web3_provider = get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file))
     job = ExportContractsJob(
         contract_addresses_iterable=contract_addresses,
         batch_size=batch_size,
-        batch_web3_provider=web3_provider,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file), batch=True)
+        ),
         max_workers=5,
         item_exporter=contracts_item_exporter(contracts_output_file)
     )
