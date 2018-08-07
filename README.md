@@ -3,28 +3,28 @@
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/medvedev1088/ethereum-etl.png)](https://travis-ci.org/medvedev1088/ethereum-etl)
 
-Export blocks and transactions ([Reference](#export_blocks_and_transactionspy)):
+Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactionspy)):
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
 --provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 and ERC721 transfers ([Reference](#export_token_transferspy)):
+Export ERC20 and ERC721 transfers ([Schema](#token_transferscsv), [Reference](#export_token_transferspy)):
 
 ```bash
 > python export_token_transfers.py --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
-Export receipts and logs ([Reference](#export_receipts_and_logspy)):
+Export receipts and logs ([Schema](#receiptscsv), [Reference](#export_receipts_and_logspy)):
 
 ```bash
 > python export_receipts_and_logs.py --transaction-hashes transaction_hashes.txt \
 --provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
 ```
 
-Export ERC20 and ERC721 token details ([Reference](#export_tokenspy)):
+Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export_tokenspy)):
 
 ```bash
 > python export_tokens.py --token-addresses token_addresses.csv \
@@ -342,14 +342,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### export_tokens.py
 
-First extract token addresses from `token_transfers.csv` 
-(Exported with [export_token_transfers.py](#export_token_transferspy)):
-
-```bash
-> python extract_csv_column.py -i token_transfers.csv -c token_address | sort | uniq > token_addresses.txt
-```
-
-Alternatively extract token addresses from `contracts.json` 
+First extract token addresses from `contracts.json` 
 (Exported with [export_contracts.py](#export_contractspy)):
 
 ```bash
@@ -365,9 +358,6 @@ Then export ERC20 / ERC721 tokens:
 ```
 
 You can tune `--max-workers` for performance.
-
-Note that there will be duplicate tokens across different partitions, 
-which need to be deduplicated (see Querying in Google BigQuery section).
 
 Upvote this pull request to make tokens export faster 
 https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
