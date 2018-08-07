@@ -30,7 +30,7 @@
     {
         "name": "logs_bloom",
         "type": "STRING",
-        "description": "The bloom filter for the logs of the block. null when its pending block"
+        "description": "The bloom filter for the logs of the block."
     },
     {
         "name": "transactions_root",
