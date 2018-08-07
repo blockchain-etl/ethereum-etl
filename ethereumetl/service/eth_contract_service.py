@@ -44,8 +44,6 @@ class EthContractService:
             return []
 
     # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-    # Fuzzy matching either transfer(address,uint256) or transferFrom(address,address,uint256) for consistency
-    # with ERC721 (see below)
     def is_erc20_contract(self, function_sighashes):
         c = ContractWrapper(function_sighashes)
         return c.implements('totalSupply()') and \
