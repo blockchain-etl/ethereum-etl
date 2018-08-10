@@ -207,6 +207,8 @@ there is no need to wait until the full sync as the state is not needed.
     ```
 
 Should work with geth and parity, on Linux, Mac, Windows.
+If you use Parity you should disable warp mode with `--no-warp` option because warp mode 
+does not place all of the block or receipt data into the database https://wiki.parity.io/Getting-Synced
 Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
 If you see weird behavior, e.g. wrong number of rows in the CSV files or corrupted files,
