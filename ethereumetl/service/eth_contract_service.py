@@ -44,8 +44,7 @@ class EthContractService:
             return []
 
     # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-    # Fuzzy matching either transfer(address,uint256) or transferFrom(address,address,uint256) for consistency
-    # with ERC721 (see below)
+    # https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
     def is_erc20_contract(self, function_sighashes):
         c = ContractWrapper(function_sighashes)
         return c.implements('totalSupply()') and \
@@ -56,12 +55,18 @@ class EthContractService:
                c.implements('allowance(address,address)')
 
     # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
-    # In the standard only transferFrom(address,address,uint256) is defined, but many contracts implement
-    # only transfer(address,uint256) so this function makes a fuzzy check.
+    # https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC721/ERC721Basic.sol
+    # Doesn't check the below ERC721 methods to match CryptoKitties contract
+    # getApproved(uint256)
+    # setApprovalForAll(address,bool)
+    # isApprovedForAll(address,address)
+    # transferFrom(address,address,uint256)
+    # safeTransferFrom(address,address,uint256)
+    # safeTransferFrom(address,address,uint256,bytes)
     def is_erc721_contract(self, function_sighashes):
         c = ContractWrapper(function_sighashes)
-        return c.implements('ownerOf(uint256)') and \
-               c.implements('balanceOf(address)') and \
+        return c.implements('balanceOf(address)') and \
+               c.implements('ownerOf(uint256)') and \
                c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)') and \
                c.implements('approve(address,uint256)')
 
