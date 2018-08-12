@@ -17,7 +17,7 @@
     {
         "name": "value",
         "type": "STRING",
-        "description": "Amount of tokens transferred (ERC20) / id of the token transferred (ERC721)"
+        "description": "Amount of tokens transferred (ERC20) / id of the token transferred (ERC721). Use safe_cast for casting to NUMERIC or FLOAT64"
     },
     {
         "name": "transaction_hash",
