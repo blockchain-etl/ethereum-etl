@@ -482,7 +482,7 @@ Enrich `tokens`:
 
 ```bash
 > bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/tokens.txt | tr '\n' ' ')" ethereum_blockchain.tokens ./schemas/gcp/enriched/tokens.json
-> bq --location=US query --destination_table ethereum_blockchain.tokens --destination_schema ./schemas/gcp/enriched/tokens.json --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/tokens.sql | tr '\n' ' ')"
+> bq --location=US query --destination_table ethereum_blockchain.tokens --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/tokens.sql | tr '\n' ' ')"
 ```
 
 ### Public Dataset
