@@ -71,15 +71,7 @@ while [ 1 ] ; do
     && batch_start_block=${block_range_array[0]} && batch_end_block=${block_range_array[1]}
     quit_if_returned_error
     
-    echo "batch_start_block:"
-    echo $batch_start_block
-    
-    echo "batch_end_block:"
-    echo $batch_end_block
-
     start_time=$(date +%s)
-#    batch_end_block=$((batch_start_block + batch_size - 1))
-#   batch_end_block=$((batch_end_block > end_block ? end_block : batch_end_block))
 
     padded_batch_start_block=`printf "%08d" ${batch_start_block}`
     padded_batch_end_block=`printf "%08d" ${batch_end_block}`
@@ -98,8 +90,8 @@ while [ 1 ] ; do
 
     blocks_file=${blocks_output_dir}/blocks_${file_name_suffix}.csv
     transactions_file=${transactions_output_dir}/transactions_${file_name_suffix}.csv
-    log "Exporting blocks ${block_range} to ${blocks_file}"
-    log "Exporting transactions from blocks ${block_range} to ${transactions_file}"
+    log "Exporting blocks on ${start_date} (${block_range}) to ${blocks_file}"
+    log "Exporting transactions from blocks on ${start_date} (${block_range}) to ${transactions_file}"
     python3 export_blocks_and_transactions.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
@@ -109,7 +101,7 @@ while [ 1 ] ; do
     mkdir -p ${token_transfers_output_dir};
 
     token_transfers_file=${token_transfers_output_dir}/token_transfers_${file_name_suffix}.csv
-    log "Exporting ERC20 transfers from blocks ${block_range} to ${token_transfers_file}"
+    log "Exporting token transfers from blocks on ${start_date} (${block_range}) to ${token_transfers_file}"
     python3 export_token_transfers.py --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --output=${token_transfers_file}
     quit_if_returned_error
 
@@ -131,7 +123,7 @@ while [ 1 ] ; do
 
     receipts_file=${receipts_output_dir}/receipts_${file_name_suffix}.csv
     logs_file=${logs_output_dir}/logs_${file_name_suffix}.csv
-    log "Exporting receipts and logs from blocks ${block_range} to ${receipts_file} and ${logs_file}"
+    log "Exporting receipts and logs from blocks on ${start_date} (${block_range}) to ${receipts_file} and ${logs_file}"
     python3 export_receipts_and_logs.py --transaction-hashes ${transaction_hashes_file} --provider-uri="${provider_uri}"  --receipts-output=${receipts_file} --logs-output=${logs_file}
     quit_if_returned_error
 
@@ -149,7 +141,7 @@ while [ 1 ] ; do
     mkdir -p ${contracts_output_dir};
     
     contracts_file=${contracts_output_dir}/contracts_${file_name_suffix}.csv
-    log "Exporting contracts from blocks ${block_range} to ${contracts_file}"
+    log "Exporting contracts from blocks on ${start_date} (${block_range}) to ${contracts_file}"
     python3 export_contracts.py --contract-addresses ${contract_addresses_file} --provider-uri="${provider_uri}" --output=${contracts_file}
     quit_if_returned_error
 
@@ -167,14 +159,14 @@ while [ 1 ] ; do
     mkdir -p ${tokens_output_dir}
     
     tokens_file=${tokens_output_dir}/tokens_${file_name_suffix}.csv
-    log "Exporting tokens from blocks ${block_range} to ${tokens_file}"
+    log "Exporting tokens from blocks on ${start_date} (${block_range}) to ${tokens_file}"
     python3 export_tokens.py --token-addresses ${token_addresses_file} --provider-uri="${provider_uri}" --output ${tokens_file}
     quit_if_returned_error
 
     end_time=$(date +%s)
     time_diff=$((end_time-start_time))
 
-    log "Exporting blocks ${block_range} took ${time_diff} seconds"
+    log "Exporting blocks on ${start_date} (${block_range}) took ${time_diff} seconds"
 
     if [ $start_date = $end_date ] ; then
         break
