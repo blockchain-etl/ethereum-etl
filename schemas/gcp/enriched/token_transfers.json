@@ -17,7 +17,7 @@
     {
         "name": "value",
         "type": "STRING",
-        "description": "Amount of tokens transferred (ERC20) / id of the token transferred (ERC721)"
+        "description": "Amount of tokens transferred (ERC20) / id of the token transferred (ERC721). Use safe_cast for casting to NUMERIC or FLOAT64"
     },
     {
         "name": "transaction_hash",
@@ -31,9 +31,22 @@
         "mode": "REQUIRED",
         "description": "Log index in the transaction receipt"
     },
+        {
+        "name": "block_timestamp",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": "The timestamp for when the block was collated"
+    },
     {
         "name": "block_number",
         "type": "INT64",
-        "description": "The block number"
+        "mode": "REQUIRED",
+        "description": "Block number where this transfer was in"
+    },
+    {
+        "name": "block_hash",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": "Hash of the block where this transfer was in"
     }
 ]

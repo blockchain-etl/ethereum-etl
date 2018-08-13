@@ -1,0 +1,4 @@
+Similar to the token_transfers table, the logs table contains data for smart contract events.
+However, it contains all log data, not only ERC20 token transfers.
+This table is generally useful for reporting on any logged event type on the Ethereum blockchain.
+Exported using https://github.com/medvedev1088/ethereum-etl

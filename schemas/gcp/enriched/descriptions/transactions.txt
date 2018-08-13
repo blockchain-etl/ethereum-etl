@@ -1,0 +1,5 @@
+Each block in the blockchain is composed of zero or more transactions.
+Each transaction has a source address, a target address, an amount of Ether transferred, and an array of input bytes.
+This table contains a set of all transactions from all blocks, and contains a block identifier to get associated
+block-specific information associated with each transaction.
+Exported using https://github.com/medvedev1088/ethereum-etl
