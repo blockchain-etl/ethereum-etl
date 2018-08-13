@@ -1,0 +1,5 @@
+Some transactions create smart contracts from their input bytes, and this smart contract is stored at a particular
+32-byte address.
+This table contains a subset of Ethereum addresses that contain contract byte-code, as well as some basic analysis
+of that byte-code.
+Exported using https://github.com/medvedev1088/ethereum-etl
