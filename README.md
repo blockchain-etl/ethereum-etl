@@ -433,35 +433,56 @@ To upload CSVs to BigQuery:
 
 - Sign in to BigQuery https://bigquery.cloud.google.com/
 
-- Create a new dataset called `ethereum`
+- Create a new dataset called `ethereum_blockchain_raw` and `ethereum_blockchain`
 
 - Load the files from the bucket to BigQuery:
 
 ```bash
 > cd ethereum-etl
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/blocks.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/transactions.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./schemas/gcp/token_transfers.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/receipts.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/logs.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/contracts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./schemas/gcp/tokens.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/raw/blocks.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/raw/transactions.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./schemas/gcp/raw/token_transfers.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/raw/receipts.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/raw/logs.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/raw/contracts.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum_blockchain_raw.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./schemas/gcp/raw/tokens.json
 ```
 
 Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the columns with lists.
 
-Join `transactions` and `receipts`:
+Enrich `blocks`:
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" --time_partitioning_field timestamp_partition ethereum.transactions_join_receipts ./schemas/gcp/transactions_join_receipts.json
-> bq --location=US query --replace --destination_table ethereum.transactions_join_receipts --use_legacy_sql=false "$(cat ./schemas/gcp/transactions_join_receipts.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/blocks.txt | tr '\n' ' ')" --time_partitioning_field timestamp ethereum_blockchain.blocks ./schemas/gcp/enriched/blocks.json
+> bq --location=US query --destination_table ethereum_blockchain.blocks --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/blocks.sql | tr '\n' ' ')"
 ```
 
-Deduplicate `tokens`:
+Enrich `transactions`:
 
 ```bash
-> bq mk --table --description "Exported using https://github.com/medvedev1088/ethereum-etl" ethereum.tokens ./schemas/gcp/tokens.json
-> bq --location=US query --replace --destination_table ethereum.tokens --use_legacy_sql=false "$(cat ./schemas/gcp/tokens_deduplicate.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/transactions.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.transactions ./schemas/gcp/enriched/transactions.json
+> bq --location=US query --destination_table ethereum_blockchain.transactions --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/transactions.sql | tr '\n' ' ')"
+```
+
+Enrich `token_transfers`:
+
+```bash
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/token_transfers.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.token_transfers ./schemas/gcp/enriched/token_transfers.json
+> bq --location=US query --destination_table ethereum_blockchain.token_transfers --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/token_transfers.sql | tr '\n' ' ')"
+```
+
+Enrich `logs`:
+
+```bash
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/logs.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.logs ./schemas/gcp/enriched/logs.json
+> bq --location=US query --destination_table ethereum_blockchain.logs --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/logs.sql | tr '\n' ' ')"
+```
+
+Enrich `tokens`:
+
+```bash
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/tokens.txt | tr '\n' ' ')" ethereum_blockchain.tokens ./schemas/gcp/enriched/tokens.json
+> bq --location=US query --destination_table ethereum_blockchain.tokens --destination_schema ./schemas/gcp/enriched/tokens.json --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/tokens.sql | tr '\n' ' ')"
 ```
 
 ### Public Dataset

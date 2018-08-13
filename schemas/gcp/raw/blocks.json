@@ -30,7 +30,7 @@
     {
         "name": "logs_bloom",
         "type": "STRING",
-        "description": "The bloom filter for the logs of the block."
+        "description": "The bloom filter for the logs of the block"
     },
     {
         "name": "transactions_root",
@@ -85,6 +85,7 @@
     {
         "name": "timestamp",
         "type": "INT64",
+        "mode": "REQUIRED",
         "description": "The unix timestamp for when the block was collated"
     },
     {
