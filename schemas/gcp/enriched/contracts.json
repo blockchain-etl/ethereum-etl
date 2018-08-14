@@ -26,7 +26,7 @@
         "type": "BOOLEAN",
         "description": "Whether this contract is an ERC721 contract"
     },
-        {
+    {
         "name": "block_timestamp",
         "type": "TIMESTAMP",
         "mode": "REQUIRED",

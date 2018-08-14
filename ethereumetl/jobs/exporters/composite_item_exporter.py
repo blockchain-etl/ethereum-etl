@@ -68,4 +68,5 @@ class CompositeItemExporter:
         for item_type, file in self.file_mapping.items():
             close_silently(file)
             counter = self.counter_mapping[item_type]
-            self.logger.info('{} items exported: {}'.format(item_type, counter.increment() - 1))
+            if counter is not None:
+                self.logger.info('{} items exported: {}'.format(item_type, counter.increment() - 1))

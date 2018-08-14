@@ -478,6 +478,13 @@ Enrich `logs`:
 > bq --location=US query --destination_table ethereum_blockchain.logs --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/logs.sql | tr '\n' ' ')"
 ```
 
+Enrich `contracts`:
+
+```bash
+> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/contracts.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.contracts ./schemas/gcp/enriched/contracts.json
+> bq --location=US query --destination_table ethereum_blockchain.contracts --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/contracts.sql | tr '\n' ' ')"
+```
+
 Enrich `tokens`:
 
 ```bash
