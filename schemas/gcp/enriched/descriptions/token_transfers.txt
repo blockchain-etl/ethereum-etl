@@ -2,4 +2,4 @@ The most popular type of transaction on the Ethereum blockchain invokes a contra
 transfer operation, moving some number of tokens from one 20-byte address to another 20-byte address.
 This table contains the subset of those transactions and has further processed and denormalized the data to make it
 easier to consume for analysis of token transfer events.
-Exported using https://github.com/medvedev1088/ethereum-etl
+Data is exported using https://github.com/medvedev1088/ethereum-etl

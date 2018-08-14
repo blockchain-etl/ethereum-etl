@@ -44,6 +44,6 @@
     {
         "name": "status",
         "type": "INT64",
-        "description": "Either 1 (success) or 0 (failure)"
+        "description": "Either 1 (success) or 0 (failure) (post Byzantium)"
     }
 ]
