@@ -71,13 +71,13 @@
     {
         "name": "receipt_status",
         "type": "INT64",
-        "description": "Either 1 (success) or 0 (failure)"
+        "description": "Either 1 (success) or 0 (failure) (post Byzantium)"
     },
         {
         "name": "block_timestamp",
         "type": "TIMESTAMP",
         "mode": "REQUIRED",
-        "description": "The timestamp for when the block was collated"
+        "description": "Timestamp of the block where this transaction was in"
     },
     {
         "name": "block_number",

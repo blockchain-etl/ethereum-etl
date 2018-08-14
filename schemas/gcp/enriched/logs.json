@@ -37,7 +37,7 @@
         "name": "block_timestamp",
         "type": "TIMESTAMP",
         "mode": "REQUIRED",
-        "description": "The timestamp for when the block was collated"
+        "description": "Timestamp of the block where this log was in"
     },
     {
         "name": "block_number",

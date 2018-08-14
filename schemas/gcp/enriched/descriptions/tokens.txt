@@ -1,2 +1,2 @@
 Token data.
-Exported using https://github.com/medvedev1088/ethereum-etl
+Data is exported using https://github.com/medvedev1088/ethereum-etl
