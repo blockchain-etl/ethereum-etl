@@ -151,7 +151,7 @@ name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
 
-You can find column descriptions in [schemas/gcp](schemas/gcp)
+You can find column descriptions in [https://github.com/medvedev1088/ethereum-export-pipeline](https://github.com/medvedev1088/ethereum-export-pipeline/tree/master/ethereumetl/airflow_dags/resources/stages/raw/schemas)
 
 Note: `symbol`, `name`, `decimals`, `total_supply` 
 columns in `tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
@@ -438,14 +438,15 @@ To upload CSVs to BigQuery:
 - Load the files from the bucket to BigQuery:
 
 ```bash
-> cd ethereum-etl
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/raw/blocks.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/raw/transactions.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./schemas/gcp/raw/token_transfers.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/raw/receipts.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/raw/logs.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/raw/contracts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum_blockchain_raw.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./schemas/gcp/raw/tokens.json
+> git clone https://github.com/medvedev1088/ethereum-export-pipeline.git
+> cd ethereum-export-pipeline/ethereumetl/airflow_dags/resources/stages
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./raw/schemas/blocks.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./raw/schemas/transactions.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./raw/schemas/token_transfers.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./raw/schemas/receipts.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./raw/schemas/logs.json
+> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./raw/schemas/contracts.json
+> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum_blockchain_raw.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./raw/schemas/tokens.json
 ```
 
 Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the columns with lists.
@@ -453,43 +454,43 @@ Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the column
 Enrich `blocks`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/blocks.txt | tr '\n' ' ')" --time_partitioning_field timestamp ethereum_blockchain.blocks ./schemas/gcp/enriched/blocks.json
-> bq --location=US query --destination_table ethereum_blockchain.blocks --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/blocks.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/blocks.txt | tr '\n' ' ')" --time_partitioning_field timestamp ethereum_blockchain.blocks ./enrich/schemas/blocks.json
+> bq --location=US query --destination_table ethereum_blockchain.blocks --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/blocks.sql | tr '\n' ' ')"
 ```
 
 Enrich `transactions`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/transactions.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.transactions ./schemas/gcp/enriched/transactions.json
-> bq --location=US query --destination_table ethereum_blockchain.transactions --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/transactions.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/transactions.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.transactions ./enrich/schemas/transactions.json
+> bq --location=US query --destination_table ethereum_blockchain.transactions --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/transactions.sql | tr '\n' ' ')"
 ```
 
 Enrich `token_transfers`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/token_transfers.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.token_transfers ./schemas/gcp/enriched/token_transfers.json
-> bq --location=US query --destination_table ethereum_blockchain.token_transfers --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/token_transfers.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/token_transfers.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.token_transfers ./enrich/schemas/token_transfers.json
+> bq --location=US query --destination_table ethereum_blockchain.token_transfers --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/token_transfers.sql | tr '\n' ' ')"
 ```
 
 Enrich `logs`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/logs.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.logs ./schemas/gcp/enriched/logs.json
-> bq --location=US query --destination_table ethereum_blockchain.logs --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/logs.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/logs.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.logs ./enrich/schemas/logs.json
+> bq --location=US query --destination_table ethereum_blockchain.logs --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/logs.sql | tr '\n' ' ')"
 ```
 
 Enrich `contracts`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/contracts.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.contracts ./schemas/gcp/enriched/contracts.json
-> bq --location=US query --destination_table ethereum_blockchain.contracts --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/contracts.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/contracts.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.contracts ./enrich/schemas/contracts.json
+> bq --location=US query --destination_table ethereum_blockchain.contracts --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/contracts.sql | tr '\n' ' ')"
 ```
 
 Enrich `tokens`:
 
 ```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/tokens.txt | tr '\n' ' ')" ethereum_blockchain.tokens ./schemas/gcp/enriched/tokens.json
-> bq --location=US query --destination_table ethereum_blockchain.tokens --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/tokens.sql | tr '\n' ' ')"
+> bq mk --table --description "$(cat ./enrich/schemas/descriptions/tokens.txt | tr '\n' ' ')" ethereum_blockchain.tokens ./enrich/schemas/tokens.json
+> bq --location=US query --destination_table ethereum_blockchain.tokens --use_legacy_sql=false "$(cat ./enrich/schemas/sqls/tokens.sql | tr '\n' ' ')"
 ```
 
 ### Public Dataset
