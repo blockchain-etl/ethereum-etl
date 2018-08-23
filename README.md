@@ -422,17 +422,6 @@ Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructio
 
 ### Public Dataset
 
-You can query the data that I exported in the public BigQuery dataset
+You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
-### SQL for Blockchain
-
-I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:
-
-- Built on top of AWS, cost efficient
-- Can provide access to raw CSV data if needed
-- Support for internal transactions in the future
-- Support for Bitcoin and other blockchains in the future
-- ERC20 token metrics in the future
-
-Contact me if you would like to contribute evge.medvedev@gmail.com
