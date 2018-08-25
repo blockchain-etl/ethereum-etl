@@ -8,7 +8,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS logs (
     data STRING,
     topics STRING
 )
-PARTITIONED BY (year int, month, int, day int)
+PARTITIONED BY (year STRING, month, STRING, day STRING)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
