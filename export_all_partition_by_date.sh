@@ -37,9 +37,9 @@ quit_if_returned_error() {
     fi
 }
 
-usage() { echo "Usage: $0 -s <start_date> -e <end_date> -p <provider_uri> [-o <output_dir>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -s <start_date> -e <end_date> -p <provider_uri> [-o <output_dir>] [-t <timezone_offset>]" 1>&2; exit 1; }
 
-while getopts ":s:e:b:p:o:" opt; do
+while getopts ":s:e:b:p:o:t" opt; do
     case "${opt}" in
         s)
             start_date=${OPTARG}
@@ -52,6 +52,9 @@ while getopts ":s:e:b:p:o:" opt; do
             ;;
         o)
             output_dir=${OPTARG}
+            ;;
+        t)
+            timezone_offset=${OPTARG}
             ;;
         *)
             usage
@@ -66,7 +69,7 @@ fi
 
 while [ 1 ] ; do
 
-    block_range=$(python3 get_block_range_for_date.py -d $start_date --provider-uri="${provider_uri}") \
+    block_range=$(python3 get_block_range_for_date.py -d $start_date -t $timezone_offset --provider-uri="${provider_uri}") \
     && block_range_array=(${block_range//,/ }) \
     && batch_start_block=${block_range_array[0]} && batch_end_block=${block_range_array[1]}
     quit_if_returned_error
