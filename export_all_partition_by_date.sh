@@ -69,7 +69,7 @@ fi
 
 while [ 1 ] ; do
 
-    block_range=$(python3 get_block_range_for_date.py -d $start_date --provider-uri="${provider_uri}"  -t="${timezone_offset}" ) \
+    block_range=$(python3 get_block_range_for_date.py -d $start_date --provider-uri="${provider_uri}"  --timezone="${timezone_offset}" ) \
     && block_range_array=(${block_range//,/ }) \
     && batch_start_block=${block_range_array[0]} && batch_end_block=${block_range_array[1]}
     quit_if_returned_error
