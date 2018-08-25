@@ -5,7 +5,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS tokens (
     decimals BIGINT,
     total_supply DECIMAL(38,0)
 )
-PARTITIONED BY (date STRING)
+PARTITIONED BY (year int, month, int, day int)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
