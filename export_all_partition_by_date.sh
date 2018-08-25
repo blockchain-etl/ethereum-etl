@@ -39,7 +39,7 @@ quit_if_returned_error() {
 
 usage() { echo "Usage: $0 -s <start_date> -e <end_date> -p <provider_uri> [-o <output_dir>] [-t <timezone_offset>]" 1>&2; exit 1; }
 
-while getopts ":s:e:b:p:o:t" opt; do
+while getopts ":s:e:p:o:t:" opt; do
     case "${opt}" in
         s)
             start_date=${OPTARG}
