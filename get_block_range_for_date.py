@@ -48,7 +48,7 @@ provider = get_provider_from_uri(args.provider_uri)
 web3 = Web3(provider)
 eth_service = EthService(web3)
 
-start_block, end_block = eth_service.get_block_range_for_date(args.date, args.offset)
+start_block, end_block = eth_service.get_block_range_for_date(args.date, args.timezone)
 
 with smart_open(args.output, 'w') as output_file:
     output_file.write('{},{}\n'.format(start_block, end_block))
