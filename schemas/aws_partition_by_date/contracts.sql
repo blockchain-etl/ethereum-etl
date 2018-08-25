@@ -5,7 +5,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS contracts (
     is_erc20 BOOLEAN,
     is_erc721 BOOLEAN
 )
-PARTITIONED BY (YEAR STRING, MONTH STRING, DAY STRING)
+PARTITIONED BY (year STRING, month STRING, day STRING)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',

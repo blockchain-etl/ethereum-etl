@@ -11,7 +11,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS transactions (
     gas_price BIGINT,
     input STRING
 )
-PARTITIONED BY (YEAR STRING, MONTH STRING, DAY STRING)
+PARTITIONED BY (year STRING, month STRING, day STRING)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     'serialization.format' = ',',
