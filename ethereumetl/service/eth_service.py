@@ -31,9 +31,9 @@ class EthService(object):
         graph = BlockTimestampGraph(web3)
         self._graph_operations = GraphOperations(graph)
 
-    def get_block_range_for_date(self, date, timezone):
-        start_datetime = datetime.combine(date, datetime.min.time(), tzinfo=timezone(timedelta(hours=int(timezone[:-3]), minutes=int(timezone[-2:]))))
-        end_datetime = datetime.combine(date, datetime.max.time(), tzinfo=timezone(timedelta(hours=int(timezone[:-3]), minutes=int(timezone[-2:]))))
+    def get_block_range_for_date(self, date, tz_offset):
+        start_datetime = datetime.combine(date, datetime.min.time(), tzinfo=timezone(timedelta(hours=int(tz_offset[:-3]), minutes=int(tz_offset[-2:]))))
+        end_datetime = datetime.combine(date, datetime.max.time(), tzinfo=timezone(timedelta(hours=int(tz_offset[:-3]), minutes=int(tz_offset[-2:]))))
         return self.get_block_range_for_timestamps(start_datetime.timestamp(), end_datetime.timestamp())
 
     def get_block_range_for_timestamps(self, start_timestamp, end_timestamp):
