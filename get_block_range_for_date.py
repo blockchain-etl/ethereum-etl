@@ -40,6 +40,7 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io',
 parser.add_argument('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
                     help='The date e.g. 2018-01-01.')
 parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+parser.add_argument('-t', '--timezone', default='UTC', type=str, help='The Time zone. If not specified UTC(0) is used.')
 
 args = parser.parse_args()
 

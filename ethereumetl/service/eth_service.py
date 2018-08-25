@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from ethereumetl.service.graph_operations import GraphOperations, OutOfBoundsError, Point
 
@@ -31,9 +31,9 @@ class EthService(object):
         graph = BlockTimestampGraph(web3)
         self._graph_operations = GraphOperations(graph)
 
-    def get_block_range_for_date(self, date):
-        start_datetime = datetime.combine(date, datetime.min.time(), tzinfo=timezone.utc)
-        end_datetime = datetime.combine(date, datetime.max.time(), tzinfo=timezone.utc)
+    def get_block_range_for_date(self, date, offset):
+        start_datetime = datetime.combine(date, datetime.min.time(), tzinfo=timezone(timedelta(hours=offset[:-3], minutes=offset[-2:])))
+        end_datetime = datetime.combine(date, datetime.max.time(), tzinfo=timezone(timedelta(hours=offset[:-3], minutes=offset[-2:])))
         return self.get_block_range_for_timestamps(start_datetime.timestamp(), end_datetime.timestamp())
 
     def get_block_range_for_timestamps(self, start_timestamp, end_timestamp):
