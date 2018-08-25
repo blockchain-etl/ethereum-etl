@@ -78,7 +78,7 @@ while [ 1 ] ; do
     block_range=${padded_batch_start_block}-${padded_batch_end_block}
     file_name_suffix=${padded_batch_start_block}_${padded_batch_end_block}
     # Hive style partitioning
-    partition_dir=/date=${start_date}
+    partition_dir=/year="${start_date:0:4}"/month="${start_date:5:2}"/day="${start_date:8:2}"
 
     ### blocks_and_transactions
 
