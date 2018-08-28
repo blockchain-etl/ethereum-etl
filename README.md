@@ -151,7 +151,7 @@ name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
 
-You can find column descriptions in [schemas/gcp](schemas/gcp)
+You can find column descriptions in [https://github.com/medvedev1088/ethereum-export-pipeline](https://github.com/medvedev1088/ethereum-export-pipeline/tree/master/ethereumetl/airflow_dags/resources/stages/raw/schemas)
 
 Note: `symbol`, `name`, `decimals`, `total_supply` 
 columns in `tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
@@ -418,93 +418,10 @@ so values greater than 38 decimals will be null.
 
 ## Querying in Google BigQuery
 
-To upload CSVs to BigQuery:
-
-- Install Google Cloud SDK https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
-
-- Create a new Google Storage bucket https://console.cloud.google.com/storage/browser
-
-- Upload the files:
-
-```bash
-> cd output
-> gsutil -m rsync -r . gs://<your_bucket>/ethereumetl/export
-```
-
-- Sign in to BigQuery https://bigquery.cloud.google.com/
-
-- Create a new dataset called `ethereum_blockchain_raw` and `ethereum_blockchain`
-
-- Load the files from the bucket to BigQuery:
-
-```bash
-> cd ethereum-etl
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.blocks gs://<your_bucket>/ethereumetl/export/blocks/*.csv ./schemas/gcp/raw/blocks.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.transactions gs://<your_bucket>/ethereumetl/export/transactions/*.csv ./schemas/gcp/raw/transactions.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.token_transfers gs://<your_bucket>/ethereumetl/export/token_transfers/*.csv ./schemas/gcp/raw/token_transfers.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 ethereum_blockchain_raw.receipts gs://<your_bucket>/ethereumetl/export/receipts/*.csv ./schemas/gcp/raw/receipts.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.logs gs://<your_bucket>/ethereumetl/export/logs/*.json ./schemas/gcp/raw/logs.json
-> bq --location=US load --replace --source_format=NEWLINE_DELIMITED_JSON ethereum_blockchain_raw.contracts gs://<your_bucket>/ethereumetl/export/contracts/*.json ./schemas/gcp/raw/contracts.json
-> bq --location=US load --replace --source_format=CSV --skip_leading_rows=1 --allow_quoted_newlines ethereum_blockchain_raw.tokens_duplicates gs://<your_bucket>/ethereumetl/export/tokens/*.csv ./schemas/gcp/raw/tokens.json
-```
-
-Note that NEWLINE_DELIMITED_JSON is used to support REPEATED mode for the columns with lists.
-
-Enrich `blocks`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/blocks.txt | tr '\n' ' ')" --time_partitioning_field timestamp ethereum_blockchain.blocks ./schemas/gcp/enriched/blocks.json
-> bq --location=US query --destination_table ethereum_blockchain.blocks --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/blocks.sql | tr '\n' ' ')"
-```
-
-Enrich `transactions`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/transactions.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.transactions ./schemas/gcp/enriched/transactions.json
-> bq --location=US query --destination_table ethereum_blockchain.transactions --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/transactions.sql | tr '\n' ' ')"
-```
-
-Enrich `token_transfers`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/token_transfers.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.token_transfers ./schemas/gcp/enriched/token_transfers.json
-> bq --location=US query --destination_table ethereum_blockchain.token_transfers --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/token_transfers.sql | tr '\n' ' ')"
-```
-
-Enrich `logs`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/logs.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.logs ./schemas/gcp/enriched/logs.json
-> bq --location=US query --destination_table ethereum_blockchain.logs --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/logs.sql | tr '\n' ' ')"
-```
-
-Enrich `contracts`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/contracts.txt | tr '\n' ' ')" --time_partitioning_field block_timestamp ethereum_blockchain.contracts ./schemas/gcp/enriched/contracts.json
-> bq --location=US query --destination_table ethereum_blockchain.contracts --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/contracts.sql | tr '\n' ' ')"
-```
-
-Enrich `tokens`:
-
-```bash
-> bq mk --table --description "$(cat ./schemas/gcp/enriched/descriptions/tokens.txt | tr '\n' ' ')" ethereum_blockchain.tokens ./schemas/gcp/enriched/tokens.json
-> bq --location=US query --destination_table ethereum_blockchain.tokens --use_legacy_sql=false "$(cat ./schemas/gcp/enriched/sqls/tokens.sql | tr '\n' ' ')"
-```
+Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
 
 ### Public Dataset
 
-You can query the data that I exported in the public BigQuery dataset
+You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
 
-### SQL for Blockchain
-
-I'm currently working on a SaaS solution for analysts and developers. The MVP will have the following:
-
-- Built on top of AWS, cost efficient
-- Can provide access to raw CSV data if needed
-- Support for internal transactions in the future
-- Support for Bitcoin and other blockchains in the future
-- ERC20 token metrics in the future
-
-Contact me if you would like to contribute evge.medvedev@gmail.com

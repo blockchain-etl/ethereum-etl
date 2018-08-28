@@ -1,5 +1,0 @@
-The most popular type of transaction on the Ethereum blockchain invokes a contract of type ERC20 to perform a
-transfer operation, moving some number of tokens from one 20-byte address to another 20-byte address.
-This table contains the subset of those transactions and has further processed and denormalized the data to make it
-easier to consume for analysis of token transfer events.
-Data is exported using https://github.com/medvedev1088/ethereum-etl
