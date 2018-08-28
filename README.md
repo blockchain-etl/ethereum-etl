@@ -242,6 +242,7 @@ Additional steps:
 - [export_contracts.py](#export_contractspy)
 - [export_tokens.py](#export_tokenspy)
 - [get_block_range_for_date.py](#get_block_range_for_datepy)
+- [get_keccak_hash.py](#get_keccak_hashpy)
 
 All the commands accept `-h` parameter for help, e.g.:
 
@@ -369,6 +370,13 @@ https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
 ```bash
 > python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io --date 2018-01-01
 4832686,4838611
+```
+
+##### get_keccak_hash.py
+
+```bash
+> python get_keccak_hash.py -i "transfer(address,uint256)"
+0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
 
 #### Running Tests
