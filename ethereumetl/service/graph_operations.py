@@ -55,12 +55,13 @@ class GraphOperations(object):
             if start.y >= end.y:
                 raise ValueError('y must increase strictly monotonically')
 
+            # Interpolation Search https://en.wikipedia.org/wiki/Interpolation_search, O(log(log(n)) average case.
+            # Improvements for worst case:
             # Find the 1st estimation by linear interpolation from start and end points.
             # If the 1st estimation is below the needed y coordinate (graph is concave),
             # drop the next estimation by interpolating with the start and 1st estimation point (likely will be above the needed y).
             # If 1st estimation is above the needed y coordinate (graph is convex),
             # drop the next estimation by interpolating with the 1st estimation and end point (likely will be below the needed y.
-            # Still runs in log(n) time but about 2-3 times faster than the naive dichotomy method.
 
             estimation1_x = interpolate(start, end, y)
             estimation1_x = bound(estimation1_x, (start.x, end.x))
