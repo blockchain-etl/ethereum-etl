@@ -31,7 +31,7 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
 --provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
-Read this article https://medium.com/@medvedev1088/exporting-and-analyzing-ethereum-blockchain-f5353414a94e
+[LIMITATIONS](#limitations)
 
 ## Table of Contents
 
@@ -153,12 +153,22 @@ total_supply                 | numeric     |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-export-pipeline](https://github.com/medvedev1088/ethereum-export-pipeline/tree/master/ethereumetl/airflow_dags/resources/stages/raw/schemas)
 
-Note: `symbol`, `name`, `decimals`, `total_supply` 
-columns in `tokens.csv` can have empty values in case the contract doesn't implement the corresponding methods
-or implements it incorrectly (e.g. wrong return type). 
-
 Note: for the `address` type all hex characters are lower-cased. 
 `boolean` type can have 2 values: `True` or `False`.
+
+## LIMITATIONS
+
+- `contracts.csv` and `tokens.csv` files don’t include contracts created by message calls (a.k.a. internal transactions). 
+We are working on adding support for those.
+- In case the contract is a proxy, which forwards all calls to a delegate, interface detection doesn’t work,
+which means `is_erc20` and `is_erc721` will always be false for proxy contracts.
+- The metadata methods (`symbol`, `name`, `decimals`, `total_supply`) for ERC20 are optional, so around 10% of the 
+contracts are missing this data. Also some contracts (EOS) implement these methods but with wrong return type, 
+so the metadata columns are missing in this case as well.
+- `token_transfers.value`, `tokens.decimals` and `tokens.total_supply` have type `STRING` in BigQuery tables,
+because numeric types there can't handle 32-byte integers.
+
+
 
 ## Exporting the Blockchain
 
@@ -361,9 +371,6 @@ Then export ERC20 / ERC721 tokens:
 ```
 
 You can tune `--max-workers` for performance.
-
-Upvote this pull request to make tokens export faster 
-https://github.com/ethereum/web3.py/pull/944#issuecomment-403957468
 
 ##### get_block_range_for_date.py
 
