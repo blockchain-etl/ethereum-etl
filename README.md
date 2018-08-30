@@ -166,7 +166,9 @@ which means `is_erc20` and `is_erc721` will always be false for proxy contracts.
 contracts are missing this data. Also some contracts (EOS) implement these methods but with wrong return type, 
 so the metadata columns are missing in this case as well.
 - `token_transfers.value`, `tokens.decimals` and `tokens.total_supply` have type `STRING` in BigQuery tables,
-because numeric types there can't handle 32-byte integers.
+because numeric types there can't handle 32-byte integers. You should use 
+`cast(value as FLOAT64)` (possible loss of precision) or
+`safe_cast(value as NUMERIC)` (possible overflow) to convert to numbers.
 
 
 
