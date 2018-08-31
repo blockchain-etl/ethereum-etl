@@ -151,7 +151,7 @@ name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
 
-You can find column descriptions in [https://github.com/medvedev1088/ethereum-export-pipeline](https://github.com/medvedev1088/ethereum-export-pipeline/tree/master/ethereumetl/airflow_dags/resources/stages/raw/schemas)
+You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
 Note: for the `address` type all hex characters are lower-cased. 
 `boolean` type can have 2 values: `True` or `False`.
