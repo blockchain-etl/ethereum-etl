@@ -64,6 +64,7 @@ def write_last_synced_block(file, last_synced_block):
 
 
 max_batch_size = 10
+sleep_seconds = 10
 
 last_synced_block = read_last_synced_block(args.last_synced_block_file)
 web3 = Web3(get_provider_from_uri(args.provider_uri))
@@ -81,8 +82,8 @@ while True:
             current_block, target_block, last_synced_block, blocks_to_sync))
 
         if blocks_to_sync == 0:
-            logging.info('Nothing to sync. Sleeping...')
-            time.sleep(10)
+            logging.info('Nothing to sync. Sleeping {} seconds...'.format(sleep_seconds))
+            time.sleep(sleep_seconds)
             continue
 
         # Export blocks and transactions
@@ -139,4 +140,5 @@ while True:
         logging.info('An exception occurred {}'.format(repr(e)))
 
     if blocks_to_sync != max_batch_size:
-        time.sleep(10)
+        logging.info('Sleeping {} seconds...'.format(sleep_seconds))
+        time.sleep(sleep_seconds)
