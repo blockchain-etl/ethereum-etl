@@ -169,6 +169,9 @@ so the metadata columns are missing in this case as well.
 because numeric types there can't handle 32-byte integers. You should use 
 `cast(value as FLOAT64)` (possible loss of precision) or
 `safe_cast(value as NUMERIC)` (possible overflow) to convert to numbers.
+- The contracts that don't implement `decimals()` function but have the 
+[fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) that returns a `boolean`
+will have `0` or `1` in the `decimals` column in the CSVs.
 
 
 
@@ -186,9 +189,7 @@ export the data ~40 times faster, you will need to set up a local Ethereum node:
 Make sure it downloaded the blocks that you need by executing `eth.syncing` in the JS console.
 You can export blocks below `currentBlock`, 
 there is no need to wait until the full sync as the state is not needed (unless you also need contracts bytecode 
-and token details).
-You can export blocks below `currentBlock`,
-there is no need to wait until the full sync as the state is not needed.
+and token details; for those you need to wait until the full sync).
 
 1. Clone Ethereum ETL and install the dependencies:
 
