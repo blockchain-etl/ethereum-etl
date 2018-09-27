@@ -247,7 +247,7 @@ while True:
         token_transfers = token_transfers_item_exporter.get_items('token_transfer')
 
         enriched_transactions = enrich_transactions(blocks, transactions, receipts)
-        if len(enriched_transactions) == len(transactions):
+        if len(enriched_transactions) != len(transactions):
             raise ValueError('The number of transactions is wrong ' + str(enriched_transactions))
         enriched_logs = enrich_logs(blocks, logs)
         if len(enriched_logs) != len(logs):
