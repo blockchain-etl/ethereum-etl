@@ -1,0 +1,17 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: $CIRCLE_PROJECT_REPONAME
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: $CIRCLE_PROJECT_REPONAME
+    spec:
+      containers:
+      - name: $CIRCLE_PROJECT_REPONAME
+        image: ${REPO}/$CIRCLE_PROJECT_REPONAME:${CIRCLE_SHA1}
+        env:
+        - name: TEST_VAR
+          value: "5"
