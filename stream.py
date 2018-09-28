@@ -101,6 +101,7 @@ def enrich_transactions(blocks, transactions, receipts):
     transactions_and_receipts = join(
         transactions, receipts, ('hash', 'transaction_hash'),
         left_fields=[
+            'type',
             'hash',
             'nonce',
             'transaction_index',
@@ -123,6 +124,7 @@ def enrich_transactions(blocks, transactions, receipts):
     result = join(
         transactions_and_receipts, blocks, ('block_number', 'number'),
         [
+            'type',
             'hash',
             'nonce',
             'transaction_index',
@@ -145,6 +147,7 @@ def enrich_logs(blocks, logs):
     result = join(
         logs, blocks, ('block_number', 'number'),
         [
+            'type',
             'log_index',
             'transaction_hash',
             'transaction_index',
@@ -164,6 +167,7 @@ def enrich_token_transfers(blocks, token_transfers):
     result = join(
         token_transfers, blocks, ('block_number', 'number'),
         [
+            'type',
             'token_address',
             'from_address',
             'to_address',
