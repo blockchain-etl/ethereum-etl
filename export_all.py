@@ -23,6 +23,7 @@
 
 import argparse
 import csv
+import logging
 import os
 
 from time import time
@@ -48,22 +49,22 @@ from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.file_utils import smart_open
 
 parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
-                                 usage='-s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir>]')
+                                 usage='-s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir> -w <max_workers>]')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
 parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
 parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-o', '--output-dir', required=True, type=str, help='Output directory, partitioned in Hive style.')
+parser.add_argument('-o', '--output-dir', default=None, type=str, help='Output directory, partitioned in Hive style.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 
 args = parser.parse_args()
 
-def log(msg=''):
-    print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} {msg}')
+logger = logging.getLogger(__name__)
+logging_basic_config()
 
-def extract_csv_column(input, output, column):
+def extract_csv_column_unique(input, output, column):
     set_max_field_size_limit()
 
     with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
@@ -99,10 +100,9 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
 
     blocks_file = f'{blocks_output_dir}/blocks_{file_name_suffix}.csv'
     transactions_file = f'{transactions_output_dir}/transactions_{file_name_suffix}.csv'
-    log(f'Exporting blocks {block_range} to {blocks_file}')
-    log(f'Exporting transactions from blocks {block_range} to {transactions_file}')
+    logger.info(f'Exporting blocks {block_range} to {blocks_file}')
+    logger.info(f'Exporting transactions from blocks {block_range} to {transactions_file}')
 
-    logging_basic_config()
     job = ExportBlocksJob(
         start_block=batch_start_block,
         end_block=batch_end_block,
@@ -120,9 +120,8 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
         os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
 
         token_transfers_file = f'{token_transfers_output_dir}/token_transfers_{file_name_suffix}.csv'
-        log(f'Exporting ERC20 transfers from blocks {block_range} to {token_transfers_file}')
+        logger.info(f'Exporting ERC20 transfers from blocks {block_range} to {token_transfers_file}')
 
-        logging_basic_config()
         job = ExportTokenTransfersJob(
             start_block=batch_start_block,
             end_block=batch_end_block,
@@ -137,8 +136,8 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
     os.makedirs(os.path.dirname(transaction_hashes_output_dir), exist_ok=True)
 
     transaction_hashes_file = f'{transaction_hashes_output_dir}/transaction_hashes_{file_name_suffix}.csv'
-    log(f'Extracting hash column from transaction file {transactions_file}')
-    extract_csv_column(transactions_file, transaction_hashes_file, 'hash')
+    logger.info(f'Extracting hash column from transaction file {transactions_file}')
+    extract_csv_column_unique(transactions_file, transaction_hashes_file, 'hash')
 
     receipts_output_dir = f'{args.output_dir}/receipts{partition_dir}'
     os.makedirs(os.path.dirname(receipts_output_dir), exist_ok=True)
@@ -148,9 +147,8 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
 
     receipts_file = f'{receipts_output_dir}/receipts_{file_name_suffix}.csv'
     logs_file = f'{logs_output_dir}/logs_{file_name_suffix}.csv'
-    log(f'Exporting receipts and logs from blocks {block_range} to {receipts_file} and {logs_file}')
+    logger.info(f'Exporting receipts and logs from blocks {block_range} to {receipts_file} and {logs_file}')
 
-    logging_basic_config()
     with smart_open(transaction_hashes_file, 'r') as transaction_hashes:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes),
@@ -167,16 +165,15 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
     os.makedirs(os.path.dirname(contract_addresses_output_dir), exist_ok=True)
 
     contract_addresses_file = f'{contract_addresses_output_dir}/contract_addresses_{file_name_suffix}.csv'
-    log(f'Extracting contract_address from receipt file {receipts_file}')
-    extract_csv_column(receipts_file, contract_addresses_file, 'contract_address')
+    logger.info(f'Extracting contract_address from receipt file {receipts_file}')
+    extract_csv_column_unique(receipts_file, contract_addresses_file, 'contract_address')
 
     contracts_output_dir = f'{args.output_dir}/contracts{partition_dir}'
     os.makedirs(os.path.dirname(contracts_output_dir), exist_ok=True)
 
     contracts_file = f'{contracts_output_dir}/contracts_{file_name_suffix}.csv'
-    log(f'Exporting contracts from blocks {block_range} to {contracts_file}')
+    logger.info(f'Exporting contracts from blocks {block_range} to {contracts_file}')
 
-    logging_basic_config()
     with smart_open(contract_addresses_file, 'r') as contract_addresses_file:
         contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                               if contract_address.strip())
@@ -194,16 +191,15 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
         os.makedirs(os.path.dirname(token_addresses_output_dir), exist_ok=True)
 
         token_addresses_file = f'{token_addresses_output_dir}/token_addresses_{file_name_suffix}'
-        log(f'Extracting token_address from token_transfers file {token_transfers_file}')
-        extract_csv_column(token_transfers_file, token_addresses_file, 'token_address')
+        logger.info(f'Extracting token_address from token_transfers file {token_transfers_file}')
+        extract_csv_column_unique(token_transfers_file, token_addresses_file, 'token_address')
 
         tokens_output_dir = f'{args.output_dir}/tokens{partition_dir}'
         os.makedirs(os.path.dirname(tokens_output_dir), exist_ok=True)
 
         tokens_file = f'{tokens_output_dir}/tokens_{file_name_suffix}.csv'
-        log(f'Exporting tokens from blocks {block_range} to {tokens_file}')
+        logger.info(f'Exporting tokens from blocks {block_range} to {tokens_file}')
 
-        logging_basic_config()
         with smart_open(token_addresses_file, 'r') as token_addresses:
             job = ExportTokensJob(
                 token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
@@ -215,4 +211,4 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
     ### finish
     end_time = time()
     time_diff = round(end_time - start_time, 5)
-    log(f'Exporting blocks {block_range} took {time_diff} seconds')
+    logger.info(f'Exporting blocks {block_range} took {time_diff} seconds')
