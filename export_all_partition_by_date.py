@@ -50,7 +50,7 @@ from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.file_utils import smart_open
 
 parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
-                                 usage='-s <start_date> -e <end_date> -p <provider_uri> [-o <output_dir> -w <max_workers>]')
+                                 usage='-s <start_date> -e <end_date> -b <batch_size> -p <provider_uri> [-o <output_dir> -w <max_workers>]')
 parser.add_argument('-s', '--start-date', default='2015-07-30', type=str, help='Start date (YYYY-MM-DD)')
 parser.add_argument('-e', '--end-date', required=True, type=str, help='End date (YYYY-MM-DD)')
 parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
