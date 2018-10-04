@@ -48,6 +48,10 @@ logging_basic_config()
 logger = logging.getLogger('export_all')
 
 
+def is_log_filter_supported(provider_uri):
+    return 'infura' not in provider_uri
+
+
 def extract_csv_column_unique(input, output, column):
     set_max_field_size_limit()
 
@@ -65,7 +69,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
     batch_size = 100
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
-        ### start
+        # # # start # # #
+
         start_time = time()
 
         padded_batch_start_block = str(batch_start_block).zfill(8)
@@ -73,7 +78,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
         block_range = f'{padded_batch_start_block}-{padded_batch_end_block}'
         file_name_suffix = f'{padded_batch_start_block}_{padded_batch_end_block}'
 
-        ### blocks_and_transactions
+        # # # blocks_and_transactions # # #
+
         blocks_output_dir = f'{output_dir}/blocks{partition_dir}'
         os.makedirs(os.path.dirname(blocks_output_dir), exist_ok=True)
 
@@ -96,8 +102,10 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
             export_transactions=transactions_file is not None)
         job.run()
 
-        ### token_transfers
-        if 'infura' not in provider_uri:
+        # # # token_transfers # # #
+
+        token_transfers_file = None
+        if is_log_filter_supported(provider_uri):
             token_transfers_output_dir = f'{output_dir}/token_transfers{partition_dir}'
             os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
 
@@ -113,7 +121,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
                 max_workers=max_workers)
             job.run()
 
-        ### receipts_and_logs
+        # # # receipts_and_logs # # #
+
         transaction_hashes_output_dir = f'{output_dir}/transaction_hashes{partition_dir}'
         os.makedirs(os.path.dirname(transaction_hashes_output_dir), exist_ok=True)
 
@@ -142,7 +151,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
                 export_logs=logs_file is not None)
             job.run()
 
-        ### contracts
+        # # # contracts # # #
+
         contract_addresses_output_dir = f'{output_dir}/contract_addresses{partition_dir}'
         os.makedirs(os.path.dirname(contract_addresses_output_dir), exist_ok=True)
 
@@ -167,8 +177,9 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
                 max_workers=max_workers)
             job.run()
 
-        ### tokens
-        if 'infura' not in provider_uri:
+        # # # tokens # # #
+
+        if token_transfers_file is not None:
             token_addresses_output_dir = f'{output_dir}/token_addresses{partition_dir}'
             os.makedirs(os.path.dirname(token_addresses_output_dir), exist_ok=True)
 
@@ -190,7 +201,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers):
                     max_workers=max_workers)
                 job.run()
 
-        ### finish
+        # # # finish # # #
+
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info(f'Exporting blocks {block_range} took {time_diff} seconds')
