@@ -48,20 +48,26 @@ from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.file_utils import smart_open
 
 parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
-                                 usage='-s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir> -w <max_workers>]')
+                                 usage='-s <start_block> -e <end_block> [-b <batch_size>] [-p <provider_uri>] '
+                                       '[-o <output_dir>] [-w <max_workers>]')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
 parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
-parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
+parser.add_argument('-b', '--partition-batch-size', default=10000, type=int,
+                    help='The number of blocks to export in partition.')
 parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
                     help='The URI of the web3 provider e.g. '
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-o', '--output-dir', default=None, type=str, help='Output directory, partitioned in Hive style.')
+parser.add_argument('-o', '--output-dir', default='output', type=str,
+                    help='Output directory, partitioned in Hive style.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 
 args = parser.parse_args()
 
-logger = logging.getLogger(__name__)
 logging_basic_config()
+logger = logging.getLogger('export_all.py')
+
+batch_size = 100
+
 
 def extract_csv_column_unique(input, output, column):
     set_max_field_size_limit()
@@ -76,10 +82,10 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
-for batch_start_block in range(args.start_block, args.end_block, args.batch_size):
+for batch_start_block in range(args.start_block, args.end_block, args.partition_batch_size):
     ### start
     start_time = time()
-    batch_end_block = batch_start_block + args.batch_size - 1
+    batch_end_block = batch_start_block + args.partition_batch_size - 1
     if batch_end_block > args.end_block:
         batch_end_block = args.end_block
 
@@ -105,7 +111,7 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
     job = ExportBlocksJob(
         start_block=batch_start_block,
         end_block=batch_end_block,
-        batch_size=args.batch_size,
+        batch_size=batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
         max_workers=args.max_workers,
         item_exporter=blocks_and_transactions_item_exporter(blocks_file, transactions_file),
@@ -124,7 +130,7 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
         job = ExportTokenTransfersJob(
             start_block=batch_start_block,
             end_block=batch_end_block,
-            batch_size=args.batch_size,
+            batch_size=batch_size,
             web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
             item_exporter=token_transfers_item_exporter(token_transfers_file),
             max_workers=args.max_workers)
@@ -151,7 +157,7 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
     with smart_open(transaction_hashes_file, 'r') as transaction_hashes:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes),
-            batch_size=args.batch_size,
+            batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
             max_workers=args.max_workers,
             item_exporter=receipts_and_logs_item_exporter(receipts_file, logs_file),
@@ -178,7 +184,7 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
                               if contract_address.strip())
         job = ExportContractsJob(
             contract_addresses_iterable=contract_addresses,
-            batch_size=args.batch_size,
+            batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
             item_exporter=contracts_item_exporter(contracts_file),
             max_workers=args.max_workers)

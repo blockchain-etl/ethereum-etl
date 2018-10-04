@@ -177,7 +177,7 @@ will have `0` or `1` in the `decimals` column in the CSVs.
 
 ## Exporting the Blockchain
 
-1. Install python 3.5 or 3.6 https://www.python.org/downloads/
+1. Install python 3.6 https://www.python.org/downloads/ (3.5 and 3.7 are not supported by this tool for now)
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
 For that use `-p https://mainnet.infura.io` option for the commands below. If you need ERC20 transfers or want to
