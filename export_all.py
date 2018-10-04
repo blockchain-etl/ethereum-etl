@@ -27,7 +27,6 @@ import logging
 import os
 
 from time import time
-from datetime import datetime
 from web3 import Web3
 
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
@@ -204,7 +203,7 @@ for batch_start_block in range(args.start_block, args.end_block, args.batch_size
             job = ExportTokensJob(
                 token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
                 web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
-                item_exporter=tokens_item_exporter(token_addresses_file),
+                item_exporter=tokens_item_exporter(tokens_file),
                 max_workers=args.max_workers)
             job.run()
 

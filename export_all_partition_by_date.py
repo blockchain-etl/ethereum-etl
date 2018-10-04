@@ -211,7 +211,7 @@ while start_date <= end_date:
             job = ExportTokensJob(
                 token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
                 web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
-                item_exporter=tokens_item_exporter(token_addresses_file),
+                item_exporter=tokens_item_exporter(tokens_file),
                 max_workers=args.max_workers)
             job.run()
 
