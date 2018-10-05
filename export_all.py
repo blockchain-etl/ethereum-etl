@@ -43,7 +43,7 @@ args = parser.parse_args()
 
 
 def get_partitions():
-    for batch_start_block in range(args.start_block, args.end_block, args.partition_batch_size):
+    for batch_start_block in range(args.start_block, args.end_block + 1, args.partition_batch_size):
         batch_end_block = batch_start_block + args.partition_batch_size - 1
         if batch_end_block > args.end_block:
             batch_end_block = args.end_block
