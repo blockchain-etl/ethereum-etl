@@ -32,7 +32,7 @@ from export_all_common import export_all
 
 parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
                                  usage='-s <start_date> -e <end_date> [-p <provider_uri>] '
-                                       '[-o <output_dir>] [-w <max_workers>]')
+                                       '[-o <output_dir>] [-w <max_workers>] [-B <export_batch_size>]')
 parser.add_argument('-s', '--start-date', default='2015-07-30', type=str, help='Start date (YYYY-MM-DD)')
 parser.add_argument('-e', '--end-date', required=True, type=str, help='End date (YYYY-MM-DD)')
 parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
@@ -40,6 +40,7 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io',
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 parser.add_argument('-o', '--output-dir', default='output', type=str, help='Output directory, partitioned in Hive style.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+parser.add_argument('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
 
 args = parser.parse_args()
 
@@ -63,4 +64,4 @@ def get_partitions():
         start_date += day
 
 
-export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers)
+export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers, args.export_batch_size)

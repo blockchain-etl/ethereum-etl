@@ -26,8 +26,8 @@ import argparse
 from export_all_common import export_all
 
 parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
-                                 usage='-s <start_block> -e <end_block> [-b <batch_size>] [-p <provider_uri>] '
-                                       '[-o <output_dir>] [-w <max_workers>]')
+                                 usage='-s <start_block> -e <end_block> [-b <partition_batch_size>] [-p <provider_uri>] '
+                                       '[-o <output_dir>] [-w <max_workers>] [-B <export_batch_size>]')
 parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
 parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
 parser.add_argument('-b', '--partition-batch-size', default=10000, type=int,
@@ -38,6 +38,7 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io',
 parser.add_argument('-o', '--output-dir', default='output', type=str,
                     help='Output directory, partitioned in Hive style.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+parser.add_argument('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
 
 args = parser.parse_args()
 
@@ -56,4 +57,4 @@ def get_partitions():
         yield batch_start_block, batch_end_block, partition_dir
 
 
-export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers)
+export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers, args.export_batch_size)
