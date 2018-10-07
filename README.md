@@ -163,7 +163,20 @@ total_supply                 | numeric     |
 
 Column                       |    Type     |
 -----------------------------|-------------|
-address                      | address     |
+block_number                 | bigint      |
+block_timestamp              | bigint      |
+hash                         | hex_string  |
+from_address                 | address     |
+to_address                   | address     |
+value                        | numeric     |
+contract_address             | address     |
+input                        | hex_string  |
+transaction_type             | string      |
+gas                          | bigint      |
+gas_used                     | bigint      |
+trace_id                     | ? numeric   |
+is_error                     | boolean     |
+err_code                     | string      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 

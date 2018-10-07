@@ -29,6 +29,7 @@ from ethereumetl.jobs.export_internal_transactions_job import ExportInternalTran
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.jobs.exporters.internal_transactions_item_exporter import internal_transactions_item_exporter
 
 logging_basic_config()
 
@@ -50,6 +51,7 @@ job = ExportInternalTransactionsJob(
     end_block=args.end_block,
     batch_size=args.batch_size,
     web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
+    item_exporter=internal_transactions_item_exporter(args.output),
     max_workers=args.max_workers)
 
 job.run()
