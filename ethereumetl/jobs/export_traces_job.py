@@ -23,10 +23,10 @@
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.utils import validate_range
-from ethereumetl.mappers.internal_transaction_mapper import EthInternalTransactionMapper
+from ethereumetl.mappers.trace_mapper import EthTraceMapper
 
 
-class ExportInternalTransactionsJob(BaseJob):
+class ExportTracesJob(BaseJob):
     def __init__(
             self,
             start_block,
@@ -44,7 +44,7 @@ class ExportInternalTransactionsJob(BaseJob):
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
 
-        self.internal_transaction_mapper = EthInternalTransactionMapper()
+        self.trace_mapper = EthTraceMapper()
 
     def _start(self):
         self.item_exporter.open()
@@ -64,19 +64,12 @@ class ExportInternalTransactionsJob(BaseJob):
             'toBlock': hex(block_number_batch[-1]),
         }
 
-        traces = self.web3.parity.traceFilter(filter_params)
+        json_traces = self.web3.parity.traceFilter(filter_params)
 
-        for trace in traces:
-            # skip reward tracces
-            if trace.get('type', None) == 'reward':
-                continue
-
-            # skip non-internal transactions
-            if not trace.get('traceAddress', []):
-                continue
-
-            internal_transaction = self.internal_transaction_mapper.json_dict_to_internal_transaction(trace)
-            self.item_exporter.export_item(self.internal_transaction_mapper.internal_transaction_to_dict(internal_transaction))
+        for json_trace in json_traces:
+            trace = self.trace_mapper.json_dict_to_trace(json_trace)
+            self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
     def _end(self):
         self.batch_work_executor.shutdown()
+        self.item_exporter.close()

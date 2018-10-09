@@ -21,19 +21,18 @@
 # SOFTWARE.
 
 
-class EthInternalTransaction(object):
+class EthTrace(object):
     def __init__(self):
         self.block_number = None
-        self.block_timestamp = None
-        self.hash = None
+        self.transaction_hash = None
         self.from_address = None
         self.to_address = None
         self.value = None
         self.contract_address = None
         self.input = None
-        self.transaction_type = None
+        self.trace_type = None
         self.gas = None
         self.gas_used = None
-        self.trace_id = None
-        self.is_error = None
-        self.err_code = None
+        self.subtraces = None
+        self.trace_address = None
+        self.error = None
