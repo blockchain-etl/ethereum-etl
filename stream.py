@@ -24,6 +24,7 @@
 import argparse
 import itertools
 import logging
+import os
 import time
 from collections import defaultdict
 
@@ -51,18 +52,30 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io',
                          'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 parser.add_argument('-t', '--topic-path', default='projects/your-project/topics/ethereum_blockchain', type=str,
                     help='Google PubSub topic path')
+parser.add_argument('-s', '--start-block', default=None, type=int, help='Start block')
 
 args = parser.parse_args()
-
-
-def read_last_synced_block(file):
-    with smart_open(file, 'r') as last_synced_block_file:
-        return int(last_synced_block_file.read())
 
 
 def write_last_synced_block(file, last_synced_block):
     with smart_open(file, 'w') as last_synced_block_file:
         return last_synced_block_file.write(str(last_synced_block) + '\n')
+
+
+def init_last_synced_block_file(start_block, last_synced_block_file):
+    if os.path.isfile(last_synced_block_file):
+        raise ValueError(
+            '{} should not exist if --start-block options is specified'.format(last_synced_block_file))
+    write_last_synced_block(last_synced_block_file, start_block)
+
+
+if args.start_block is not None:
+    init_last_synced_block_file(args.start_block, args.last_synced_block_file)
+
+
+def read_last_synced_block(file):
+    with smart_open(file, 'r') as last_synced_block_file:
+        return int(last_synced_block_file.read())
 
 
 def join(left, right, join_fields, left_fields, right_fields):
