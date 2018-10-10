@@ -44,39 +44,44 @@ parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io',
 parser.add_argument('-o', '--output-dir', default='output', type=str,
                     help='Output directory, partitioned in Hive style.')
 parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
+parser.add_argument('-B', '--export-batch-size', default=100, type=int,
+                    help='The number of rows to write concurrently.')
 
 args = parser.parse_args()
 
-def is_date_range():
+
+def is_date_range(start, end):
     """Checks for YYYY-MM-DD date format."""
-    return bool(re.match('^2[0-9]{3}-[0-9]{2}-[0-9]{2}$', args.start) and
-                re.match('^2[0-9]{3}-[0-9]{2}-[0-9]{2}$', args.end))
+    return bool(re.match('^2[0-9]{3}-[0-9]{2}-[0-9]{2}$', start) and
+                re.match('^2[0-9]{3}-[0-9]{2}-[0-9]{2}$', end))
 
-def is_unix_time_range():
+
+def is_unix_time_range(start, end):
     """Checks for Unix timestamp format."""
-    return bool(re.match("^[0-9]{10}$|^[0-9]{13}$", args.start) and
-                re.match("^[0-9]{10}$|^[0-9]{13}$", args.end))
+    return bool(re.match("^[0-9]{10}$|^[0-9]{13}$", start) and
+                re.match("^[0-9]{10}$|^[0-9]{13}$", end))
 
-def is_block_range():
+
+def is_block_range(start, end):
     """Checks for a valid block number."""
-    return (int(args.start) >= 0 and int(args.start) <= 99999999 and
-            int(args.end)   >= 0 and int(args.end)   <= 99999999)
+    return (start.isdigit() and 0 <= int(start) <= 99999999 and
+            end.isdigit() and 0 <= int(end) <= 99999999)
+
 
 def get_partitions():
-    if is_date_range() or is_unix_time_range():
-        if is_date_range():
+    if is_date_range(args.start, args.end) or is_unix_time_range(args.start, args.end):
+        if is_date_range(args.start, args.end):
             start_date = datetime.strptime(args.start, '%Y-%m-%d').date()
             end_date = datetime.strptime(args.end, '%Y-%m-%d').date()
 
-        elif is_unix_time_range():
+        elif is_unix_time_range(args.start, args.end):
             if len(args.start) == 10 and len(args.end) == 10:
                 start_date = datetime.utcfromtimestamp(int(args.start)).date()
                 end_date = datetime.utcfromtimestamp(int(args.end)).date()
 
             elif len(args.start) == 13 and len(args.end) == 13:
-                start_date = datetime.utcfromtimestamp(int(args.start)/1e3).date()
-                end_date = datetime.utcfromtimestamp(int(args.end)/1e3).date()
+                start_date = datetime.utcfromtimestamp(int(args.start) / 1e3).date()
+                end_date = datetime.utcfromtimestamp(int(args.end) / 1e3).date()
 
         day = timedelta(days=1)
 
@@ -90,7 +95,7 @@ def get_partitions():
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
-    elif is_block_range():
+    elif is_block_range(args.start, args.end):
         start_block = int(args.start)
         end_block = int(args.end)
 
@@ -103,5 +108,9 @@ def get_partitions():
             padded_batch_end_block = str(batch_end_block).zfill(8)
             partition_dir = f'/start_block={padded_batch_start_block}/end_block={padded_batch_end_block}'
             yield batch_start_block, batch_end_block, partition_dir
+
+    else:
+        raise ValueError('start and end must be either block numbers or ISO dates or Unix times')
+
 
 export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers, args.export_batch_size)
