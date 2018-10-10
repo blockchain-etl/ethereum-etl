@@ -13,19 +13,37 @@ spec:
       - name: google-cloud-key
         secret:
           secretName: ethereum-etl-app-key
+      - name: last-synced-block
+        emptyDir: {}
+      initContainers:
+      - name: download-last-synced-block-file
+        image: google/cloud-sdk:220.0.0-alpine
+        command:
+        - gsutil
+        - cp
+        - gs://ethereum-etl-resources-dev/streaming/last_synced_block.txt
+        - /var/ethereum-etl/last_synced_block.txt
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        - name: last-synced-block
+          mountPath: /var/ethereum-etl
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
       containers:
       - name: ethereum-etl-streaming
         image: gcr.io/coinfi-dev/ethereum-etl-streaming:1.1
         args:
+          - "--last-synced-block-file=/var/ethereum-etl/last_synced_block.txt"
           - "--topic-path=projects/coinfi-dev/topics/ethereum_blockchain_test"
           - "--lag=1"
-          - "--start-block=6488409"
-        env:
-        - name: PUBSUB_TOPIC
-          value: projects/coinfi-dev/topics/ethereum_blockchain_test
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
+        - name: last-synced-block
+          mountPath: /var/ethereum-etl
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: /var/secrets/google/key.json
+
