@@ -46,4 +46,30 @@ spec:
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: /var/secrets/google/key.json
+      - name: upload-last-synced-block-file
+        image: google/cloud-sdk:220.0.0-alpine
+        command:
+        - watch
+        - "-n"
+        - "60"
+        - gsutil
+        - cp
+        - /var/ethereum-etl/last_synced_block.txt
+        - gs://ethereum-etl-resources-dev/streaming/last_synced_block.txt
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        - name: last-synced-block
+          mountPath: /var/ethereum-etl
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - gsutil
+              - cp
+              - /var/ethereum-etl/last_synced_block.txt
+              - gs://ethereum-etl-resources-dev/streaming/last_synced_block.txt
 
