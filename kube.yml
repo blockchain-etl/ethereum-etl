@@ -1,17 +1,31 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: $CIRCLE_PROJECT_REPONAME
+  name: ethereum-etl-streaming
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: $CIRCLE_PROJECT_REPONAME
+        app: ethereum-etl-streaming
     spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: ethereum-etl-app-key
       containers:
-      - name: $CIRCLE_PROJECT_REPONAME
-        image: ${REPO}/$CIRCLE_PROJECT_REPONAME:${CIRCLE_SHA1}
+      - name: ethereum-etl-streaming
+        image: gcr.io/coinfi-dev/ethereum-etl-streaming:1.1
+        args:
+          - "--topic-path=projects/coinfi-dev/topics/ethereum_blockchain_test"
+          - "--lag=1"
+          - "--start-block=6488409"
         env:
-        - name: TEST_VAR
-          value: "5"
+        - name: PUBSUB_TOPIC
+          value: projects/coinfi-dev/topics/ethereum_blockchain_test
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
