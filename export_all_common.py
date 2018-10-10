@@ -65,8 +65,7 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
-def export_all(partitions, output_dir, provider_uri, max_workers):
-    batch_size = 100
+def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
         # # # start # # #
