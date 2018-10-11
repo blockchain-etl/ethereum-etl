@@ -31,6 +31,13 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
 --provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
+Export traces ([Schema](#tracescsv), [Reference](#export_tracespy)):
+
+```bash
+> python export_traces.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
+```
+
 [LIMITATIONS](#limitations)
 
 ## Table of Contents
@@ -43,6 +50,7 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
   - [tokens.csv](#tokenscsv)
+  - [traces.csv](#tracescsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
@@ -150,6 +158,24 @@ symbol                       | string      |
 name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
+
+### traces.csv
+
+Column                       |    Type     |
+-----------------------------|-------------|
+block_number                 | bigint      |
+transaction_hash             | hex_string  |
+from_address                 | address     |
+to_address                   | address     |
+value                        | numeric     |
+contract_address             | address     |
+input                        | hex_string  |
+trace_type                   | string      |
+gas                          | bigint      |
+gas_used                     | bigint      |
+subtraces                    | bigint      |
+trace_address                | string      |
+error                        | string      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
@@ -270,6 +296,7 @@ Additional steps:
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
 - [export_tokens.py](#export_tokenspy)
+- [export_traces.py](#export_tracespy)
 - [get_block_range_for_date.py](#get_block_range_for_datepy)
 - [get_keccak_hash.py](#get_keccak_hashpy)
 
@@ -390,6 +417,17 @@ Then export ERC20 / ERC721 tokens:
 ```
 
 You can tune `--max-workers` for performance.
+
+##### export_traces.py
+
+The API used in this command is not supported by Infura, so you will need a local node.
+
+```bash
+> python export_traces.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/parity.ipc --batch-size 100 --output traces.csv
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
 
 ##### get_block_range_for_date.py
 
