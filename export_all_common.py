@@ -24,6 +24,8 @@
 import csv
 import logging
 import os
+import shutil
+
 from time import time
 
 from web3 import Web3
@@ -150,6 +152,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
                 export_logs=logs_file is not None)
             job.run()
 
+        shutil.rmtree(os.path.dirname(transaction_hashes_output_dir))
+
         # # # contracts # # #
 
         contract_addresses_output_dir = f'{output_dir}/contract_addresses{partition_dir}'
@@ -176,6 +180,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
                 max_workers=max_workers)
             job.run()
 
+        shutil.rmtree(os.path.dirname(contract_addresses_output_dir))
+
         # # # tokens # # #
 
         if token_transfers_file is not None:
@@ -199,6 +205,8 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
                     item_exporter=tokens_item_exporter(tokens_file),
                     max_workers=max_workers)
                 job.run()
+
+            shutil.rmtree(os.path.dirname(token_addresses_output_dir))
 
         # # # finish # # #
 
