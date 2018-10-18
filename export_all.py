@@ -91,7 +91,7 @@ def get_partitions():
 
         while start_date <= end_date:
             batch_start_block, batch_end_block = eth_service.get_block_range_for_date(start_date)
-            partition_dir = '/date=' + str(start_date)
+            partition_dir = f'/date={str(start_date)}/'
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
