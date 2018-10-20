@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-import argparse
+import click
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
@@ -32,27 +32,26 @@ from ethereumetl.providers.auto import get_provider_from_uri
 
 logging_basic_config()
 
-parser = argparse.ArgumentParser(
-    description='Exports contracts bytecode using eth_getCode JSON RPC APIs.')
-parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
-parser.add_argument('-c', '--contract-addresses', type=str,
-                    help='The file containing contract addresses, one per line.')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
+@click.option('-c', '--contract-addresses', type=str, help='The file containing contract addresses, one per line.')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 
-args = parser.parse_args()
+def main(batch_size, contract_addresses, output, max_workers, provider_uri):
+    """Exports contracts bytecode using eth_getCode JSON RPC APIs."""
+    with smart_open(contract_addresses, 'r') as contract_addresses_file:
+        contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
+                              if contract_address.strip())
+        job = ExportContractsJob(
+            contract_addresses_iterable=contract_addresses,
+            batch_size=batch_size,
+            batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+            item_exporter=contracts_item_exporter(output),
+            max_workers=max_workers)
 
-with smart_open(args.contract_addresses, 'r') as contract_addresses_file:
-    contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
-                          if contract_address.strip())
-    job = ExportContractsJob(
-        contract_addresses_iterable=contract_addresses,
-        batch_size=args.batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
-        item_exporter=contracts_item_exporter(args.output),
-        max_workers=args.max_workers)
+        job.run()
 
-    job.run()
+if __name__ == '__main__':
+    main()

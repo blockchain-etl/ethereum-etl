@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-import argparse
+import click
 import re
 
 from datetime import datetime, timedelta
@@ -30,24 +30,6 @@ from web3 import Web3
 
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
-
-parser = argparse.ArgumentParser(description='Export all for a range of blocks.',
-                                 usage='-s <start> -e <end> [-b <partition_batch_size>] [-p <provider_uri>] '
-                                       '[-o <output_dir>] [-w <max_workers>] [-B <export_batch_size>]')
-parser.add_argument('-s', '--start', required=True, type=str, help='Start block/ISO date/Unix time')
-parser.add_argument('-e', '--end', required=True, type=str, help='End block/ISO date/Unix time')
-parser.add_argument('-b', '--partition-batch-size', default=10000, type=int,
-                    help='The number of blocks to export in partition.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-o', '--output-dir', default='output', type=str,
-                    help='Output directory, partitioned in Hive style.')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-B', '--export-batch-size', default=100, type=int,
-                    help='The number of rows to write concurrently.')
-
-args = parser.parse_args()
 
 
 def is_date_range(start, end):
@@ -68,24 +50,25 @@ def is_block_range(start, end):
             end.isdigit() and 0 <= int(end) <= 99999999)
 
 
-def get_partitions():
-    if is_date_range(args.start, args.end) or is_unix_time_range(args.start, args.end):
-        if is_date_range(args.start, args.end):
-            start_date = datetime.strptime(args.start, '%Y-%m-%d').date()
-            end_date = datetime.strptime(args.end, '%Y-%m-%d').date()
+def get_partitions(start, end, partition_batch_size, provider_uri):
+    """Yield partitions based on input data type."""
+    if is_date_range(start, end) or is_unix_time_range(start, end):
+        if is_date_range(start, end):
+            start_date = datetime.strptime(start, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end, '%Y-%m-%d').date()
 
-        elif is_unix_time_range(args.start, args.end):
-            if len(args.start) == 10 and len(args.end) == 10:
-                start_date = datetime.utcfromtimestamp(int(args.start)).date()
-                end_date = datetime.utcfromtimestamp(int(args.end)).date()
+        elif is_unix_time_range(start, end):
+            if len(start) == 10 and len(end) == 10:
+                start_date = datetime.utcfromtimestamp(int(start)).date()
+                end_date = datetime.utcfromtimestamp(int(end)).date()
 
-            elif len(args.start) == 13 and len(args.end) == 13:
-                start_date = datetime.utcfromtimestamp(int(args.start) / 1e3).date()
-                end_date = datetime.utcfromtimestamp(int(args.end) / 1e3).date()
+            elif len(start) == 13 and len(end) == 13:
+                start_date = datetime.utcfromtimestamp(int(start) / 1e3).date()
+                end_date = datetime.utcfromtimestamp(int(end) / 1e3).date()
 
         day = timedelta(days=1)
 
-        provider = get_provider_from_uri(args.provider_uri)
+        provider = get_provider_from_uri(provider_uri)
         web3 = Web3(provider)
         eth_service = EthService(web3)
 
@@ -95,12 +78,12 @@ def get_partitions():
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
-    elif is_block_range(args.start, args.end):
-        start_block = int(args.start)
-        end_block = int(args.end)
+    elif is_block_range(start, end):
+        start_block = int(start)
+        end_block = int(end)
 
-        for batch_start_block in range(start_block, end_block + 1, args.partition_batch_size):
-            batch_end_block = batch_start_block + args.partition_batch_size - 1
+        for batch_start_block in range(start_block, end_block + 1, partition_batch_size):
+            batch_end_block = batch_start_block + partition_batch_size - 1
             if batch_end_block > end_block:
                 batch_end_block = end_block
 
@@ -112,5 +95,19 @@ def get_partitions():
     else:
         raise ValueError('start and end must be either block numbers or ISO dates or Unix times')
 
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-s', '--start', required=True, type=str, help='Start block/ISO date/Unix time')
+@click.option('-e', '--end', required=True, type=str, help='End block/ISO date/Unix time')
+@click.option('-b', '--partition-batch-size', default=10000, type=int, help='The number of blocks to export in partition.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-o', '--output-dir', default='output', type=str, help='Output directory, partitioned in Hive style.')
+@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+@click.option('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
 
-export_all(get_partitions(), args.output_dir, args.provider_uri, args.max_workers, args.export_batch_size)
+def main(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size):
+    """Export all for a range of blocks."""
+    export_all(get_partitions(start, end, partition_batch_size, provider_uri),
+               output_dir, provider_uri, max_workers, export_batch_size)
+
+if __name__ == '__main__':
+    main()

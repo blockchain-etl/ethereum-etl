@@ -21,23 +21,23 @@
 # SOFTWARE.
 
 
-import argparse
+import click
 
 from eth_utils import keccak
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.logging_utils import logging_basic_config
 
-logging_basic_config()
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-i', '--input-string', default='Transfer(address,address,uint256)', type=str, help='String to hash, e.g. Transfer(address,address,uint256)')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
-parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the given string.')
-parser.add_argument('-i', '--input-string', default='Transfer(address,address,uint256)', type=str,
-                    help='String to hash, e.g. Transfer(address,address,uint256)')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+def main(input_string, output):
+    """Outputs the 32-byte keccak hash of the given string."""
+    hash = keccak(text=input_string)
 
-args = parser.parse_args()
+    with smart_open(output, 'w') as output_file:
+        output_file.write('0x{}\n'.format(hash.hex()))
 
-hash = keccak(text=args.input_string)
-
-with smart_open(args.output, 'w') as output_file:
-    output_file.write('0x{}\n'.format(hash.hex()))
+if __name__ == '__main__':
+    main()

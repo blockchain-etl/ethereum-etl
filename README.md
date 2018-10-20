@@ -253,12 +253,12 @@ Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 If you see weird behavior, e.g. wrong number of rows in the CSV files or corrupted files,
 check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 
-#### Export in 2 Hours
+### Export in 2 Hours
 
 You can use AWS Auto Scaling and Data Pipeline to reduce the exporting time to a few hours.
 Read this article for details https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
 
-#### Running in Windows
+### Running in Windows
 
 Additional steps:
 
@@ -272,7 +272,7 @@ Additional steps:
     >  ./export_all.sh -s 0 -e 999999 -b 100000 -p 'file:\\\\.\pipe\geth.ipc' -o output
     ```
 
-#### Running in Docker
+### Running in Docker
 
 1. Install Docker https://docs.docker.com/install/
 
@@ -288,7 +288,7 @@ Additional steps:
     > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest -s 2018-01-01 -e 2018-01-01 -b 100000 -p https://mainnet.infura.io
     ```
 
-#### Command Reference
+### Command Reference
 
 - [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)
 - [export_token_transfers.py](#export_token_transferspy)
@@ -305,29 +305,41 @@ All the commands accept `-h` parameter for help, e.g.:
 ```bash
 > python export_blocks_and_transactions.py -h
 
-usage: export_blocks_and_transactions.py [-h] [-s START_BLOCK] -e END_BLOCK
-                                         [-b BATCH_SIZE] --provider-uri PROVIDER_URI
-                                         [-w MAX_WORKERS]
-                                         [--blocks-output BLOCKS_OUTPUT]
-                                         [--transactions-output TRANSACTIONS_OUTPUT]
+Usage: export_blocks_and_transactions.py [OPTIONS]
 
-Export blocks and transactions.
+  Export blocks and transactions.
+
+Options:
+  -s, --start-block INTEGER   Start block
+  -e, --end-block INTEGER     End block  [required]
+  -b, --batch-size INTEGER    The number of blocks to export at a time.
+  -p, --provider-uri TEXT     The URI of the web3 provider e.g.
+                              file://$HOME/Library/Ethereum/geth.ipc or
+                              https://mainnet.infura.io
+  -w, --max-workers INTEGER   The maximum number of workers.
+  --blocks-output TEXT        The output file for blocks. If not provided
+                              blocks will not be exported. Use "-" for stdout
+  --transactions-output TEXT  The output file for transactions. If not
+                              provided transactions will not be exported. Use
+                              "-" for stdout
+  -h, --help                  Show this message and exit.
 ```
 
 For the `--output` parameters the supported types are csv and json. The format type is inferred from the output file name.
 
-##### export_blocks_and_transactions.py
+#### export_blocks_and_transactions.py
 
 ```bash
 > python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --blocks-output blocks.csv --transactions-output transactions.csv
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc \
+--blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Omit `--blocks-output` or `--transactions-output` options if you want to export only transactions/blocks.
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_token_transfers.py
+#### export_token_transfers.py
 
 The API used in this command is not supported by Infura, so you will need a local node.
 If you want to use Infura for exporting ERC20 transfers refer to [extract_token_transfers.py](#extract_token_transferspy)
@@ -337,22 +349,23 @@ If you want to use Infura for exporting ERC20 transfers refer to [extract_token_
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output token_transfers.csv
 ```
 
-Include `--tokens <token1> <token2>` to filter only certain tokens, e.g.
+Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g.
 
 ```bash
-> python export_token_transfers.py --start-block 0 --end-block 500000 --provider-uri file://$HOME/Library/Ethereum/geth.ipc \
---output token_transfers.csv --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 0x06012c8cf97bead5deae237070f9587f8e7a266d
+> python export_token_transfers.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv \
+--tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 --tokens 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_receipts_and_logs.py
+#### export_receipts_and_logs.py
 
 First extract transaction hashes from `transactions.csv`
 (Exported with [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)):
 
 ```bash
-> python extract_csv_column.py --input transactions.csv --column transaction_hash --output transaction_hashes.txt
+> python extract_csv_column.py --input transactions.csv --column hash --output transaction_hashes.txt
 ```
 
 Then export receipts and logs:
@@ -369,7 +382,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-##### extract_token_transfers.py
+#### extract_token_transfers.py
 
 First export receipt logs with [export_receipts_and_logs.py](#export_receipts_and_logspy).
 
@@ -381,7 +394,7 @@ Then extract transfers from the logs.csv file:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_contracts.py
+#### export_contracts.py
 
 First extract contract addresses from `receipts.csv`
 (Exported with [export_receipts_and_logs.py](#export_receipts_and_logspy)):
@@ -399,7 +412,7 @@ Then export contracts:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### export_tokens.py
+#### export_tokens.py
 
 First extract token addresses from `contracts.json`
 (Exported with [export_contracts.py](#export_contractspy)):
@@ -418,7 +431,7 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
-##### export_traces.py
+#### export_traces.py
 
 The API used in this command is not supported by Infura, so you will need a local node.
 
@@ -429,14 +442,14 @@ The API used in this command is not supported by Infura, so you will need a loca
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-##### get_block_range_for_date.py
+#### get_block_range_for_date.py
 
 ```bash
 > python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io --date 2018-01-01
 4832686,4838611
 ```
 
-##### get_keccak_hash.py
+#### get_keccak_hash.py
 
 ```bash
 > python get_keccak_hash.py -i "transfer(address,uint256)"

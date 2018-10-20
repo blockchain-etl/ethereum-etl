@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-import argparse
+import click
 
 from web3 import Web3
 
@@ -32,21 +32,22 @@ from ethereumetl.service.eth_service import EthService
 
 logging_basic_config()
 
-parser = argparse.ArgumentParser(description='Outputs the start block and end block for a given timestamp range.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-s', '--start-timestamp', required=True, type=int, help='Start unix timestamp, in seconds.')
-parser.add_argument('-e', '--end-timestamp', required=True, type=int, help='End unix timestamp, in seconds.')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-s', '--start-timestamp', required=True, type=int, help='Start unix timestamp, in seconds.')
+@click.option('-e', '--end-timestamp', required=True, type=int, help='End unix timestamp, in seconds.')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
-args = parser.parse_args()
+def main(provider_uri, start_timestamp, end_timestamp, output):
+    """Outputs the start block and end block for a given timestamp range."""
+    provider = get_provider_from_uri(provider_uri)
+    web3 = Web3(provider)
+    eth_service = EthService(web3)
 
-provider = get_provider_from_uri(args.provider_uri)
-web3 = Web3(provider)
-eth_service = EthService(web3)
+    start_block, end_block = eth_service.get_block_range_for_timestamps(start_timestamp, end_timestamp)
 
-start_block, end_block = eth_service.get_block_range_for_timestamps(args.start_timestamp, args.end_timestamp)
+    with smart_open(output, 'w') as output_file:
+        output_file.write('{},{}\n'.format(start_block, end_block))
 
-with smart_open(args.output, 'w') as output_file:
-    output_file.write('{},{}\n'.format(start_block, end_block))
+if __name__ == '__main__':
+    main()

@@ -34,9 +34,13 @@ parser.add_argument('-p', '--predicate', required=True, type=str,
 
 args = parser.parse_args()
 
-# TODO: Add support for CSV
-with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
-    for line in input_file:
-        item = json.loads(line)
-        if eval(args.predicate, globals(), {'item': item}):
-            output_file.write(json.dumps(item) + '\n')
+def main():
+    # TODO: Add support for CSV
+    with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
+        for line in input_file:
+            item = json.loads(line)
+            if eval(args.predicate, globals(), {'item': item}):
+                output_file.write(json.dumps(item) + '\n')
+
+if __name__ == '__main__':
+    main()
