@@ -21,23 +21,6 @@
 # SOFTWARE.
 
 
-import click
+from ethereumetl.cli.get_keccak_hash import get_keccak_hash
 
-from eth_utils import keccak
-
-from ethereumetl.file_utils import smart_open
-from ethereumetl.logging_utils import logging_basic_config
-
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--input-string', default='Transfer(address,address,uint256)', type=str, help='String to hash, e.g. Transfer(address,address,uint256)')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-
-def main(input_string, output):
-    """Outputs the 32-byte keccak hash of the given string."""
-    hash = keccak(text=input_string)
-
-    with smart_open(output, 'w') as output_file:
-        output_file.write('0x{}\n'.format(hash.hex()))
-
-if __name__ == '__main__':
-    main()
+get_keccak_hash()

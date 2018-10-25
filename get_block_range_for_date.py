@@ -21,33 +21,6 @@
 # SOFTWARE.
 
 
-import click
+from ethereumetl.cli.get_block_range_for_date import get_block_range_for_date
 
-from datetime import datetime
-from web3 import Web3
-
-from ethereumetl.file_utils import smart_open
-from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.service.eth_service import EthService
-from ethereumetl.providers.auto import get_provider_from_uri
-
-logging_basic_config()
-
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-@click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'), help='The date e.g. 2018-01-01.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-
-def main(provider_uri, date, output):
-    """Outputs the start block and end block for a given date."""
-    provider = get_provider_from_uri(provider_uri)
-    web3 = Web3(provider)
-    eth_service = EthService(web3)
-
-    start_block, end_block = eth_service.get_block_range_for_date(date)
-
-    with smart_open(output, 'w') as output_file:
-        output_file.write('{},{}\n'.format(start_block, end_block))
-
-if __name__ == '__main__':
-    main()
+get_block_range_for_date()
