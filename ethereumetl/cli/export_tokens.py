@@ -22,24 +22,31 @@
 
 
 import click
-import csv
 
-from ethereumetl.csv_utils import set_max_field_size_limit
+from web3 import Web3
+
 from ethereumetl.file_utils import smart_open
+from ethereumetl.jobs.export_tokens_job import ExportTokensJob
+from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from ethereumetl.logging_utils import logging_basic_config
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.providers.auto import get_provider_from_uri
+
+logging_basic_config()
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
+@click.option('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-c', '--column', required=True, type=str, help='The csv column name to extract.')
+@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 
-def main(input, output, column):
-    """Extracts a single column from a given csv file."""
-    set_max_field_size_limit()
+def export_tokens(token_addresses, output, max_workers, provider_uri):
+    """Exports ERC20 tokens."""
+    with smart_open(token_addresses, 'r') as token_addresses_file:
+        job = ExportTokensJob(
+            token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),
+            web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+            item_exporter=tokens_item_exporter(output),
+            max_workers=max_workers)
 
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
-        reader = csv.DictReader(input_file)
-        for row in reader:
-            output_file.write(row[column] + '\n')
-
-if __name__ == '__main__':
-    main()
+        job.run()

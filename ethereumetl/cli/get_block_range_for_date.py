@@ -22,24 +22,29 @@
 
 
 import click
-import csv
 
-from ethereumetl.csv_utils import set_max_field_size_limit
+from datetime import datetime
+from web3 import Web3
+
 from ethereumetl.file_utils import smart_open
+from ethereumetl.logging_utils import logging_basic_config
+from ethereumetl.service.eth_service import EthService
+from ethereumetl.providers.auto import get_provider_from_uri
+
+logging_basic_config()
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'), help='The date e.g. 2018-01-01.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-c', '--column', required=True, type=str, help='The csv column name to extract.')
 
-def main(input, output, column):
-    """Extracts a single column from a given csv file."""
-    set_max_field_size_limit()
+def get_block_range_for_date(provider_uri, date, output):
+    """Outputs the start block and end block for a given date."""
+    provider = get_provider_from_uri(provider_uri)
+    web3 = Web3(provider)
+    eth_service = EthService(web3)
 
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
-        reader = csv.DictReader(input_file)
-        for row in reader:
-            output_file.write(row[column] + '\n')
+    start_block, end_block = eth_service.get_block_range_for_date(date)
 
-if __name__ == '__main__':
-    main()
+    with smart_open(output, 'w') as output_file:
+        output_file.write('{},{}\n'.format(start_block, end_block))

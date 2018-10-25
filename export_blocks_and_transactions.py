@@ -21,41 +21,6 @@
 # SOFTWARE.
 
 
-import argparse
+from ethereumetl.cli.export_blocks_and_transactions import export_blocks_and_transactions
 
-from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
-from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.providers.auto import get_provider_from_uri
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
-
-logging_basic_config()
-
-parser = argparse.ArgumentParser(description='Export blocks and transactions.')
-parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
-parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
-parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to export at a time.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('--blocks-output', default=None, type=str,
-                    help='The output file for blocks. If not provided blocks will not be exported. '
-                         'Use "-" for stdout')
-parser.add_argument('--transactions-output', default=None, type=str,
-                    help='The output file for transactions. If not provided transactions will not be exported. '
-                         'Use "-" for stdout')
-
-args = parser.parse_args()
-
-job = ExportBlocksJob(
-    start_block=args.start_block,
-    end_block=args.end_block,
-    batch_size=args.batch_size,
-    batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
-    max_workers=args.max_workers,
-    item_exporter=blocks_and_transactions_item_exporter(args.blocks_output, args.transactions_output),
-    export_blocks=args.blocks_output is not None,
-    export_transactions=args.transactions_output is not None)
-
-job.run()
+export_blocks_and_transactions()
