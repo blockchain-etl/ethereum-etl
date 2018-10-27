@@ -54,13 +54,17 @@ def validate_range(range_start_incl, range_end_incl):
 
 def rpc_response_batch_to_results(response):
     for response_item in response:
-        result = response_item.get('result', None)
-        if result is None:
-            error_message = 'result is None in response {}.'.format(response_item)
-            if response_item.get('error', None) is None:
-                error_message = error_message + ' Make sure Ethereum node is synced.'
-            raise ValueError(error_message)
-        yield result
+        yield rpc_response_to_result(response_item)
+
+
+def rpc_response_to_result(response):
+    result = response.get('result', None)
+    if result is None:
+        error_message = 'result is None in response {}.'.format(response)
+        if response.get('error', None) is None:
+            error_message = error_message + ' Make sure Ethereum node is synced.'
+        raise ValueError(error_message)
+    return result
 
 
 def split_to_batches(start_incl, end_incl, batch_size):
