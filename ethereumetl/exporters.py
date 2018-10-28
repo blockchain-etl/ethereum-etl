@@ -120,7 +120,7 @@ class CsvItemExporter(BaseItemExporter):
     def _join_if_needed(self, value):
         if isinstance(value, (list, tuple)):
             try:
-                return self._join_multivalued.join(value)
+                return self._join_multivalued.join(str(x) for x in value)
             except TypeError:  # list in value may not contain strings
                 pass
         return value
