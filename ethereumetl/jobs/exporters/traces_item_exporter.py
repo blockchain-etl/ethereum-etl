@@ -31,6 +31,7 @@ FIELDS_TO_EXPORT = [
     'value',
     'contract_address',
     'input',
+    'output',
     'trace_type',
     'gas',
     'gas_used',
