@@ -39,8 +39,14 @@ class EthTraceMapper(object):
         if error:
             trace.error = error
 
-        action = json_dict.get('action', {})
+        action = json_dict.get('action')
+        if action is None:
+            action = {}
         result = json_dict.get('result', {})
+        if result is None:
+            result = {}
+
+        trace.output = result.get('output', None)
 
         trace_type = json_dict.get('type', None)
 
@@ -85,6 +91,7 @@ class EthTraceMapper(object):
             'value': trace.value,
             'contract_address': trace.contract_address,
             'input': trace.input,
+            'output': trace.output,
             'trace_type': trace.trace_type,
             'gas': trace.gas,
             'gas_used': trace.gas_used,

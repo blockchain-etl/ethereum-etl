@@ -30,6 +30,7 @@ class EthTrace(object):
         self.value = None
         self.contract_address = None
         self.input = None
+        self.output = None
         self.trace_type = None
         self.gas = None
         self.gas_used = None
