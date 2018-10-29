@@ -77,6 +77,61 @@ class EthTraceMapper(object):
 
         return trace
 
+    def geth_trace_to_traces(self, geth_trace):
+        block_number = geth_trace.block_number
+        transaction_traces = geth_trace.traces
+
+        traces = []
+
+        for tx_index, tx_trace in enumerate(transaction_traces):
+            traces.extend(self._iterate_transaction_trace(
+                block_number,
+                tx_index,
+                tx_trace.get('result')
+            ))
+
+        return traces
+
+    def _iterate_transaction_trace(self, block_number, tx_index, tx_trace, trace_address=[]):
+        trace = EthTrace()
+
+        trace.block_number = block_number
+        trace.transaction_hash = tx_index
+
+        trace.from_address = to_normalized_address(tx_trace.get('from', None))
+        trace.to_address = to_normalized_address(tx_trace.get('to', None))
+        trace.value = hex_to_dec(tx_trace.get('value', None))
+        trace.input = tx_trace.get('input', None)
+        trace.output = tx_trace.get('output', None)
+        trace.gas = hex_to_dec(tx_trace.get('gas', None))
+        trace.gas_used = hex_to_dec(tx_trace.get('gasUsed', None))
+        trace.subtraces = len(tx_trace.get('calls', []))
+        trace.trace_type = tx_trace.get('type', None).lower() # TODO: map
+        # TODO: normal error handling
+        trace.error = tx_trace.get('error', None)
+        if trace.trace_type == 'selfdestruct':
+            trace.trace_type = 'suicide'
+        if trace.trace_type == 'create':
+            trace.to_address = to_normalized_address(0)
+            trace.contract_address = tx_trace.get('to', None)
+            # TODO: fix in parity traces
+            trace.output = ''
+        trace.trace_address = trace_address
+
+        result = [trace]
+
+        calls = tx_trace.get('calls', [])
+
+        for call_index, call_trace in enumerate(calls):
+            result.extend(self._iterate_transaction_trace(
+                block_number,
+                tx_index,
+                call_trace,
+                trace_address + [call_index]
+            ))
+
+        return result
+
     def trace_to_dict(self, trace):
         return {
             'type': 'trace',
