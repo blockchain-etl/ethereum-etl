@@ -33,6 +33,8 @@ FIELDS_TO_EXPORT = [
     'input',
     'output',
     'trace_type',
+    'call_type',
+    'reward_type',
     'gas',
     'gas_used',
     'subtraces',
