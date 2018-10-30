@@ -53,7 +53,7 @@ class ExtractGethTracesJob(BaseJob):
             traces = self.trace_mapper.geth_trace_to_traces(geth_trace)
             for trace in traces:
                 self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
-                
+              
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()

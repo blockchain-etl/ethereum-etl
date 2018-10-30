@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class EthGethTrace(object):
     def __init__(self):
         self.block_number = None
-        self.traces = None
+        self.transaction_traces = None

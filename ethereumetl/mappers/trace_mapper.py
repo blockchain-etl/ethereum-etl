@@ -79,7 +79,7 @@ class EthTraceMapper(object):
 
     def geth_trace_to_traces(self, geth_trace):
         block_number = geth_trace.block_number
-        transaction_traces = geth_trace.traces
+        transaction_traces = geth_trace.transaction_traces
 
         traces = []
 
@@ -87,7 +87,7 @@ class EthTraceMapper(object):
             traces.extend(self._iterate_transaction_trace(
                 block_number,
                 tx_index,
-                tx_trace.get('result')
+                tx_trace,
             ))
 
         return traces
@@ -96,31 +96,37 @@ class EthTraceMapper(object):
         trace = EthTrace()
 
         trace.block_number = block_number
-        trace.transaction_hash = tx_index
+        trace.transaction_hash = tx_index  # TODO: save index in separate field
 
         trace.from_address = to_normalized_address(tx_trace.get('from', None))
         trace.to_address = to_normalized_address(tx_trace.get('to', None))
-        trace.value = hex_to_dec(tx_trace.get('value', None))
+
         trace.input = tx_trace.get('input', None)
         trace.output = tx_trace.get('output', None)
+
+        trace.value = hex_to_dec(tx_trace.get('value', None))
         trace.gas = hex_to_dec(tx_trace.get('gas', None))
         trace.gas_used = hex_to_dec(tx_trace.get('gasUsed', None))
-        trace.subtraces = len(tx_trace.get('calls', []))
-        trace.trace_type = tx_trace.get('type', None).lower() # TODO: map
-        # TODO: normal error handling
+
         trace.error = tx_trace.get('error', None)
+
+        # lowercase for compatibility with parity traces
+        trace.trace_type = tx_trace.get('type', None).lower()
+
         if trace.trace_type == 'selfdestruct':
+            # rename to suicide for compatibility with parity traces
             trace.trace_type = 'suicide'
-        if trace.trace_type == 'create':
+        elif trace.trace_type == 'create':
+            # move created contract address from `to_address` to `contract_address`
             trace.to_address = to_normalized_address(0)
-            trace.contract_address = tx_trace.get('to', None)
-            # TODO: fix in parity traces
-            trace.output = ''
-        trace.trace_address = trace_address
+            trace.contract_address = to_normalized_address(tx_trace.get('to', None))
 
         result = [trace]
 
         calls = tx_trace.get('calls', [])
+
+        trace.subtraces = len(calls)
+        trace.trace_address = trace_address
 
         for call_index, call_trace in enumerate(calls):
             result.extend(self._iterate_transaction_trace(

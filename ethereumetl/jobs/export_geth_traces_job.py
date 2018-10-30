@@ -26,7 +26,7 @@ from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.json_rpc_requests import generate_trace_block_by_number_json_rpc
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.geth_trace_mapper import EthGethTraceMapper
-from ethereumetl.utils import validate_range, rpc_response_batch_to_results
+from ethereumetl.utils import validate_range, rpc_response_to_result
 
 
 # Exports geth traces
@@ -61,17 +61,18 @@ class ExportGethTracesJob(BaseJob):
         )
 
     def _export_batch(self, block_number_batch):
-        blocks_rpc = list(generate_trace_block_by_number_json_rpc(block_number_batch))
-        response = self.batch_web3_provider.make_request(json.dumps(blocks_rpc))
-        results = rpc_response_batch_to_results(response)
+        trace_block_rpc = list(generate_trace_block_by_number_json_rpc(block_number_batch))
+        response = self.batch_web3_provider.make_request(json.dumps(trace_block_rpc))
 
-        # adding block_numbers here, as RPC response doesn't have them
-        geth_traces = [self.geth_trace_mapper.json_dict_to_geth_trace({
-            'block_number': block_number,
-            'traces': traces,
-        }) for block_number, traces in zip(block_number_batch, results)]
+        for response_item in response:
+            block_number = response_item.get('id', None)
+            result = rpc_response_to_result(response_item)
 
-        for geth_trace in geth_traces:
+            geth_trace = self.geth_trace_mapper.json_dict_to_geth_trace({
+                'block_number': block_number,
+                'transaction_traces': [tx_trace.get('result', None) for tx_trace in result],
+            })
+
             self.item_exporter.export_item(self.geth_trace_mapper.geth_trace_to_dict(geth_trace))
 
     def _end(self):

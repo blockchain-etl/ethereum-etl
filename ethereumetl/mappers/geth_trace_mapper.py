@@ -29,7 +29,7 @@ class EthGethTraceMapper(object):
         geth_trace = EthGethTrace()
 
         geth_trace.block_number = json_dict.get('block_number', None)
-        geth_trace.traces = json_dict.get('traces', None)
+        geth_trace.transaction_traces = json_dict.get('transaction_traces', None)
 
         return geth_trace
 
@@ -37,5 +37,5 @@ class EthGethTraceMapper(object):
         return {
             'type': 'geth_trace',
             'block_number': geth_trace.block_number,
-            'traces': geth_trace.traces,
+            'transaction_traces': geth_trace.transaction_traces,
         }

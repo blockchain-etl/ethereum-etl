@@ -20,15 +20,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import json
-
 import pytest
 
+from web3 import Web3
+
 import tests.resources
-from ethereumetl.jobs.exporters.traces_item_exporter import traces_item_exporter
-from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
+from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
+from ethereumetl.jobs.exporters.geth_traces_item_exporter import geth_traces_item_exporter
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file
 
+# use same resources for testing export/extract jobs
 RESOURCE_GROUP = 'test_extract_geth_traces_job'
 
 
@@ -36,26 +39,26 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.parametrize('resource_group', [
-    'block_without_transactions',
-    'block_with_create',
-    'block_with_suicide',
-    'block_with_subtraces',
-    'block_with_error',
+@pytest.mark.parametrize("start_block,end_block,resource_group,web3_provider_type", [
+    (1, 1, 'block_without_transactions', 'mock'),
+    (1000690, 1000690, 'block_with_create', 'mock'),
+    (1011973, 1011973, 'block_with_suicide', 'mock'),
+    (1000000, 1000000, 'block_with_subtraces', 'mock'),
+    (1000895, 1000895, 'block_with_error', 'mock'),
 ])
-def test_extract_traces_job(tmpdir, resource_group):
-    output_file = tmpdir.join('actual_traces.csv')
+def test_export_geth_traces_job(tmpdir, start_block, end_block, resource_group, web3_provider_type):
+    traces_output_file = tmpdir.join('actual_geth_traces.json')
 
-    geth_traces_content = read_resource(resource_group, 'geth_traces.json')
-    traces_iterable = (json.loads(line) for line in geth_traces_content.splitlines())
-    job = ExtractGethTracesJob(
-        traces_iterable=traces_iterable,
-        batch_size=2,
-        item_exporter=traces_item_exporter(output_file),
-        max_workers=5
+    job = ExportGethTracesJob(
+        start_block=start_block, end_block=end_block, batch_size=1,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file), batch=True)
+        ),
+        max_workers=5,
+        item_exporter=geth_traces_item_exporter(traces_output_file),
     )
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_traces.csv'), read_file(output_file)
+        read_resource(resource_group, 'geth_traces.json'), read_file(traces_output_file)
     )
