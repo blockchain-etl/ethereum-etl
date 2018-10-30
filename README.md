@@ -38,6 +38,19 @@ Export traces ([Schema](#tracescsv), [Reference](#export_tracespy)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
+Export geth traces ([Reference](#export_geth_tracespy)):
+
+```bash
+> python export_geth_traces.py --start-block 1 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output geth_traces.json
+```
+
+Extract geth traces ([Schema](#tracescsv), [Reference](#extract_geth_tracespy)):
+
+```bash
+> python extract_geth_traces.py --input geth_traces.json --output traces.csv
+```
+
 [LIMITATIONS](#limitations)
 
 ## Table of Contents
@@ -165,6 +178,7 @@ Column                       |    Type     |
 -----------------------------|-------------|
 block_number                 | bigint      |
 transaction_hash             | hex_string  |
+transaction_index            | bigint      |
 from_address                 | address     |
 to_address                   | address     |
 value                        | numeric     |
@@ -199,6 +213,15 @@ because numeric types there can't handle 32-byte integers. You should use
 [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) that returns a `boolean`
 will have `0` or `1` in the `decimals` column in the CSVs.
 
+### Differences between geth and parity traces.csv
+
+- `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
+- geth output doesn't have `reward` traces;
+- geth output doesn't have `to_address`, `from_address`, `value` for `suicide traces;
+- `error` field contains human readable error message, which might differ in geth/parity output;
+- geth output doesn't have `transaction_hash`;
+- `gas_used` is 0 on traces with error in geth, empty in parity;
+- zero output of subcalls is `0x000...` in geth, `0x` in parity;
 
 
 ## Exporting the Blockchain
@@ -297,6 +320,8 @@ Additional steps:
 - [export_contracts.py](#export_contractspy)
 - [export_tokens.py](#export_tokenspy)
 - [export_traces.py](#export_tracespy)
+- [export_geth_traces.py](#export_geth_tracespy)
+- [extract_geth_traces.py](#extract_geth_tracespy)
 - [get_block_range_for_date.py](#get_block_range_for_datepy)
 - [get_keccak_hash.py](#get_keccak_hashpy)
 
@@ -438,6 +463,25 @@ The API used in this command is not supported by Infura, so you will need a loca
 ```bash
 > python export_traces.py --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --batch-size 100 --output traces.csv
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
+
+#### export_geth_traces.py
+
+The API used in this command is not supported by Infura, so you will need a local geth archive node (`geth --gcmode archive --syncmode full`).
+
+```bash
+> python export_geth_traces.py --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output geth_traces.json
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
+
+#### extract_geth_traces.py
+
+```bash
+> python extract_geth_traces.py --input geth_traces.json --output traces.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
