@@ -118,8 +118,11 @@ class EthTraceMapper(object):
             trace.trace_type = 'suicide'
         elif trace.trace_type == 'create':
             # move created contract address from `to_address` to `contract_address`
-            trace.to_address = to_normalized_address(0)
+            trace.to_address = None
             trace.contract_address = to_normalized_address(tx_trace.get('to', None))
+        elif trace.trace_type in ('call', 'callcode', 'delegatecall', 'staticcall'):
+            trace.call_type = trace.trace_type
+            trace.trace_type = 'call'
 
         result = [trace]
 
