@@ -40,7 +40,7 @@ logging_basic_config()
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 
-def export_tokens(token_addresses, output, max_workers, provider_uri):
+def cli(token_addresses, output, max_workers, provider_uri):
     """Exports ERC20 tokens."""
     with smart_open(token_addresses, 'r') as token_addresses_file:
         job = ExportTokensJob(

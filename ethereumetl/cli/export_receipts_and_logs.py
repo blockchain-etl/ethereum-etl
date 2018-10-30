@@ -40,7 +40,7 @@ logging_basic_config()
 @click.option('--receipts-output', default=None, type=str, help='The output file for receipts. If not provided receipts will not be exported. Use "-" for stdout')
 @click.option('--logs-output', default=None, type=str, help='The output file for receipt logs. If not provided receipt logs will not be exported. Use "-" for stdout')
 
-def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
+def cli(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
     """Export receipts and logs."""
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(

@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_receipts_and_logs import export_receipts_and_logs
+from ethereumetl.cli.export_receipts_and_logs import cli
 
-export_receipts_and_logs()
+cli()

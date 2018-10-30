@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_tokens import export_tokens
+from ethereumetl.cli.export_tokens import cli
 
-export_tokens()
+cli()

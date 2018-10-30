@@ -40,7 +40,7 @@ logging_basic_config()
 @click.option('--blocks-output', default=None, type=str, help='The output file for blocks. If not provided blocks will not be exported. Use "-" for stdout')
 @click.option('--transactions-output', default=None, type=str, help='The output file for transactions. If not provided transactions will not be exported. Use "-" for stdout')
 
-def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
+def cli(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
     """Export blocks and transactions."""
     job = ExportBlocksJob(
         start_block=start_block,

@@ -41,7 +41,7 @@ logging_basic_config()
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', required=True, type=str, help='The URI of the web3 provider e.g. file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
 
-def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri):
+def cli(start_block, end_block, batch_size, output, max_workers, provider_uri):
     """Exports traces using trace_filter JSON RPC API."""
     job = ExportTracesJob(
         start_block=start_block,

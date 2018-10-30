@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.get_block_range_for_timestamps import get_block_range_for_timestamps
+from ethereumetl.cli.get_block_range_for_timestamps import cli
 
-get_block_range_for_timestamps()
+cli()

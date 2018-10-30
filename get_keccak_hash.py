@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.get_keccak_hash import get_keccak_hash
+from ethereumetl.cli.get_keccak_hash import cli
 
-get_keccak_hash()
+cli()

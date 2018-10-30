@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.extract_token_transfers import extract_token_transfers
+from ethereumetl.cli.extract_token_transfers import cli
 
-extract_token_transfers()
+cli()
