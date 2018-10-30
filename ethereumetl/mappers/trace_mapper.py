@@ -31,6 +31,7 @@ class EthTraceMapper(object):
 
         trace.block_number = json_dict.get('blockNumber', None)
         trace.transaction_hash = json_dict.get('transactionHash', None)
+        trace.transaction_index = json_dict.get('transactionPosition', None)
         trace.subtraces = json_dict.get('subtraces', None)
         trace.trace_address = json_dict.get('traceAddress', [])
 
@@ -96,7 +97,7 @@ class EthTraceMapper(object):
         trace = EthTrace()
 
         trace.block_number = block_number
-        trace.transaction_hash = tx_index  # TODO: save index in separate field
+        trace.transaction_index = tx_index
 
         trace.from_address = to_normalized_address(tx_trace.get('from', None))
         trace.to_address = to_normalized_address(tx_trace.get('to', None))
@@ -146,6 +147,7 @@ class EthTraceMapper(object):
             'type': 'trace',
             'block_number': trace.block_number,
             'transaction_hash': trace.transaction_hash,
+            'transaction_index': trace.transaction_index,
             'from_address': trace.from_address,
             'to_address': trace.to_address,
             'value': trace.value,

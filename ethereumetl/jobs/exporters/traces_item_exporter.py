@@ -26,6 +26,7 @@ from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExpo
 FIELDS_TO_EXPORT = [
     'block_number',
     'transaction_hash',
+    'transaction_index',
     'from_address',
     'to_address',
     'value',
