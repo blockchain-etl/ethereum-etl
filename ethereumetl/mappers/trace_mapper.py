@@ -39,16 +39,17 @@ class EthTraceMapper(object):
         if error:
             trace.error = error
 
-        action = json_dict.get('action')
+        action = json_dict.get('action', None)
         if action is None:
             action = {}
-        result = json_dict.get('result', {})
+        result = json_dict.get('result', None)
         if result is None:
             result = {}
 
         trace.output = result.get('output', None)
 
         trace_type = json_dict.get('type', None)
+        trace.trace_type = trace_type
 
         # common fields in call/create
         if trace_type in ('call', 'create'):
@@ -57,17 +58,12 @@ class EthTraceMapper(object):
             trace.gas = hex_to_dec(action.get('gas', None))
             trace.gas_used = hex_to_dec(result.get('gasUsed', None))
 
-        # process 'call' traces
+        # process different trace types
         if trace_type == 'call':
-            trace.trace_type = action.get('callType', None)
-
+            trace.call_type = action.get('callType', None)
             trace.to_address = to_normalized_address(action.get('to', None))
             trace.input = action.get('input', None)
-        else:
-            trace.trace_type = trace_type
-
-        # process other traces
-        if trace_type == 'create':
+        elif trace_type == 'create':
             trace.contract_address = result.get('address', None)
             trace.to_address = to_normalized_address(0)
             trace.input = action.get('init', None)
@@ -78,6 +74,7 @@ class EthTraceMapper(object):
         elif trace_type == 'reward':
             trace.to_address = to_normalized_address(action.get('author', None))
             trace.value = hex_to_dec(action.get('value', None))
+            trace.reward_type = action.get('rewardType', None)
 
         return trace
 
@@ -93,6 +90,8 @@ class EthTraceMapper(object):
             'input': trace.input,
             'output': trace.output,
             'trace_type': trace.trace_type,
+            'call_type': trace.call_type,
+            'reward_type': trace.reward_type,
             'gas': trace.gas,
             'gas_used': trace.gas_used,
             'subtraces': trace.subtraces,
