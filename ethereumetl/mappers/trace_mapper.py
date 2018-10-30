@@ -46,8 +46,6 @@ class EthTraceMapper(object):
         if result is None:
             result = {}
 
-        trace.output = result.get('output', None)
-
         trace_type = json_dict.get('type', None)
         trace.trace_type = trace_type
 
@@ -63,10 +61,12 @@ class EthTraceMapper(object):
             trace.call_type = action.get('callType', None)
             trace.to_address = to_normalized_address(action.get('to', None))
             trace.input = action.get('input', None)
+            trace.output = result.get('output', None)
         elif trace_type == 'create':
             trace.contract_address = result.get('address', None)
             trace.to_address = to_normalized_address(0)
             trace.input = action.get('init', None)
+            trace.output = result.get('code', None)
         elif trace_type == 'suicide':
             trace.from_address = to_normalized_address(action.get('address', None))
             trace.to_address = to_normalized_address(action.get('refundAddress', None))
