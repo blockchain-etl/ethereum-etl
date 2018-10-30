@@ -41,7 +41,8 @@ class ExportTracesJob(BaseJob):
 
         self.web3 = web3
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        # TODO: use batch_size when this issue is fixed https://github.com/paritytech/parity-ethereum/issues/9822
+        self.batch_work_executor = BatchWorkExecutor(1, max_workers)
         self.item_exporter = item_exporter
 
         self.trace_mapper = EthTraceMapper()
@@ -57,14 +58,14 @@ class ExportTracesJob(BaseJob):
         )
 
     def _export_batch(self, block_number_batch):
-        assert len(block_number_batch) > 0
+        # TODO: Change to len(block_number_batch) > 0 when this issue is fixed
+        # https://github.com/paritytech/parity-ethereum/issues/9822
+        assert len(block_number_batch) == 1
+        block_number = block_number_batch[0]
 
-        filter_params = {
-            'fromBlock': hex(block_number_batch[0]),
-            'toBlock': hex(block_number_batch[-1]),
-        }
-
-        json_traces = self.web3.parity.traceFilter(filter_params)
+        # TODO: Change to traceFilter when this issue is fixed
+        # https://github.com/paritytech/parity-ethereum/issues/9822
+        json_traces = self.web3.parity.traceBlock(block_number)
 
         for json_trace in json_traces:
             trace = self.trace_mapper.json_dict_to_trace(json_trace)
