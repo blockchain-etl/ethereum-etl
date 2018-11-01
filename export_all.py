@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_all import export_all
+from ethereumetl.cli.export_all import cli
 
-export_all()
+cli()

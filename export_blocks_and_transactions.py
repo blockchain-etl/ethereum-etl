@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_blocks_and_transactions import export_blocks_and_transactions
+from ethereumetl.cli.export_blocks_and_transactions import cli
 
-export_blocks_and_transactions()
+cli()

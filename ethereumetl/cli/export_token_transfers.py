@@ -42,7 +42,7 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', required=True, type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
 @click.option('-t', '--tokens', default=None, type=str, nargs=1, help='The list of token addresses to filter by.')
 
-def export_token_transfers(start_block, end_block, batch_size, output, max_workers, provider_uri, tokens):
+def cli(start_block, end_block, batch_size, output, max_workers, provider_uri, tokens):
     """Exports ERC20 transfers using eth_newFilter and eth_getFilterLogs JSON RPC APIs."""
     job = ExportTokenTransfersJob(
         start_block=start_block,

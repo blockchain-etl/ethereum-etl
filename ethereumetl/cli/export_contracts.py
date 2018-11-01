@@ -39,7 +39,7 @@ logging_basic_config()
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 
-def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri):
+def cli(batch_size, contract_addresses, output, max_workers, provider_uri):
     """Exports contracts bytecode using eth_getCode JSON RPC APIs."""
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
         contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file

@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.get_block_range_for_date import get_block_range_for_date
+from ethereumetl.cli.get_block_range_for_date import cli
 
-get_block_range_for_date()
+cli()

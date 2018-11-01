@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_contracts import export_contracts
+from ethereumetl.cli.export_contracts import cli
 
-export_contracts()
+cli()

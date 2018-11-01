@@ -38,7 +38,7 @@ logging_basic_config()
 @click.option('-e', '--end-timestamp', required=True, type=int, help='End unix timestamp, in seconds.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
-def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output):
+def cli(provider_uri, start_timestamp, end_timestamp, output):
     """Outputs the start block and end block for a given timestamp range."""
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)

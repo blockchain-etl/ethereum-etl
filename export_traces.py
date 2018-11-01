@@ -21,6 +21,6 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_traces import export_traces
+from ethereumetl.cli.export_traces import cli
 
-export_traces()
+cli()
