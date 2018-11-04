@@ -51,7 +51,7 @@ class CompositeItemExporter:
             self.counter_mapping[item_type] = AtomicCounter()
 
     def export_item(self, item):
-        item_type = item.get('type', None)
+        item_type = item.get('type')
         if item_type is None:
             raise ValueError('type key is not found in item {}'.format(repr(item)))
 
@@ -60,7 +60,7 @@ class CompositeItemExporter:
             raise ValueError('Exporter for item type {} not found'.format(item_type))
         exporter.export_item(item)
 
-        counter = self.counter_mapping[item_type]
+        counter = self.counter_mapping.get(item_type)
         if counter is not None:
             counter.increment()
 

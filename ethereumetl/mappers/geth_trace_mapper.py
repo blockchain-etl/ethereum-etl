@@ -28,8 +28,8 @@ class EthGethTraceMapper(object):
     def json_dict_to_geth_trace(self, json_dict):
         geth_trace = EthGethTrace()
 
-        geth_trace.block_number = json_dict.get('block_number', None)
-        geth_trace.transaction_traces = json_dict.get('transaction_traces', None)
+        geth_trace.block_number = json_dict.get('block_number')
+        geth_trace.transaction_traces = json_dict.get('transaction_traces')
 
         return geth_trace
 

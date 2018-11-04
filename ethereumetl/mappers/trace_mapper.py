@@ -29,52 +29,52 @@ class EthTraceMapper(object):
     def json_dict_to_trace(self, json_dict):
         trace = EthTrace()
 
-        trace.block_number = json_dict.get('blockNumber', None)
-        trace.transaction_hash = json_dict.get('transactionHash', None)
-        trace.transaction_index = json_dict.get('transactionPosition', None)
-        trace.subtraces = json_dict.get('subtraces', None)
+        trace.block_number = json_dict.get('blockNumber')
+        trace.transaction_hash = json_dict.get('transactionHash')
+        trace.transaction_index = json_dict.get('transactionPosition')
+        trace.subtraces = json_dict.get('subtraces')
         trace.trace_address = json_dict.get('traceAddress', [])
 
-        error = json_dict.get('error', None)
+        error = json_dict.get('error')
 
         if error:
             trace.error = error
 
-        action = json_dict.get('action', None)
+        action = json_dict.get('action')
         if action is None:
             action = {}
-        result = json_dict.get('result', None)
+        result = json_dict.get('result')
         if result is None:
             result = {}
 
-        trace_type = json_dict.get('type', None)
+        trace_type = json_dict.get('type')
         trace.trace_type = trace_type
 
         # common fields in call/create
         if trace_type in ('call', 'create'):
-            trace.from_address = to_normalized_address(action.get('from', None))
-            trace.value = hex_to_dec(action.get('value', None))
-            trace.gas = hex_to_dec(action.get('gas', None))
-            trace.gas_used = hex_to_dec(result.get('gasUsed', None))
+            trace.from_address = to_normalized_address(action.get('from'))
+            trace.value = hex_to_dec(action.get('value'))
+            trace.gas = hex_to_dec(action.get('gas'))
+            trace.gas_used = hex_to_dec(result.get('gasUsed'))
 
         # process different trace types
         if trace_type == 'call':
-            trace.call_type = action.get('callType', None)
-            trace.to_address = to_normalized_address(action.get('to', None))
-            trace.input = action.get('input', None)
-            trace.output = result.get('output', None)
+            trace.call_type = action.get('callType')
+            trace.to_address = to_normalized_address(action.get('to'))
+            trace.input = action.get('input')
+            trace.output = result.get('output')
         elif trace_type == 'create':
-            trace.contract_address = result.get('address', None)
-            trace.input = action.get('init', None)
-            trace.output = result.get('code', None)
+            trace.contract_address = result.get('address')
+            trace.input = action.get('init')
+            trace.output = result.get('code')
         elif trace_type == 'suicide':
-            trace.from_address = to_normalized_address(action.get('address', None))
-            trace.to_address = to_normalized_address(action.get('refundAddress', None))
-            trace.value = hex_to_dec(action.get('balance', None))
+            trace.from_address = to_normalized_address(action.get('address'))
+            trace.to_address = to_normalized_address(action.get('refundAddress'))
+            trace.value = hex_to_dec(action.get('balance'))
         elif trace_type == 'reward':
-            trace.to_address = to_normalized_address(action.get('author', None))
-            trace.value = hex_to_dec(action.get('value', None))
-            trace.reward_type = action.get('rewardType', None)
+            trace.to_address = to_normalized_address(action.get('author'))
+            trace.value = hex_to_dec(action.get('value'))
+            trace.reward_type = action.get('rewardType')
 
         return trace
 
@@ -99,20 +99,20 @@ class EthTraceMapper(object):
         trace.block_number = block_number
         trace.transaction_index = tx_index
 
-        trace.from_address = to_normalized_address(tx_trace.get('from', None))
-        trace.to_address = to_normalized_address(tx_trace.get('to', None))
+        trace.from_address = to_normalized_address(tx_trace.get('from'))
+        trace.to_address = to_normalized_address(tx_trace.get('to'))
 
-        trace.input = tx_trace.get('input', None)
-        trace.output = tx_trace.get('output', None)
+        trace.input = tx_trace.get('input')
+        trace.output = tx_trace.get('output')
 
-        trace.value = hex_to_dec(tx_trace.get('value', None))
-        trace.gas = hex_to_dec(tx_trace.get('gas', None))
-        trace.gas_used = hex_to_dec(tx_trace.get('gasUsed', None))
+        trace.value = hex_to_dec(tx_trace.get('value'))
+        trace.gas = hex_to_dec(tx_trace.get('gas'))
+        trace.gas_used = hex_to_dec(tx_trace.get('gasUsed'))
 
-        trace.error = tx_trace.get('error', None)
+        trace.error = tx_trace.get('error')
 
         # lowercase for compatibility with parity traces
-        trace.trace_type = tx_trace.get('type', None).lower()
+        trace.trace_type = tx_trace.get('type').lower()
 
         if trace.trace_type == 'selfdestruct':
             # rename to suicide for compatibility with parity traces
@@ -120,7 +120,7 @@ class EthTraceMapper(object):
         elif trace.trace_type == 'create':
             # move created contract address from `to_address` to `contract_address`
             trace.to_address = None
-            trace.contract_address = to_normalized_address(tx_trace.get('to', None))
+            trace.contract_address = to_normalized_address(tx_trace.get('to'))
         elif trace.trace_type in ('call', 'callcode', 'delegatecall', 'staticcall'):
             trace.call_type = trace.trace_type
             trace.trace_type = 'call'
