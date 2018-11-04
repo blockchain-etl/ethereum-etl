@@ -21,35 +21,21 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
-
-FIELDS_TO_EXPORT = [
-    'block_number',
-    'transaction_hash',
-    'transaction_index',
-    'from_address',
-    'to_address',
-    'value',
-    'contract_address',
-    'input',
-    'output',
-    'trace_type',
-    'call_type',
-    'reward_type',
-    'gas',
-    'gas_used',
-    'subtraces',
-    'trace_address',
-    'error',
-]
+from ethereumetl.domain.geth_trace import EthGethTrace
 
 
-def traces_item_exporter(traces_output):
-    return CompositeItemExporter(
-        filename_mapping={
-            'trace': traces_output
-        },
-        field_mapping={
-            'trace': FIELDS_TO_EXPORT
+class EthGethTraceMapper(object):
+    def json_dict_to_geth_trace(self, json_dict):
+        geth_trace = EthGethTrace()
+
+        geth_trace.block_number = json_dict.get('block_number', None)
+        geth_trace.transaction_traces = json_dict.get('transaction_traces', None)
+
+        return geth_trace
+
+    def geth_trace_to_dict(self, geth_trace):
+        return {
+            'type': 'geth_trace',
+            'block_number': geth_trace.block_number,
+            'transaction_traces': geth_trace.transaction_traces,
         }
-    )

@@ -31,6 +31,7 @@ class EthTraceMapper(object):
 
         trace.block_number = json_dict.get('blockNumber', None)
         trace.transaction_hash = json_dict.get('transactionHash', None)
+        trace.transaction_index = json_dict.get('transactionPosition', None)
         trace.subtraces = json_dict.get('subtraces', None)
         trace.trace_address = json_dict.get('traceAddress', [])
 
@@ -77,11 +78,76 @@ class EthTraceMapper(object):
 
         return trace
 
+    def geth_trace_to_traces(self, geth_trace):
+        block_number = geth_trace.block_number
+        transaction_traces = geth_trace.transaction_traces
+
+        traces = []
+
+        for tx_index, tx_trace in enumerate(transaction_traces):
+            traces.extend(self._iterate_transaction_trace(
+                block_number,
+                tx_index,
+                tx_trace,
+            ))
+
+        return traces
+
+    def _iterate_transaction_trace(self, block_number, tx_index, tx_trace, trace_address=[]):
+        trace = EthTrace()
+
+        trace.block_number = block_number
+        trace.transaction_index = tx_index
+
+        trace.from_address = to_normalized_address(tx_trace.get('from', None))
+        trace.to_address = to_normalized_address(tx_trace.get('to', None))
+
+        trace.input = tx_trace.get('input', None)
+        trace.output = tx_trace.get('output', None)
+
+        trace.value = hex_to_dec(tx_trace.get('value', None))
+        trace.gas = hex_to_dec(tx_trace.get('gas', None))
+        trace.gas_used = hex_to_dec(tx_trace.get('gasUsed', None))
+
+        trace.error = tx_trace.get('error', None)
+
+        # lowercase for compatibility with parity traces
+        trace.trace_type = tx_trace.get('type', None).lower()
+
+        if trace.trace_type == 'selfdestruct':
+            # rename to suicide for compatibility with parity traces
+            trace.trace_type = 'suicide'
+        elif trace.trace_type == 'create':
+            # move created contract address from `to_address` to `contract_address`
+            trace.to_address = None
+            trace.contract_address = to_normalized_address(tx_trace.get('to', None))
+        elif trace.trace_type in ('call', 'callcode', 'delegatecall', 'staticcall'):
+            trace.call_type = trace.trace_type
+            trace.trace_type = 'call'
+
+        result = [trace]
+
+        calls = tx_trace.get('calls', [])
+
+        trace.subtraces = len(calls)
+        trace.trace_address = trace_address
+
+        for call_index, call_trace in enumerate(calls):
+            result.extend(self._iterate_transaction_trace(
+                block_number,
+                tx_index,
+                call_trace,
+                trace_address + [call_index]
+            ))
+
+        return result
+
     def trace_to_dict(self, trace):
         return {
             'type': 'trace',
             'block_number': trace.block_number,
             'transaction_hash': trace.transaction_hash,
+            'transaction_index': trace.transaction_index,
             'from_address': trace.from_address,
             'to_address': trace.to_address,
             'value': trace.value,

@@ -25,31 +25,16 @@ from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExpo
 
 FIELDS_TO_EXPORT = [
     'block_number',
-    'transaction_hash',
-    'transaction_index',
-    'from_address',
-    'to_address',
-    'value',
-    'contract_address',
-    'input',
-    'output',
-    'trace_type',
-    'call_type',
-    'reward_type',
-    'gas',
-    'gas_used',
-    'subtraces',
-    'trace_address',
-    'error',
+    'transaction_traces',
 ]
 
 
-def traces_item_exporter(traces_output):
+def geth_traces_item_exporter(geth_traces_output):
     return CompositeItemExporter(
         filename_mapping={
-            'trace': traces_output
+            'geth_trace': geth_traces_output
         },
         field_mapping={
-            'trace': FIELDS_TO_EXPORT
+            'geth_trace': FIELDS_TO_EXPORT
         }
     )

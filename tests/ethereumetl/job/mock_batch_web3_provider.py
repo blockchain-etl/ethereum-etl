@@ -43,6 +43,9 @@ class MockBatchWeb3Provider(object):
             elif req['method'] == 'eth_getTransactionReceipt':
                 transaction_hash = req['params'][0]
                 file_name = 'web3_response.receipt.' + str(transaction_hash) + '.json'
+            elif req['method'] == 'debug_traceBlockByNumber':
+                block_number = req['params'][0]
+                file_name = 'web3_response.block_trace.' + str(block_number) + '.json'
             else:
                 raise ValueError('Request method {} is unexpected'.format(req['method']))
             file_content = self.read_resource(file_name)
