@@ -25,9 +25,9 @@ import click
 import re
 
 from datetime import datetime, timedelta
-from export_all_common import export_all_common
 from web3 import Web3
 
+from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
 
@@ -106,7 +106,7 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output-dir', default='output', type=str, help='Output directory, partitioned in Hive style.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
+@click.option('-B', '--export-batch-size', default=100, type=int, help='The number of requests in JSON RPC batches.')
 def cli(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size):
     """Export all for a range of blocks."""
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),

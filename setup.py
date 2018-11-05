@@ -1,7 +1,13 @@
+import os
+
 from setuptools import setup, find_packages
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+
+long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -21,25 +27,14 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
     keywords='ethereum',
-    python_requires='>=3.5.0,<3.7.0',
+    python_requires='>=3.6.0,<3.7.0',
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'export_all=ethereumetl.cli.export_all:cli',
-            'export_blocks_and_transactions=ethereumetl.cli.export_blocks_and_transactions:cli',
-            'export_contracts=ethereumetl.cli.export_contracts:cli',
-            'export_receipts_and_logs=ethereumetl.cli.export_receipts_and_logs:cli',
-            'export_token_transfers=ethereumetl.cli.export_token_transfers:cli',
-            'export_tokens=ethereumetl.cli.export_tokens:cli',
-            'export_traces=ethereumetl.cli.export_traces:cli',
-            'extract_token_transfers=ethereumetl.cli.extract_token_transfers:cli',
-            'get_block_range_for_date=ethereumetl.cli.get_block_range_for_date:cli',
-            'get_block_range_for_timestamps=ethereumetl.cli.get_block_range_for_timestamps:cli',
-            'get_keccak_hash=ethereumetl.cli.get_keccak_hash:cli',
+            'ethereumetl=ethereumetl.cli:cli',
         ],
     },
     project_urls={
