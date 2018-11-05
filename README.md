@@ -44,19 +44,6 @@ Export traces ([Schema](#tracescsv), [Reference](#export_tracespy)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
-Export geth traces ([Reference](#export_geth_tracespy)):
-
-```bash
-> ethereumetl export_geth_traces --start-block 1 --end-block 500000 \
---provider-uri file://$HOME/Library/Ethereum/geth.ipc --output geth_traces.json
-```
-
-Extract geth traces ([Schema](#tracescsv), [Reference](#extract_geth_tracespy)):
-
-```bash
-> ethereumetl extract_geth_traces --input geth_traces.json --output traces.csv
-```
-
 [LIMITATIONS](#limitations)
 
 ## Table of Contents
