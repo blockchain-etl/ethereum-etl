@@ -184,7 +184,10 @@ to_address                   | address     |
 value                        | numeric     |
 contract_address             | address     |
 input                        | hex_string  |
+output                       | hex_string  |
 trace_type                   | string      |
+call_type                    | string      |
+reward_type                  | string      |
 gas                          | bigint      |
 gas_used                     | bigint      |
 subtraces                    | bigint      |
