@@ -458,7 +458,8 @@ You can tune `--max-workers` for performance.
 
 #### export_traces.py
 
-The API used in this command is not supported by Infura, so you will need a local node.
+The API used in this command is not supported by Infura, 
+so you will need a local Parity archive node (`parity --tracing on`).
 
 ```bash
 > python export_traces.py --start-block 0 --end-block 500000 \
@@ -469,7 +470,8 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 #### export_geth_traces.py
 
-The API used in this command is not supported by Infura, so you will need a local geth archive node (`geth --gcmode archive --syncmode full`).
+The API used in this command is not supported by Infura, 
+so you will need a local Geth archive node (`geth --gcmode archive --syncmode full`).
 
 ```bash
 > python export_geth_traces.py --start-block 0 --end-block 500000 \
