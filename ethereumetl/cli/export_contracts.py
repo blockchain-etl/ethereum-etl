@@ -32,13 +32,15 @@ from ethereumetl.providers.auto import get_provider_from_uri
 
 logging_basic_config()
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 @click.option('-c', '--contract-addresses', type=str, help='The file containing contract addresses, one per line.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 def cli(batch_size, contract_addresses, output, max_workers, provider_uri):
     """Exports contracts bytecode using eth_getCode JSON RPC APIs."""
     with smart_open(contract_addresses, 'r') as contract_addresses_file:

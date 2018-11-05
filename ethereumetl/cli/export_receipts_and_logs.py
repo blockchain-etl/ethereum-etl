@@ -32,14 +32,19 @@ from ethereumetl.providers.auto import get_provider_from_uri
 
 logging_basic_config()
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
 @click.option('-t', '--transaction-hashes', type=str, help='The file containing transaction hashes, one per line.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('--receipts-output', default=None, type=str, help='The output file for receipts. If not provided receipts will not be exported. Use "-" for stdout')
-@click.option('--logs-output', default=None, type=str, help='The output file for receipt logs. If not provided receipt logs will not be exported. Use "-" for stdout')
-
+@click.option('--receipts-output', default=None, type=str,
+              help='The output file for receipts. If not provided receipts will not be exported. Use "-" for stdout')
+@click.option('--logs-output', default=None, type=str,
+              help='The output file for receipt logs. '
+                   'aIf not provided receipt logs will not be exported. Use "-" for stdout')
 def cli(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
     """Export receipts and logs."""
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:

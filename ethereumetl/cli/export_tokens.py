@@ -34,12 +34,14 @@ from ethereumetl.providers.auto import get_provider_from_uri
 
 logging_basic_config()
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 def cli(token_addresses, output, max_workers, provider_uri):
     """Exports ERC20 tokens."""
     with smart_open(token_addresses, 'r') as token_addresses_file:
