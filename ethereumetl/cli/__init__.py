@@ -23,7 +23,7 @@ import click
 
 from ethereumetl.cli import export_blocks_and_transactions, export_receipts_and_logs, export_all, \
     export_token_transfers, extract_token_transfers, export_contracts, export_tokens, get_block_range_for_date, \
-    get_block_range_for_timestamps, get_keccak_hash, export_traces
+    get_block_range_for_timestamps, get_keccak_hash, export_traces, export_geth_traces, extract_geth_traces
 
 
 @click.group()
@@ -41,8 +41,8 @@ cli.add_command(extract_token_transfers.cli, "extract_token_transfers")
 cli.add_command(export_contracts.cli, "export_contracts")
 cli.add_command(export_tokens.cli, "export_tokens")
 cli.add_command(export_traces.cli, "export_traces")
-# cli.add_command(export_geth_traces.cli, "export_geth_traces")
-# cli.add_command(extract_geth_traces.cli, "extract_geth_traces")
+cli.add_command(export_geth_traces.cli, "export_geth_traces")
+cli.add_command(extract_geth_traces.cli, "extract_geth_traces")
 
 # utils
 cli.add_command(get_block_range_for_date.cli, "get_block_range_for_date")

@@ -467,7 +467,8 @@ You can tune `--batch-size`, `--max-workers` for performance.
 #### export_geth_traces.py
 
 The API used in this command is not supported by Infura, 
-so you will need a local Geth archive node (`geth --gcmode archive --syncmode full`).
+so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).
+When using rpc, add `--rpc --rpcapi debug` options.
 
 ```bash
 > python export_geth_traces.py --start-block 0 --end-block 500000 \
