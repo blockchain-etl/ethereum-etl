@@ -64,7 +64,7 @@ class EthTraceMapper(object):
             trace.input = action.get('input')
             trace.output = result.get('output')
         elif trace_type == 'create':
-            trace.contract_address = result.get('address')
+            trace.to_address = result.get('address')
             trace.input = action.get('init')
             trace.output = result.get('code')
         elif trace_type == 'suicide':
@@ -117,10 +117,6 @@ class EthTraceMapper(object):
         if trace.trace_type == 'selfdestruct':
             # rename to suicide for compatibility with parity traces
             trace.trace_type = 'suicide'
-        elif trace.trace_type == 'create':
-            # move created contract address from `to_address` to `contract_address`
-            trace.to_address = None
-            trace.contract_address = to_normalized_address(tx_trace.get('to'))
         elif trace.trace_type in ('call', 'callcode', 'delegatecall', 'staticcall'):
             trace.call_type = trace.trace_type
             trace.trace_type = 'call'
@@ -151,7 +147,6 @@ class EthTraceMapper(object):
             'from_address': trace.from_address,
             'to_address': trace.to_address,
             'value': trace.value,
-            'contract_address': trace.contract_address,
             'input': trace.input,
             'output': trace.output,
             'trace_type': trace.trace_type,
