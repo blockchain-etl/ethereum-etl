@@ -23,4 +23,8 @@
 
 from ethereumetl.cli.export_geth_traces import cli
 
+print('========================================================================================')
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
+print('========================================================================================')
+
 cli()
