@@ -9,12 +9,9 @@ def read(fname):
 
 long_description = read('README.md') if os.path.isfile("README.md") else ""
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
-
 setup(
     name='ethereum-etl',
-    version='0.5.0',
+    version='0.6.0',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
     description='Export Ethereum blockchain data to CSV or JSON',
@@ -31,7 +28,15 @@ setup(
     ],
     keywords='ethereum',
     python_requires='>=3.6.0,<3.7.0',
-    install_requires=requirements,
+    install_requires=[
+        'web3==4.7.2',
+        'eth-utils==1.2.0',
+        'eth-abi==1.2.0',
+        # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
+        'python-dateutil==2.7.0',
+        'click==6.7',
+        'ethereum-dasm==0.1.4'
+    ],
     entry_points={
         'console_scripts': [
             'ethereumetl=ethereumetl.cli:cli',
