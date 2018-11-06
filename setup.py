@@ -14,10 +14,10 @@ with open('requirements.txt') as f:
 
 setup(
     name='ethereum-etl',
-    version='0.0.1',
+    version='0.5.0',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
-    description='Export data components of Ethereum Blockchain',
+    description='Export Ethereum blockchain data to CSV or JSON',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/blockchain-etl/ethereum-etl',

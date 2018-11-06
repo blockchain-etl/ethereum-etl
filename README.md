@@ -6,7 +6,7 @@
 Install Ethereum ETL:
 
 ```bash
-pip install ethereumetl
+pip install ethereum-etl
 ```
 
 Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactionspy)):
