@@ -44,6 +44,8 @@ Export traces ([Schema](#tracescsv), [Reference](#export_tracespy)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
+Use `python ethereumetl.py` for development.
+
 [LIMITATIONS](#limitations)
 
 ## Table of Contents
@@ -236,20 +238,17 @@ You can export blocks below `currentBlock`,
 there is no need to wait until the full sync as the state is not needed (unless you also need contracts bytecode
 and token details; for those you need to wait until the full sync).
 
-1. Clone Ethereum ETL and install the dependencies:
+1. Install Ethereum ETL:
 
     ```bash
-    > git clone https://github.com/medvedev1088/ethereum-etl.git
-    > cd ethereum-etl
-    > pip install -r requirements.txt
+    > pip install ethereum-etl
     ```
 
 1. Export all:
 
     ```bash
-    > ./export_all.sh -h
-    Usage: ./export_all.sh -s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir>]
-    > ./export_all.sh -s 0 -e 5499999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
+    > ethereumetl export_all --help
+    > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
@@ -277,20 +276,6 @@ check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 You can use AWS Auto Scaling and Data Pipeline to reduce the exporting time to a few hours.
 Read this article for details https://medium.com/@medvedev1088/how-to-export-the-entire-ethereum-blockchain-to-csv-in-2-hours-for-10-69fef511e9a2
 
-### Running in Windows
-
-Additional steps:
-
-1. Install Visual C++ Build Tools https://landinghub.visualstudio.com/visual-cpp-build-tools
-
-1. Install Git Bash with  Git for Windows https://git-scm.com/download/win
-
-1. Run in Git Bash:
-
-    ```bash
-    >  ./export_all.sh -s 0 -e 999999 -b 100000 -p 'file:\\\\.\pipe\geth.ipc' -o output
-    ```
-
 ### Running in Docker
 
 1. Install Docker https://docs.docker.com/install/
@@ -309,24 +294,24 @@ Additional steps:
 
 ### Command Reference
 
-- [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)
-- [export_token_transfers.py](#export_token_transferspy)
-- [extract_token_transfers.py](#extract_token_transferspy)
-- [export_receipts_and_logs.py](#export_receipts_and_logspy)
-- [export_contracts.py](#export_contractspy)
-- [export_tokens.py](#export_tokenspy)
-- [export_traces.py](#export_tracespy)
-- [export_geth_traces.py](#export_geth_tracespy)
-- [extract_geth_traces.py](#extract_geth_tracespy)
-- [get_block_range_for_date.py](#get_block_range_for_datepy)
-- [get_keccak_hash.py](#get_keccak_hashpy)
+- [export_blocks_and_transactions](#export_blocks_and_transactions)
+- [export_token_transfers](#export_token_transfers)
+- [extract_token_transfers](#extract_token_transfers)
+- [export_receipts_and_logs](#export_receipts_and_logs)
+- [export_contracts](#export_contracts)
+- [export_tokens](#export_tokens)
+- [export_traces](#export_traces)
+- [export_geth_traces](#export_geth_traces)
+- [extract_geth_traces](#extract_geth_traces)
+- [get_block_range_for_date](#get_block_range_for_date)
+- [get_keccak_hash](#get_keccak_hash)
 
 All the commands accept `-h` parameter for help, e.g.:
 
 ```bash
-> python export_blocks_and_transactions.py -h
+> ethereumetl export_blocks_and_transactions -h
 
-Usage: export_blocks_and_transactions.py [OPTIONS]
+Usage: ethereumetl export_blocks_and_transactions [OPTIONS]
 
   Export blocks and transactions.
 
@@ -348,10 +333,10 @@ Options:
 
 For the `--output` parameters the supported types are csv and json. The format type is inferred from the output file name.
 
-#### export_blocks_and_transactions.py
+#### export_blocks_and_transactions
 
 ```bash
-> python export_blocks_and_transactions.py --start-block 0 --end-block 500000 \
+> ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc \
 --blocks-output blocks.csv --transactions-output transactions.csv
 ```
@@ -360,30 +345,30 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### export_token_transfers.py
+#### export_token_transfers
 
 The API used in this command is not supported by Infura, so you will need a local node.
-If you want to use Infura for exporting ERC20 transfers refer to [extract_token_transfers.py](#extract_token_transferspy)
+If you want to use Infura for exporting ERC20 transfers refer to [extract_token_transfers](#extract_token_transfers)
 
 ```bash
-> python export_token_transfers.py --start-block 0 --end-block 500000 \
+> ethereumetl export_token_transfers --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output token_transfers.csv
 ```
 
 Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g.
 
 ```bash
-> python export_token_transfers.py --start-block 0 --end-block 500000 \
+> ethereumetl export_token_transfers --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv \
 --tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 --tokens 0x06012c8cf97bead5deae237070f9587f8e7a266d
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### export_receipts_and_logs.py
+#### export_receipts_and_logs
 
 First extract transaction hashes from `transactions.csv`
-(Exported with [export_blocks_and_transactions.py](#export_blocks_and_transactionspy)):
+(Exported with [export_blocks_and_transactions](#export_blocks_and_transactions)):
 
 ```bash
 > python extract_csv_column.py --input transactions.csv --column hash --output transaction_hashes.txt
@@ -392,7 +377,7 @@ First extract transaction hashes from `transactions.csv`
 Then export receipts and logs:
 
 ```bash
-> python export_receipts_and_logs.py --transaction-hashes transaction_hashes.txt \
+> ethereumetl export_receipts_and_logs --transaction-hashes transaction_hashes.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --receipts-output receipts.csv --logs-output logs.csv
 ```
 
@@ -403,22 +388,22 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-#### extract_token_transfers.py
+#### extract_token_transfers
 
-First export receipt logs with [export_receipts_and_logs.py](#export_receipts_and_logspy).
+First export receipt logs with [export_receipts_and_logs](#export_receipts_and_logs).
 
 Then extract transfers from the logs.csv file:
 
 ```bash
-> python extract_token_transfers.py --logs logs.csv --output token_transfers.csv
+> ethereumetl extract_token_transfers --logs logs.csv --output token_transfers.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### export_contracts.py
+#### export_contracts
 
 First extract contract addresses from `receipts.csv`
-(Exported with [export_receipts_and_logs.py](#export_receipts_and_logspy)):
+(Exported with [export_receipts_and_logs](#export_receipts_and_logs)):
 
 ```bash
 > python extract_csv_column.py --input receipts.csv --column contract_address --output contract_addresses.txt
@@ -427,16 +412,16 @@ First extract contract addresses from `receipts.csv`
 Then export contracts:
 
 ```bash
-> python export_contracts.py --contract-addresses contract_addresses.txt \
+> ethereumetl export_contracts --contract-addresses contract_addresses.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output contracts.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### export_tokens.py
+#### export_tokens
 
 First extract token addresses from `contracts.json`
-(Exported with [export_contracts.py](#export_contractspy)):
+(Exported with [export_contracts](#export_contracts)):
 
 ```bash
 > python filter_items.py -i contracts.json -p "item['is_erc20'] or item['is_erc721']" | \
@@ -446,62 +431,63 @@ python extract_field.py -f address -o token_addresses.txt
 Then export ERC20 / ERC721 tokens:
 
 ```bash
-> python export_tokens.py --token-addresses token_addresses.txt \
+> ethereumetl export_tokens --token-addresses token_addresses.txt \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output tokens.csv
 ```
 
 You can tune `--max-workers` for performance.
 
-#### export_traces.py
+#### export_traces
 
 The API used in this command is not supported by Infura, 
 so you will need a local Parity archive node (`parity --tracing on`).
 
 ```bash
-> python export_traces.py --start-block 0 --end-block 500000 \
+> ethereumetl export_traces --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --batch-size 100 --output traces.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### export_geth_traces.py
+#### export_geth_traces
 
 The API used in this command is not supported by Infura, 
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).
 When using rpc, add `--rpc --rpcapi debug` options.
 
 ```bash
-> python export_geth_traces.py --start-block 0 --end-block 500000 \
+> ethereumetl export_geth_traces --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output geth_traces.json
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### extract_geth_traces.py
+#### extract_geth_traces
 
 ```bash
-> python extract_geth_traces.py --input geth_traces.json --output traces.csv
+> ethereumetl extract_geth_traces --input geth_traces.json --output traces.csv
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-#### get_block_range_for_date.py
+#### get_block_range_for_date
 
 ```bash
-> python get_block_range_for_date.py --provider-uri=https://mainnet.infura.io --date 2018-01-01
+> ethereumetl get_block_range_for_date --provider-uri=https://mainnet.infura.io --date 2018-01-01
 4832686,4838611
 ```
 
-#### get_keccak_hash.py
+#### get_keccak_hash
 
 ```bash
-> python get_keccak_hash.py -i "transfer(address,uint256)"
+> ethereumetl get_keccak_hash -i "transfer(address,uint256)"
 0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
 
 #### Running Tests
 
 ```bash
+> pip install -e . -r requirements.txt
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
