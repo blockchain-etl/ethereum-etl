@@ -376,7 +376,7 @@ First extract transaction hashes from `transactions.csv`
 (Exported with [export_blocks_and_transactions](#export_blocks_and_transactions)):
 
 ```bash
-> python extract_csv_column.py --input transactions.csv --column hash --output transaction_hashes.txt
+> ethereumetl extract_csv_column --input transactions.csv --column hash --output transaction_hashes.txt
 ```
 
 Then export receipts and logs:
@@ -411,7 +411,7 @@ First extract contract addresses from `receipts.csv`
 (Exported with [export_receipts_and_logs](#export_receipts_and_logs)):
 
 ```bash
-> python extract_csv_column.py --input receipts.csv --column contract_address --output contract_addresses.txt
+> ethereumetl extract_csv_column --input receipts.csv --column contract_address --output contract_addresses.txt
 ```
 
 Then export contracts:
@@ -429,8 +429,8 @@ First extract token addresses from `contracts.json`
 (Exported with [export_contracts](#export_contracts)):
 
 ```bash
-> python filter_items.py -i contracts.json -p "item['is_erc20'] or item['is_erc721']" | \
-python extract_field.py -f address -o token_addresses.txt
+> ethereumetl filter_items -i contracts.json -p "item['is_erc20'] or item['is_erc721']" | \
+ethereumetl extract_field -f address -o token_addresses.txt
 ```
 
 Then export ERC20 / ERC721 tokens:

@@ -21,10 +21,20 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.extract_csv_column import cli
+import json
 
-print('========================================================================================')
-print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
-print('========================================================================================')
+import click
 
-cli()
+from ethereumetl.file_utils import smart_open
+
+
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.option('-f', '--field', required=True, type=str, help='The field name to extract.')
+def cli(input, output, field):
+    # TODO: Add support for CSV
+    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
+        for line in input_file:
+            item = json.loads(line)
+            output_file.write(item[field] + '\n')
