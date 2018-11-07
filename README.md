@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/blockchain-etl/ethereum-etl.png)](https://travis-ci.org/blockchain-etl/ethereum-etl)
+[Telegram](https://web.telegram.org/#/im?p=g233226067)
 
 Install Ethereum ETL:
 
@@ -9,42 +10,42 @@ Install Ethereum ETL:
 pip install ethereum-etl
 ```
 
-Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactionspy)):
+Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactions)):
 
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 and ERC721 transfers ([Schema](#token_transferscsv), [Reference](#export_token_transferspy)):
+Export ERC20 and ERC721 transfers ([Schema](#token_transferscsv), [Reference](#export_token_transfers)):
 
 ```bash
 > ethereumetl export_token_transfers --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
-Export receipts and logs ([Schema](#receiptscsv), [Reference](#export_receipts_and_logspy)):
+Export receipts and logs ([Schema](#receiptscsv), [Reference](#export_receipts_and_logs)):
 
 ```bash
 > ethereumetl export_receipts_and_logs --transaction-hashes transaction_hashes.txt \
 --provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
 ```
 
-Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export_tokenspy)):
+Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export_tokens)):
 
 ```bash
 > ethereumetl export_tokens --token-addresses token_addresses.csv \
 --provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
-Export traces ([Schema](#tracescsv), [Reference](#export_tracespy)):
+Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
-Use `python ethereumetl.py` for development.
+For the latest version, check out the repo and call `python ethereumetl.py`.
 
 [LIMITATIONS](#limitations)
 
