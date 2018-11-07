@@ -182,7 +182,6 @@ transaction_index            | bigint      |
 from_address                 | address     |
 to_address                   | address     |
 value                        | numeric     |
-contract_address             | address     |
 input                        | hex_string  |
 output                       | hex_string  |
 trace_type                   | string      |

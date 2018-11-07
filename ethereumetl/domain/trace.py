@@ -29,7 +29,6 @@ class EthTrace(object):
         self.from_address = None
         self.to_address = None
         self.value = None
-        self.contract_address = None
         self.input = None
         self.output = None
         self.trace_type = None

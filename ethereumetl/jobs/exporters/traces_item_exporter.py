@@ -30,7 +30,6 @@ FIELDS_TO_EXPORT = [
     'from_address',
     'to_address',
     'value',
-    'contract_address',
     'input',
     'output',
     'trace_type',
