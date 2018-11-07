@@ -33,7 +33,7 @@ from ethereumetl.logging_utils import logging_basic_config
 @click.option('-i', '--input-string', default='Transfer(address,address,uint256)', type=str,
               help='String to hash, e.g. Transfer(address,address,uint256)')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-def cli(input_string, output):
+def get_keccak_hash(input_string, output):
     """Outputs 32-byte Keccak hash of given string."""
     hash = keccak(text=input_string)
 

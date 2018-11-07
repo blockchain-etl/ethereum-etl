@@ -38,7 +38,7 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-def cli(logs, batch_size, output, max_workers):
+def extract_token_transfers(logs, batch_size, output, max_workers):
     """Extracts ERC20/ERC721 transfers from logs file."""
     with smart_open(logs, 'r') as logs_file:
         if logs.endswith('.json'):

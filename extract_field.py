@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.extract_field import cli
+from ethereumetl.cli.extract_field import extract_field
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+extract_field()

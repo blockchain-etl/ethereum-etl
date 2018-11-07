@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_receipts_and_logs import cli
+from ethereumetl.cli.export_receipts_and_logs import export_receipts_and_logs
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+export_receipts_and_logs()

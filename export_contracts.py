@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_contracts import cli
+from ethereumetl.cli.export_contracts import export_contracts
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+export_contracts()

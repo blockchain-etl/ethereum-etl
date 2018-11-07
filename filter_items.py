@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.filter_items import cli
+from ethereumetl.cli.filter_items import filter_items
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+filter_items()

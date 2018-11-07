@@ -32,7 +32,7 @@ from ethereumetl.file_utils import smart_open
 @click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-c', '--column', required=True, type=str, help='The csv column name to extract.')
-def cli(input, output, column):
+def extract_csv_column(input, output, column):
     """Extracts column from given CSV file."""
     set_max_field_size_limit()
 

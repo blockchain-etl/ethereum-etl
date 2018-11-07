@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.get_keccak_hash import cli
+from ethereumetl.cli.get_keccak_hash import get_keccak_hash
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+get_keccak_hash()

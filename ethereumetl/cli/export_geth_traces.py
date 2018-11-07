@@ -42,7 +42,7 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
-def cli(start_block, end_block, batch_size, output, max_workers, provider_uri):
+def export_geth_traces(start_block, end_block, batch_size, output, max_workers, provider_uri):
     """Exports traces from geth node."""
     job = ExportGethTracesJob(
         start_block=start_block,

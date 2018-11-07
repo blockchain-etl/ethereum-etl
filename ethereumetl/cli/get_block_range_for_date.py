@@ -41,7 +41,7 @@ logging_basic_config()
 @click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
               help='The date e.g. 2018-01-01.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-def cli(provider_uri, date, output):
+def get_block_range_for_date(provider_uri, date, output):
     """Outputs start and end blocks for given date."""
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)

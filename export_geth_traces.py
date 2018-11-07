@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_geth_traces import cli
+from ethereumetl.cli.export_geth_traces import export_geth_traces
 
 print('========================================================================================')
 print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
 print('========================================================================================')
 
-cli()
+export_geth_traces()

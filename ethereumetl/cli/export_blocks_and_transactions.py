@@ -45,7 +45,7 @@ logging_basic_config()
 @click.option('--transactions-output', default=None, type=str,
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
-def cli(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
+def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
     """Exports blocks and transactions."""
     if blocks_output is None and transactions_output is None:
         raise ValueError('Either --blocks-output or --transactions-output options must be provided')
