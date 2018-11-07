@@ -46,7 +46,7 @@ logging_basic_config()
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
 def cli(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
-    """Export blocks and transactions."""
+    """Exports blocks and transactions."""
     job = ExportBlocksJob(
         start_block=start_block,
         end_block=end_block,

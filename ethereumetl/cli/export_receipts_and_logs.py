@@ -46,7 +46,7 @@ logging_basic_config()
               help='The output file for receipt logs. '
                    'aIf not provided receipt logs will not be exported. Use "-" for stdout')
 def cli(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
-    """Export receipts and logs."""
+    """Exports receipts and logs."""
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),

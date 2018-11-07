@@ -42,7 +42,7 @@ logging_basic_config()
               help='The date e.g. 2018-01-01.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 def cli(provider_uri, date, output):
-    """Outputs the start block and end block for a given date."""
+    """Outputs start and end blocks for given date."""
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)

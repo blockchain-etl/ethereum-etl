@@ -42,7 +42,7 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 def cli(batch_size, contract_addresses, output, max_workers, provider_uri):
-    """Exports contracts bytecode using eth_getCode JSON RPC APIs."""
+    """Exports contracts bytecode and sighashes."""
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
         contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                               if contract_address.strip())

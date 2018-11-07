@@ -45,7 +45,11 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
-For the latest version, check out the repo and call `python ethereumetl.py`.
+For the latest version, check out the repo and call 
+```bash
+> pip install -e . 
+> python ethereumetl.py
+```
 
 [LIMITATIONS](#limitations)
 

@@ -43,7 +43,7 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 def cli(token_addresses, output, max_workers, provider_uri):
-    """Exports ERC20 tokens."""
+    """Exports ERC20/ERC721 tokens."""
     with smart_open(token_addresses, 'r') as token_addresses_file:
         job = ExportTokensJob(
             token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),

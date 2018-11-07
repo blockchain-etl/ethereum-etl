@@ -44,7 +44,7 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
 def cli(start_block, end_block, batch_size, output, max_workers, provider_uri):
-    """Exports traces using trace_filter JSON RPC API."""
+    """Exports traces from parity node."""
     job = ExportTracesJob(
         start_block=start_block,
         end_block=end_block,
