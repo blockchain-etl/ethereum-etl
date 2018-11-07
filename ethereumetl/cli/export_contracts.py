@@ -35,7 +35,8 @@ logging_basic_config()
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
-@click.option('-c', '--contract-addresses', type=str, help='The file containing contract addresses, one per line.')
+@click.option('-c', '--contract-addresses', required=True, type=str,
+              help='The file containing contract addresses, one per line.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,

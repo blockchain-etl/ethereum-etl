@@ -35,7 +35,8 @@ logging_basic_config()
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
-@click.option('-t', '--transaction-hashes', type=str, help='The file containing transaction hashes, one per line.')
+@click.option('-t', '--transaction-hashes', required=True, type=str,
+              help='The file containing transaction hashes, one per line.')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
