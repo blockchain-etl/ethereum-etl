@@ -33,6 +33,7 @@ from ethereumetl.file_utils import smart_open
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-f', '--field', required=True, type=str, help='The field name to extract.')
 def cli(input, output, field):
+    """Extracts field from given JSON lines file."""
     # TODO: Add support for CSV
     with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
         for line in input_file:
