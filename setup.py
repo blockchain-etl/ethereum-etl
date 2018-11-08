@@ -14,7 +14,7 @@ setup(
     version='1.0.0',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
-    description='Export Ethereum blockchain data to CSV or JSON',
+    description='Tools for exporting Ethereum blockchain data to CSV or JSON',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/blockchain-etl/ethereum-etl',
