@@ -21,15 +21,14 @@
 # SOFTWARE.
 
 
-import click
-
 from datetime import datetime
+
+import click
 from web3 import Web3
 
-from ethereumetl.file_utils import smart_open
 from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.service.eth_service import EthService
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.service.eth_service import EthService
 
 logging_basic_config()
 
@@ -49,5 +48,5 @@ def get_block_range_for_date(provider_uri, date, output):
 
     start_block, end_block = eth_service.get_block_range_for_date(date)
 
-    with smart_open(output, 'w') as output_file:
+    with click.open_file(output, 'w') as output_file:
         output_file.write('{},{}\n'.format(start_block, end_block))

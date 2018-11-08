@@ -22,9 +22,11 @@
 
 
 import pytest
+from click.testing import CliRunner
 from dateutil.parser import parse
 from web3 import HTTPProvider, Web3
 
+from ethereumetl.cli import get_block_range_for_date
 from ethereumetl.service.eth_service import EthService
 from ethereumetl.service.graph_operations import OutOfBoundsError
 from tests.helpers import skip_if_slow_tests_disabled
@@ -39,10 +41,10 @@ from tests.helpers import skip_if_slow_tests_disabled
     ('2018-06-10', 5761663, 5767303)
 ])
 def test_get_block_range_for_date(date, expected_start_block, expected_end_block):
-    eth_service = get_new_eth_service()
-    parsed_date = parse(date)
-    blocks = eth_service.get_block_range_for_date(parsed_date)
-    assert blocks == (expected_start_block, expected_end_block)
+    runner = CliRunner()
+    result = runner.invoke(get_block_range_for_date, ['--date', date])
+    assert 0 == result.exit_code
+    assert '{},{}\n'.format(expected_start_block, expected_end_block) == result.output
 
 
 @skip_if_slow_tests_disabled
