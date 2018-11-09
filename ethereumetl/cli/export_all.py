@@ -25,9 +25,9 @@ import click
 import re
 
 from datetime import datetime, timedelta
-from export_all_common import export_all_common
 from web3 import Web3
 
+from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
 
@@ -95,16 +95,19 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
     else:
         raise ValueError('start and end must be either block numbers or ISO dates or Unix times')
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-s', '--start', required=True, type=str, help='Start block/ISO date/Unix time')
 @click.option('-e', '--end', required=True, type=str, help='End block/ISO date/Unix time')
-@click.option('-b', '--partition-batch-size', default=10000, type=int, help='The number of blocks to export in partition.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-b', '--partition-batch-size', default=10000, type=int,
+              help='The number of blocks to export in partition.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output-dir', default='output', type=str, help='Output directory, partitioned in Hive style.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-B', '--export-batch-size', default=100, type=int, help='The number of rows to write concurrently.')
-
-def cli(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size):
-    """Export all for a range of blocks."""
+@click.option('-B', '--export-batch-size', default=100, type=int, help='The number of requests in JSON RPC batches.')
+def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size):
+    """Exports all for a range of blocks."""
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
                       output_dir, provider_uri, max_workers, export_batch_size)

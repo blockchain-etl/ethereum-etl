@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
+# Copyright (c) 2018 Evgeniy Filatov, evgeniyfilatov@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,36 +19,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-
-import click
 import csv
 import json
 
+import click
+
 from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
-from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from ethereumetl.jobs.exporters.traces_item_exporter import traces_item_exporter
+from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
 from ethereumetl.logging_utils import logging_basic_config
 
 logging_basic_config()
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-l', '--logs', type=str, required=True, help='The CSV file containing receipt logs.')
+@click.option('-i', '--input', required=True, type=str, help='The JSON file containing geth traces.')
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-def extract_token_transfers(logs, batch_size, output, max_workers):
-    """Extracts ERC20/ERC721 transfers from logs file."""
-    with smart_open(logs, 'r') as logs_file:
-        if logs.endswith('.json'):
-            logs_reader = (json.loads(line) for line in logs_file)
+def extract_geth_traces(input, batch_size, output, max_workers):
+    """Extracts geth traces from JSON lines file."""
+    with smart_open(input, 'r') as geth_traces_file:
+        if input.endswith('.json'):
+            traces_iterable = (json.loads(line) for line in geth_traces_file)
         else:
-            logs_reader = csv.DictReader(logs_file)
-        job = ExtractTokenTransfersJob(
-            logs_iterable=logs_reader,
+            traces_iterable = (trace for trace in csv.DictReader(geth_traces_file))
+        job = ExtractGethTracesJob(
+            traces_iterable=traces_iterable,
             batch_size=batch_size,
             max_workers=max_workers,
-            item_exporter=token_transfers_item_exporter(output))
+            item_exporter=traces_item_exporter(output))
 
         job.run()

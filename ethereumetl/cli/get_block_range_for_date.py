@@ -33,13 +33,16 @@ from ethereumetl.providers.auto import get_provider_from_uri
 
 logging_basic_config()
 
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-@click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'), help='The date e.g. 2018-01-01.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 
-def cli(provider_uri, date, output):
-    """Outputs the start block and end block for a given date."""
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
+              help='The date e.g. 2018-01-01.')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+def get_block_range_for_date(provider_uri, date, output):
+    """Outputs start and end blocks for given date."""
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)

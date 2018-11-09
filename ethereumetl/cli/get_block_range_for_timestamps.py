@@ -32,14 +32,16 @@ from ethereumetl.service.eth_service import EthService
 
 logging_basic_config()
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str, help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+              help='The URI of the web3 provider e.g. '
+                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-s', '--start-timestamp', required=True, type=int, help='Start unix timestamp, in seconds.')
 @click.option('-e', '--end-timestamp', required=True, type=int, help='End unix timestamp, in seconds.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-
-def cli(provider_uri, start_timestamp, end_timestamp, output):
-    """Outputs the start block and end block for a given timestamp range."""
+def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output):
+    """Outputs start and end blocks for given timestamps."""
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)

@@ -21,6 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_tokens import cli
+from ethereumetl.cli.export_tokens import export_tokens
 
-cli()
+print('========================================================================================')
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
+print('========================================================================================')
+
+export_tokens()

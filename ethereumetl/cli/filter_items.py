@@ -21,10 +21,23 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.export_token_transfers import export_token_transfers
+import json
 
-print('========================================================================================')
-print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
-print('========================================================================================')
+import click
 
-export_token_transfers()
+from ethereumetl.file_utils import smart_open
+
+
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
+@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.option('-p', '--predicate', required=True, type=str,
+              help='Predicate in Python code e.g. "item[\'is_erc20\']".')
+def filter_items(input, output, predicate):
+    """Filters given JSON lines file by predicate."""
+    # TODO: Add support for CSV
+    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
+        for line in input_file:
+            item = json.loads(line)
+            if eval(predicate, globals(), {'item': item}):
+                output_file.write(json.dumps(item) + '\n')

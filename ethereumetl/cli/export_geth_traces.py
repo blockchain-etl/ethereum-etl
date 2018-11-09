@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
+# Copyright (c) 2018 Evgeniy Filatov, evgeniyfilatov@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,33 @@
 
 import click
 
-from web3 import Web3
-
-from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.export_tokens_job import ExportTokensJob
-from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
+from ethereumetl.jobs.exporters.geth_traces_item_exporter import geth_traces_item_exporter
 from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 logging_basic_config()
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-t', '--token-addresses', type=str, help='The file containing token addresses, one per line.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.option('-s', '--start-block', default=0, type=int, help='Start block')
+@click.option('-e', '--end-block', required=True, type=int, help='End block')
+@click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to process at a time.')
+@click.option('-o', '--output', default='-', type=str,
+              help='The output file for geth traces. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+@click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
-                   'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-def export_tokens(token_addresses, output, max_workers, provider_uri):
-    """Exports ERC20/ERC721 tokens."""
-    with smart_open(token_addresses, 'r') as token_addresses_file:
-        job = ExportTokensJob(
-            token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),
-            web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
-            item_exporter=tokens_item_exporter(output),
-            max_workers=max_workers)
+                   'file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
+def export_geth_traces(start_block, end_block, batch_size, output, max_workers, provider_uri):
+    """Exports traces from geth node."""
+    job = ExportGethTracesJob(
+        start_block=start_block,
+        end_block=end_block,
+        batch_size=batch_size,
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+        max_workers=max_workers,
+        item_exporter=geth_traces_item_exporter(output))
 
-        job.run()
+    job.run()

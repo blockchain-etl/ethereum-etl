@@ -21,6 +21,10 @@
 # SOFTWARE.
 
 
-from ethereumetl.cli.get_block_range_for_date import cli
+from ethereumetl.cli.get_block_range_for_date import get_block_range_for_date
 
-cli()
+print('========================================================================================')
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
+print('========================================================================================')
+
+get_block_range_for_date()

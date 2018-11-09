@@ -21,25 +21,10 @@
 # SOFTWARE.
 
 
-import click
-import csv
+from ethereumetl.cli.extract_csv_column import extract_csv_column
 
-from ethereumetl.csv_utils import set_max_field_size_limit
-from ethereumetl.file_utils import smart_open
+print('========================================================================================')
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
+print('========================================================================================')
 
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-c', '--column', required=True, type=str, help='The csv column name to extract.')
-
-def main(input, output, column):
-    """Extracts a single column from a given csv file."""
-    set_max_field_size_limit()
-
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
-        reader = csv.DictReader(input_file)
-        for row in reader:
-            output_file.write(row[column] + '\n')
-
-if __name__ == '__main__':
-    main()
+extract_csv_column()
