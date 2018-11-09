@@ -292,8 +292,8 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 
 1. Run a container out of the image
     ```bash
-    > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest -s 0 -e 5499999 -b 100000 -p https://mainnet.infura.io
-    > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest -s 2018-01-01 -e 2018-01-01 -b 100000 -p https://mainnet.infura.io
+    > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 0 -e 5499999 -b 100000 -p https://mainnet.infura.io
+    > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://mainnet.infura.io
     ```
 
 ### Command Reference
@@ -491,7 +491,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 #### Running Tests
 
 ```bash
-> pip install -e . -r requirements.txt
+> pip install -e . -r requirements-dev.txt
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
