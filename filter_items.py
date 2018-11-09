@@ -19,12 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import sys
 
 from ethereumetl.cli.filter_items import filter_items
 
-print('========================================================================================')
-print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.')
-print('========================================================================================')
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
 filter_items()
