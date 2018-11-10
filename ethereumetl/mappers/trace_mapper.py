@@ -93,6 +93,19 @@ class EthTraceMapper(object):
 
         return traces
 
+    def genesis_alloc_to_trace(self, allocation):
+        address = allocation[0]
+        amount = allocation[1]
+
+        trace = EthTrace()
+
+        trace.block_number = 0
+        trace.to_address = address
+        trace.value = amount
+        trace.trace_type = 'genesis'
+
+        return trace
+
     def _iterate_transaction_trace(self, block_number, tx_index, tx_trace, trace_address=[]):
         trace = EthTrace()
 

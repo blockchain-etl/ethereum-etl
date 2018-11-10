@@ -22,8 +22,9 @@
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
-from ethereumetl.utils import validate_range
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
+from ethereumetl.service.eth_special_trace_service import EthSpecialTraceService
+from ethereumetl.utils import validate_range
 
 
 class ExportTracesJob(BaseJob):
@@ -34,7 +35,8 @@ class ExportTracesJob(BaseJob):
             batch_size,
             web3,
             item_exporter,
-            max_workers):
+            max_workers,
+            include_genesis_traces=False):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -46,6 +48,9 @@ class ExportTracesJob(BaseJob):
         self.item_exporter = item_exporter
 
         self.trace_mapper = EthTraceMapper()
+
+        self.special_trace_service = EthSpecialTraceService()
+        self.include_genesis_traces = include_genesis_traces
 
     def _start(self):
         self.item_exporter.open()
@@ -62,6 +67,12 @@ class ExportTracesJob(BaseJob):
         # https://github.com/paritytech/parity-ethereum/issues/9822
         assert len(block_number_batch) == 1
         block_number = block_number_batch[0]
+
+        if self.include_genesis_traces:
+            if 0 in block_number_batch:
+                genesis_traces = self.special_trace_service.get_genesis_traces()
+                for trace in genesis_traces:
+                    self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
         # TODO: Change to traceFilter when this issue is fixed
         # https://github.com/paritytech/parity-ethereum/issues/9822
