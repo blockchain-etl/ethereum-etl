@@ -40,12 +40,13 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('--genesis-traces/--no-genesis-traces', default=False,
-              help='Whether to include genesis allocation traces')
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
-def export_traces(start_block, end_block, batch_size, output, max_workers, genesis_traces, provider_uri):
+@click.option('--genesis-traces/--no-genesis-traces', default=False, help='Whether to include genesis traces')
+@click.option('--daofork-traces/--no-daofork-traces', default=False, help='Whether to include daofork traces')
+def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri,
+                  genesis_traces, daofork_traces):
     """Exports traces from parity node."""
     job = ExportTracesJob(
         start_block=start_block,
@@ -54,6 +55,7 @@ def export_traces(start_block, end_block, batch_size, output, max_workers, genes
         web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
         item_exporter=traces_item_exporter(output),
         max_workers=max_workers,
-        include_genesis_traces=genesis_traces)
+        include_genesis_traces=genesis_traces,
+        include_daofork_traces=daofork_traces)
 
     job.run()

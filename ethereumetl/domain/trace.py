@@ -36,6 +36,6 @@ class EthTrace(object):
         self.reward_type = None
         self.gas = None
         self.gas_used = None
-        self.subtraces = None
+        self.subtraces = 0
         self.trace_address = None
         self.error = None

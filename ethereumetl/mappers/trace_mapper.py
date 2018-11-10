@@ -22,6 +22,7 @@
 
 
 from ethereumetl.domain.trace import EthTrace
+from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
 from ethereumetl.utils import hex_to_dec, to_normalized_address
 
 
@@ -95,14 +96,29 @@ class EthTraceMapper(object):
 
     def genesis_alloc_to_trace(self, allocation):
         address = allocation[0]
-        amount = allocation[1]
+        value = allocation[1]
 
         trace = EthTrace()
 
         trace.block_number = 0
         trace.to_address = address
-        trace.value = amount
+        trace.value = value
         trace.trace_type = 'genesis'
+
+        return trace
+
+    def daofork_state_change_to_trace(self, state_change):
+        from_address = state_change[0]
+        to_address = state_change[1]
+        value = state_change[2]
+
+        trace = EthTrace()
+
+        trace.block_number = DAOFORK_BLOCK_NUMBER
+        trace.from_address = from_address
+        trace.to_address = to_address
+        trace.value = value
+        trace.trace_type = 'daofork'
 
         return trace
 

@@ -22,6 +22,7 @@
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.jobs.base_job import BaseJob
+from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.service.eth_special_trace_service import EthSpecialTraceService
 from ethereumetl.utils import validate_range
@@ -36,7 +37,8 @@ class ExportTracesJob(BaseJob):
             web3,
             item_exporter,
             max_workers,
-            include_genesis_traces=False):
+            include_genesis_traces=False,
+            include_daofork_traces=False):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -51,6 +53,7 @@ class ExportTracesJob(BaseJob):
 
         self.special_trace_service = EthSpecialTraceService()
         self.include_genesis_traces = include_genesis_traces
+        self.include_daofork_traces = include_daofork_traces
 
     def _start(self):
         self.item_exporter.open()
@@ -68,15 +71,22 @@ class ExportTracesJob(BaseJob):
         assert len(block_number_batch) == 1
         block_number = block_number_batch[0]
 
-        if self.include_genesis_traces:
-            if 0 in block_number_batch:
-                genesis_traces = self.special_trace_service.get_genesis_traces()
-                for trace in genesis_traces:
-                    self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
+        if self.include_genesis_traces and 0 in block_number_batch:
+            genesis_traces = self.special_trace_service.get_genesis_traces()
+            for trace in genesis_traces:
+                self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
+
+        if self.include_daofork_traces and DAOFORK_BLOCK_NUMBER in block_number_batch:
+            daofork_traces = self.special_trace_service.get_daofork_traces()
+            for trace in daofork_traces:
+                self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
         # TODO: Change to traceFilter when this issue is fixed
         # https://github.com/paritytech/parity-ethereum/issues/9822
         json_traces = self.web3.parity.traceBlock(block_number)
+
+        if json_traces is None:
+            raise ValueError('Response from the node is None. Is the node fully synced?')
 
         for json_trace in json_traces:
             trace = self.trace_mapper.json_dict_to_trace(json_trace)
