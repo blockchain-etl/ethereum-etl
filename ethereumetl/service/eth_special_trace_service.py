@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Evgeniy Filatov, evgeniyfilatov@gmail.com
+# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,22 @@
 # SOFTWARE.
 
 
-class EthTrace(object):
+from ethereumetl.mappers.trace_mapper import EthTraceMapper
+
+
+class EthSpecialTraceService(object):
+
     def __init__(self):
-        self.block_number = None
-        self.transaction_hash = None
-        self.transaction_index = None
-        self.from_address = None
-        self.to_address = None
-        self.value = None
-        self.input = None
-        self.output = None
-        self.trace_type = None
-        self.call_type = None
-        self.reward_type = None
-        self.gas = None
-        self.gas_used = None
-        self.subtraces = 0
-        self.trace_address = None
-        self.error = None
+        self.trace_mapper = EthTraceMapper()
+
+    def get_genesis_traces(self):
+        from ethereumetl.mainnet_genesis_alloc import MAINNET_GENESIS_ALLOC
+        genesis_traces = [self.trace_mapper.genesis_alloc_to_trace(alloc)
+                          for alloc in MAINNET_GENESIS_ALLOC]
+        return genesis_traces
+
+    def get_daofork_traces(self):
+        from ethereumetl.mainnet_daofork_state_changes import MAINNET_DAOFORK_STATE_CHANGES
+        daofork_traces = [self.trace_mapper.daofork_state_change_to_trace(change)
+                          for change in MAINNET_DAOFORK_STATE_CHANGES]
+        return daofork_traces
