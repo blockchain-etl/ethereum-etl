@@ -47,7 +47,7 @@ def read_resource(resource_group, file_name):
     (1000895, 1000895, 'block_with_error', 'mock'),
 ])
 def test_export_geth_traces_job(tmpdir, start_block, end_block, resource_group, web3_provider_type):
-    traces_output_file = tmpdir.join('actual_geth_traces.json')
+    traces_output_file = str(tmpdir.join('actual_geth_traces.json'))
 
     job = ExportGethTracesJob(
         start_block=start_block, end_block=end_block, batch_size=1,

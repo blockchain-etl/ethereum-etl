@@ -27,7 +27,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     keywords='ethereum',
-    python_requires='>=3.6.0,<3.7.0',
+    python_requires='>=3.5.3,<3.8.0',
     install_requires=[
         'web3==4.7.2',
         'eth-utils==1.2.0',
@@ -37,6 +37,11 @@ setup(
         'click==6.7',
         'ethereum-dasm==0.1.4'
     ],
+    extras_require={
+        'dev': [
+            'pytest~=3.2.0',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ethereumetl=ethereumetl.cli:cli',
