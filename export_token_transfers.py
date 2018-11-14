@@ -19,42 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 
+from ethereumetl.cli.export_token_transfers import export_token_transfers
 
-import argparse
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
-from web3 import Web3
-
-from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
-from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.providers.auto import get_provider_from_uri
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
-
-logging_basic_config()
-
-parser = argparse.ArgumentParser(
-    description='Exports ERC20 transfers using eth_newFilter and eth_getFilterLogs JSON RPC APIs.')
-parser.add_argument('-s', '--start-block', default=0, type=int, help='Start block')
-parser.add_argument('-e', '--end-block', required=True, type=int, help='End block')
-parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('-p', '--provider-uri', required=True, type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
-parser.add_argument('-t', '--tokens', default=None, type=str, nargs='+',
-                    help='The list of token addresses to filter by.')
-
-args = parser.parse_args()
-
-job = ExportTokenTransfersJob(
-    start_block=args.start_block,
-    end_block=args.end_block,
-    batch_size=args.batch_size,
-    web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(args.provider_uri))),
-    item_exporter=token_transfers_item_exporter(args.output),
-    max_workers=args.max_workers,
-    tokens=args.tokens)
-
-job.run()
+export_token_transfers()

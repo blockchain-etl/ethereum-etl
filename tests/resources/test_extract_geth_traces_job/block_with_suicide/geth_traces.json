@@ -1,0 +1,1 @@
+{"block_number": 1011973, "transaction_traces": [{"calls": [{"type": "SELFDESTRUCT"}], "from": "0x83973747eec131bf9a08ac64fb1a518e891bdf4b", "gas": "0x10c78", "gasUsed": "0xe8", "input": "0x41c0e1b5", "output": "0x", "time": "578.495\u00b5s", "to": "0x474faa5018639791952fae334e2911700ac7fe9b", "type": "CALL", "value": "0x0"}]}

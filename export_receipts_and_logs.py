@@ -19,43 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 
+from ethereumetl.cli.export_receipts_and_logs import export_receipts_and_logs
 
-import argparse
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
-from ethereumetl.file_utils import smart_open
-from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from ethereumetl.providers.auto import get_provider_from_uri
-
-logging_basic_config()
-
-parser = argparse.ArgumentParser(description='Export receipts and logs.')
-parser.add_argument('-b', '--batch-size', default=100, type=int, help='The number of receipts to export at a time.')
-parser.add_argument('-t', '--transaction-hashes', type=str, help='The file containing transaction hashes, one per line.')
-parser.add_argument('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
-                    help='The URI of the web3 provider e.g. '
-                         'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-parser.add_argument('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-parser.add_argument('--receipts-output', default=None, type=str,
-                    help='The output file for receipts. If not provided receipts will not be exported. '
-                         'Use "-" for stdout')
-parser.add_argument('--logs-output', default=None, type=str,
-                    help='The output file for receipt logs. If not provided receipt logs will not be exported. '
-                         'Use "-" for stdout')
-
-args = parser.parse_args()
-
-with smart_open(args.transaction_hashes, 'r') as transaction_hashes_file:
-    job = ExportReceiptsJob(
-        transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),
-        batch_size=args.batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
-        max_workers=args.max_workers,
-        item_exporter=receipts_and_logs_item_exporter(args.receipts_output, args.logs_output),
-        export_receipts=args.receipts_output is not None,
-        export_logs=args.logs_output is not None)
-
-    job.run()
+export_receipts_and_logs()

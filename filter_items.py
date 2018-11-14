@@ -19,24 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 
+from ethereumetl.cli.filter_items import filter_items
 
-import argparse
-import json
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
-from ethereumetl.file_utils import smart_open
-
-parser = argparse.ArgumentParser(description='Extracts a single column from a given csv file.')
-parser.add_argument('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-parser.add_argument('-p', '--predicate', required=True, type=str,
-                    help='Predicate in Python code e.g. "item[\'is_erc20\']".')
-
-args = parser.parse_args()
-
-# TODO: Add support for CSV
-with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
-    for line in input_file:
-        item = json.loads(line)
-        if eval(args.predicate, globals(), {'item': item}):
-            output_file.write(json.dumps(item) + '\n')
+filter_items()

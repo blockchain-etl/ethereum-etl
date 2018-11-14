@@ -24,6 +24,8 @@
 import csv
 import logging
 import os
+import shutil
+
 from time import time
 
 from web3 import Web3
@@ -65,7 +67,7 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
-def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
+def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_size):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
         # # # start # # #
@@ -122,10 +124,10 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
 
         # # # receipts_and_logs # # #
 
-        transaction_hashes_output_dir = f'{output_dir}/transaction_hashes{partition_dir}'
-        os.makedirs(os.path.dirname(transaction_hashes_output_dir), exist_ok=True)
+        cache_output_dir = f'{output_dir}/.tmp{partition_dir}'
+        os.makedirs(os.path.dirname(cache_output_dir), exist_ok=True)
 
-        transaction_hashes_file = f'{transaction_hashes_output_dir}/transaction_hashes_{file_name_suffix}.csv'
+        transaction_hashes_file = f'{cache_output_dir}/transaction_hashes_{file_name_suffix}.csv'
         logger.info(f'Extracting hash column from transaction file {transactions_file}')
         extract_csv_column_unique(transactions_file, transaction_hashes_file, 'hash')
 
@@ -152,10 +154,7 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
 
         # # # contracts # # #
 
-        contract_addresses_output_dir = f'{output_dir}/contract_addresses{partition_dir}'
-        os.makedirs(os.path.dirname(contract_addresses_output_dir), exist_ok=True)
-
-        contract_addresses_file = f'{contract_addresses_output_dir}/contract_addresses_{file_name_suffix}.csv'
+        contract_addresses_file = f'{cache_output_dir}/contract_addresses_{file_name_suffix}.csv'
         logger.info(f'Extracting contract_address from receipt file {receipts_file}')
         extract_csv_column_unique(receipts_file, contract_addresses_file, 'contract_address')
 
@@ -179,10 +178,7 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
         # # # tokens # # #
 
         if token_transfers_file is not None:
-            token_addresses_output_dir = f'{output_dir}/token_addresses{partition_dir}'
-            os.makedirs(os.path.dirname(token_addresses_output_dir), exist_ok=True)
-
-            token_addresses_file = f'{token_addresses_output_dir}/token_addresses_{file_name_suffix}'
+            token_addresses_file = f'{cache_output_dir}/token_addresses_{file_name_suffix}'
             logger.info(f'Extracting token_address from token_transfers file {token_transfers_file}')
             extract_csv_column_unique(token_transfers_file, token_addresses_file, 'token_address')
 
@@ -201,7 +197,7 @@ def export_all(partitions, output_dir, provider_uri, max_workers, batch_size):
                 job.run()
 
         # # # finish # # #
-
+        shutil.rmtree(os.path.dirname(cache_output_dir))
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info(f'Exporting blocks {block_range} took {time_diff} seconds')
