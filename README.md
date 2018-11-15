@@ -228,7 +228,7 @@ will have `0` or `1` in the `decimals` column in the CSVs.
 
 ## Exporting the Blockchain
 
-1. Install python 3.6 https://www.python.org/downloads/ (3.5 and 3.7 are not supported by this tool for now)
+1. Install python 3.5.3+ https://www.python.org/downloads/
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
 For that use `-p https://mainnet.infura.io` option for the commands below. If you need ERC20 transfers or want to
@@ -254,6 +254,8 @@ and token details; for those you need to wait until the full sync).
     > ethereumetl export_all --help
     > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
+    
+    In case `ethereumetl` command is not available in PATH, use `python -m ethereumetl` instead.
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
 
@@ -443,6 +445,7 @@ You can tune `--max-workers` for performance.
 
 #### export_traces
 
+Also called internal transactions.
 The API used in this command is not supported by Infura, 
 so you will need a local Parity archive node (`parity --tracing on`).
 
@@ -454,6 +457,8 @@ so you will need a local Parity archive node (`parity --tracing on`).
 You can tune `--batch-size`, `--max-workers` for performance.
 
 #### export_geth_traces
+
+Read [Differences between geth and parity traces.csv](#differences-between-geth-and-parity-tracescsv)
 
 The API used in this command is not supported by Infura, 
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).
