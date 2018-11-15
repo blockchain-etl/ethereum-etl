@@ -491,9 +491,16 @@ You can tune `--batch-size`, `--max-workers` for performance.
 #### Running Tests
 
 ```bash
-> pip install -e . -r requirements-dev.txt
+> pip install -e .[dev]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
+```
+
+#### Running Tox Tests
+
+```bash
+> pip install tox
+> tox
 ```
 
 ## Querying in Amazon Athena

@@ -44,7 +44,7 @@ def read_resource(resource_group, file_name):
     'block_with_error',
 ])
 def test_extract_traces_job(tmpdir, resource_group):
-    output_file = tmpdir.join('actual_traces.csv')
+    output_file = str(tmpdir.join('actual_traces.csv'))
 
     geth_traces_content = read_resource(resource_group, 'geth_traces.json')
     traces_iterable = (json.loads(line) for line in geth_traces_content.splitlines())

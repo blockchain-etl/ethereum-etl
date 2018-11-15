@@ -74,7 +74,7 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
         while start_date <= end_date:
             batch_start_block, batch_end_block = eth_service.get_block_range_for_date(start_date)
-            partition_dir = f'/date={str(start_date)}/'
+            partition_dir = '/date={start_date!s}/'.format(start_date=start_date)
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
@@ -89,7 +89,10 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
             padded_batch_start_block = str(batch_start_block).zfill(8)
             padded_batch_end_block = str(batch_end_block).zfill(8)
-            partition_dir = f'/start_block={padded_batch_start_block}/end_block={padded_batch_end_block}'
+            partition_dir = '/start_block={padded_batch_start_block}/end_block={padded_batch_end_block}'.format(
+                padded_batch_start_block=padded_batch_start_block,
+                padded_batch_end_block=padded_batch_end_block,
+            )
             yield batch_start_block, batch_end_block, partition_dir
 
     else:
