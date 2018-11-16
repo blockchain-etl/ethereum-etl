@@ -92,3 +92,7 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
+def check_classic_provider_uri(chain, provider_uri):
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")

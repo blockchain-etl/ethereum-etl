@@ -30,6 +30,7 @@ from web3 import Web3
 from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
+from ethereumetl.utils import check_classic_provider_uri
 
 
 def is_date_range(start, end):
@@ -114,7 +115,6 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
 def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size, chain):
     """Exports all data for a range of blocks."""
-    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
-        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
+    check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
                       output_dir, provider_uri, max_workers, export_batch_size)

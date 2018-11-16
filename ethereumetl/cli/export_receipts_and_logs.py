@@ -29,6 +29,7 @@ from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.utils import check_classic_provider_uri
 
 logging_basic_config()
 
@@ -50,8 +51,7 @@ logging_basic_config()
 
 def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output, chain):
     """Exports receipts and logs."""
-    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
-        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
+    check_classic_provider_uri(chain, provider_uri)
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),

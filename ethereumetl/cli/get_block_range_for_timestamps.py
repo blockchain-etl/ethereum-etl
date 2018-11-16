@@ -29,6 +29,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
+from ethereumetl.utils import check_classic_provider_uri 
 
 logging_basic_config()
 
@@ -44,8 +45,7 @@ logging_basic_config()
 
 def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output, chain):
     """Outputs start and end blocks for given timestamps."""
-    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
-        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
+    check_classic_provider_uri(chain, provider_uri)
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)
