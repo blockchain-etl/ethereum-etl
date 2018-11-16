@@ -45,7 +45,7 @@ logging_basic_config()
 
 def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output, chain):
     """Outputs start and end blocks for given timestamps."""
-    check_classic_provider_uri(chain, provider_uri)
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)

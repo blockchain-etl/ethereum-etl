@@ -50,7 +50,7 @@ logging_basic_config()
 
 def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output, chain):
     """Exports blocks and transactions."""
-    check_classic_provider_uri(chain, provider_uri)
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     if blocks_output is None and transactions_output is None:
         raise ValueError('Either --blocks-output or --transactions-output options must be provided')
 

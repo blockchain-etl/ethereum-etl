@@ -47,7 +47,7 @@ logging_basic_config()
 
 def export_tokens(token_addresses, output, max_workers, provider_uri, chain):
     """Exports ERC20/ERC721 tokens."""
-    check_classic_provider_uri(chain, provider_uri)
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     with smart_open(token_addresses, 'r') as token_addresses_file:
         job = ExportTokensJob(
             token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),

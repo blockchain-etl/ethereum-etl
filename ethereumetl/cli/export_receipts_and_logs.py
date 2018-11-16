@@ -51,7 +51,7 @@ logging_basic_config()
 
 def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output, chain):
     """Exports receipts and logs."""
-    check_classic_provider_uri(chain, provider_uri)
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),

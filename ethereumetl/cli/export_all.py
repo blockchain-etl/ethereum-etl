@@ -115,6 +115,6 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
 def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size, chain):
     """Exports all data for a range of blocks."""
-    check_classic_provider_uri(chain, provider_uri)
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
                       output_dir, provider_uri, max_workers, export_batch_size)
