@@ -195,6 +195,11 @@ error                        | string      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
+# Ethereum Classic
+
+For getting ETC csv files, make sure you pass in the `--chain classic` param where it's required for the scripts you want to export. 
+ETC won't run if your `--provider-uri` is Infura. Only `parity chain=classic` and Geth-classic will work.
+
 Note: for the `address` type all hex characters are lower-cased.
 `boolean` type can have 2 values: `True` or `False`.
 
