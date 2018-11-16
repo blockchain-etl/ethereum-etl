@@ -46,8 +46,12 @@ logging_basic_config()
 @click.option('--logs-output', default=None, type=str,
               help='The output file for receipt logs. '
                    'aIf not provided receipt logs will not be exported. Use "-" for stdout')
-def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output, chain):
     """Exports receipts and logs."""
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),

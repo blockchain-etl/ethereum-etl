@@ -42,8 +42,12 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain):
     """Exports contracts bytecode and sighashes."""
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
         contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                               if contract_address.strip())

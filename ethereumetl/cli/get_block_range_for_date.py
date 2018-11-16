@@ -41,8 +41,12 @@ logging_basic_config()
 @click.option('-d', '--date', required=True, type=lambda d: datetime.strptime(d, '%Y-%m-%d'),
               help='The date e.g. 2018-01-01.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-def get_block_range_for_date(provider_uri, date, output):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def get_block_range_for_date(provider_uri, date, output, chain):
     """Outputs start and end blocks for given date."""
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        raise ValueError("Classic chain isn't supported in Infura. Use parity classic chain or geth-classic instead.")
     provider = get_provider_from_uri(provider_uri)
     web3 = Web3(provider)
     eth_service = EthService(web3)
