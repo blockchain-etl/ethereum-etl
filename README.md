@@ -67,6 +67,7 @@ For the latest version, check out the repo and call
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
+- [Ethereum Classic Support](#ethereum-classic-support)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
@@ -497,7 +498,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 > tox
 ```
 
-### Ethereum Classic
+### Ethereum Classic Support
 
 For getting ETC csv files, make sure you pass in the `--chain classic` param where it's required for the scripts you want to export. 
 ETC won't run if your `--provider-uri` is Infura. It will provide a warning and change the provider-uri to `https://ethereumclassic.network` instead. For faster performance, run a client instead locally for classic such as `parity chain=classic` and Geth-classic.
