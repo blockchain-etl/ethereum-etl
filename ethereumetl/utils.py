@@ -23,6 +23,8 @@
 
 import itertools
 
+from ethereumetl.misc.retriable_value_error import RetriableValueError
+
 
 def hex_to_dec(hex_string):
     if hex_string is None:
@@ -63,6 +65,9 @@ def rpc_response_to_result(response):
         error_message = 'result is None in response {}.'.format(response)
         if response.get('error') is None:
             error_message = error_message + ' Make sure Ethereum node is synced.'
+            # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
+            # synced node
+            raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
 
