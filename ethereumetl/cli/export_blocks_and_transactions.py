@@ -28,6 +28,7 @@ from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blo
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.utils import check_classic_provider_uri
 
 logging_basic_config()
 
@@ -45,8 +46,11 @@ logging_basic_config()
 @click.option('--transactions-output', default=None, type=str,
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
-def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output, chain):
     """Exports blocks and transactions."""
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     if blocks_output is None and transactions_output is None:
         raise ValueError('Either --blocks-output or --transactions-output options must be provided')
 

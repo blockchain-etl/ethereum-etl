@@ -29,6 +29,7 @@ from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.utils import check_classic_provider_uri
 
 logging_basic_config()
 
@@ -46,8 +47,11 @@ logging_basic_config()
 @click.option('--logs-output', default=None, type=str,
               help='The output file for receipt logs. '
                    'aIf not provided receipt logs will not be exported. Use "-" for stdout')
-def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output, chain):
     """Exports receipts and logs."""
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     with smart_open(transaction_hashes, 'r') as transaction_hashes_file:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes_file),

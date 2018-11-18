@@ -22,6 +22,7 @@
 
 
 import itertools
+import warnings
 
 
 def hex_to_dec(hex_string):
@@ -92,3 +93,9 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
+def check_classic_provider_uri(chain, provider_uri):
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        warnings.warn("ETC Chain not supported on Infura.io. Using https://ethereumclassic.network instead")
+        return 'https://ethereumclassic.network'
+    return provider_uri

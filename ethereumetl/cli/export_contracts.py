@@ -29,6 +29,7 @@ from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_ex
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.utils import check_classic_provider_uri
 
 logging_basic_config()
 
@@ -42,8 +43,11 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+
+def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain):
     """Exports contracts bytecode and sighashes."""
+    check_classic_provider_uri(chain, provider_uri)
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
         contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                               if contract_address.strip())
