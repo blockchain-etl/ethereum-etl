@@ -195,11 +195,6 @@ error                        | string      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
-# Ethereum Classic
-
-For getting ETC csv files, make sure you pass in the `--chain classic` param where it's required for the scripts you want to export. 
-ETC won't run if your `--provider-uri` is Infura. It will provide a warning and change the provider-uri to `https://ethereumclassic.network` instead. For faster performance, run a client instead locally for classic such as `parity chain=classic` and Geth-classic.
-
 Note: for the `address` type all hex characters are lower-cased.
 `boolean` type can have 2 values: `True` or `False`.
 
@@ -219,17 +214,6 @@ because numeric types there can't handle 32-byte integers. You should use
 - The contracts that don't implement `decimals()` function but have the
 [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) that returns a `boolean`
 will have `0` or `1` in the `decimals` column in the CSVs.
-
-### Differences between geth and parity traces.csv
-
-- `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
-- geth output doesn't have `reward` traces;
-- geth output doesn't have `to_address`, `from_address`, `value` for `suicide` traces;
-- `error` field contains human readable error message, which might differ in geth/parity output;
-- geth output doesn't have `transaction_hash`;
-- `gas_used` is 0 on traces with error in geth, empty in parity;
-- zero output of subcalls is `0x000...` in geth, `0x` in parity;
-
 
 ## Exporting the Blockchain
 
@@ -498,7 +482,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
 
-#### Running Tests
+### Running Tests
 
 ```bash
 > pip install -e .[dev]
@@ -506,12 +490,27 @@ You can tune `--batch-size`, `--max-workers` for performance.
 > pytest -vv
 ```
 
-#### Running Tox Tests
+### Running Tox Tests
 
 ```bash
 > pip install tox
 > tox
 ```
+
+### Ethereum Classic
+
+For getting ETC csv files, make sure you pass in the `--chain classic` param where it's required for the scripts you want to export. 
+ETC won't run if your `--provider-uri` is Infura. It will provide a warning and change the provider-uri to `https://ethereumclassic.network` instead. For faster performance, run a client instead locally for classic such as `parity chain=classic` and Geth-classic.
+
+### Differences between geth and parity traces.csv
+
+- `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
+- geth output doesn't have `reward` traces;
+- geth output doesn't have `to_address`, `from_address`, `value` for `suicide` traces;
+- `error` field contains human readable error message, which might differ in geth/parity output;
+- geth output doesn't have `transaction_hash`;
+- `gas_used` is 0 on traces with error in geth, empty in parity;
+- zero output of subcalls is `0x000...` in geth, `0x` in parity;
 
 ## Querying in Amazon Athena
 
