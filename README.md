@@ -224,7 +224,7 @@ will have `0` or `1` in the `decimals` column in the CSVs.
 
 - `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
 - geth output doesn't have `reward` traces;
-- geth output doesn't have `to_address`, `from_address`, `value` for `suicide traces;
+- geth output doesn't have `to_address`, `from_address`, `value` for `suicide` traces;
 - `error` field contains human readable error message, which might differ in geth/parity output;
 - geth output doesn't have `transaction_hash`;
 - `gas_used` is 0 on traces with error in geth, empty in parity;
