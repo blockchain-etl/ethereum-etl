@@ -47,3 +47,6 @@ coverage.xml
 .venv
 venv/
 ENV/
+
+# IDE
+.vscode/
