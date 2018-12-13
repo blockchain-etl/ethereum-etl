@@ -439,7 +439,7 @@ Also called internal transactions.
 The API used in this command is not supported by Infura, 
 so you will need a local Parity archive node (`parity --tracing on`). 
 Make sure your node has at least 8GB of memory, or else you will face timeout errors. 
-See this issue https://github.com/blockchain-etl/ethereum-etl/issues/137
+See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137) 
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
