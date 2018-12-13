@@ -77,8 +77,8 @@ For the latest version, check out the repo and call
 
 ### blocks.csv
 
-Column                  | Type               |
-------------------------|--------------------|
+Column            | Type               |
+------------------|--------------------|
 number            | bigint             |
 hash              | hex_string         |
 parent_hash       | hex_string         |
@@ -100,8 +100,8 @@ transaction_count | bigint             |
 
 ### transactions.csv
 
-Column              |    Type     |
---------------------|-------------|
+Column           |    Type     |
+-----------------|-------------|
 hash             | hex_string  |
 nonce            | bigint      |
 block_hash       | hex_string  |
@@ -142,9 +142,9 @@ status                       | bigint      |
 
 ### logs.csv
 
-Column                       |    Type     |
------------------------------|-------------|
-log_index                    | bigint      |
+Column                   |    Type     |
+-------------------------|-------------|
+log_index                | bigint      |
 transaction_hash         | hex_string  |
 transaction_index        | bigint      |
 block_hash               | hex_string  |
@@ -437,7 +437,9 @@ You can tune `--max-workers` for performance.
 
 Also called internal transactions.
 The API used in this command is not supported by Infura, 
-so you will need a local Parity archive node (`parity --tracing on`).
+so you will need a local Parity archive node (`parity --tracing on`). 
+Make sure your node has at least 8GB of memory, or else you will face timeout errors. 
+See this issue https://github.com/blockchain-etl/ethereum-etl/issues/137
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
