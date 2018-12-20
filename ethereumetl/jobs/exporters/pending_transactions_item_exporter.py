@@ -21,3 +21,30 @@
 # SOFTWARE.
 
 
+from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+
+PENDING_TRANSACTION_FIELDS_TO_EXPORT = [
+    'hash',
+    # 'nonce',
+    # 'block_hash',
+    # 'block_number',
+    # 'transaction_index',
+    # 'from_address',
+    # 'to_address',
+    # 'value',
+    # 'gas',
+    # 'gas_price',
+    # 'input',
+    'timestamp'
+]
+
+
+def pending_transactions_item_exporter(pending_transactions_output=None):
+    return CompositeItemExporter(
+        filename_mapping={
+            'pending_transaction': pending_transactions_output
+        },
+        field_mapping={
+            'pending_transaction': PENDING_TRANSACTION_FIELDS_TO_EXPORT
+        }
+    )

@@ -50,3 +50,4 @@ ENV/
 
 # IDE
 .vscode/
+.idea/
