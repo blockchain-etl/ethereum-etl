@@ -43,8 +43,7 @@ logging_basic_config()
               help='The date e.g. 2018-01-01.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
-
-def get_block_range_for_date(provider_uri, date, output, chain):
+def get_block_range_for_date(provider_uri, date, output, chain='ethereum'):
     """Outputs start and end blocks for given date."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     provider = get_provider_from_uri(provider_uri)

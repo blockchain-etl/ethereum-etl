@@ -46,12 +46,12 @@ logging_basic_config()
 @click.option('--genesis-traces/--no-genesis-traces', default=False, help='Whether to include genesis traces')
 @click.option('--daofork-traces/--no-daofork-traces', default=False, help='Whether to include daofork traces')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
-
 def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri,
-                  genesis_traces, daofork_traces, chain):
+                  genesis_traces, daofork_traces, chain='ethereum'):
     """Exports traces from parity node."""
     if chain == 'classic' and daofork_traces == True:
-        raise ValueError('Classic chain does not include daofork traces. Disable daofork traces with --no-daofork-traces option.')
+        raise ValueError(
+            'Classic chain does not include daofork traces. Disable daofork traces with --no-daofork-traces option.')
     job = ExportTracesJob(
         start_block=start_block,
         end_block=end_block,

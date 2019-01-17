@@ -29,7 +29,7 @@ from ethereumetl.file_utils import smart_open
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
-from ethereumetl.utils import check_classic_provider_uri 
+from ethereumetl.utils import check_classic_provider_uri
 
 logging_basic_config()
 
@@ -42,8 +42,7 @@ logging_basic_config()
 @click.option('-e', '--end-timestamp', required=True, type=int, help='End unix timestamp, in seconds.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
-
-def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output, chain):
+def get_block_range_for_timestamps(provider_uri, start_timestamp, end_timestamp, output, chain='ethereum'):
     """Outputs start and end blocks for given timestamps."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     provider = get_provider_from_uri(provider_uri)

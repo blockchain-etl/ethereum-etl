@@ -47,8 +47,8 @@ logging_basic_config()
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
-
-def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output, transactions_output, chain):
+def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
+                                   transactions_output, chain='ethereum'):
     """Exports blocks and transactions."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     if blocks_output is None and transactions_output is None:

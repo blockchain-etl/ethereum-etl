@@ -44,8 +44,7 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
-
-def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain):
+def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain='ethereum'):
     """Exports contracts bytecode and sighashes."""
     check_classic_provider_uri(chain, provider_uri)
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
