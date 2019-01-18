@@ -11,7 +11,7 @@ long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 setup(
     name='ethereum-etl',
-    version='1.0.0',
+    version='1.2.2',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
     description='Tools for exporting Ethereum blockchain data to CSV or JSON',
@@ -24,10 +24,13 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ],
     keywords='ethereum',
-    python_requires='>=3.6.0,<3.7.0',
+    # web3.py doesn't work on 3.5.2 and less (https://github.com/ethereum/web3.py/issues/1012)
+    python_requires='>=3.5.3,<3.8.0',
     install_requires=[
         'web3==4.7.2',
         'eth-utils==1.2.0',
@@ -37,6 +40,11 @@ setup(
         'click==6.7',
         'ethereum-dasm==0.1.4'
     ],
+    extras_require={
+        'dev': [
+            'pytest~=3.2.0',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ethereumetl=ethereumetl.cli:cli',

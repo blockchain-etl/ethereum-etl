@@ -30,6 +30,7 @@ from web3 import Web3
 from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
+from ethereumetl.utils import check_classic_provider_uri
 
 
 def is_date_range(start, end):
@@ -74,7 +75,7 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
         while start_date <= end_date:
             batch_start_block, batch_end_block = eth_service.get_block_range_for_date(start_date)
-            partition_dir = f'/date={str(start_date)}/'
+            partition_dir = '/date={start_date!s}/'.format(start_date=start_date)
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
@@ -89,7 +90,10 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 
             padded_batch_start_block = str(batch_start_block).zfill(8)
             padded_batch_end_block = str(batch_end_block).zfill(8)
-            partition_dir = f'/start_block={padded_batch_start_block}/end_block={padded_batch_end_block}'
+            partition_dir = '/start_block={padded_batch_start_block}/end_block={padded_batch_end_block}'.format(
+                padded_batch_start_block=padded_batch_start_block,
+                padded_batch_end_block=padded_batch_end_block,
+            )
             yield batch_start_block, batch_end_block, partition_dir
 
     else:
@@ -107,7 +111,10 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 @click.option('-o', '--output-dir', default='output', type=str, help='Output directory, partitioned in Hive style.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-B', '--export-batch-size', default=100, type=int, help='The number of requests in JSON RPC batches.')
-def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size):
+@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size,
+               chain='ethereum'):
     """Exports all data for a range of blocks."""
+    provider_uri = check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
                       output_dir, provider_uri, max_workers, export_batch_size)

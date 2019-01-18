@@ -40,6 +40,7 @@ from ethereumetl.cli.get_keccak_hash import get_keccak_hash
 
 
 @click.group()
+@click.version_option(version='1.2.2')
 @click.pass_context
 def cli(ctx):
     pass
