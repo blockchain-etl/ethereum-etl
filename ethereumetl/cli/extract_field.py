@@ -21,11 +21,9 @@
 # SOFTWARE.
 
 
-import json
-
 import click
 
-from ethereumetl.file_utils import smart_open
+from ethereumetl import misc_utils
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
@@ -33,9 +31,4 @@ from ethereumetl.file_utils import smart_open
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-f', '--field', required=True, type=str, help='The field name to extract.')
 def extract_field(input, output, field):
-    """Extracts field from given JSON lines file."""
-    # TODO: Add support for CSV
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
-        for line in input_file:
-            item = json.loads(line)
-            output_file.write(item[field] + '\n')
+    misc_utils.extract_field(input, output, field)
