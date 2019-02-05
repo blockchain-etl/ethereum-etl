@@ -42,7 +42,7 @@ parser.add_argument('-o', '--output', default=None, type=str,
 args = parser.parse_args()
 
 job = ExportPendingTransactionsJob(
-    web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=False)),
+    batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(args.provider_uri, batch=True)),
     item_exporter=pending_transactions_item_exporter(args.output),
     export_pending_transactions=args.output is not None)
 

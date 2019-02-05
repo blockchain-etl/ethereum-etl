@@ -31,6 +31,13 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
 --provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
+Export pending transactions ([Schema](#pending_transactionscsv) [Reference](#export_pending_transactionspy)):
+```bash
+> python export_pending_transactions.py \
+--provider http://35.229.51.253:8545 --output pending_transactions.csv
+
+```
+
 [LIMITATIONS](#limitations)
 
 ## Table of Contents
@@ -43,6 +50,7 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
   - [tokens.csv](#tokenscsv)
+  - [pending_transactions.csv](#pending_transactionscsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
@@ -151,6 +159,14 @@ name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
 
+### pending_transactions.csv
+
+Column                       |    Type     |
+-----------------------------|-------------|
+transaction_hash             | address     |
+timestamp                    | numeric     |
+
+
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
 Note: for the `address` type all hex characters are lower-cased. 
@@ -253,6 +269,7 @@ Additional steps:
 - [export_receipts_and_logs.py](#export_receipts_and_logspy)
 - [export_contracts.py](#export_contractspy)
 - [export_tokens.py](#export_tokenspy)
+- [export_pending_transactions.py](#export_pending_transactionspy)
 - [get_block_range_for_date.py](#get_block_range_for_datepy)
 - [get_keccak_hash.py](#get_keccak_hashpy)
 
@@ -373,6 +390,16 @@ Then export ERC20 / ERC721 tokens:
 ```
 
 You can tune `--max-workers` for performance.
+
+##### export_pending_transactions.py
+
+Export pending transactions for every certain period
+
+```bash
+> python export_pending_transactions.py \
+--provider http://35.229.51.253:8545 --output pending_transactions.csv
+
+```
 
 ##### get_block_range_for_date.py
 

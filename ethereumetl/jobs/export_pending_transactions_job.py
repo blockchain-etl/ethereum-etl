@@ -21,30 +21,35 @@
 # SOFTWARE.
 
 import time
+import json
 from web3 import Web3
 
 from ethereumetl.executors.repeated_executor import RepeatedExecutor
 from ethereumetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.pending_transaction_mapper import EthPendingTransactionMapper
+from ethereumetl.json_rpc_requests import \
+    generate_pending_transaction_filter_json_rpc, \
+    generate_get_new_entries_json_rpc, \
+    generate_get_transaction_json_rpc
+from ethereumetl.utils import rpc_response_batch_to_results, safe_rpc_response_batch_to_results
 
 
 # Exports pending transactions
 class ExportPendingTransactionsJob(BaseJob):
     def __init__(
             self,
-            web3_provider,
+            batch_web3_provider,
             item_exporter,
             export_pending_transactions=True):
 
-        self.web3_provider = web3_provider
-        self.web3 = Web3(web3_provider)
-        self.pending_transaction_filter = self.web3.eth.filter('pending')
+        self.batch_web3_provider = batch_web3_provider
+        self.web3 = Web3(batch_web3_provider)
 
+        self.pending_transaction_filter_id = self._generate_pending_transaction_filter()
         self.repeated_executor = RepeatedExecutor(1, self._get_new_pending_transaction)
-
         self.item_exporter = item_exporter
-
         self.export_pending_transactions = export_pending_transactions
+
         if not self.export_pending_transactions:
             raise ValueError('export_pending_transactions must be True')
 
@@ -57,15 +62,19 @@ class ExportPendingTransactionsJob(BaseJob):
         self.repeated_executor.start()
 
     def _get_new_pending_transaction(self):
-        results = self.pending_transaction_filter.get_new_entries()
-        pending_transactions = [self.pending_transaction_mapper.hash_to_pending_transaction(result)
+        pending_transaction_hashes = self._get_new_pending_transaction_hashes()
+        if len(pending_transaction_hashes) == 0:
+            return
+        timestamp = time.time()
+        print(pending_transaction_hashes, timestamp)
+        filter_rpc = list(generate_get_transaction_json_rpc(pending_transaction_hashes))
+        response = self.batch_web3_provider.make_request(json.dumps(filter_rpc))
+        results = safe_rpc_response_batch_to_results(response)
+        pending_transactions = [self.pending_transaction_mapper.json_dict_to_pending_transaction(result)
                                 for result in results]
 
         for pending_transaction in pending_transactions:
-            # Set current local timestamp
-            pending_transaction.timestamp = time.time()
-            print(pending_transaction.hash)
-            print(pending_transaction.timestamp)
+            pending_transaction.timestamp = timestamp
             self._export_pending_transaction_item(pending_transaction)
 
     def _export_pending_transaction_item(self, pending_transaction):
@@ -73,6 +82,18 @@ class ExportPendingTransactionsJob(BaseJob):
             self.item_exporter.export_item(
                 self.pending_transaction_mapper.pending_transaction_to_dict(pending_transaction)
             )
+
+    def _generate_pending_transaction_filter(self):
+        filter_rpc = list(generate_pending_transaction_filter_json_rpc())
+        response = self.batch_web3_provider.make_request(json.dumps(filter_rpc))
+        results = rpc_response_batch_to_results(response)
+        return next(results)
+
+    def _get_new_pending_transaction_hashes(self):
+        filter_rpc = list(generate_get_new_entries_json_rpc(self.pending_transaction_filter_id))
+        response = self.batch_web3_provider.make_request(json.dumps(filter_rpc))
+        results = rpc_response_batch_to_results(response)
+        return next(results)
 
     def _end(self):
         pass

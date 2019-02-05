@@ -63,6 +63,18 @@ def rpc_response_batch_to_results(response):
         yield result
 
 
+def safe_rpc_response_batch_to_results(response):
+    for response_item in response:
+        result = response_item.get('result', None)
+        if result is None:
+            yield {}
+        #     error_message = 'result is None in response {}.'.format(response_item)
+        #     if response_item.get('error', None) is None:
+        #         error_message = error_message + ' Make sure Ethereum node is synced.'
+        #     raise ValueError(error_message)
+        yield result
+
+
 def split_to_batches(start_incl, end_incl, batch_size):
     """start_incl and end_incl are inclusive, the returned batch ranges are also inclusive"""
     for batch_start in range(start_incl, end_incl + 1, batch_size):
