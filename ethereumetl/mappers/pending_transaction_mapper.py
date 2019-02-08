@@ -34,19 +34,9 @@ class EthPendingTransactionMapper(object):
         return pending_transaction
 
     def json_dict_to_pending_transaction(self, json_dict):
-        # pending_transaction = EthPendingTransaction()
-        # pending_transaction.hash = json_dict.get('hash', None)
-        # pending_transaction.timestamp = json_dict.get('timestamp', None)
-        #
-        # return pending_transaction
-
-        """Do not remove, it might be used to enrich pending transaction data"""
         pending_transaction = EthPendingTransaction()
         pending_transaction.hash = json_dict.get('hash', None)
         pending_transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
-        pending_transaction.block_hash = json_dict.get('blockHash', None)
-        pending_transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        pending_transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
         pending_transaction.from_address = to_normalized_address(json_dict.get('from', None))
         pending_transaction.to_address = to_normalized_address(json_dict.get('to', None))
         pending_transaction.value = hex_to_dec(json_dict.get('value', None))
@@ -61,9 +51,6 @@ class EthPendingTransactionMapper(object):
             'type': 'pending_transaction',
             'hash': pending_transaction.hash,
             'nonce': pending_transaction.nonce,
-            'block_hash': pending_transaction.block_hash,
-            'block_number': pending_transaction.block_number,
-            'transaction_index': pending_transaction.transaction_index,
             'from_address': pending_transaction.from_address,
             'to_address': pending_transaction.to_address,
             'value': pending_transaction.value,

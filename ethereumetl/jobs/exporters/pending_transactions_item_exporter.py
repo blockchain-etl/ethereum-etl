@@ -26,9 +26,6 @@ from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExpo
 PENDING_TRANSACTION_FIELDS_TO_EXPORT = [
     'hash',
     'nonce',
-    'block_hash',
-    'block_number',
-    'transaction_index',
     'from_address',
     'to_address',
     'value',
