@@ -67,7 +67,7 @@ def safe_rpc_response_batch_to_results(response):
     for response_item in response:
         result = response_item.get('result', None)
         if result is None:
-            yield {}
+            continue
         #     error_message = 'result is None in response {}.'.format(response_item)
         #     if response_item.get('error', None) is None:
         #         error_message = error_message + ' Make sure Ethereum node is synced.'

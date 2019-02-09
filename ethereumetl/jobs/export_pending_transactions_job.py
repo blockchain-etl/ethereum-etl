@@ -66,10 +66,11 @@ class ExportPendingTransactionsJob(BaseJob):
         if len(pending_transaction_hashes) == 0:
             return
         timestamp = time.time()
-        print(pending_transaction_hashes, timestamp)
+        print(pending_transaction_hashes)
         filter_rpc = list(generate_get_transaction_json_rpc(pending_transaction_hashes))
         response = self.batch_web3_provider.make_request(json.dumps(filter_rpc))
         results = safe_rpc_response_batch_to_results(response)
+
         pending_transactions = [self.pending_transaction_mapper.json_dict_to_pending_transaction(result)
                                 for result in results]
 
