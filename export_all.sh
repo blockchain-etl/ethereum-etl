@@ -108,7 +108,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     transaction_hashes_output_dir=${output_dir}/transaction_hashes${partition_dir}
     mkdir -p ${transaction_hashes_output_dir};
-    
+
     transaction_hashes_file=${transaction_hashes_output_dir}/transaction_hashes_${file_name_suffix}.csv
     log "Extracting hash column from transaction file ${transactions_file}"
     python3 extract_csv_column.py --input ${transactions_file} --output ${transaction_hashes_file} --column "hash"
@@ -130,7 +130,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     contract_addresses_output_dir=${output_dir}/contract_addresses${partition_dir}
     mkdir -p ${contract_addresses_output_dir}
-    
+
     contract_addresses_file=${contract_addresses_output_dir}/contract_addresses_${file_name_suffix}.csv
     log "Extracting contract_address from receipt file ${receipts_file}"
     python3 extract_csv_column.py --input ${receipts_file} --column contract_address --output ${contract_addresses_file}
@@ -138,7 +138,7 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     contracts_output_dir=${output_dir}/contracts${partition_dir}
     mkdir -p ${contracts_output_dir};
-    
+
     contracts_file=${contracts_output_dir}/contracts_${file_name_suffix}.csv
     log "Exporting contracts from blocks ${block_range} to ${contracts_file}"
     python3 export_contracts.py --contract-addresses ${contract_addresses_file} --provider-uri="${provider_uri}" --output=${contracts_file}
@@ -148,15 +148,15 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
 
     token_addresses_output_dir=${output_dir}/token_addresses${partition_dir}
     mkdir -p ${token_addresses_output_dir}
-    
+
     token_addresses_file=${token_addresses_output_dir}/token_addresses_${file_name_suffix}
     log "Extracting token_address from token_transfers file ${token_transfers_file}"
     python3 extract_csv_column.py -i ${token_transfers_file} -c token_address -o - | sort | uniq > ${token_addresses_file}
     quit_if_returned_error
-    
+
     tokens_output_dir=${output_dir}/tokens${partition_dir}
     mkdir -p ${tokens_output_dir}
-    
+
     tokens_file=${tokens_output_dir}/tokens_${file_name_suffix}.csv
     log "Exporting tokens from blocks ${block_range} to ${tokens_file}"
     python3 export_tokens.py --token-addresses ${token_addresses_file} --provider-uri="${provider_uri}" --output ${tokens_file}
