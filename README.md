@@ -287,6 +287,15 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
     > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://mainnet.infura.io
     ```
 
+1. Run streaming to console or Pub/Sub
+    ```bash
+    > docker build -t ethereum-etl:streaming-latest -f Dockerfile_with_streaming .
+    > echo "Stream to console"
+    > docker run ethereum-etl:streaming-latest stream -p https://mainnet.infura.io --start-block 7000000
+    > echo "Stream to Pub/Sub"
+    > docker run ethereum-etl:streaming-latest stream -p https://mainnet.infura.io --start-block 7000000 --output projects/your-project/topics/ethereum_blockchain
+    ```
+
 ### Command Reference
 
 - [export_blocks_and_transactions](#export_blocks_and_transactions)

@@ -33,7 +33,7 @@ setup(
     python_requires='>=3.5.3,<3.8.0',
     install_requires=[
         'web3==4.7.2',
-        'eth-utils==1.2.0',
+        'eth-utils==1.3.0',
         'eth-abi==1.2.0',
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil==2.7.0',
@@ -41,9 +41,12 @@ setup(
         'ethereum-dasm==0.1.4'
     ],
     extras_require={
+        'streaming': [
+            'google-cloud-pubsub==0.37.2'
+        ],
         'dev': [
             'pytest~=3.2.0',
-        ],
+        ]
     },
     entry_points={
         'console_scripts': [
