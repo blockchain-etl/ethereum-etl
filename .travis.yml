@@ -2,6 +2,6 @@ language: python
 python:
   - "3.6"
 install:
-  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install -e . -r requirements-dev.txt
 script:
   - pytest -vv

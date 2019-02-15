@@ -21,18 +21,17 @@
 # SOFTWARE.
 from eth_utils import function_signature_to_4byte_selector
 
-from ethereum_dasm.evmdasm import EVMCode
+from ethereum_dasm.evmdasm import EvmCode, Contract
 
 
 class EthContractService:
 
     def get_function_sighashes(self, bytecode):
-        evm_dasm = EVMCode()
         bytecode = clean_bytecode(bytecode)
         if bytecode is not None:
-            disassembled_code = evm_dasm.disassemble(bytecode)
-
-            basic_blocks = list(evm_dasm.basicblocks(disassembled_code))
+            evm_code = EvmCode(contract=Contract(bytecode=bytecode), static_analysis=False, dynamic_analysis=False)
+            evm_code.disassemble(bytecode)
+            basic_blocks = evm_code.basicblocks
             if basic_blocks and len(basic_blocks) > 0:
                 init_block = basic_blocks[0]
                 instructions = init_block.instructions

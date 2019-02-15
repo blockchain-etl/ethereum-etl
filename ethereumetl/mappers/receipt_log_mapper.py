@@ -30,14 +30,14 @@ class EthReceiptLogMapper(object):
     def json_dict_to_receipt_log(self, json_dict):
         receipt_log = EthReceiptLog()
 
-        receipt_log.log_index = hex_to_dec(json_dict.get('logIndex', None))
-        receipt_log.transaction_hash = json_dict.get('transactionHash', None)
-        receipt_log.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
-        receipt_log.block_hash = json_dict.get('blockHash', None)
-        receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        receipt_log.address = json_dict.get('address', None)
-        receipt_log.data = json_dict.get('data', None)
-        receipt_log.topics = json_dict.get('topics', None)
+        receipt_log.log_index = hex_to_dec(json_dict.get('logIndex'))
+        receipt_log.transaction_hash = json_dict.get('transactionHash')
+        receipt_log.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
+        receipt_log.block_hash = json_dict.get('blockHash')
+        receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        receipt_log.address = json_dict.get('address')
+        receipt_log.data = json_dict.get('data')
+        receipt_log.topics = json_dict.get('topics')
 
         return receipt_log
 
@@ -45,21 +45,21 @@ class EthReceiptLogMapper(object):
 
         receipt_log = EthReceiptLog()
 
-        receipt_log.log_index = dict.get('logIndex', None)
+        receipt_log.log_index = dict.get('logIndex')
 
-        transaction_hash = dict.get('transactionHash', None)
+        transaction_hash = dict.get('transactionHash')
         if transaction_hash is not None:
             transaction_hash = transaction_hash.hex()
         receipt_log.transaction_hash = transaction_hash
 
-        block_hash = dict.get('blockHash', None)
+        block_hash = dict.get('blockHash')
         if block_hash is not None:
             block_hash = block_hash.hex()
         receipt_log.block_hash = block_hash
 
-        receipt_log.block_number = dict.get('blockNumber', None)
-        receipt_log.address = dict.get('address', None)
-        receipt_log.data = dict.get('data', None)
+        receipt_log.block_number = dict.get('blockNumber')
+        receipt_log.address = dict.get('address')
+        receipt_log.data = dict.get('data')
 
         if 'topics' in dict:
             receipt_log.topics = [topic.hex() for topic in dict['topics']]

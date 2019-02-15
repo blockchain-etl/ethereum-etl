@@ -36,17 +36,17 @@ class EthReceiptMapper(object):
     def json_dict_to_receipt(self, json_dict):
         receipt = EthReceipt()
 
-        receipt.transaction_hash = json_dict.get('transactionHash', None)
-        receipt.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
-        receipt.block_hash = json_dict.get('blockHash', None)
-        receipt.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        receipt.cumulative_gas_used = hex_to_dec(json_dict.get('cumulativeGasUsed', None))
-        receipt.gas_used = hex_to_dec(json_dict.get('gasUsed', None))
+        receipt.transaction_hash = json_dict.get('transactionHash')
+        receipt.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
+        receipt.block_hash = json_dict.get('blockHash')
+        receipt.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        receipt.cumulative_gas_used = hex_to_dec(json_dict.get('cumulativeGasUsed'))
+        receipt.gas_used = hex_to_dec(json_dict.get('gasUsed'))
 
-        receipt.contract_address = to_normalized_address(json_dict.get('contractAddress', None))
+        receipt.contract_address = to_normalized_address(json_dict.get('contractAddress'))
 
-        receipt.root = json_dict.get('root', None)
-        receipt.status = hex_to_dec(json_dict.get('status', None))
+        receipt.root = json_dict.get('root')
+        receipt.status = hex_to_dec(json_dict.get('status'))
 
         if 'logs' in json_dict:
             receipt.logs = [

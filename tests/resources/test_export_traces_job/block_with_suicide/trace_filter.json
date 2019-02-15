@@ -1,0 +1,59 @@
+{
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "action": {
+                "callType": "call",
+                "from": "0x83973747eec131bf9a08ac64fb1a518e891bdf4b",
+                "gas": "0x10c78",
+                "input": "0x41c0e1b5",
+                "to": "0x474faa5018639791952fae334e2911700ac7fe9b",
+                "value": "0x0"
+            },
+            "blockHash": "0x3bedf784f81ff55e3a8c04f8b3b3a5e7421b2f5ba139d8e5696e4622bb37467b",
+            "blockNumber": 1011973,
+            "result": {
+                "gasUsed": "0xe8",
+                "output": "0x"
+            },
+            "subtraces": 1,
+            "traceAddress": [],
+            "transactionHash": "0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89",
+            "transactionPosition": 0,
+            "type": "call"
+        },
+        {
+            "action": {
+                "address": "0x474faa5018639791952fae334e2911700ac7fe9b",
+                "balance": "0xb1a2bc2ec50000",
+                "refundAddress": "0x83973747eec131bf9a08ac64fb1a518e891bdf4b"
+            },
+            "blockHash": "0x3bedf784f81ff55e3a8c04f8b3b3a5e7421b2f5ba139d8e5696e4622bb37467b",
+            "blockNumber": 1011973,
+            "result": null,
+            "subtraces": 0,
+            "traceAddress": [
+                0
+            ],
+            "transactionHash": "0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89",
+            "transactionPosition": 0,
+            "type": "suicide"
+        },
+        {
+            "action": {
+                "author": "0x738db714c08b8a32a29e0e68af00215079aa9c5c",
+                "rewardType": "block",
+                "value": "0x4563918244f40000"
+            },
+            "blockHash": "0x3bedf784f81ff55e3a8c04f8b3b3a5e7421b2f5ba139d8e5696e4622bb37467b",
+            "blockNumber": 1011973,
+            "result": null,
+            "subtraces": 0,
+            "traceAddress": [],
+            "transactionHash": null,
+            "transactionPosition": null,
+            "type": "reward"
+        }
+    ],
+    "id": 0
+}

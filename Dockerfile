@@ -1,7 +1,11 @@
-FROM python:3.6
+FROM python:3.6-alpine
+MAINTAINER Eric Lim <elim0322@gmail.com>
+ENV PROJECT_DIR=ethereum-etl
 
-ADD requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN mkdir /$PROJECT_DIR
+WORKDIR /$PROJECT_DIR
+COPY . .
+RUN apk add --no-cache gcc musl-dev  #for C libraries: <limits.h> <stdio.h>
+RUN pip install --upgrade pip && pip install -e /$PROJECT_DIR/
 
-ADD . .
-ENTRYPOINT ["python3", "stream.py"]
+ENTRYPOINT ["python", "ethereumetl"]
