@@ -67,6 +67,7 @@ For the latest version, check out the repo and call
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
   - [Command Reference](#command-reference)
+- [Ethereum Classic Support](#ethereum-classic-support)
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
@@ -76,8 +77,8 @@ For the latest version, check out the repo and call
 
 ### blocks.csv
 
-Column                  | Type               |
-------------------------|--------------------|
+Column            | Type               |
+------------------|--------------------|
 number            | bigint             |
 hash              | hex_string         |
 parent_hash       | hex_string         |
@@ -99,8 +100,8 @@ transaction_count | bigint             |
 
 ### transactions.csv
 
-Column              |    Type     |
---------------------|-------------|
+Column           |    Type     |
+-----------------|-------------|
 hash             | hex_string  |
 nonce            | bigint      |
 block_hash       | hex_string  |
@@ -141,9 +142,9 @@ status                       | bigint      |
 
 ### logs.csv
 
-Column                       |    Type     |
------------------------------|-------------|
-log_index                    | bigint      |
+Column                   |    Type     |
+-------------------------|-------------|
+log_index                | bigint      |
 transaction_hash         | hex_string  |
 transaction_index        | bigint      |
 block_hash               | hex_string  |
@@ -215,20 +216,9 @@ because numeric types there can't handle 32-byte integers. You should use
 [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) that returns a `boolean`
 will have `0` or `1` in the `decimals` column in the CSVs.
 
-### Differences between geth and parity traces.csv
-
-- `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
-- geth output doesn't have `reward` traces;
-- geth output doesn't have `to_address`, `from_address`, `value` for `suicide traces;
-- `error` field contains human readable error message, which might differ in geth/parity output;
-- geth output doesn't have `transaction_hash`;
-- `gas_used` is 0 on traces with error in geth, empty in parity;
-- zero output of subcalls is `0x000...` in geth, `0x` in parity;
-
-
 ## Exporting the Blockchain
 
-1. Install python 3.6 https://www.python.org/downloads/ (3.5 and 3.7 are not supported by this tool for now)
+1. Install python 3.5.3+ https://www.python.org/downloads/
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
 For that use `-p https://mainnet.infura.io` option for the commands below. If you need ERC20 transfers or want to
@@ -254,6 +244,8 @@ and token details; for those you need to wait until the full sync).
     > ethereumetl export_all --help
     > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
+    
+    In case `ethereumetl` command is not available in PATH, use `python -m ethereumetl` instead.
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
 
@@ -270,10 +262,9 @@ and token details; for those you need to wait until the full sync).
 Should work with geth and parity, on Linux, Mac, Windows.
 If you use Parity you should disable warp mode with `--no-warp` option because warp mode
 does not place all of the block or receipt data into the database https://wiki.parity.io/Getting-Synced
-Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
 If you see weird behavior, e.g. wrong number of rows in the CSV files or corrupted files,
-check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
+check out this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 
 ### Export in 2 Hours
 
@@ -443,8 +434,11 @@ You can tune `--max-workers` for performance.
 
 #### export_traces
 
+Also called internal transactions.
 The API used in this command is not supported by Infura, 
-so you will need a local Parity archive node (`parity --tracing on`).
+so you will need a local Parity archive node (`parity --tracing on`). 
+Make sure your node has at least 8GB of memory, or else you will face timeout errors. 
+See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137) 
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
@@ -454,6 +448,8 @@ so you will need a local Parity archive node (`parity --tracing on`).
 You can tune `--batch-size`, `--max-workers` for performance.
 
 #### export_geth_traces
+
+Read [Differences between geth and parity traces.csv](#differences-between-geth-and-parity-tracescsv)
 
 The API used in this command is not supported by Infura, 
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).
@@ -488,13 +484,35 @@ You can tune `--batch-size`, `--max-workers` for performance.
 0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
 
-#### Running Tests
+### Running Tests
 
 ```bash
-> pip install -e . -r requirements-dev.txt
+> pip install -e .[dev]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
+
+### Running Tox Tests
+
+```bash
+> pip install tox
+> tox
+```
+
+### Ethereum Classic Support
+
+For getting ETC csv files, make sure you pass in the `--chain classic` param where it's required for the scripts you want to export. 
+ETC won't run if your `--provider-uri` is Infura. It will provide a warning and change the provider-uri to `https://ethereumclassic.network` instead. For faster performance, run a client instead locally for classic such as `parity chain=classic` and Geth-classic.
+
+### Differences between geth and parity traces.csv
+
+- `to_address` field differs for `callcode` trace (geth seems to return correct value, as parity value of `to_address` is same as `to_address` of parent call);
+- geth output doesn't have `reward` traces;
+- geth output doesn't have `to_address`, `from_address`, `value` for `suicide` traces;
+- `error` field contains human readable error message, which might differ in geth/parity output;
+- geth output doesn't have `transaction_hash`;
+- `gas_used` is 0 on traces with error in geth, empty in parity;
+- zero output of subcalls is `0x000...` in geth, `0x` in parity;
 
 ## Querying in Amazon Athena
 

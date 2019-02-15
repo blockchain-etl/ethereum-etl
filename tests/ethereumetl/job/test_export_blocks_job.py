@@ -46,8 +46,8 @@ def read_resource(resource_group, file_name):
     skip_if_slow_tests_disabled((47218, 47219, 2, 'blocks_with_transactions', 'infura')),
 ])
 def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type):
-    blocks_output_file = tmpdir.join('actual_blocks.csv')
-    transactions_output_file = tmpdir.join('actual_transactions.csv')
+    blocks_output_file = str(tmpdir.join('actual_blocks.csv'))
+    transactions_output_file = str(tmpdir.join('actual_transactions.csv'))
 
     job = ExportBlocksJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,

@@ -51,8 +51,8 @@ DEFAULT_TX_HASHES = ['0x04cbcb236043d8fb7839e07bbc7f5eed692fb2ca55d897f1101eac3e
     skip_if_slow_tests_disabled((2, DEFAULT_TX_HASHES, 'json', 'receipts_with_logs', 'infura'))
 ])
 def test_export_receipts_job(tmpdir, batch_size, transaction_hashes, output_format, resource_group, web3_provider_type):
-    receipts_output_file = tmpdir.join('actual_receipts.' + output_format)
-    logs_output_file = tmpdir.join('actual_logs.' + output_format)
+    receipts_output_file = str(tmpdir.join('actual_receipts.' + output_format))
+    logs_output_file = str(tmpdir.join('actual_logs.' + output_format))
 
     job = ExportReceiptsJob(
         transaction_hashes_iterable=transaction_hashes,
