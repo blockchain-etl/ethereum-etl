@@ -39,6 +39,6 @@ logging_basic_config()
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
 def stream(last_synced_block_file, lag, provider_uri, output, start_block):
-    """Streams all data types to Google Pub/Sub."""
+    """Streams all data types to console or Google Pub/Sub."""
     from ethereumetl.streaming.stream import stream as do_stream
     do_stream(last_synced_block_file, lag, provider_uri, output, start_block)

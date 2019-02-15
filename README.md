@@ -293,6 +293,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
     > echo "Stream to console"
     > docker run ethereum-etl:streaming-latest stream -p https://mainnet.infura.io --start-block 7000000
     > echo "Stream to Pub/Sub"
+    > export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
     > docker run ethereum-etl:streaming-latest stream -p https://mainnet.infura.io --start-block 7000000 --output projects/your-project/topics/ethereum_blockchain
     ```
 
