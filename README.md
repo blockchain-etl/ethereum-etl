@@ -289,7 +289,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 
 1. Run streaming to console or Pub/Sub
     ```bash
-    > docker build -t ethereum-etl:streaming-latest -f Dockerfile_with_streaming .
+    > docker build -t ethereum-etl:latest-streaming -f Dockerfile_with_streaming .
     > echo "Stream to console"
     > docker run ethereum-etl:latest-streaming stream -p https://mainnet.infura.io --start-block 7000000
     > echo "Stream to Pub/Sub"
