@@ -28,22 +28,22 @@ from web3 import IPCProvider, HTTPProvider
 from ethereumetl.providers.ipc import BatchIPCProvider
 from ethereumetl.providers.rpc import BatchHTTPProvider
 
-DEFAULT_IPC_TIMEOUT = 60
-DEFAULT_HTTP_REQUEST_KWARGS = {'timeout': 60}
+DEFAULT_TIMEOUT = 60
 
 
-def get_provider_from_uri(uri_string, batch=False):
+def get_provider_from_uri(uri_string, timeout=DEFAULT_TIMEOUT, batch=False):
     uri = urlparse(uri_string)
     if uri.scheme == 'file':
         if batch:
-            return BatchIPCProvider(uri.path, timeout=DEFAULT_IPC_TIMEOUT)
+            return BatchIPCProvider(uri.path, timeout=timeout)
         else:
-            return IPCProvider(uri.path, timeout=DEFAULT_IPC_TIMEOUT)
+            return IPCProvider(uri.path, timeout=timeout)
     elif uri.scheme == 'http' or uri.scheme == 'https':
+        request_kwargs = {'timeout': timeout}
         if batch:
-            return BatchHTTPProvider(uri_string, request_kwargs=DEFAULT_HTTP_REQUEST_KWARGS)
+            return BatchHTTPProvider(uri_string, request_kwargs=request_kwargs)
         else:
-            return HTTPProvider(uri_string, request_kwargs=DEFAULT_HTTP_REQUEST_KWARGS)
+            return HTTPProvider(uri_string, request_kwargs=request_kwargs)
     else:
         raise ValueError('Unknown uri scheme {}'.format(uri_string))
 
