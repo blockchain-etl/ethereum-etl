@@ -19,25 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 
+from ethereumetl.cli.get_keccak_hash import get_keccak_hash
 
-import argparse
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
-from eth_utils import keccak
-
-from ethereumetl.file_utils import smart_open
-from ethereumetl.logging_utils import logging_basic_config
-
-logging_basic_config()
-
-parser = argparse.ArgumentParser(description='Outputs the 32-byte keccak hash of the given string.')
-parser.add_argument('-i', '--input-string', default='Transfer(address,address,uint256)', type=str,
-                    help='String to hash, e.g. Transfer(address,address,uint256)')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-
-args = parser.parse_args()
-
-hash = keccak(text=args.input_string)
-
-with smart_open(args.output, 'w') as output_file:
-    output_file.write('0x{}\n'.format(hash.hex()))
+get_keccak_hash()

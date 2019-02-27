@@ -22,6 +22,9 @@
 
 
 import itertools
+import warnings
+
+from ethereumetl.misc.retriable_value_error import RetriableValueError
 
 
 def hex_to_dec(hex_string):
@@ -54,13 +57,20 @@ def validate_range(range_start_incl, range_end_incl):
 
 def rpc_response_batch_to_results(response):
     for response_item in response:
-        result = response_item.get('result', None)
-        if result is None:
-            error_message = 'result is None in response {}.'.format(response_item)
-            if response_item.get('error', None) is None:
-                error_message = error_message + ' Make sure Ethereum node is synced.'
-            raise ValueError(error_message)
-        yield result
+        yield rpc_response_to_result(response_item)
+
+
+def rpc_response_to_result(response):
+    result = response.get('result')
+    if result is None:
+        error_message = 'result is None in response {}.'.format(response)
+        if response.get('error') is None:
+            error_message = error_message + ' Make sure Ethereum node is synced.'
+            # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
+            # synced node
+            raise RetriableValueError(error_message)
+        raise ValueError(error_message)
+    return result
 
 
 def safe_rpc_response_batch_to_results(response):
@@ -100,3 +110,9 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
+def check_classic_provider_uri(chain, provider_uri):
+    if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
+        warnings.warn("ETC Chain not supported on Infura.io. Using https://ethereumclassic.network instead")
+        return 'https://ethereumclassic.network'
+    return provider_uri

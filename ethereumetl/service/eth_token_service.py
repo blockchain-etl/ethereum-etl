@@ -19,12 +19,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import logging
 
 from web3.exceptions import BadFunctionCallOutput
 
 from ethereumetl.domain.token import EthToken
 from ethereumetl.erc20_abi import ERC20_ABI
+
+logger = logging.getLogger('eth_token_service')
 
 
 class EthTokenService(object):
@@ -56,7 +58,7 @@ class EthTokenService(object):
         # OverflowError exception happens if the return type of the function doesn't match the expected type
         result = call_contract_function(
             func=func,
-            ignore_errors=(BadFunctionCallOutput, OverflowError),
+            ignore_errors=(BadFunctionCallOutput, OverflowError, ValueError),
             default_value=None)
 
         if self._function_call_result_transformer is not None:
@@ -71,6 +73,7 @@ def call_contract_function(func, ignore_errors, default_value=None):
         return result
     except Exception as ex:
         if type(ex) in ignore_errors:
+            logger.exception('An exception occurred. This exception can be safely ignored.')
             return default_value
         else:
             raise ex

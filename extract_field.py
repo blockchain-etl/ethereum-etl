@@ -19,22 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import sys
 
+from ethereumetl.cli.extract_field import extract_field
 
-import argparse
-import json
+print('========================================================================================', file=sys.stderr)
+print('THIS SCRIPT IS DEPRECATED AND WILL BE REMOVED ON 2019-01-01. Use ethereumetl.py instead.', file=sys.stderr)
+print('========================================================================================', file=sys.stderr)
 
-from ethereumetl.file_utils import smart_open
-
-parser = argparse.ArgumentParser(description='Extracts a single field from a given file.')
-parser.add_argument('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
-parser.add_argument('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-parser.add_argument('-f', '--field', required=True, type=str, help='The field name to extract.')
-
-args = parser.parse_args()
-
-# TODO: Add support for CSV
-with smart_open(args.input, 'r') as input_file, smart_open(args.output, 'w') as output_file:
-    for line in input_file:
-        item = json.loads(line)
-        output_file.write(item[args.field] + '\n')
+extract_field()

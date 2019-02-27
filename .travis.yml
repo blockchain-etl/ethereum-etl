@@ -1,7 +1,14 @@
 language: python
-python:
-  - "3.6"
+dist: xenial
+matrix:
+  include:
+    - python: "3.5"
+      env: TOX_POSARGS="-e py35"
+    - python: "3.6"
+      env: TOX_POSARGS="-e py36"
+    - python: "3.7"
+      env: TOX_POSARGS="-e py37"
 install:
-  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install tox
 script:
-  - pytest -vv
+  - tox $TOX_POSARGS

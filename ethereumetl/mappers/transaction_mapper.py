@@ -28,17 +28,17 @@ from ethereumetl.utils import hex_to_dec, to_normalized_address
 class EthTransactionMapper(object):
     def json_dict_to_transaction(self, json_dict):
         transaction = EthTransaction()
-        transaction.hash = json_dict.get('hash', None)
-        transaction.nonce = hex_to_dec(json_dict.get('nonce', None))
-        transaction.block_hash = json_dict.get('blockHash', None)
-        transaction.block_number = hex_to_dec(json_dict.get('blockNumber', None))
-        transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex', None))
-        transaction.from_address = to_normalized_address(json_dict.get('from', None))
-        transaction.to_address = to_normalized_address(json_dict.get('to', None))
-        transaction.value = hex_to_dec(json_dict.get('value', None))
-        transaction.gas = hex_to_dec(json_dict.get('gas', None))
-        transaction.gas_price = hex_to_dec(json_dict.get('gasPrice', None))
-        transaction.input = json_dict.get('input', None)
+        transaction.hash = json_dict.get('hash')
+        transaction.nonce = hex_to_dec(json_dict.get('nonce'))
+        transaction.block_hash = json_dict.get('blockHash')
+        transaction.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
+        transaction.from_address = to_normalized_address(json_dict.get('from'))
+        transaction.to_address = to_normalized_address(json_dict.get('to'))
+        transaction.value = hex_to_dec(json_dict.get('value'))
+        transaction.gas = hex_to_dec(json_dict.get('gas'))
+        transaction.gas_price = hex_to_dec(json_dict.get('gasPrice'))
+        transaction.input = json_dict.get('input')
         return transaction
 
     def transaction_to_dict(self, transaction):
