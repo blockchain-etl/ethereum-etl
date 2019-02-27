@@ -71,6 +71,8 @@ For the latest version, check out the repo and call
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
+  - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
+  - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
 
 
 ## Schema
@@ -560,3 +562,13 @@ Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructio
 
 You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
+
+### How to Query Balances for all Ethereum Addresses
+
+Read this article 
+https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses-in-bigquery-fb594e4034a7
+
+### Building Token Recommender in Google Cloud Platform
+
+Read this article 
+https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
