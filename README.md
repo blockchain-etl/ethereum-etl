@@ -7,7 +7,7 @@
 Install Ethereum ETL:
 
 ```bash
-pip install ethereum-etl
+pip3 install ethereum-etl
 ```
 
 Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactions)):
@@ -47,8 +47,8 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 For the latest version, check out the repo and call 
 ```bash
-> pip install -e . 
-> python ethereumetl.py
+> pip3 install -e . 
+> python3 ethereumetl.py
 ```
 
 [LIMITATIONS](#limitations)
@@ -71,6 +71,8 @@ For the latest version, check out the repo and call
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
+  - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
+  - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
 
 
 ## Schema
@@ -235,7 +237,7 @@ and token details; for those you need to wait until the full sync).
 1. Install Ethereum ETL:
 
     ```bash
-    > pip install ethereum-etl
+    > pip3 install ethereum-etl
     ```
 
 1. Export all:
@@ -245,7 +247,7 @@ and token details; for those you need to wait until the full sync).
     > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
     
-    In case `ethereumetl` command is not available in PATH, use `python -m ethereumetl` instead.
+    In case `ethereumetl` command is not available in PATH, use `python3 -m ethereumetl` instead.
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
 
@@ -262,10 +264,9 @@ and token details; for those you need to wait until the full sync).
 Should work with geth and parity, on Linux, Mac, Windows.
 If you use Parity you should disable warp mode with `--no-warp` option because warp mode
 does not place all of the block or receipt data into the database https://wiki.parity.io/Getting-Synced
-Tested with Python 3.6, geth 1.8.7, Ubuntu 16.04.4
 
 If you see weird behavior, e.g. wrong number of rows in the CSV files or corrupted files,
-check this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
+check out this issue: https://github.com/medvedev1088/ethereum-etl/issues/28
 
 ### Export in 2 Hours
 
@@ -488,7 +489,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tests
 
 ```bash
-> pip install -e .[dev]
+> pip3 install -e .[dev]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
@@ -496,7 +497,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tox Tests
 
 ```bash
-> pip install tox
+> pip3 install tox
 > tox
 ```
 
@@ -561,3 +562,13 @@ Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructio
 
 You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
+
+### How to Query Balances for all Ethereum Addresses
+
+Read this article 
+https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses-in-bigquery-fb594e4034a7
+
+### Building Token Recommender in Google Cloud Platform
+
+Read this article 
+https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb

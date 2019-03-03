@@ -45,9 +45,10 @@ logging_basic_config()
                    'file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
 @click.option('--genesis-traces/--no-genesis-traces', default=False, help='Whether to include genesis traces')
 @click.option('--daofork-traces/--no-daofork-traces', default=False, help='Whether to include daofork traces')
+@click.option('-t', '--timeout', default=60, type=int, help='IPC or HTTP request timeout.')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
 def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri,
-                  genesis_traces, daofork_traces, chain='ethereum'):
+                  genesis_traces, daofork_traces, timeout=60, chain='ethereum'):
     """Exports traces from parity node."""
     if chain == 'classic' and daofork_traces == True:
         raise ValueError(
@@ -56,7 +57,7 @@ def export_traces(start_block, end_block, batch_size, output, max_workers, provi
         start_block=start_block,
         end_block=end_block,
         batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri, timeout=timeout))),
         item_exporter=traces_item_exporter(output),
         max_workers=max_workers,
         include_genesis_traces=genesis_traces,

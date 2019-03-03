@@ -11,7 +11,7 @@ long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 setup(
     name='ethereum-etl',
-    version='1.2.2',
+    version='1.2.4',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
     description='Tools for exporting Ethereum blockchain data to CSV or JSON',
@@ -33,7 +33,7 @@ setup(
     python_requires='>=3.5.3,<3.8.0',
     install_requires=[
         'web3==4.7.2',
-        'eth-utils==1.2.0',
+        'eth-utils==1.3.0',
         'eth-abi==1.2.0',
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil==2.7.0',

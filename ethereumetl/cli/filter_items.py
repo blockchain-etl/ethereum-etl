@@ -20,12 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-import json
-
 import click
 
-from ethereumetl.file_utils import smart_open
+from ethereumetl import misc_utils
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
@@ -34,10 +31,7 @@ from ethereumetl.file_utils import smart_open
 @click.option('-p', '--predicate', required=True, type=str,
               help='Predicate in Python code e.g. "item[\'is_erc20\']".')
 def filter_items(input, output, predicate):
-    """Filters given JSON lines file by predicate."""
-    # TODO: Add support for CSV
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
-        for line in input_file:
-            item = json.loads(line)
-            if eval(predicate, globals(), {'item': item}):
-                output_file.write(json.dumps(item) + '\n')
+    """Filters rows in given CSV or JSON newline-delimited file."""
+    def evaluated_predicate(item):
+        return eval(predicate, globals(), {'item': item})
+    misc_utils.filter_items(input, output, evaluated_predicate)
