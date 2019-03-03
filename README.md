@@ -7,7 +7,7 @@
 Install Ethereum ETL:
 
 ```bash
-pip install ethereum-etl
+pip3 install ethereum-etl
 ```
 
 Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactions)):
@@ -47,8 +47,8 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 For the latest version, check out the repo and call 
 ```bash
-> pip install -e . 
-> python ethereumetl.py
+> pip3 install -e . 
+> python3 ethereumetl.py
 ```
 
 [LIMITATIONS](#limitations)
@@ -237,7 +237,7 @@ and token details; for those you need to wait until the full sync).
 1. Install Ethereum ETL:
 
     ```bash
-    > pip install ethereum-etl
+    > pip3 install ethereum-etl
     ```
 
 1. Export all:
@@ -247,7 +247,7 @@ and token details; for those you need to wait until the full sync).
     > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
     
-    In case `ethereumetl` command is not available in PATH, use `python -m ethereumetl` instead.
+    In case `ethereumetl` command is not available in PATH, use `python3 -m ethereumetl` instead.
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
 
@@ -489,7 +489,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tests
 
 ```bash
-> pip install -e .[dev]
+> pip3 install -e .[dev]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
@@ -497,7 +497,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tox Tests
 
 ```bash
-> pip install tox
+> pip3 install tox
 > tox
 ```
 
