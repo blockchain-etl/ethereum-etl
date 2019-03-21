@@ -541,6 +541,10 @@ CREATE DATABASE ethereumetl;
   - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
   - tokens: [schemas/aws/tokens.sql](schemas/aws/tokens.sql)
 
+### Airflow DAGs
+
+Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
+
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
@@ -554,8 +558,6 @@ Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/
 so values greater than 38 decimals will be null.
 
 ## Querying in Google BigQuery
-
-Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
 
 ### Public Dataset
 
@@ -571,3 +573,4 @@ https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses
 
 Read this article 
 https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
+
