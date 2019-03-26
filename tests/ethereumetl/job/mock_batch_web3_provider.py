@@ -30,7 +30,7 @@ class MockBatchWeb3Provider(object):
     def __init__(self, read_resource):
         self.read_resource = read_resource
 
-    def make_request(self, text):
+    def make_batch_request(self, text):
         batch = json.loads(text)
         web3_response = []
         for req in batch:

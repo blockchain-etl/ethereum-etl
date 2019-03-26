@@ -24,6 +24,8 @@
 import click
 
 from ethereumetl.logging_utils import logging_basic_config
+from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 logging_basic_config()
 
@@ -38,7 +40,25 @@ logging_basic_config()
               help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. '
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block):
+@click.option('--period-seconds', default=10, type=int, help='How many seconds to sleep between syncs')
+@click.option('-b', '--batch-size', default=2, type=int, help='How many blocks to batch in single request')
+@click.option('-B', '--block-batch-size', default=1, type=int, help='How many blocks to batch in single sync round')
+@click.option('-w', '--max-workers', default=5, type=int, help='The number of workers')
+def stream(last_synced_block_file, lag, provider_uri, output, start_block,
+           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5):
     """Streams all data types to console or Google Pub/Sub."""
+
+    from ethereumetl.streaming.streaming_utils import get_item_exporter
     from ethereumetl.streaming.stream import stream as do_stream
-    do_stream(last_synced_block_file, lag, provider_uri, output, start_block)
+
+    do_stream(
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+        last_synced_block_file=last_synced_block_file,
+        lag=lag,
+        item_exporter=get_item_exporter(output),
+        start_block=start_block,
+        period_seconds=period_seconds,
+        batch_size=batch_size,
+        block_batch_size=block_batch_size,
+        max_workers=max_workers
+    )

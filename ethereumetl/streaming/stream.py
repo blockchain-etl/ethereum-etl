@@ -27,20 +27,15 @@ import os
 import time
 from collections import defaultdict
 
-from google.api_core.exceptions import GoogleAPIError
 from web3 import Web3
-from web3.utils.threads import Timeout
 
 from ethereumetl.file_utils import smart_open
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
-from ethereumetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
 from ethereumetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.logging_utils import logging_basic_config
-from ethereumetl.providers.auto import get_provider_from_uri
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 logging_basic_config()
 
@@ -53,7 +48,9 @@ def write_last_synced_block(file, last_synced_block):
 def init_last_synced_block_file(start_block, last_synced_block_file):
     if os.path.isfile(last_synced_block_file):
         raise ValueError(
-            '{} should not exist if --start-block option is specified'.format(last_synced_block_file))
+            '{} should not exist if --start-block option is specified. '
+            'Either remove the {} file or the --start-block option.'
+                .format(last_synced_block_file, last_synced_block_file))
     write_last_synced_block(last_synced_block_file, start_block)
 
 
@@ -131,7 +128,12 @@ def enrich_transactions(blocks, transactions, receipts):
             'gas',
             'gas_price',
             'input',
-            'block_number'
+            'block_number',
+            'receipt_cumulative_gas_used',
+            'receipt_gas_used',
+            'receipt_contract_address',
+            'receipt_root',
+            'receipt_status'
         ],
         [
             ('timestamp', 'block_timestamp'),
@@ -180,34 +182,39 @@ def enrich_token_transfers(blocks, token_transfers):
     return list(result)
 
 
-def stream(last_synced_block_file, lag, provider_uri, output, start_block):
-    if start_block is not None:
-        init_last_synced_block_file(start_block, last_synced_block_file)
-
-    max_batch_size = 10
-    sleep_seconds = 10
+def stream(
+        batch_web3_provider,
+        last_synced_block_file='last_synced_block.txt',
+        lag=0,
+        item_exporter=ConsoleItemExporter(),
+        start_block=None,
+        end_block=None,
+        period_seconds=10,
+        batch_size=100,
+        block_batch_size=10,
+        max_workers=5):
+    if start_block is not None or not os.path.isfile(last_synced_block_file):
+        init_last_synced_block_file((start_block or 0) - 1, last_synced_block_file)
 
     last_synced_block = read_last_synced_block(last_synced_block_file)
-    web3 = Web3(get_provider_from_uri(provider_uri))
 
-    if output is not None:
-        item_exporter = GooglePubSubItemExporter(output)
-    else:
-        item_exporter = ConsoleItemExporter()
+    item_exporter.open()
 
-    while True:
+    while True and (end_block is None or last_synced_block < end_block):
         blocks_to_sync = 0
+
         try:
-            current_block = int(web3.eth.getBlock("latest").number)
+            current_block = int(Web3(batch_web3_provider).eth.getBlock("latest").number)
             target_block = current_block - lag
-            target_block = min(target_block, last_synced_block + max_batch_size)
+            target_block = min(target_block, last_synced_block + block_batch_size)
+            target_block = min(target_block, end_block) if end_block is not None else target_block
             blocks_to_sync = max(target_block - last_synced_block, 0)
             logging.info('Current block {}, target block {}, last synced block {}, blocks to sync {}'.format(
                 current_block, target_block, last_synced_block, blocks_to_sync))
 
             if blocks_to_sync == 0:
-                logging.info('Nothing to sync. Sleeping {} seconds...'.format(sleep_seconds))
-                time.sleep(sleep_seconds)
+                logging.info('Nothing to sync. Sleeping {} seconds...'.format(period_seconds))
+                time.sleep(period_seconds)
                 continue
 
             # Export blocks and transactions
@@ -215,9 +222,9 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block):
             blocks_and_transactions_job = ExportBlocksJob(
                 start_block=last_synced_block + 1,
                 end_block=target_block,
-                batch_size=100,
-                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-                max_workers=5,
+                batch_size=batch_size,
+                batch_web3_provider=batch_web3_provider,
+                max_workers=max_workers,
                 item_exporter=blocks_and_transactions_item_exporter,
                 export_blocks=True,
                 export_transactions=True
@@ -231,9 +238,9 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block):
             receipts_and_logs_item_exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
             receipts_and_logs_job = ExportReceiptsJob(
                 transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
-                batch_size=100,
-                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-                max_workers=5,
+                batch_size=batch_size,
+                batch_web3_provider=batch_web3_provider,
+                max_workers=max_workers,
                 item_exporter=receipts_and_logs_item_exporter,
                 export_receipts=True,
                 export_logs=True
@@ -247,8 +254,8 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block):
             token_transfers_item_exporter = InMemoryItemExporter(item_types=['token_transfer'])
             token_transfers_job = ExtractTokenTransfersJob(
                 logs_iterable=logs,
-                batch_size=100,
-                max_workers=5,
+                batch_size=batch_size,
+                max_workers=max_workers,
                 item_exporter=token_transfers_item_exporter)
 
             token_transfers_job.run()
@@ -270,9 +277,10 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block):
             logging.info('Writing last synced block {}'.format(target_block))
             write_last_synced_block(last_synced_block_file, target_block)
             last_synced_block = target_block
-        except (GoogleAPIError, RuntimeError, OSError, IOError, TypeError, NameError, ValueError, Timeout) as e:
-            logging.info('An exception occurred {}'.format(repr(e)))
+        except Exception as e:
+            # https://stackoverflow.com/a/4992124/1580227
+            logging.exception('An exception occurred while fetching block data.')
 
-        if blocks_to_sync != max_batch_size:
-            logging.info('Sleeping {} seconds...'.format(sleep_seconds))
-            time.sleep(sleep_seconds)
+        if blocks_to_sync != block_batch_size and last_synced_block != end_block:
+            logging.info('Sleeping {} seconds...'.format(period_seconds))
+            time.sleep(period_seconds)

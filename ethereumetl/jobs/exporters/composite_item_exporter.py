@@ -27,9 +27,9 @@ from ethereumetl.file_utils import get_file_handle, close_silently
 
 
 class CompositeItemExporter:
-    def __init__(self, filename_mapping, field_mapping):
+    def __init__(self, filename_mapping, field_mapping=None):
         self.filename_mapping = filename_mapping
-        self.field_mapping = field_mapping
+        self.field_mapping = field_mapping or {}
 
         self.file_mapping = {}
         self.exporter_mapping = {}
@@ -40,7 +40,7 @@ class CompositeItemExporter:
     def open(self):
         for item_type, filename in self.filename_mapping.items():
             file = get_file_handle(filename, binary=True)
-            fields = self.field_mapping[item_type]
+            fields = self.field_mapping.get(item_type)
             self.file_mapping[item_type] = file
             if str(filename).endswith('.json'):
                 item_exporter = JsonLinesItemExporter(file, fields_to_export=fields)
@@ -49,6 +49,10 @@ class CompositeItemExporter:
             self.exporter_mapping[item_type] = item_exporter
 
             self.counter_mapping[item_type] = AtomicCounter()
+
+    def export_items(self, items):
+        for item in items:
+            self.export_item(item)
 
     def export_item(self, item):
         item_type = item.get('type')
