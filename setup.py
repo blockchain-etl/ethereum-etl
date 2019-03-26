@@ -37,15 +37,16 @@ setup(
         'eth-abi==1.2.0',
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil==2.7.0',
-        'click==6.7',
+        'click==7.0',
         'ethereum-dasm==0.1.4'
     ],
     extras_require={
         'streaming': [
-            'google-cloud-pubsub==0.37.2'
+            'google-cloud-pubsub==0.39.1'
         ],
         'dev': [
-            'pytest~=3.2.0',
+            'pytest~=4.3.0',
+            'pytest-timeout~=1.3.3'
         ]
     },
     entry_points={
