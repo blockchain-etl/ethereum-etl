@@ -7,7 +7,7 @@
 Install Ethereum ETL:
 
 ```bash
-pip install ethereum-etl
+pip3 install ethereum-etl
 ```
 
 Export blocks and transactions ([Schema](#blockscsv), [Reference](#export_blocks_and_transactions)):
@@ -47,8 +47,8 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 For the latest version, check out the repo and call 
 ```bash
-> pip install -e . 
-> python ethereumetl.py
+> pip3 install -e . 
+> python3 ethereumetl.py
 ```
 
 [LIMITATIONS](#limitations)
@@ -71,6 +71,8 @@ For the latest version, check out the repo and call
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
+  - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
+  - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
 
 
 ## Schema
@@ -201,10 +203,9 @@ Note: for the `address` type all hex characters are lower-cased.
 
 ## LIMITATIONS
 
-- `contracts.csv` and `tokens.csv` files don’t include contracts created by message calls (a.k.a. internal transactions).
-We are working on adding support for those.
 - In case the contract is a proxy, which forwards all calls to a delegate, interface detection doesn’t work,
-which means `is_erc20` and `is_erc721` will always be false for proxy contracts.
+which means `is_erc20` and `is_erc721` will always be false for proxy contracts and they will be missing in the `tokens`
+table.
 - The metadata methods (`symbol`, `name`, `decimals`, `total_supply`) for ERC20 are optional, so around 10% of the
 contracts are missing this data. Also some contracts (EOS) implement these methods but with wrong return type,
 so the metadata columns are missing in this case as well.
@@ -235,7 +236,7 @@ and token details; for those you need to wait until the full sync).
 1. Install Ethereum ETL:
 
     ```bash
-    > pip install ethereum-etl
+    > pip3 install ethereum-etl
     ```
 
 1. Export all:
@@ -245,7 +246,7 @@ and token details; for those you need to wait until the full sync).
     > ethereumetl export_all -s 0 -e 5999999 -b 100000 -p file://$HOME/Library/Ethereum/geth.ipc -o output
     ```
     
-    In case `ethereumetl` command is not available in PATH, use `python -m ethereumetl` instead.
+    In case `ethereumetl` command is not available in PATH, use `python3 -m ethereumetl` instead.
 
     The result will be in the `output` subdirectory, partitioned in Hive style:
 
@@ -497,7 +498,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tests
 
 ```bash
-> pip install -e .[dev]
+> pip3 install -e .[dev]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
@@ -505,7 +506,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tox Tests
 
 ```bash
-> pip install tox
+> pip3 install tox
 > tox
 ```
 
@@ -550,6 +551,10 @@ CREATE DATABASE ethereumetl;
   - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
   - tokens: [schemas/aws/tokens.sql](schemas/aws/tokens.sql)
 
+### Airflow DAGs
+
+Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
+
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
@@ -564,9 +569,18 @@ so values greater than 38 decimals will be null.
 
 ## Querying in Google BigQuery
 
-Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
-
 ### Public Dataset
 
 You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
+
+### How to Query Balances for all Ethereum Addresses
+
+Read this article 
+https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses-in-bigquery-fb594e4034a7
+
+### Building Token Recommender in Google Cloud Platform
+
+Read this article 
+https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
+
