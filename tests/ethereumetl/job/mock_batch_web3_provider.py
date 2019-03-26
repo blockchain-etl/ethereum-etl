@@ -24,11 +24,19 @@
 import json
 
 from ethereumetl.utils import hex_to_dec
+from web3 import HTTPProvider
 
 
-class MockBatchWeb3Provider(object):
+class MockBatchWeb3Provider(HTTPProvider):
+
     def __init__(self, read_resource):
+        super().__init__()
         self.read_resource = read_resource
+
+    def make_request(self, method, params):
+        file_name = 'web3_response.' + method + '_' + '_'.join([str(param) for param in params]) + '.json'
+        file_content = self.read_resource(file_name)
+        return json.loads(file_content)
 
     def make_batch_request(self, text):
         batch = json.loads(text)

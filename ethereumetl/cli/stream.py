@@ -49,9 +49,9 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block,
     """Streams all data types to console or Google Pub/Sub."""
 
     from ethereumetl.streaming.streaming_utils import get_item_exporter
-    from ethereumetl.streaming.stream import stream as do_stream
+    from ethereumetl.streaming.streamer import Streamer
 
-    do_stream(
+    streamer = Streamer(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         last_synced_block_file=last_synced_block_file,
         lag=lag,
@@ -62,3 +62,4 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block,
         block_batch_size=block_batch_size,
         max_workers=max_workers
     )
+    streamer.stream()

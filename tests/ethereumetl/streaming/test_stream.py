@@ -27,7 +27,7 @@ from blockchainetl.thread_local_proxy import ThreadLocalProxy
 
 import tests.resources
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
-from ethereumetl.streaming.stream import stream
+from ethereumetl.streaming.streamer import Streamer
 from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
@@ -38,9 +38,9 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.timeout(1000)
+@pytest.mark.timeout(10)
 @pytest.mark.parametrize("start_block, end_block, batch_size, resource_group ,provider_type", [
-    # (1755634, 1755635, 1, 'blocks_1755634_1755635', 'mock'),
+    (1755634, 1755635, 1, 'blocks_1755634_1755635', 'mock'),
     skip_if_slow_tests_disabled([1755634, 1755635, 1, 'blocks_1755634_1755635', 'infura']),
 ])
 def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, provider_type):
@@ -54,7 +54,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, prov
     logs_output_file = str(tmpdir.join('actual_logs.json'))
     token_transfers_output_file = str(tmpdir.join('actual_token_transfers.json'))
 
-    stream(
+    streamer = Streamer(
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(provider_type,
                                       read_resource_lambda=lambda file: read_resource(resource_group, file),
@@ -72,6 +72,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, prov
             }
         )
     )
+    streamer.stream()
 
     print('=====================')
     print(read_file(blocks_output_file))
