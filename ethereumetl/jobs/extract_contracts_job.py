@@ -52,10 +52,9 @@ class ExtractContractsJob(BaseJob):
         self.batch_work_executor.execute(self.traces_iterable, self._extract_contracts)
 
     def _extract_contracts(self, traces):
-        # TODO: Filter by status
         contract_creation_traces = [trace for trace in traces
                                     if trace['trace_type'] == 'create' and trace['to_address'] is not None
-                                    and len(trace['to_address']) > 0]
+                                    and len(trace['to_address']) > 0 and trace['status'] == 1]
 
         contracts = []
         for trace in contract_creation_traces:

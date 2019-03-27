@@ -23,7 +23,7 @@
 import os
 
 import pytest
-from blockchainetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 import tests.resources
 from ethereumetl.enumeration.entity_type import EntityType

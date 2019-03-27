@@ -153,7 +153,7 @@ class Streamer:
         enriched_traces = enrich_traces(blocks, traces)
         enriched_contracts = enrich_contracts(blocks, contracts)
 
-        logging.info('Publishing to PubSub')
+        logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
         self.item_exporter.export_items(
             (blocks if EntityType.BLOCK in self.entity_types else []) +
