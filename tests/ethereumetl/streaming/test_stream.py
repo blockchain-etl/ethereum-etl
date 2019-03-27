@@ -26,6 +26,7 @@ import pytest
 from blockchainetl.thread_local_proxy import ThreadLocalProxy
 
 import tests.resources
+from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 from ethereumetl.streaming.streamer import Streamer
 from tests.ethereumetl.job.helpers import get_web3_provider
@@ -39,11 +40,12 @@ def read_resource(resource_group, file_name):
 
 
 @pytest.mark.timeout(10)
-@pytest.mark.parametrize("start_block, end_block, batch_size, resource_group ,provider_type", [
-    (1755634, 1755635, 1, 'blocks_1755634_1755635', 'mock'),
-    skip_if_slow_tests_disabled([1755634, 1755635, 1, 'blocks_1755634_1755635', 'infura']),
+@pytest.mark.parametrize("start_block, end_block, batch_size, resource_group, entity_types, provider_type", [
+    (1755634, 1755635, 1, 'blocks_1755634_1755635', EntityType.ALL_FOR_INFURA, 'mock'),
+    skip_if_slow_tests_disabled([1755634, 1755635, 1, 'blocks_1755634_1755635', EntityType.ALL_FOR_INFURA, 'infura']),
+    (508110, 508110, 1, 'blocks_508110_508110', ['trace', 'contract', 'token'], 'mock'),
 ])
-def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, provider_type):
+def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, entity_types, provider_type):
     try:
         os.remove('last_synced_block.txt')
     except OSError:
@@ -53,6 +55,9 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, prov
     transactions_output_file = str(tmpdir.join('actual_transactions.json'))
     logs_output_file = str(tmpdir.join('actual_logs.json'))
     token_transfers_output_file = str(tmpdir.join('actual_token_transfers.json'))
+    traces_output_file = str(tmpdir.join('actual_traces.json'))
+    contracts_output_file = str(tmpdir.join('actual_contracts.json'))
+    tokens_output_file = str(tmpdir.join('actual_tokens.json'))
 
     streamer = Streamer(
         batch_web3_provider=ThreadLocalProxy(
@@ -69,31 +74,60 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, prov
                 'transaction': transactions_output_file,
                 'log': logs_output_file,
                 'token_transfer': token_transfers_output_file,
+                'trace': traces_output_file,
+                'contract': contracts_output_file,
+                'token': tokens_output_file,
             }
-        )
+        ),
+        entity_types=entity_types
     )
     streamer.stream()
 
-    print('=====================')
-    print(read_file(blocks_output_file))
-    compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_blocks.json'), read_file(blocks_output_file)
-    )
+    if 'block' in entity_types:
+        print('=====================')
+        print(read_file(blocks_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_blocks.json'), read_file(blocks_output_file)
+        )
 
-    print('=====================')
-    print(read_file(transactions_output_file))
-    compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_transactions.json'), read_file(transactions_output_file)
-    )
+    if 'transactions' in entity_types:
+        print('=====================')
+        print(read_file(transactions_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_transactions.json'), read_file(transactions_output_file)
+        )
 
-    print('=====================')
-    print(read_file(logs_output_file))
-    compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_logs.json'), read_file(logs_output_file)
-    )
+    if 'log' in entity_types:
+        print('=====================')
+        print(read_file(logs_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_logs.json'), read_file(logs_output_file)
+        )
 
-    print('=====================')
-    print(read_file(token_transfers_output_file))
-    compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_token_transfers.json'), read_file(token_transfers_output_file)
-    )
+    if 'token_transfer' in entity_types:
+        print('=====================')
+        print(read_file(token_transfers_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_token_transfers.json'), read_file(token_transfers_output_file)
+        )
+
+    if 'trace' in entity_types:
+        print('=====================')
+        print(read_file(traces_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_traces.json'), read_file(traces_output_file)
+        )
+
+    if 'contract' in entity_types:
+        print('=====================')
+        print(read_file(contracts_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_contracts.json'), read_file(contracts_output_file)
+        )
+
+    if 'token' in entity_types:
+        print('=====================')
+        print(read_file(tokens_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_tokens.json'), read_file(tokens_output_file)
+        )
