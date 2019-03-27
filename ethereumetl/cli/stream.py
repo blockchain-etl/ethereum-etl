@@ -22,6 +22,7 @@
 
 
 import click
+from ethereumetl.enumeration.entity_type import EntityType
 
 from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
@@ -40,11 +41,14 @@ logging_basic_config()
               help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. '
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
+@click.option('-e', '--entity-types', default=EntityType.ALL_FOR_INFURA,
+              type=click.Choice(EntityType.ALL_FOR_STREAMING), multiple=True,
+              help='The list of entity types to export.')
 @click.option('--period-seconds', default=10, type=int, help='How many seconds to sleep between syncs')
 @click.option('-b', '--batch-size', default=2, type=int, help='How many blocks to batch in single request')
 @click.option('-B', '--block-batch-size', default=1, type=int, help='How many blocks to batch in single sync round')
 @click.option('-w', '--max-workers', default=5, type=int, help='The number of workers')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block,
+def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5):
     """Streams all data types to console or Google Pub/Sub."""
 
@@ -60,6 +64,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block,
         period_seconds=period_seconds,
         batch_size=batch_size,
         block_batch_size=block_batch_size,
-        max_workers=max_workers
+        max_workers=max_workers,
+        entity_types=entity_types
     )
     streamer.stream()

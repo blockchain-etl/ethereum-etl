@@ -158,3 +158,60 @@ def enrich_token_transfers(blocks, token_transfers):
         raise ValueError('The number of token transfers is wrong ' + str(result))
 
     return result
+
+
+def enrich_traces(blocks, traces):
+    result = list(join(
+        traces, blocks, ('block_number', 'number'),
+        [
+            'type',
+            'transaction_index',
+            'from_address',
+            'to_address',
+            'value',
+            'input',
+            'output',
+            'trace_type',
+            'call_type',
+            'reward_type',
+            'gas',
+            'gas_used',
+            'subtraces',
+            'trace_address',
+            'error',
+            'status',
+            'transaction_hash',
+            'block_number'
+        ],
+        [
+            ('timestamp', 'block_timestamp'),
+            ('hash', 'block_hash'),
+        ]))
+
+    if len(result) != len(traces):
+        raise ValueError('The number of traces is wrong ' + str(result))
+
+    return result
+
+
+def enrich_contracts(blocks, contracts):
+    result = list(join(
+        contracts, blocks, ('block_number', 'number'),
+        [
+            'type',
+            'address',
+            'bytecode',
+            'function_sighashes',
+            'is_erc20',
+            'is_erc721',
+            'block_number'
+        ],
+        [
+            ('timestamp', 'block_timestamp'),
+            ('hash', 'block_hash'),
+        ]))
+
+    if len(result) != len(contracts):
+        raise ValueError('The number of contracts is wrong ' + str(result))
+
+    return result
