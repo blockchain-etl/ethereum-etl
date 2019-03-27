@@ -164,6 +164,7 @@ bytecode                     | hex_string  |
 function_sighashes           | string      |
 is_erc20                     | boolean     |
 is_erc721                    | boolean     |
+block_number                 | bigint      |
 
 ### tokens.csv
 
@@ -195,6 +196,7 @@ gas_used                     | bigint      |
 subtraces                    | bigint      |
 trace_address                | string      |
 error                        | string      |
+status                       | string      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 

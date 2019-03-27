@@ -28,7 +28,8 @@ FIELDS_TO_EXPORT = [
     'bytecode',
     'function_sighashes',
     'is_erc20',
-    'is_erc721'
+    'is_erc721',
+    'block_number',
 ]
 
 
