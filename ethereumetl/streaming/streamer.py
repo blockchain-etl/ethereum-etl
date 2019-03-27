@@ -88,7 +88,7 @@ class Streamer:
             synced_blocks = new_last_synced_block - last_synced_block
             last_synced_block = new_last_synced_block
             if synced_blocks <= 0:
-                logging.info('Nothing to sync. Sleeping for {} seconds...'.format(self.period_seconds))
+                logging.info('Nothing to sync or exception. Sleeping for {} seconds...'.format(self.period_seconds))
                 time.sleep(self.period_seconds)
 
         self.item_exporter.close()

@@ -45,6 +45,20 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
+Stream blocks, transactions, logs, token_transfers continually to console:
+
+```bash
+> pip install ethereum-etl[streaming]
+> ethereumetl stream --start-block 500000 -e block -e transaction -e log -e token_transfer --log-file log.txt
+```
+
+Stream blockchain data continually to Google Pub/Sub:
+
+```bash
+> export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
+> ethereumetl stream --start-block 500000 --output projects/your-project/topics/crypto_ethereum
+
+
 For the latest version, check out the repo and call 
 ```bash
 > pip3 install -e . 
@@ -294,10 +308,9 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
     ```bash
     > docker build -t ethereum-etl:latest-streaming -f Dockerfile_with_streaming .
     > echo "Stream to console"
-    > docker run ethereum-etl:latest-streaming stream -p https://mainnet.infura.io --start-block 7000000
+    > docker run ethereum-etl:latest-streaming stream --start-block 500000 --log-file log.txt
     > echo "Stream to Pub/Sub"
-    > export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
-    > docker run ethereum-etl:latest-streaming stream -p https://mainnet.infura.io --start-block 7000000 --output projects/your-project/topics/ethereum_blockchain
+    > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest-streaming stream --start-block 500000 --output projects/your-project/topics/crypto_ethereum
     ```
 
 ### Command Reference
