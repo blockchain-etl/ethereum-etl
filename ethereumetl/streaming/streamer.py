@@ -35,13 +35,10 @@ from ethereumetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from ethereumetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
-from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
     enrich_contracts
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3
-
-logging_basic_config()
 
 
 class Streamer:

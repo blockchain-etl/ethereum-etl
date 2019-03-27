@@ -25,10 +25,7 @@ import csv
 import logging
 import os
 import shutil
-
 from time import time
-
-from web3 import Web3
 
 from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.file_utils import smart_open
@@ -42,11 +39,10 @@ from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_ex
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from web3 import Web3
 
-logging_basic_config()
 logger = logging.getLogger('export_all')
 
 

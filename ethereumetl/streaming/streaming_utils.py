@@ -1,4 +1,4 @@
-from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
+from ethereumetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 
 
 def get_item_exporter(output):

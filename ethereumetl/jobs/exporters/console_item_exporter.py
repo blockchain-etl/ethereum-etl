@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 import json
-import logging
 
 
 class ConsoleItemExporter:
@@ -33,7 +32,7 @@ class ConsoleItemExporter:
             self.export_item(item)
 
     def export_item(self, item):
-        logging.info(json.dumps(item))
+        print(json.dumps(item))
 
     def close(self):
         pass
