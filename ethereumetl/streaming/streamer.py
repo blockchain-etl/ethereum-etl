@@ -38,6 +38,7 @@ from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJo
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
     enrich_contracts
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from timeout_decorator import timeout_decorator
 from web3 import Web3
 
 
@@ -76,34 +77,38 @@ class Streamer:
         self.item_exporter.open()
 
         while True and (self.end_block is None or last_synced_block < self.end_block):
-            blocks_to_sync = 0
+            new_last_synced_block = last_synced_block
 
             try:
-                current_block = int(Web3(self.batch_web3_provider).eth.getBlock("latest").number)
-                target_block = self._calculate_target_block(current_block, last_synced_block)
-                blocks_to_sync = max(target_block - last_synced_block, 0)
-                logging.info('Current block {}, target block {}, last synced block {}, blocks to sync {}'.format(
-                    current_block, target_block, last_synced_block, blocks_to_sync))
-
-                if blocks_to_sync == 0:
-                    logging.info('Nothing to sync. Sleeping {} seconds...'.format(self.period_seconds))
-                    time.sleep(self.period_seconds)
-                    continue
-
-                self._export_all(last_synced_block + 1, target_block)
-
-                logging.info('Writing last synced block {}'.format(target_block))
-                write_last_synced_block(self.last_synced_block_file, target_block)
-                last_synced_block = target_block
+                new_last_synced_block = self._sync_cycle(last_synced_block)
             except Exception as e:
                 # https://stackoverflow.com/a/4992124/1580227
                 logging.exception('An exception occurred while fetching block data.')
 
-            if blocks_to_sync != self.block_batch_size and last_synced_block != self.end_block:
-                logging.info('Sleeping {} seconds...'.format(self.period_seconds))
+            synced_blocks = new_last_synced_block - last_synced_block
+            last_synced_block = new_last_synced_block
+            if synced_blocks <= 0:
+                logging.info('Nothing to sync. Sleeping for {} seconds...'.format(self.period_seconds))
                 time.sleep(self.period_seconds)
 
         self.item_exporter.close()
+
+    @timeout_decorator.timeout(900)
+    def _sync_cycle(self, last_synced_block):
+        current_block = int(Web3(self.batch_web3_provider).eth.getBlock("latest").number)
+        target_block = self._calculate_target_block(current_block, last_synced_block)
+        blocks_to_sync = max(target_block - last_synced_block, 0)
+
+        logging.info('Current block {}, target block {}, last synced block {}, blocks to sync {}'.format(
+            current_block, target_block, last_synced_block, blocks_to_sync))
+
+        if blocks_to_sync != 0:
+            self._export_all(last_synced_block + 1, target_block)
+            logging.info('Writing last synced block {}'.format(target_block))
+            write_last_synced_block(self.last_synced_block_file, target_block)
+            last_synced_block = target_block
+
+        return last_synced_block
 
     def _calculate_target_block(self, current_block, last_synced_block):
         target_block = current_block - self.lag
