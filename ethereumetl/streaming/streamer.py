@@ -55,7 +55,8 @@ class Streamer:
             batch_size=100,
             block_batch_size=10,
             max_workers=5,
-            entity_types=tuple(EntityType.ALL_FOR_STREAMING)):
+            entity_types=tuple(EntityType.ALL_FOR_STREAMING),
+            retry_errors=True):
         self.batch_web3_provider = batch_web3_provider
         self.last_synced_block_file = last_synced_block_file
         self.lag = lag
@@ -67,6 +68,7 @@ class Streamer:
         self.block_batch_size = block_batch_size
         self.max_workers = max_workers
         self.entity_types = entity_types
+        self.retry_errors = retry_errors
 
     def stream(self):
         if self.start_block is not None or not os.path.isfile(self.last_synced_block_file):
@@ -84,6 +86,8 @@ class Streamer:
             except Exception as e:
                 # https://stackoverflow.com/a/4992124/1580227
                 logging.exception('An exception occurred while fetching block data.')
+                if not self.retry_errors:
+                    raise e
 
             synced_blocks = new_last_synced_block - last_synced_block
             last_synced_block = new_last_synced_block

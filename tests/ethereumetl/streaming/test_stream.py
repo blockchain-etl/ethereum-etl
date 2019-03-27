@@ -39,7 +39,6 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.timeout(10)
 @pytest.mark.parametrize("start_block, end_block, batch_size, resource_group, entity_types, provider_type", [
     (1755634, 1755635, 1, 'blocks_1755634_1755635', EntityType.ALL_FOR_INFURA, 'mock'),
     skip_if_slow_tests_disabled([1755634, 1755635, 1, 'blocks_1755634_1755635', EntityType.ALL_FOR_INFURA, 'infura']),
@@ -79,7 +78,8 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
                 'token': tokens_output_file,
             }
         ),
-        entity_types=entity_types
+        entity_types=entity_types,
+        retry_errors=False
     )
     streamer.stream()
 
