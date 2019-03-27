@@ -40,6 +40,7 @@ FIELDS_TO_EXPORT = [
     'subtraces',
     'trace_address',
     'error',
+    'status',
 ]
 
 

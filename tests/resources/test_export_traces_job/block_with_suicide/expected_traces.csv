@@ -1,4 +1,4 @@
-block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error
-1011973,0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89,0,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,0x474faa5018639791952fae334e2911700ac7fe9b,0,0x41c0e1b5,0x,call,call,,68728,232,1,,
-1011973,0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89,0,0x474faa5018639791952fae334e2911700ac7fe9b,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,50000000000000000,,,suicide,,,,,0,0,
-1011973,,,,0x738db714c08b8a32a29e0e68af00215079aa9c5c,5000000000000000000,,,reward,,block,,,0,,
+block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error,status
+1011973,0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89,0,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,0x474faa5018639791952fae334e2911700ac7fe9b,0,0x41c0e1b5,0x,call,call,,68728,232,1,,,1
+1011973,0x91acb43c5f141c393a189e091c190c9ffb20e4e8a502e4cc3087be9587bdbc89,0,0x474faa5018639791952fae334e2911700ac7fe9b,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,50000000000000000,,,suicide,,,,,0,0,,1
+1011973,,,,0x738db714c08b8a32a29e0e68af00215079aa9c5c,5000000000000000000,,,reward,,block,,,0,,,1

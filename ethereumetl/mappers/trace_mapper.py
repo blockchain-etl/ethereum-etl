@@ -186,4 +186,5 @@ class EthTraceMapper(object):
             'subtraces': trace.subtraces,
             'trace_address': trace.trace_address,
             'error': trace.error,
+            'status': trace.status,
         }

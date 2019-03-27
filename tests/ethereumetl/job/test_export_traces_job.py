@@ -58,6 +58,8 @@ def test_export_traces_job(tmpdir, start_block, end_block, resource_group, web3_
     )
     job.run()
 
+    print('=====================')
+    print(read_file(traces_output_file))
     compare_lines_ignore_order(
         read_resource(resource_group, 'expected_traces.csv'), read_file(traces_output_file)
     )
