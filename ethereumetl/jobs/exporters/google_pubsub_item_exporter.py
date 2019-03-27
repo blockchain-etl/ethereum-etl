@@ -21,21 +21,24 @@
 # SOFTWARE.
 
 import json
+import logging
 
 from google.cloud import pubsub_v1
 
 
 class GooglePubSubItemExporter:
 
-    def __init__(self, topic_path):
-        self.topic_path = topic_path
+    def __init__(self, item_type_to_topic_mapping, timeout=300):
+        self.item_type_to_topic_mapping = item_type_to_topic_mapping
 
         batch_settings = pubsub_v1.types.BatchSettings(
             max_bytes=1024 * 5,  # 5 kilobytes
-            max_latency=2,  # 2 seconds
+            max_latency=1,  # 1 second
+            max_messages=1000,
         )
 
         self.publisher = pubsub_v1.PublisherClient(batch_settings)
+        self.timeout = timeout
 
     def open(self):
         pass
@@ -48,12 +51,17 @@ class GooglePubSubItemExporter:
 
         for future in futures:
             # result() blocks until the message is published.
-            future.result()
+            future.result(timeout=self.timeout)
 
     def export_item(self, item):
-        data = json.dumps(item).encode('utf-8')
-        message_future = self.publisher.publish(self.topic_path, data=data)
-        return message_future
+        item_type = item.get('type')
+        if item_type is not None and item_type in self.item_type_to_topic_mapping:
+            topic_path = self.item_type_to_topic_mapping.get(item_type)
+            data = json.dumps(item).encode('utf-8')
+            message_future = self.publisher.publish(topic_path, data=data)
+            return message_future
+        else:
+            logging.warning('Topic for item type "{}" is not configured.'.format(item_type))
 
     def close(self):
         pass
