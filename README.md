@@ -513,7 +513,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 ### Running Tests
 
 ```bash
-> pip3 install -e .[dev]
+> pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
