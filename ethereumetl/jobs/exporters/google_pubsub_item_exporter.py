@@ -20,34 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 
-from concurrent.futures import ThreadPoolExecutor
-from threading import BoundedSemaphore
+from google.cloud import pubsub_v1
 
 
-class BoundedExecutor:
-    """BoundedExecutor behaves as a ThreadPoolExecutor which will block on
-    calls to submit() once the limit given as "bound" work items are queued for
-    execution.
-    :param bound: Integer - the maximum number of items in the work queue
-    :param max_workers: Integer - the size of the thread pool
-    """
-    def __init__(self, bound, max_workers):
-        self._delegate = ThreadPoolExecutor(max_workers=max_workers)
-        self._semaphore = BoundedSemaphore(bound + max_workers)
+class GooglePubSubItemExporter:
 
-    """See concurrent.futures.Executor#submit"""
-    def submit(self, fn, *args, **kwargs):
-        self._semaphore.acquire()
-        try:
-            future = self._delegate.submit(fn, *args, **kwargs)
-        except:
-            self._semaphore.release()
-            raise
-        else:
-            future.add_done_callback(lambda x: self._semaphore.release())
-            return future
+    def __init__(self, topic_path):
+        self.topic_path = topic_path
 
-    """See concurrent.futures.Executor#shutdown"""
-    def shutdown(self, wait=True):
-        self._delegate.shutdown(wait)
+        batch_settings = pubsub_v1.types.BatchSettings(
+            max_bytes=1024 * 5,  # 5 kilobytes
+            max_latency=2,  # 2 seconds
+        )
+
+        self.publisher = pubsub_v1.PublisherClient(batch_settings)
+
+    def open(self):
+        pass
+
+    def export_items(self, items):
+        futures = []
+        for item in items:
+            message_future = self.export_item(item)
+            futures.append(message_future)
+
+        for future in futures:
+            # result() blocks until the message is published.
+            future.result()
+
+    def export_item(self, item):
+        data = json.dumps(item).encode('utf-8')
+        message_future = self.publisher.publish(self.topic_path, data=data)
+        return message_future
+
+    def close(self):
+        pass

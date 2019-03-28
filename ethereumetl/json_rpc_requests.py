@@ -58,6 +58,31 @@ def generate_get_code_json_rpc(contract_addresses, block='latest'):
         )
 
 
+def generate_pending_transaction_filter_json_rpc():
+    yield generate_json_rpc(
+        method='eth_newPendingTransactionFilter',
+        params=[],
+        request_id=1,
+    )
+
+
+def generate_get_new_entries_json_rpc(filter_id):
+    yield generate_json_rpc(
+        method='eth_getFilterChanges',
+        params=[filter_id],
+        request_id=2,
+    )
+
+
+def generate_get_transaction_json_rpc(transaction_hashes):
+    for idx, transaction_hash in enumerate(transaction_hashes):
+        yield generate_json_rpc(
+            method='eth_getTransactionByHash',
+            params=[transaction_hash],
+            request_id=idx,
+        )
+
+
 def generate_json_rpc(method, params, request_id=1):
     return {
         'jsonrpc': '2.0',

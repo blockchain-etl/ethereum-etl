@@ -20,34 +20,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from concurrent.futures import ThreadPoolExecutor
-from threading import BoundedSemaphore
+import logging
 
 
-class BoundedExecutor:
-    """BoundedExecutor behaves as a ThreadPoolExecutor which will block on
-    calls to submit() once the limit given as "bound" work items are queued for
-    execution.
-    :param bound: Integer - the maximum number of items in the work queue
-    :param max_workers: Integer - the size of the thread pool
-    """
-    def __init__(self, bound, max_workers):
-        self._delegate = ThreadPoolExecutor(max_workers=max_workers)
-        self._semaphore = BoundedSemaphore(bound + max_workers)
+class InMemoryItemExporter:
+    def __init__(self, item_types):
+        self.item_types = item_types
+        self.items = {}
 
-    """See concurrent.futures.Executor#submit"""
-    def submit(self, fn, *args, **kwargs):
-        self._semaphore.acquire()
-        try:
-            future = self._delegate.submit(fn, *args, **kwargs)
-        except:
-            self._semaphore.release()
-            raise
-        else:
-            future.add_done_callback(lambda x: self._semaphore.release())
-            return future
+    def open(self):
+        for item_type in self.item_types:
+            self.items[item_type] = []
 
-    """See concurrent.futures.Executor#shutdown"""
-    def shutdown(self, wait=True):
-        self._delegate.shutdown(wait)
+    def export_item(self, item):
+        item_type = item.get('type', None)
+        if item_type is None:
+            raise ValueError('type key is not found in item {}'.format(repr(item)))
+
+        self.items[item_type].append(item)
+
+    def close(self):
+        pass
+
+    def get_items(self, item_type):
+        return self.items[item_type]

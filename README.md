@@ -38,6 +38,12 @@ Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export
 --provider-uri https://mainnet.infura.io --output tokens.csv
 ```
 
+Export pending transactions ([Schema](#pending_transactionscsv) [Reference](#export_pending_transactionspy)):
+```bash
+> python export_pending_transactions.py \
+--provider http://35.229.51.253:8545 --output pending_transactions.csv
+```
+
 Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 ```bash
@@ -63,6 +69,7 @@ For the latest version, check out the repo and call
   - [logs.csv](#logscsv)
   - [contracts.csv](#contractscsv)
   - [tokens.csv](#tokenscsv)
+  - [pending_transactions.csv](#pending_transactionscsv)
   - [traces.csv](#tracescsv)
 - [Exporting the Blockchain](#exporting-the-blockchain)
   - [Export in 2 Hours](#export-in-2-hours)
@@ -174,6 +181,20 @@ symbol                       | string      |
 name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
+
+### pending_transactions.csv
+
+Column                       |    Type     |
+-----------------------------|-------------|
+hash                         | hex_string  |
+nonce                        | numeric     |
+from_address                 | address     |
+to_address                   | address     |
+value                        | numeric     |
+gas                          | bigint      |
+gas_price                    | bigint      |
+input                        | string      |
+timestamp                    | timestamp   |
 
 ### traces.csv
 
@@ -296,6 +317,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 - [export_receipts_and_logs](#export_receipts_and_logs)
 - [export_contracts](#export_contracts)
 - [export_tokens](#export_tokens)
+- [export_pending_transactions.py](#export_pending_transactionspy)
 - [export_traces](#export_traces)
 - [export_geth_traces](#export_geth_traces)
 - [extract_geth_traces](#extract_geth_traces)
@@ -432,6 +454,16 @@ Then export ERC20 / ERC721 tokens:
 ```
 
 You can tune `--max-workers` for performance.
+
+#### export_pending_transactions.py
+
+Export pending transactions for every certain period
+
+```bash
+> python export_pending_transactions.py \
+--provider http://35.229.51.253:8545 --output pending_transactions.csv
+
+```
 
 #### export_traces
 
