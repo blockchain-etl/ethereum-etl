@@ -24,7 +24,7 @@
 import json
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.jobs.base_job import BaseJob
+from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.json_rpc_requests import generate_get_code_json_rpc
 from ethereumetl.mappers.contract_mapper import EthContractMapper
 

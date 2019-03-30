@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 FIELDS_TO_EXPORT = [
     'token_address',

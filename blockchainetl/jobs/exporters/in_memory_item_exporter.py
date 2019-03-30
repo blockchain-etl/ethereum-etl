@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Evgeniy Filatov, evgeniyfilatov@gmail.com
+# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,24 @@
 # SOFTWARE.
 
 
-from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+class InMemoryItemExporter:
+    def __init__(self, item_types):
+        self.item_types = item_types
+        self.items = {}
 
-FIELDS_TO_EXPORT = [
-    'block_number',
-    'transaction_hash',
-    'transaction_index',
-    'from_address',
-    'to_address',
-    'value',
-    'input',
-    'output',
-    'trace_type',
-    'call_type',
-    'reward_type',
-    'gas',
-    'gas_used',
-    'subtraces',
-    'trace_address',
-    'error',
-    'status',
-]
+    def open(self):
+        for item_type in self.item_types:
+            self.items[item_type] = []
 
+    def export_item(self, item):
+        item_type = item.get('type', None)
+        if item_type is None:
+            raise ValueError('type key is not found in item {}'.format(repr(item)))
 
-def traces_item_exporter(traces_output):
-    return CompositeItemExporter(
-        filename_mapping={
-            'trace': traces_output
-        },
-        field_mapping={
-            'trace': FIELDS_TO_EXPORT
-        }
-    )
+        self.items[item_type].append(item)
+
+    def close(self):
+        pass
+
+    def get_items(self, item_type):
+        return self.items[item_type]

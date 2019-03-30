@@ -20,27 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
+import itertools
 
 
-class InMemoryItemExporter:
-    def __init__(self, item_types):
-        self.item_types = item_types
-        self.items = {}
+# https://stackoverflow.com/a/27062830/1580227
+class AtomicCounter:
+    def __init__(self):
+        self._counter = itertools.count()
+        # init to 0
+        next(self._counter)
 
-    def open(self):
-        for item_type in self.item_types:
-            self.items[item_type] = []
-
-    def export_item(self, item):
-        item_type = item.get('type', None)
-        if item_type is None:
-            raise ValueError('type key is not found in item {}'.format(repr(item)))
-
-        self.items[item_type].append(item)
-
-    def close(self):
-        pass
-
-    def get_items(self, item_type):
-        return self.items[item_type]
+    def increment(self, increment=1):
+        assert increment > 0
+        return [next(self._counter) for _ in range(0, increment)][-1]

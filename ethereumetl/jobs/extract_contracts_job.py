@@ -23,7 +23,7 @@
 
 from ethereumetl.domain.contract import EthContract
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.jobs.base_job import BaseJob
+from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.contract_mapper import EthContractMapper
 
 from ethereumetl.service.eth_contract_service import EthContractService

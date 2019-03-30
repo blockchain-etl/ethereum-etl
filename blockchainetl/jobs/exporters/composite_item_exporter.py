@@ -21,8 +21,8 @@
 # SOFTWARE.
 import logging
 
-from ethereumetl.atomic_counter import AtomicCounter
-from ethereumetl.exporters import CsvItemExporter, JsonLinesItemExporter
+from blockchainetl.atomic_counter import AtomicCounter
+from blockchainetl.exporters import CsvItemExporter, JsonLinesItemExporter
 from blockchainetl.file_utils import get_file_handle, close_silently
 
 
@@ -57,9 +57,9 @@ class CompositeItemExporter:
     def export_item(self, item):
         item_type = item.get('type')
         if item_type is None:
-            raise ValueError('type key is not found in item {}'.format(repr(item)))
+            raise ValueError('"type" key is not found in item {}'.format(repr(item)))
 
-        exporter = self.exporter_mapping[item_type]
+        exporter = self.exporter_mapping.get(item_type)
         if exporter is None:
             raise ValueError('Exporter for item type {} not found'.format(item_type))
         exporter.export_item(item)
