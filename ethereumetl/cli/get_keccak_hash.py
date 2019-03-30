@@ -25,7 +25,7 @@ import click
 
 from eth_utils import keccak
 
-from ethereumetl.file_utils import smart_open
+from blockchainetl.file_utils import smart_open
 from ethereumetl.logging_utils import logging_basic_config
 
 

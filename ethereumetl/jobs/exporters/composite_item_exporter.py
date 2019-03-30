@@ -23,7 +23,7 @@ import logging
 
 from ethereumetl.atomic_counter import AtomicCounter
 from ethereumetl.exporters import CsvItemExporter, JsonLinesItemExporter
-from ethereumetl.file_utils import get_file_handle, close_silently
+from blockchainetl.file_utils import get_file_handle, close_silently
 
 
 class CompositeItemExporter:

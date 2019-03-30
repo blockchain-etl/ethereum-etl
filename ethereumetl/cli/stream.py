@@ -53,20 +53,24 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
 
-    from ethereumetl.streaming.streaming_utils import get_item_exporter
-    from ethereumetl.streaming.streamer import Streamer
+    from blockchainetl.streaming.streaming_utils import get_item_exporter
+    from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
+    from blockchainetl.streaming.streamer import Streamer
 
-    streamer = Streamer(
+    streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        last_synced_block_file=last_synced_block_file,
-        lag=lag,
         item_exporter=get_item_exporter(output),
-        start_block=start_block,
-        period_seconds=period_seconds,
         batch_size=batch_size,
-        block_batch_size=block_batch_size,
         max_workers=max_workers,
         entity_types=entity_types
+    )
+    streamer = Streamer(
+        blockchain_streamer_adapter=streamer_adapter,
+        last_synced_block_file=last_synced_block_file,
+        lag=lag,
+        start_block=start_block,
+        period_seconds=period_seconds,
+        block_batch_size=block_batch_size,
     )
     streamer.stream()
 

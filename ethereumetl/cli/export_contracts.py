@@ -23,7 +23,7 @@
 
 import click
 
-from ethereumetl.file_utils import smart_open
+from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.logging_utils import logging_basic_config

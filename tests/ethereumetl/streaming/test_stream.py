@@ -23,12 +23,13 @@
 import os
 
 import pytest
+from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 import tests.resources
 from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
-from ethereumetl.streaming.streamer import Streamer
+from blockchainetl.streaming.streamer import Streamer
 from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
@@ -58,14 +59,12 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
     contracts_output_file = str(tmpdir.join('actual_contracts.json'))
     tokens_output_file = str(tmpdir.join('actual_tokens.json'))
 
-    streamer = Streamer(
+    streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(provider_type,
                                       read_resource_lambda=lambda file: read_resource(resource_group, file),
                                       batch=True)
         ),
-        start_block=start_block,
-        end_block=end_block,
         batch_size=batch_size,
         item_exporter=CompositeItemExporter(
             filename_mapping={
@@ -79,6 +78,11 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
             }
         ),
         entity_types=entity_types,
+    )
+    streamer = Streamer(
+        blockchain_streamer_adapter=streamer_adapter,
+        start_block=start_block,
+        end_block=end_block,
         retry_errors=False
     )
     streamer.stream()
