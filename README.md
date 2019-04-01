@@ -49,7 +49,7 @@ Stream blocks, transactions, logs, token_transfers continually to console:
 
 ```bash
 > pip install ethereum-etl[streaming]
-> ethereumetl stream --start-block 500000 -e block -e transaction -e log -e token_transfer --log-file log.txt
+> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
 Stream blockchain data continually to Google Pub/Sub:

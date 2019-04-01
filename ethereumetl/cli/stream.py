@@ -36,12 +36,11 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-@click.option('-t', '--output', type=str,
+@click.option('-o', '--output', type=str,
               help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. '
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
-@click.option('-e', '--entity-types', default=EntityType.ALL_FOR_INFURA,
-              type=click.Choice(EntityType.ALL_FOR_STREAMING), multiple=True,
+@click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), type=str,
               help='The list of entity types to export.')
 @click.option('--period-seconds', default=10, type=int, help='How many seconds to sleep between syncs')
 @click.option('-b', '--batch-size', default=10, type=int, help='How many blocks to batch in single request')
@@ -52,6 +51,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
+    entity_types = parse_entity_types(entity_types)
 
     from blockchainetl.streaming.streaming_utils import get_item_exporter
     from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
@@ -79,3 +79,16 @@ def configure_logging(filename):
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     logging_basic_config(filename=filename)
+
+
+def parse_entity_types(entity_types):
+    entity_types = [c.strip() for c in entity_types.split(',')]
+
+    # validate passed columns
+    for entity_type in entity_types:
+        if entity_type not in EntityType.ALL_FOR_STREAMING:
+            raise click.BadOptionUsage(
+                '--entity-type', '{} is not an available entity type. Supply a comma separated list of types from {}'
+                    .format(entity_type, ','.join(EntityType.ALL_FOR_STREAMING)))
+
+    return entity_types
