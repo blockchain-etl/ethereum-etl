@@ -24,26 +24,30 @@ import json
 import logging
 
 from google.cloud import pubsub_v1
+from timeout_decorator import timeout_decorator
 
 
 class GooglePubSubItemExporter:
 
-    def __init__(self, item_type_to_topic_mapping, timeout=300):
+    def __init__(self, item_type_to_topic_mapping):
         self.item_type_to_topic_mapping = item_type_to_topic_mapping
-
-        batch_settings = pubsub_v1.types.BatchSettings(
-            max_bytes=1024 * 5,  # 5 kilobytes
-            max_latency=1,  # 1 second
-            max_messages=1000,
-        )
-
-        self.publisher = pubsub_v1.PublisherClient(batch_settings)
-        self.timeout = timeout
+        self.publisher = create_publisher()
 
     def open(self):
         pass
 
     def export_items(self, items):
+        try:
+            self._export_items_with_timeout(items)
+        except TimeoutError as e:
+            # A bug in PubSub publisher that makes it stalled after running for some time.
+            # Exception in thread Thread-CommitBatchPublisher:
+            # details = "channel is in state TRANSIENT_FAILURE"
+            self.publisher = create_publisher()
+            raise e
+
+    @timeout_decorator.timeout(5)
+    def _export_items_with_timeout(self, items):
         futures = []
         for item in items:
             message_future = self.export_item(item)
@@ -51,7 +55,7 @@ class GooglePubSubItemExporter:
 
         for future in futures:
             # result() blocks until the message is published.
-            future.result(timeout=self.timeout)
+            future.result()
 
     def export_item(self, item):
         item_type = item.get('type')
@@ -65,3 +69,13 @@ class GooglePubSubItemExporter:
 
     def close(self):
         pass
+
+
+def create_publisher():
+    batch_settings = pubsub_v1.types.BatchSettings(
+        max_bytes=1024 * 5,  # 5 kilobytes
+        max_latency=1,  # 1 second
+        max_messages=1000,
+    )
+
+    return pubsub_v1.PublisherClient(batch_settings)

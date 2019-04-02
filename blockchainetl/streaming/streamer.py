@@ -27,7 +27,6 @@ import time
 
 from blockchainetl.streaming.streamer_adapter_stub import StreamerAdapterStub
 from blockchainetl.file_utils import smart_open
-from timeout_decorator import timeout_decorator
 
 
 class Streamer:
@@ -77,7 +76,6 @@ class Streamer:
 
         self.blockchain_streamer_adapter.close()
 
-    @timeout_decorator.timeout(900)
     def _sync_cycle(self, last_synced_block):
         current_block = self.blockchain_streamer_adapter.get_current_block_number()
 
