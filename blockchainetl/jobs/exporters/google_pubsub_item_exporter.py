@@ -46,7 +46,7 @@ class GooglePubSubItemExporter:
             self.publisher = create_publisher()
             raise e
 
-    @timeout_decorator.timeout(5)
+    @timeout_decorator.timeout(300)
     def _export_items_with_timeout(self, items):
         futures = []
         for item in items:
