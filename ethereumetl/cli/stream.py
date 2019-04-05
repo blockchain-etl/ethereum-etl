@@ -20,12 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
-
 import click
+from blockchainetl.streaming.streaming_utils import configure_signals, configure_logging
 from ethereumetl.enumeration.entity_type import EntityType
 
-from ethereumetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
@@ -47,10 +45,12 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-B', '--block-batch-size', default=1, type=int, help='How many blocks to batch in single sync round')
 @click.option('-w', '--max-workers', default=5, type=int, help='The number of workers')
 @click.option('--log-file', default=None, type=str, help='Log file')
+@click.option('--pid-file', default=None, type=str, help='pid file')
 def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
-           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None):
+           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
+    configure_signals()
     entity_types = parse_entity_types(entity_types)
 
     from blockchainetl.streaming.streaming_utils import get_item_exporter
@@ -71,14 +71,9 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         start_block=start_block,
         period_seconds=period_seconds,
         block_batch_size=block_batch_size,
+        pid_file=pid_file
     )
     streamer.stream()
-
-
-def configure_logging(filename):
-    for handler in logging.root.handlers[:]:
-        logging.root.removeHandler(handler)
-    logging_basic_config(filename=filename)
 
 
 def parse_entity_types(entity_types):
