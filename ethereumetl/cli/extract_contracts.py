@@ -25,6 +25,7 @@ import csv
 import json
 
 import click
+from blockchainetl.csv_utils import set_max_field_size_limit
 from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
@@ -40,6 +41,9 @@ logging_basic_config()
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 def extract_contracts(traces, batch_size, output, max_workers):
     """Extracts contracts from traces file."""
+
+    set_max_field_size_limit()
+
     with smart_open(traces, 'r') as traces_file:
         if traces.endswith('.json'):
             traces_iterable = (json.loads(line) for line in traces_file)
