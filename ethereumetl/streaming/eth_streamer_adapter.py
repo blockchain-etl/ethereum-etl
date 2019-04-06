@@ -1,16 +1,16 @@
 import logging
 
+from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
+from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
-from ethereumetl.jobs.export_tokens_job import ExportTokensJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
-from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
-from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
-    enrich_contracts
+    enrich_contracts, enrich_tokens
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3
 
@@ -64,13 +64,14 @@ class EthStreamerAdapter:
         # Export tokens
         tokens = []
         if self._should_export(EntityType.TOKEN):
-            tokens = self._export_tokens(contracts)
+            tokens = self._extract_tokens(contracts)
 
         enriched_transactions = enrich_transactions(blocks, transactions, receipts)
         enriched_logs = enrich_logs(blocks, logs)
         enriched_token_transfers = enrich_token_transfers(blocks, token_transfers)
         enriched_traces = enrich_traces(blocks, traces)
         enriched_contracts = enrich_contracts(blocks, contracts)
+        enriched_tokens = enrich_tokens(blocks, tokens)
 
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
@@ -81,7 +82,7 @@ class EthStreamerAdapter:
             (enriched_token_transfers if EntityType.TOKEN_TRANSFER in self.entity_types else []) +
             (enriched_traces if EntityType.TRACE in self.entity_types else []) +
             (enriched_contracts if EntityType.CONTRACT in self.entity_types else []) +
-            (tokens if EntityType.TOKEN in self.entity_types else [])
+            (enriched_tokens if EntityType.TOKEN in self.entity_types else [])
         )
 
     def _export_blocks_and_transactions(self, start_block, end_block):
@@ -154,13 +155,10 @@ class EthStreamerAdapter:
         contracts = exporter.get_items('contract')
         return contracts
 
-    def _export_tokens(self, contracts):
-        token_addresses = (contract['address'] for contract in contracts
-                           if contract['is_erc20'] or contract['is_erc721'])
-
+    def _extract_tokens(self, contracts):
         exporter = InMemoryItemExporter(item_types=['token'])
-        job = ExportTokensJob(
-            token_addresses_iterable=token_addresses,
+        job = ExtractTokensJob(
+            contracts_iterable=contracts,
             web3=ThreadLocalProxy(lambda: Web3(self.batch_web3_provider)),
             max_workers=self.max_workers,
             item_exporter=exporter

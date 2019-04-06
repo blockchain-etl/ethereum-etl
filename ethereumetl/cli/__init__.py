@@ -34,6 +34,7 @@ from ethereumetl.cli.extract_csv_column import extract_csv_column
 from ethereumetl.cli.extract_field import extract_field
 from ethereumetl.cli.extract_geth_traces import extract_geth_traces
 from ethereumetl.cli.extract_token_transfers import extract_token_transfers
+from ethereumetl.cli.extract_tokens import extract_tokens
 from ethereumetl.cli.filter_items import filter_items
 from ethereumetl.cli.get_block_range_for_date import get_block_range_for_date
 from ethereumetl.cli.get_block_range_for_timestamps import get_block_range_for_timestamps
@@ -60,6 +61,7 @@ cli.add_command(export_traces, "export_traces")
 cli.add_command(export_geth_traces, "export_geth_traces")
 cli.add_command(extract_geth_traces, "extract_geth_traces")
 cli.add_command(extract_contracts, "extract_contracts")
+cli.add_command(extract_tokens, "extract_tokens")
 
 # streaming
 cli.add_command(stream, "stream")

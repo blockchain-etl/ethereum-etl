@@ -28,7 +28,8 @@ FIELDS_TO_EXPORT = [
     'symbol',
     'name',
     'decimals',
-    'total_supply'
+    'total_supply',
+    'block_number'
 ]
 
 

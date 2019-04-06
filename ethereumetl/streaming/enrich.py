@@ -215,3 +215,25 @@ def enrich_contracts(blocks, contracts):
         raise ValueError('The number of contracts is wrong ' + str(result))
 
     return result
+
+def enrich_tokens(blocks, tokens):
+    result = list(join(
+        tokens, blocks, ('block_number', 'number'),
+        [
+            'type',
+            'address',
+            'symbol',
+            'name',
+            'decimals',
+            'total_supply',
+            'block_number'
+        ],
+        [
+            ('timestamp', 'block_timestamp'),
+            ('hash', 'block_hash'),
+        ]))
+
+    if len(result) != len(tokens):
+        raise ValueError('The number of tokens is wrong ' + str(result))
+
+    return result
