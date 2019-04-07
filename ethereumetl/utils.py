@@ -37,6 +37,17 @@ def hex_to_dec(hex_string):
         return hex_string
 
 
+def to_int_or_none(val):
+    if isinstance(val, int):
+        return val
+    if val is None or val == '':
+        return None
+    try:
+        return int(val)
+    except ValueError:
+        return None
+
+
 def chunk_string(string, length):
     return (string[0 + i:length + i] for i in range(0, len(string), length))
 
@@ -98,6 +109,7 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
 
 def check_classic_provider_uri(chain, provider_uri):
     if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
