@@ -45,9 +45,8 @@ def calculate_trace_statuses(traces):
 
 
 def calculate_trace_statuses_for_single_transaction(all_traces):
-    filtered_traces = [trace for trace in all_traces if trace.trace_type in ('call', 'create')]
-    sorted_traces = sorted(filtered_traces, key=lambda trace: len(trace.trace_address or []))
-
+    """O(n * log(n))"""
+    sorted_traces = sorted(all_traces, key=lambda trace: len(trace.trace_address or []))
     indexed_traces = {trace_address_to_str(trace.trace_address): trace for trace in sorted_traces}
 
     # if a parent trace failed the child trace set failed also. Because of the sorting order all parent trace statuses
