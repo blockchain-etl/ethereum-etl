@@ -39,10 +39,11 @@ class GooglePubSubItemExporter:
     def export_items(self, items):
         try:
             self._export_items_with_timeout(items)
-        except TimeoutError as e:
+        except timeout_decorator.TimeoutError as e:
             # A bug in PubSub publisher that makes it stalled after running for some time.
             # Exception in thread Thread-CommitBatchPublisher:
             # details = "channel is in state TRANSIENT_FAILURE"
+            logging.info('Recreating Pub/Sub publisher.')
             self.publisher = create_publisher()
             raise e
 

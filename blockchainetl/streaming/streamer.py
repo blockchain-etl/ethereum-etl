@@ -77,7 +77,7 @@ class Streamer:
                 synced_blocks = self._sync_cycle()
             except Exception as e:
                 # https://stackoverflow.com/a/4992124/1580227
-                logging.exception('An exception occurred while fetching block data.')
+                logging.exception('An exception occurred while syncing block data.')
                 if not self.retry_errors:
                     raise e
 
