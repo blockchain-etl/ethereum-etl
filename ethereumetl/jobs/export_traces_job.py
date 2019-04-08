@@ -45,8 +45,7 @@ class ExportTracesJob(BaseJob):
 
         self.web3 = web3
 
-        # TODO: use batch_size when this issue is fixed https://github.com/paritytech/parity-ethereum/issues/9822
-        self.batch_work_executor = BatchWorkExecutor(1, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
 
         self.trace_mapper = EthTraceMapper()
@@ -66,10 +65,12 @@ class ExportTracesJob(BaseJob):
         )
 
     def _export_batch(self, block_number_batch):
-        # TODO: Change to len(block_number_batch) > 0 when this issue is fixed
-        # https://github.com/paritytech/parity-ethereum/issues/9822
-        assert len(block_number_batch) == 1
-        block_number = block_number_batch[0]
+        assert len(block_number_batch) > 0
+
+        filter_params = {
+            'fromBlock': hex(block_number_batch[0]),
+            'toBlock': hex(block_number_batch[-1]),
+        }
 
         if self.include_genesis_traces and 0 in block_number_batch:
             genesis_traces = self.special_trace_service.get_genesis_traces()
@@ -81,9 +82,7 @@ class ExportTracesJob(BaseJob):
             for trace in daofork_traces:
                 self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
-        # TODO: Change to traceFilter when this issue is fixed
-        # https://github.com/paritytech/parity-ethereum/issues/9822
-        json_traces = self.web3.parity.traceBlock(block_number)
+        json_traces = self.web3.parity.traceFilter(filter_params)
 
         if json_traces is None:
             raise ValueError('Response from the node is None. Is the node fully synced?')
