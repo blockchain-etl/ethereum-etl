@@ -34,7 +34,7 @@ class MockBatchWeb3Provider(HTTPProvider):
         self.read_resource = read_resource
 
     def make_request(self, method, params):
-        file_name = 'web3_response.' + method + '_' + '_'.join([str(param) for param in params]) + '.json'
+        file_name = 'web3_response.' + method + '_' + '_'.join([param_to_str(param) for param in params]) + '.json'
         file_content = self.read_resource(file_name)
         return json.loads(file_content)
 
@@ -59,3 +59,10 @@ class MockBatchWeb3Provider(HTTPProvider):
             file_content = self.read_resource(file_name)
             web3_response.append(json.loads(file_content))
         return web3_response
+
+
+def param_to_str(param):
+    if isinstance(param, dict):
+        return '_'.join([str(key) + '_' + str(param[key]).lower() for key in sorted(param)])
+    else:
+        return str(param)

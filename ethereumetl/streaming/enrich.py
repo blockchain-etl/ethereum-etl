@@ -216,6 +216,7 @@ def enrich_contracts(blocks, contracts):
 
     return result
 
+
 def enrich_tokens(blocks, tokens):
     result = list(join(
         tokens, blocks, ('block_number', 'number'),
