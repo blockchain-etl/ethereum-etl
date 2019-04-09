@@ -66,23 +66,31 @@ class EthStreamerAdapter:
         if self._should_export(EntityType.TOKEN):
             tokens = self._extract_tokens(contracts)
 
-        enriched_transactions = enrich_transactions(blocks, transactions, receipts)
-        enriched_logs = enrich_logs(blocks, logs)
-        enriched_token_transfers = enrich_token_transfers(blocks, token_transfers)
-        enriched_traces = enrich_traces(blocks, traces)
-        enriched_contracts = enrich_contracts(blocks, contracts)
-        enriched_tokens = enrich_tokens(blocks, tokens)
+        enriched_blocks = blocks \
+            if EntityType.BLOCK in self.entity_types else []
+        enriched_transactions = enrich_transactions(blocks, transactions, receipts) \
+            if EntityType.TRANSACTION in self.entity_types else []
+        enriched_logs = enrich_logs(blocks, logs) \
+            if EntityType.LOG in self.entity_types else []
+        enriched_token_transfers = enrich_token_transfers(blocks, token_transfers) \
+            if EntityType.TOKEN_TRANSFER in self.entity_types else []
+        enriched_traces = enrich_traces(blocks, traces) \
+            if EntityType.TRACE in self.entity_types else []
+        enriched_contracts = enrich_contracts(blocks, contracts) \
+            if EntityType.CONTRACT in self.entity_types else []
+        enriched_tokens = enrich_tokens(blocks, tokens) \
+            if EntityType.TOKEN in self.entity_types else []
 
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
         self.item_exporter.export_items(
-            (blocks if EntityType.BLOCK in self.entity_types else []) +
-            (enriched_transactions if EntityType.TRANSACTION in self.entity_types else []) +
-            (enriched_logs if EntityType.LOG in self.entity_types else []) +
-            (enriched_token_transfers if EntityType.TOKEN_TRANSFER in self.entity_types else []) +
-            (enriched_traces if EntityType.TRACE in self.entity_types else []) +
-            (enriched_contracts if EntityType.CONTRACT in self.entity_types else []) +
-            (enriched_tokens if EntityType.TOKEN in self.entity_types else [])
+            enriched_blocks +
+            enriched_transactions +
+            enriched_logs +
+            enriched_token_transfers +
+            enriched_traces +
+            enriched_contracts +
+            enriched_tokens
         )
 
     def _export_blocks_and_transactions(self, start_block, end_block):
