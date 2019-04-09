@@ -43,6 +43,7 @@ class GooglePubSubItemExporter:
             # A bug in PubSub publisher that makes it stalled after running for some time.
             # Exception in thread Thread-CommitBatchPublisher:
             # details = "channel is in state TRANSIENT_FAILURE"
+            # https://stackoverflow.com/questions/55552606/how-can-one-catch-exceptions-in-python-pubsub-subscriber-that-are-happening-in-i?noredirect=1#comment97849067_55552606
             logging.info('Recreating Pub/Sub publisher.')
             self.publisher = create_publisher()
             raise e
