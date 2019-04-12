@@ -108,6 +108,7 @@ hash             | hex_string  |
 nonce            | bigint      |
 block_hash       | hex_string  |
 block_number     | bigint      |
+block_timestamp  | bigint      |
 transaction_index| bigint      |
 from_address     | address     |
 to_address       | address     |
