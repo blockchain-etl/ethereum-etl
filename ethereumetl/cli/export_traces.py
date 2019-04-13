@@ -37,7 +37,7 @@ logging_basic_config()
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-s', '--start-block', default=0, type=int, help='Start block')
 @click.option('-e', '--end-block', required=True, type=int, help='End block')
-@click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
+@click.option('-b', '--batch-size', default=5, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', required=True, type=str,
