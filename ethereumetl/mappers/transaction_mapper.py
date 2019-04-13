@@ -26,12 +26,13 @@ from ethereumetl.utils import hex_to_dec, to_normalized_address
 
 
 class EthTransactionMapper(object):
-    def json_dict_to_transaction(self, json_dict):
+    def json_dict_to_transaction(self, json_dict, **kwargs):
         transaction = EthTransaction()
         transaction.hash = json_dict.get('hash')
         transaction.nonce = hex_to_dec(json_dict.get('nonce'))
         transaction.block_hash = json_dict.get('blockHash')
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        transaction.block_timestamp = kwargs.get('block_timestamp')
         transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
         transaction.from_address = to_normalized_address(json_dict.get('from'))
         transaction.to_address = to_normalized_address(json_dict.get('to'))
@@ -48,6 +49,7 @@ class EthTransactionMapper(object):
             'nonce': transaction.nonce,
             'block_hash': transaction.block_hash,
             'block_number': transaction.block_number,
+            'block_timestamp': transaction.block_timestamp,
             'transaction_index': transaction.transaction_index,
             'from_address': transaction.from_address,
             'to_address': transaction.to_address,

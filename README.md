@@ -129,6 +129,7 @@ value            | numeric     |
 gas              | bigint      |
 gas_price        | bigint      |
 input            | hex_string  |
+block_timestamp  | bigint      |
 
 ### token_transfers.csv
 
