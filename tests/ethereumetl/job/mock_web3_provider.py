@@ -35,10 +35,6 @@ class MockWeb3Provider(IPCProvider):
             to = params[0]['to'].lower()
             data = params[0]['data']
             file_name = '{}_{}_{}.json'.format(method, to, data)
-        # TODO: Remove this when this issue is fixed
-        # https://github.com/paritytech/parity-ethereum/issues/9822
-        elif method == 'trace_block':
-            file_name = 'trace_filter.json'
         else:
             file_name = method + '.json'
         file_content = self.read_resource(file_name)
