@@ -49,14 +49,14 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'nonce',
     'block_hash',
     'block_number',
-    'block_timestamp',
     'transaction_index',
     'from_address',
     'to_address',
     'value',
     'gas',
     'gas_price',
-    'input'
+    'input',
+    'block_timestamp'
 ]
 
 

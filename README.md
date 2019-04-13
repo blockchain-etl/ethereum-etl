@@ -108,7 +108,6 @@ hash             | hex_string  |
 nonce            | bigint      |
 block_hash       | hex_string  |
 block_number     | bigint      |
-block_timestamp  | bigint      |
 transaction_index| bigint      |
 from_address     | address     |
 to_address       | address     |
@@ -116,6 +115,7 @@ value            | numeric     |
 gas              | bigint      |
 gas_price        | bigint      |
 input            | hex_string  |
+block_timestamp  | bigint      |
 
 ### token_transfers.csv
 
