@@ -57,8 +57,8 @@ def join(left, right, join_fields, left_fields, right_fields):
             yield result_item
 
 
-def enrich_transactions(blocks, transactions, receipts):
-    transactions_and_receipts = join(
+def enrich_transactions(transactions, receipts):
+    result = list(join(
         transactions, receipts, ('hash', 'transaction_hash'),
         left_fields=[
             'type',
@@ -71,7 +71,9 @@ def enrich_transactions(blocks, transactions, receipts):
             'gas',
             'gas_price',
             'input',
-            'block_number'
+            'block_timestamp',
+            'block_number',
+            'block_hash'
         ],
         right_fields=[
             ('cumulative_gas_used', 'receipt_cumulative_gas_used'),
@@ -79,31 +81,6 @@ def enrich_transactions(blocks, transactions, receipts):
             ('contract_address', 'receipt_contract_address'),
             ('root', 'receipt_root'),
             ('status', 'receipt_status')
-        ])
-
-    result = list(join(
-        transactions_and_receipts, blocks, ('block_number', 'number'),
-        [
-            'type',
-            'hash',
-            'nonce',
-            'transaction_index',
-            'from_address',
-            'to_address',
-            'value',
-            'gas',
-            'gas_price',
-            'input',
-            'block_number',
-            'receipt_cumulative_gas_used',
-            'receipt_gas_used',
-            'receipt_contract_address',
-            'receipt_root',
-            'receipt_status'
-        ],
-        [
-            ('timestamp', 'block_timestamp'),
-            ('hash', 'block_hash'),
         ]))
 
     if len(result) != len(transactions):
