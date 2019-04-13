@@ -55,7 +55,8 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'value',
     'gas',
     'gas_price',
-    'input'
+    'input',
+    'block_timestamp'
 ]
 
 

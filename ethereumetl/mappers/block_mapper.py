@@ -55,7 +55,8 @@ class EthBlockMapper(object):
 
         if 'transactions' in json_dict:
             block.transactions = [
-                self.transaction_mapper.json_dict_to_transaction(tx) for tx in json_dict['transactions']
+                self.transaction_mapper.json_dict_to_transaction(tx, block_timestamp=block.timestamp)
+                for tx in json_dict['transactions']
                 if isinstance(tx, dict)
             ]
 
