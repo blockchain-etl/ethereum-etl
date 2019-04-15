@@ -29,7 +29,7 @@ from blockchainetl.csv_utils import set_max_field_size_limit
 from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3

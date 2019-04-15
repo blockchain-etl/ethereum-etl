@@ -26,7 +26,7 @@ import re
 
 from datetime import datetime, timedelta
 
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from web3 import Web3
 
 from ethereumetl.jobs.export_all_common import export_all_common

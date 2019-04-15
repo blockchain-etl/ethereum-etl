@@ -57,7 +57,7 @@ Stream blockchain data continually to Google Pub/Sub:
 ```bash
 > export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
 > ethereumetl stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
-
+```
 
 For the latest version, check out the repo and call 
 ```bash
@@ -211,7 +211,7 @@ gas_used                     | bigint      |
 subtraces                    | bigint      |
 trace_address                | string      |
 error                        | string      |
-status                       | string      |
+status                       | bigint      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 

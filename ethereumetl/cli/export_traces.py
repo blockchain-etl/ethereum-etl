@@ -26,7 +26,7 @@ import click
 from web3 import Web3
 
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.jobs.exporters.traces_item_exporter import traces_item_exporter

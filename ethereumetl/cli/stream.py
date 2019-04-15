@@ -79,7 +79,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 def parse_entity_types(entity_types):
     entity_types = [c.strip() for c in entity_types.split(',')]
 
-    # validate passed columns
+    # validate passed types
     for entity_type in entity_types:
         if entity_type not in EntityType.ALL_FOR_STREAMING:
             raise click.BadOptionUsage(

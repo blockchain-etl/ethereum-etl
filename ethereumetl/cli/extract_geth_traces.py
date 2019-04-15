@@ -27,7 +27,7 @@ import click
 from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.exporters.traces_item_exporter import traces_item_exporter
 from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 
 logging_basic_config()
 

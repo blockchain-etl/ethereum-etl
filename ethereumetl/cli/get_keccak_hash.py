@@ -26,7 +26,7 @@ import click
 from eth_utils import keccak
 
 from blockchainetl.file_utils import smart_open
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
