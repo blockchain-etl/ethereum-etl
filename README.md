@@ -45,6 +45,8 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
+---
+
 Stream blocks, transactions, logs, token_transfers continually to console ([Reference](#stream)):
 
 ```bash
