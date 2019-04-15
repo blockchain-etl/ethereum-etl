@@ -45,14 +45,14 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
-Stream blocks, transactions, logs, token_transfers continually to console:
+Stream blocks, transactions, logs, token_transfers continually to console ([Reference](#stream)):
 
 ```bash
 > pip3 install ethereum-etl[streaming]
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
-Stream blockchain data continually to Google Pub/Sub:
+Stream blockchain data continually to Google Pub/Sub ([Reference](#stream)):
 
 ```bash
 > export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
