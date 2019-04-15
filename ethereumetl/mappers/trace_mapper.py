@@ -104,6 +104,7 @@ class EthTraceMapper(object):
         trace.to_address = address
         trace.value = value
         trace.trace_type = 'genesis'
+        trace.status = 1
 
         return trace
 
@@ -119,6 +120,7 @@ class EthTraceMapper(object):
         trace.to_address = to_address
         trace.value = value
         trace.trace_type = 'daofork'
+        trace.status = 1
 
         return trace
 
@@ -186,4 +188,5 @@ class EthTraceMapper(object):
             'subtraces': trace.subtraces,
             'trace_address': trace.trace_address,
             'error': trace.error,
+            'status': trace.status,
         }

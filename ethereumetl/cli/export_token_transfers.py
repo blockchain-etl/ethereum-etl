@@ -27,7 +27,7 @@ from web3 import Web3
 
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 

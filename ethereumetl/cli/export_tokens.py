@@ -25,10 +25,10 @@ import click
 
 from web3 import Web3
 
-from ethereumetl.file_utils import smart_open
+from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.utils import check_classic_provider_uri

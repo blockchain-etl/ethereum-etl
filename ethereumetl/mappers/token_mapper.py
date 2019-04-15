@@ -29,5 +29,6 @@ class EthTokenMapper(object):
             'symbol': token.symbol,
             'name': token.name,
             'decimals': token.decimals,
-            'total_supply': token.total_supply
+            'total_supply': token.total_supply,
+            'block_number': token.block_number
         }

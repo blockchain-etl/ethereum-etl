@@ -24,6 +24,8 @@
 import itertools
 import warnings
 
+from ethereumetl.misc.retriable_value_error import RetriableValueError
+
 
 def hex_to_dec(hex_string):
     if hex_string is None:
@@ -33,6 +35,17 @@ def hex_to_dec(hex_string):
     except ValueError:
         print("Not a hex string %s" % hex_string)
         return hex_string
+
+
+def to_int_or_none(val):
+    if isinstance(val, int):
+        return val
+    if val is None or val == '':
+        return None
+    try:
+        return int(val)
+    except ValueError:
+        return None
 
 
 def chunk_string(string, length):
@@ -64,6 +77,9 @@ def rpc_response_to_result(response):
         error_message = 'result is None in response {}.'.format(response)
         if response.get('error') is None:
             error_message = error_message + ' Make sure Ethereum node is synced.'
+            # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
+            # synced node
+            raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
 
@@ -93,6 +109,7 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
 
 def check_classic_provider_uri(chain, provider_uri):
     if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':

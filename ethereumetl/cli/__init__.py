@@ -29,18 +29,21 @@ from ethereumetl.cli.export_receipts_and_logs import export_receipts_and_logs
 from ethereumetl.cli.export_token_transfers import export_token_transfers
 from ethereumetl.cli.export_tokens import export_tokens
 from ethereumetl.cli.export_traces import export_traces
+from ethereumetl.cli.extract_contracts import extract_contracts
 from ethereumetl.cli.extract_csv_column import extract_csv_column
 from ethereumetl.cli.extract_field import extract_field
 from ethereumetl.cli.extract_geth_traces import extract_geth_traces
 from ethereumetl.cli.extract_token_transfers import extract_token_transfers
+from ethereumetl.cli.extract_tokens import extract_tokens
 from ethereumetl.cli.filter_items import filter_items
 from ethereumetl.cli.get_block_range_for_date import get_block_range_for_date
 from ethereumetl.cli.get_block_range_for_timestamps import get_block_range_for_timestamps
 from ethereumetl.cli.get_keccak_hash import get_keccak_hash
+from ethereumetl.cli.stream import stream
 
 
 @click.group()
-@click.version_option(version='1.2.4')
+@click.version_option(version='1.3.0')
 @click.pass_context
 def cli(ctx):
     pass
@@ -57,6 +60,11 @@ cli.add_command(export_tokens, "export_tokens")
 cli.add_command(export_traces, "export_traces")
 cli.add_command(export_geth_traces, "export_geth_traces")
 cli.add_command(extract_geth_traces, "extract_geth_traces")
+cli.add_command(extract_contracts, "extract_contracts")
+cli.add_command(extract_tokens, "extract_tokens")
+
+# streaming
+cli.add_command(stream, "stream")
 
 # utils
 cli.add_command(get_block_range_for_date, "get_block_range_for_date")

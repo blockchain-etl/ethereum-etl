@@ -1,3 +1,3 @@
-block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error
-1000895,,0,0xad9253df75b066c67aff5cdd9d6d2b9245444726,0x627da06356442122f08e2203c749978151e55800,1000000000000000000,0x,,call,call,,0,0,0,,out of gas
-1000895,,1,0x9288fe5be3be048b5c7a68bfd4b9a0746b7e4a00,0xe05ff93a9978bbb48356accc74088f3841fc5d72,1100000000000000000,0x,0x,call,call,,100000,0,0,,
+block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error,status
+1000895,,0,0xad9253df75b066c67aff5cdd9d6d2b9245444726,0x627da06356442122f08e2203c749978151e55800,1000000000000000000,0x,,call,call,,0,0,0,,out of gas,
+1000895,,1,0x9288fe5be3be048b5c7a68bfd4b9a0746b7e4a00,0xe05ff93a9978bbb48356accc74088f3841fc5d72,1100000000000000000,0x,0x,call,call,,100000,0,0,,,

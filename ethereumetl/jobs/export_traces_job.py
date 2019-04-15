@@ -21,10 +21,11 @@
 # SOFTWARE.
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.jobs.base_job import BaseJob
+from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.service.eth_special_trace_service import EthSpecialTraceService
+from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.utils import validate_range
 
 
@@ -88,8 +89,11 @@ class ExportTracesJob(BaseJob):
         if json_traces is None:
             raise ValueError('Response from the node is None. Is the node fully synced?')
 
-        for json_trace in json_traces:
-            trace = self.trace_mapper.json_dict_to_trace(json_trace)
+        traces = [self.trace_mapper.json_dict_to_trace(json_trace) for json_trace in json_traces]
+
+        calculate_trace_statuses(traces)
+
+        for trace in traces:
             self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
     def _end(self):

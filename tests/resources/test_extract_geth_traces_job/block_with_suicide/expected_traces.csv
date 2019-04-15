@@ -1,3 +1,3 @@
-block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error
-1011973,,0,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,0x474faa5018639791952fae334e2911700ac7fe9b,0,0x41c0e1b5,0x,call,call,,68728,232,1,,
-1011973,,0,,,,,,suicide,,,,,0,0,
+block_number,transaction_hash,transaction_index,from_address,to_address,value,input,output,trace_type,call_type,reward_type,gas,gas_used,subtraces,trace_address,error,status
+1011973,,0,0x83973747eec131bf9a08ac64fb1a518e891bdf4b,0x474faa5018639791952fae334e2911700ac7fe9b,0,0x41c0e1b5,0x,call,call,,68728,232,1,,,
+1011973,,0,,,,,,suicide,,,,,0,0,,

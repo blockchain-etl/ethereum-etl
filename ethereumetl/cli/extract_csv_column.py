@@ -25,7 +25,7 @@ import click
 import csv
 
 from ethereumetl.csv_utils import set_max_field_size_limit
-from ethereumetl.file_utils import smart_open
+from blockchainetl.file_utils import smart_open
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))

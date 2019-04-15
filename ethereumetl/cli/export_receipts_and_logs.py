@@ -23,10 +23,10 @@
 
 import click
 
-from ethereumetl.file_utils import smart_open
+from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
-from ethereumetl.logging_utils import logging_basic_config
+from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.utils import check_classic_provider_uri

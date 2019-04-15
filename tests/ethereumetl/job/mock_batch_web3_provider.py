@@ -23,31 +23,22 @@
 
 import json
 
-from ethereumetl.utils import hex_to_dec
+from tests.ethereumetl.job.mock_web3_provider import MockWeb3Provider, build_file_name
 
 
-class MockBatchWeb3Provider(object):
+class MockBatchWeb3Provider(MockWeb3Provider):
+
     def __init__(self, read_resource):
+        super().__init__(read_resource)
         self.read_resource = read_resource
 
-    def make_request(self, text):
+    def make_batch_request(self, text):
         batch = json.loads(text)
         web3_response = []
         for req in batch:
-            if req['method'] == 'eth_getBlockByNumber':
-                block_number = hex_to_dec(req['params'][0])
-                file_name = 'web3_response.block.' + str(block_number) + '.json'
-            elif req['method'] == 'eth_getCode':
-                contract_address = req['params'][0]
-                file_name = 'web3_response.code.' + str(contract_address) + '.json'
-            elif req['method'] == 'eth_getTransactionReceipt':
-                transaction_hash = req['params'][0]
-                file_name = 'web3_response.receipt.' + str(transaction_hash) + '.json'
-            elif req['method'] == 'debug_traceBlockByNumber':
-                block_number = req['params'][0]
-                file_name = 'web3_response.block_trace.' + str(block_number) + '.json'
-            else:
-                raise ValueError('Request method {} is unexpected'.format(req['method']))
+            method = req['method']
+            params = req['params']
+            file_name = build_file_name(method, params)
             file_content = self.read_resource(file_name)
             web3_response.append(json.loads(file_content))
         return web3_response
