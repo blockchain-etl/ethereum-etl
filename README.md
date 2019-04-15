@@ -532,6 +532,8 @@ file where the block number, from which to start streaming the blockchain data, 
 - Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to 
 handle chain reorganizations - they are less likely the further a block from the head.
 - You can tune `--period-seconds`, `--batch-size`, `--block-batch-size`, `--max-workers` for performance.
+- Refer to [blockchain-etl-streaming](https://github.com/blockchain-etl/blockchain-etl-streaming) for
+instructions on deploying it to Kubernetes. 
 
 ### Running Tests
 
