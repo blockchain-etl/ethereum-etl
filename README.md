@@ -327,6 +327,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 - [extract_geth_traces](#extract_geth_traces)
 - [get_block_range_for_date](#get_block_range_for_date)
 - [get_keccak_hash](#get_keccak_hash)
+- [stream](#stream)
 
 All the commands accept `-h` parameter for help, e.g.:
 
@@ -510,6 +511,26 @@ You can tune `--batch-size`, `--max-workers` for performance.
 > ethereumetl get_keccak_hash -i "transfer(address,uint256)"
 0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
+
+#### stream
+
+```bash
+> ethereumetl stream --provider-uri https://mainnet.infura.io --start-block 500000
+```
+
+- This command outputs blocks, transactions, logs, token_transfers to the console by default.
+- Entity types can be specified with the `-e` option, e.g. `-e block,transaction,log,token_transfer,trace,contract,token`
+- Use `--output` option to specify the Google Pub/Sub topic where to publish blockchain data, 
+e.g. `projects/your-project/topics/bitcoin_blockchain`. Data will be pushed to 
+`projects/your-project/topics/bitcoin_blockchain.blocks`, `projects/your-project/topics/bitcoin_blockchain.transactions` 
+etc. topics.
+- The command saves its state to `last_synced_block.txt` file where the last synced block number is saved periodically.
+- Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the 
+file where the block number, from which to start streaming the blockchain data, is saved.
+- Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to 
+handle chain reorganizations - they are less likely the further a block from the head.
+- Use the `--chain` option to specify the type of the chain, e.g. `bitcoin`, `litecoin`, `dash`, `zcash`, etc.
+- You can tune `--period-seconds`, `--batch-size`, `--max-workers` for performance.
 
 ### Running Tests
 
