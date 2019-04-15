@@ -48,7 +48,7 @@ Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 Stream blocks, transactions, logs, token_transfers continually to console:
 
 ```bash
-> pip install ethereum-etl[streaming]
+> pip3 install ethereum-etl[streaming]
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
@@ -515,7 +515,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 #### stream
 
 ```bash
-> pip install ethereum-etl[streaming]
+> pip3 install ethereum-etl[streaming]
 > ethereumetl stream --provider-uri https://mainnet.infura.io --start-block 500000
 ```
 
