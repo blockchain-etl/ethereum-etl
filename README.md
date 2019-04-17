@@ -238,6 +238,10 @@ will have `0` or `1` in the `decimals` column in the CSVs.
 
 ## Exporting the Blockchain
 
+If you'd like to have the [system](https://cloud.google.com/blog/products/data-analytics/ethereum-bigquery-how-we-built-dataset) 
+set up and hosted for you in AWS or GCP, get in touch with us 
+[here](https://d5ai.typeform.com/to/cmOoLe).
+
 1. Install python 3.5.3+ https://www.python.org/downloads/
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
