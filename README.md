@@ -238,7 +238,7 @@ will have `0` or `1` in the `decimals` column in the CSVs.
 
 ## Exporting the Blockchain
 
-If you'd like to have the [system](https://cloud.google.com/blog/products/data-analytics/ethereum-bigquery-how-we-built-dataset) 
+If you'd like to have the blockchain data platform 
 set up and hosted for you in AWS or GCP, get in touch with us 
 [here](https://d5ai.typeform.com/to/cmOoLe).
 
