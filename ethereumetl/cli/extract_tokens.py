@@ -49,11 +49,11 @@ def extract_tokens(contracts, provider_uri, output, max_workers):
 
     set_max_field_size_limit()
 
-    with smart_open(contracts, 'r') as traces_file:
+    with smart_open(contracts, 'r') as contracts_file:
         if contracts.endswith('.json'):
-            contracts_iterable = (json.loads(line) for line in traces_file)
+            contracts_iterable = (json.loads(line) for line in contracts_file)
         else:
-            contracts_iterable = csv.DictReader(traces_file)
+            contracts_iterable = csv.DictReader(contracts_file)
         job = ExtractTokensJob(
             contracts_iterable=contracts_iterable,
             web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
