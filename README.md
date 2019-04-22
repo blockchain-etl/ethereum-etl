@@ -24,20 +24,6 @@ Export ERC20 and ERC721 transfers ([Schema](#token_transferscsv), [Reference](#e
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
-Export receipts and logs ([Schema](#receiptscsv), [Reference](#export_receipts_and_logs)):
-
-```bash
-> ethereumetl export_receipts_and_logs --transaction-hashes transaction_hashes.txt \
---provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
-```
-
-Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export_tokens)):
-
-```bash
-> ethereumetl export_tokens --token-addresses token_addresses.csv \
---provider-uri https://mainnet.infura.io --output tokens.csv
-```
-
 Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 ```bash
@@ -54,12 +40,7 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
-Stream blockchain data continually to Google Pub/Sub ([Reference](#stream)):
-
-```bash
-> export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
-> ethereumetl stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
-```
+Find other commands [here](#command-reference).
 
 For the latest version, check out the repo and call 
 ```bash
@@ -89,6 +70,7 @@ For the latest version, check out the repo and call
   - [Public Dataset](#public-dataset)
   - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
   - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
+- [Blockchain ETL in Media](#blockchain-etl-in-media)
 
 
 ## Schema
@@ -374,6 +356,8 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
+[Output schema](#blockscsv)
+
 #### export_token_transfers
 
 The API used in this command is not supported by Infura, so you will need a local node.
@@ -393,6 +377,8 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Output schema](#token_transferscsv)
 
 #### export_receipts_and_logs
 
@@ -417,6 +403,8 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
+[Output schema](#receiptscsv)
+
 #### extract_token_transfers
 
 First export receipt logs with [export_receipts_and_logs](#export_receipts_and_logs).
@@ -428,6 +416,8 @@ Then extract transfers from the logs.csv file:
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Output schema](#token_transferscsv)
 
 #### export_contracts
 
@@ -446,6 +436,8 @@ Then export contracts:
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Output schema](#contractscsv)
 
 #### export_tokens
 
@@ -466,6 +458,8 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
+[Output schema](#tokenscsv)
+
 #### export_traces
 
 Also called internal transactions.
@@ -480,6 +474,8 @@ See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Output schema](#tracescsv)
 
 #### export_geth_traces
 
@@ -540,6 +536,13 @@ handle chain reorganizations - they are less likely the further a block from the
 - You can tune `--period-seconds`, `--batch-size`, `--block-batch-size`, `--max-workers` for performance.
 - Refer to [blockchain-etl-streaming](https://github.com/blockchain-etl/blockchain-etl-streaming) for
 instructions on deploying it to Kubernetes. 
+
+Stream blockchain data continually to Google Pub/Sub:
+
+```bash
+> export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
+> ethereumetl stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+```
 
 ### Running Tests
 
@@ -629,4 +632,9 @@ https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses
 
 Read this article 
 https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
+
+## Blockchain ETL in Media
+
+- A Technical Breakdown Of Google's New Blockchain Search Tools: https://www.forbes.com/sites/michaeldelcastillo/2019/02/05/google-launches-search-for-bitcoin-ethereum-bitcoin-cash-dash-dogecoin-ethereum-classic-litecoin-and-zcash/#394fc868c789
+- Navigating Bitcoin, Ethereum, XRP: How Google Is Quietly Making Blockchains Searchable: https://www.forbes.com/sites/michaeldelcastillo/2019/02/04/navigating-bitcoin-ethereum-xrp-how-google-is-quietly-making-blockchains-searchable/?ss=crypto-blockchain#49e111da4248
 
