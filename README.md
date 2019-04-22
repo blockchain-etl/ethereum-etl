@@ -356,7 +356,7 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Output schema](#blockscsv)
+[Blocks and transactions schema](#blockscsv).
 
 #### export_token_transfers
 
@@ -378,7 +378,7 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Output schema](#token_transferscsv)
+[Token transfers schema](#token_transferscsv).
 
 #### export_receipts_and_logs
 
@@ -403,7 +403,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-[Output schema](#receiptscsv)
+[Receipts and logs schema](#receiptscsv).
 
 #### extract_token_transfers
 
@@ -417,7 +417,7 @@ Then extract transfers from the logs.csv file:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Output schema](#token_transferscsv)
+[Token transfers schema](#token_transferscsv).
 
 #### export_contracts
 
@@ -437,7 +437,7 @@ Then export contracts:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Output schema](#contractscsv)
+[Contracts schema](#contractscsv).
 
 #### export_tokens
 
@@ -458,7 +458,7 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
-[Output schema](#tokenscsv)
+[Tokens schema](#tokenscsv).
 
 #### export_traces
 
@@ -475,7 +475,7 @@ See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Output schema](#tracescsv)
+[Traces schema](#tracescsv).
 
 #### export_geth_traces
 
