@@ -80,6 +80,8 @@ def rpc_response_to_result(response):
             # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
             # synced node
             raise RetriableValueError(error_message)
+        elif response.get('error') is not None and response.get('error').get('code') == -32603:
+            raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
 
