@@ -95,7 +95,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
             read_resource(resource_group, 'expected_blocks.json'), read_file(blocks_output_file)
         )
 
-    if 'transactions' in entity_types:
+    if 'transaction' in entity_types:
         print('=====================')
         print(read_file(transactions_output_file))
         compare_lines_ignore_order(

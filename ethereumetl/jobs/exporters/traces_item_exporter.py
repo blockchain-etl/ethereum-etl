@@ -41,6 +41,7 @@ FIELDS_TO_EXPORT = [
     'trace_address',
     'error',
     'status',
+    'trace_id',
 ]
 
 
