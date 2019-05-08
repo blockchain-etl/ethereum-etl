@@ -11,6 +11,7 @@ from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJo
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
     enrich_contracts, enrich_tokens
+from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3
 
@@ -28,6 +29,7 @@ class EthStreamerAdapter:
         self.batch_size = batch_size
         self.max_workers = max_workers
         self.entity_types = entity_types
+        self.item_id_calculator = EthItemIdCalculator()
 
     def open(self):
         self.item_exporter.open()
@@ -83,15 +85,17 @@ class EthStreamerAdapter:
 
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
-        self.item_exporter.export_items(
-            enriched_blocks +
-            enriched_transactions +
-            enriched_logs +
-            enriched_token_transfers +
-            enriched_traces +
-            enriched_contracts +
+        all_items = enriched_blocks + \
+            enriched_transactions + \
+            enriched_logs + \
+            enriched_token_transfers + \
+            enriched_traces + \
+            enriched_contracts + \
             enriched_tokens
-        )
+
+        self.calculate_item_ids(all_items)
+
+        self.item_exporter.export_items(all_items)
 
     def _export_blocks_and_transactions(self, start_block, end_block):
         blocks_and_transactions_item_exporter = InMemoryItemExporter(item_types=['block', 'transaction'])
@@ -201,6 +205,10 @@ class EthStreamerAdapter:
             return EntityType.TOKEN in self.entity_types
 
         raise ValueError('Unexpected entity type ' + entity_type)
+
+    def calculate_item_ids(self, items):
+        for item in items:
+            item['item_id'] = self.item_id_calculator.calculate(item)
 
     def close(self):
         self.item_exporter.close()

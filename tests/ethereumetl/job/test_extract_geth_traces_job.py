@@ -56,6 +56,8 @@ def test_extract_traces_job(tmpdir, resource_group):
     )
     job.run()
 
+    print('=====================')
+    print(read_file(output_file))
     compare_lines_ignore_order(
         read_resource(resource_group, 'expected_traces.csv'), read_file(output_file)
     )

@@ -158,7 +158,8 @@ def enrich_traces(blocks, traces):
             'error',
             'status',
             'transaction_hash',
-            'block_number'
+            'block_number',
+            'trace_id'
         ],
         [
             ('timestamp', 'block_timestamp'),

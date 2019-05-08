@@ -25,6 +25,8 @@ from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.service.eth_special_trace_service import EthSpecialTraceService
+
+from ethereumetl.service.trace_id_calculator import calculate_trace_ids
 from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.utils import validate_range
 
@@ -72,15 +74,15 @@ class ExportTracesJob(BaseJob):
         assert len(block_number_batch) == 1
         block_number = block_number_batch[0]
 
+        all_traces = []
+
         if self.include_genesis_traces and 0 in block_number_batch:
             genesis_traces = self.special_trace_service.get_genesis_traces()
-            for trace in genesis_traces:
-                self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
+            all_traces.extend(genesis_traces)
 
         if self.include_daofork_traces and DAOFORK_BLOCK_NUMBER in block_number_batch:
             daofork_traces = self.special_trace_service.get_daofork_traces()
-            for trace in daofork_traces:
-                self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
+            all_traces.extend(daofork_traces)
 
         # TODO: Change to traceFilter when this issue is fixed
         # https://github.com/paritytech/parity-ethereum/issues/9822
@@ -90,10 +92,12 @@ class ExportTracesJob(BaseJob):
             raise ValueError('Response from the node is None. Is the node fully synced?')
 
         traces = [self.trace_mapper.json_dict_to_trace(json_trace) for json_trace in json_traces]
+        all_traces.extend(traces)
 
-        calculate_trace_statuses(traces)
+        calculate_trace_statuses(all_traces)
+        calculate_trace_ids(all_traces)
 
-        for trace in traces:
+        for trace in all_traces:
             self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
     def _end(self):
