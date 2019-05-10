@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
+import random
 
 import click
 from blockchainetl.streaming.streaming_utils import configure_signals, configure_logging
@@ -57,6 +59,10 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
     from blockchainetl.streaming.streamer import Streamer
 
+    # TODO: Implement fallback mechanism for provider uris instead of picking randomly
+    provider_uri = pick_random_provider_uri(provider_uri)
+    logging.info('Using ' + provider_uri)
+
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         item_exporter=get_item_exporter(output),
@@ -87,3 +93,8 @@ def parse_entity_types(entity_types):
                     .format(entity_type, ','.join(EntityType.ALL_FOR_STREAMING)))
 
     return entity_types
+
+
+def pick_random_provider_uri(provider_uri):
+    provider_uris = [uri.strip() for uri in provider_uri.split(',')]
+    return random.choice(provider_uris)
