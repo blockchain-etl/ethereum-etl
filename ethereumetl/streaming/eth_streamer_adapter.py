@@ -4,6 +4,7 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
+from ethereumetl.jobs.export_balances_job import ExportBalancesJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
@@ -43,6 +44,11 @@ class EthStreamerAdapter:
         if self._should_export(EntityType.BLOCK) or self._should_export(EntityType.TRANSACTION):
             blocks, transactions = self._export_blocks_and_transactions(start_block, end_block)
 
+        # Export balances
+        balances = []
+        if self._should_export(EntityType.BALANCE):
+            balances = self._export_balances(start_block, end_block)
+
         # Export receipts and logs
         receipts, logs = [], []
         if self._should_export(EntityType.RECEIPT) or self._should_export(EntityType.LOG):
@@ -72,6 +78,8 @@ class EthStreamerAdapter:
             if EntityType.BLOCK in self.entity_types else []
         enriched_transactions = enrich_transactions(transactions, receipts) \
             if EntityType.TRANSACTION in self.entity_types else []
+        enriched_balances = balances \
+            if EntityType.BALANCE in self.entity_types else []
         enriched_logs = enrich_logs(blocks, logs) \
             if EntityType.LOG in self.entity_types else []
         enriched_token_transfers = enrich_token_transfers(blocks, token_transfers) \
@@ -87,6 +95,7 @@ class EthStreamerAdapter:
 
         all_items = enriched_blocks + \
             enriched_transactions + \
+            enriched_balances + \
             enriched_logs + \
             enriched_token_transfers + \
             enriched_traces + \
@@ -113,6 +122,20 @@ class EthStreamerAdapter:
         blocks = blocks_and_transactions_item_exporter.get_items('block')
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
+
+    def _export_balances(self, start_block, end_block):
+        balances_item_exporter = InMemoryItemExporter(item_types=['balance'])
+        balances_job = ExportBalancesJob(
+            start_block=start_block,
+            end_block=end_block,
+            batch_size=self.batch_size,
+            batch_web3_provider=self.batch_web3_provider,
+            max_workers=self.max_workers,
+            item_exporter=balances_item_exporter
+        )
+        balances_job.run()
+        balance = balances_item_exporter.get_items('balance')
+        return balance
 
     def _export_receipts_and_logs(self, transactions):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
@@ -185,6 +208,9 @@ class EthStreamerAdapter:
 
         if entity_type == EntityType.TRANSACTION:
             return EntityType.TRANSACTION in self.entity_types or self._should_export(EntityType.LOG)
+
+        if entity_type == EntityType.BALANCE:
+            return EntityType.BALANCE in self.entity_types
 
         if entity_type == EntityType.RECEIPT:
             return EntityType.TRANSACTION in self.entity_types or self._should_export(EntityType.TOKEN_TRANSFER)
