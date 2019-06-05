@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
 import logging
 import time
 
@@ -34,7 +35,7 @@ from ethereumetl.utils import dynamic_batch_iterator
 RETRY_EXCEPTIONS = (ConnectionError, HTTPError, RequestsTimeout, TooManyRedirects, Web3Timeout, OSError,
                     RetriableValueError)
 
-TWO_MINUTES = 2 * 60
+BATCH_CHANGE_COOLDOWN_PERIOD_SECONDS = 2 * 60
 
 
 # Executes the given work in batches, reducing the batch size exponentially in case of errors.
@@ -86,7 +87,7 @@ class BatchWorkExecutor:
             latest_batch_size_change_time = self.latest_batch_size_change_time
             seconds_since_last_change = current_time - latest_batch_size_change_time \
                 if latest_batch_size_change_time is not None else 0
-            if seconds_since_last_change > TWO_MINUTES:
+            if seconds_since_last_change > BATCH_CHANGE_COOLDOWN_PERIOD_SECONDS:
                 new_batch_size = current_batch_size * 2
                 self.logger.info('Increasing batch size to {}.'.format(new_batch_size))
                 self.batch_size = new_batch_size
