@@ -80,10 +80,24 @@ def rpc_response_to_result(response):
             # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
             # synced node
             raise RetriableValueError(error_message)
-        elif response.get('error') is not None and response.get('error').get('code') == -32603:
+        elif response.get('error') is not None and is_retriable_error(response.get('error').get('code')):
             raise RetriableValueError(error_message)
         raise ValueError(error_message)
     return result
+
+
+def is_retriable_error(error_code):
+    if error_code is None:
+        return False
+
+    if not isinstance(error_code, int):
+        return False
+
+    # https://www.jsonrpc.org/specification#error_object
+    if error_code == -32603 or (-32000 >= error_code >= -32099):
+        return True
+
+    return False
 
 
 def split_to_batches(start_incl, end_incl, batch_size):
