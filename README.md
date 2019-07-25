@@ -24,26 +24,23 @@ Export ERC20 and ERC721 transfers ([Schema](#token_transferscsv), [Reference](#e
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
-Export receipts and logs ([Schema](#receiptscsv), [Reference](#export_receipts_and_logs)):
-
-```bash
-> ethereumetl export_receipts_and_logs --transaction-hashes transaction_hashes.txt \
---provider-uri https://mainnet.infura.io --receipts-output receipts.csv --logs-output logs.csv
-```
-
-Export ERC20 and ERC721 token details ([Schema](#tokenscsv), [Reference](#export_tokens)):
-
-```bash
-> ethereumetl export_tokens --token-addresses token_addresses.csv \
---provider-uri https://mainnet.infura.io --output tokens.csv
-```
-
 Export traces ([Schema](#tracescsv), [Reference](#export_traces)):
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
+
+---
+
+Stream blocks, transactions, logs, token_transfers continually to console ([Reference](#stream)):
+
+```bash
+> pip3 install ethereum-etl[streaming]
+> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
+```
+
+Find other commands [here](#command-reference).
 
 For the latest version, check out the repo and call 
 ```bash
@@ -73,6 +70,7 @@ For the latest version, check out the repo and call
   - [Public Dataset](#public-dataset)
   - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
   - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
+- [Blockchain ETL in Media](#blockchain-etl-in-media)
 
 
 ## Schema
@@ -115,6 +113,7 @@ value            | numeric     |
 gas              | bigint      |
 gas_price        | bigint      |
 input            | hex_string  |
+block_timestamp  | bigint      |
 
 ### token_transfers.csv
 
@@ -164,6 +163,7 @@ bytecode                     | hex_string  |
 function_sighashes           | string      |
 is_erc20                     | boolean     |
 is_erc721                    | boolean     |
+block_number                 | bigint      |
 
 ### tokens.csv
 
@@ -195,6 +195,7 @@ gas_used                     | bigint      |
 subtraces                    | bigint      |
 trace_address                | string      |
 error                        | string      |
+status                       | bigint      |
 
 You can find column descriptions in [https://github.com/medvedev1088/ethereum-etl-airflow](https://github.com/medvedev1088/ethereum-etl-airflow/tree/master/dags/resources/stages/raw/schemas)
 
@@ -203,10 +204,9 @@ Note: for the `address` type all hex characters are lower-cased.
 
 ## LIMITATIONS
 
-- `contracts.csv` and `tokens.csv` files don’t include contracts created by message calls (a.k.a. internal transactions).
-We are working on adding support for those.
 - In case the contract is a proxy, which forwards all calls to a delegate, interface detection doesn’t work,
-which means `is_erc20` and `is_erc721` will always be false for proxy contracts.
+which means `is_erc20` and `is_erc721` will always be false for proxy contracts and they will be missing in the `tokens`
+table.
 - The metadata methods (`symbol`, `name`, `decimals`, `total_supply`) for ERC20 are optional, so around 10% of the
 contracts are missing this data. Also some contracts (EOS) implement these methods but with wrong return type,
 so the metadata columns are missing in this case as well.
@@ -219,6 +219,10 @@ because numeric types there can't handle 32-byte integers. You should use
 will have `0` or `1` in the `decimals` column in the CSVs.
 
 ## Exporting the Blockchain
+
+If you'd like to have the blockchain data platform 
+set up and hosted for you in AWS or GCP, get in touch with us 
+[here](https://d5ai.typeform.com/to/cmOoLe).
 
 1. Install python 3.5.3+ https://www.python.org/downloads/
 
@@ -289,6 +293,15 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
     > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://mainnet.infura.io
     ```
 
+1. Run streaming to console or Pub/Sub
+    ```bash
+    > docker build -t ethereum-etl:latest-streaming -f Dockerfile_with_streaming .
+    > echo "Stream to console"
+    > docker run ethereum-etl:latest-streaming stream --start-block 500000 --log-file log.txt
+    > echo "Stream to Pub/Sub"
+    > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest-streaming stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+    ```
+
 ### Command Reference
 
 - [export_blocks_and_transactions](#export_blocks_and_transactions)
@@ -302,6 +315,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 - [extract_geth_traces](#extract_geth_traces)
 - [get_block_range_for_date](#get_block_range_for_date)
 - [get_keccak_hash](#get_keccak_hash)
+- [stream](#stream)
 
 All the commands accept `-h` parameter for help, e.g.:
 
@@ -342,6 +356,8 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
+[Blocks and transactions schema](#blockscsv).
+
 #### export_token_transfers
 
 The API used in this command is not supported by Infura, so you will need a local node.
@@ -361,6 +377,8 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Token transfers schema](#token_transferscsv).
 
 #### export_receipts_and_logs
 
@@ -385,6 +403,8 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
+[Receipts and logs schema](#receiptscsv).
+
 #### extract_token_transfers
 
 First export receipt logs with [export_receipts_and_logs](#export_receipts_and_logs).
@@ -396,6 +416,8 @@ Then extract transfers from the logs.csv file:
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Token transfers schema](#token_transferscsv).
 
 #### export_contracts
 
@@ -414,6 +436,8 @@ Then export contracts:
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Contracts schema](#contractscsv).
 
 #### export_tokens
 
@@ -434,6 +458,8 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
+[Tokens schema](#tokenscsv).
+
 #### export_traces
 
 Also called internal transactions.
@@ -448,6 +474,8 @@ See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
+
+[Traces schema](#tracescsv).
 
 #### export_geth_traces
 
@@ -486,10 +514,40 @@ You can tune `--batch-size`, `--max-workers` for performance.
 0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b
 ```
 
+#### stream
+
+```bash
+> pip3 install ethereum-etl[streaming]
+> ethereumetl stream --provider-uri https://mainnet.infura.io --start-block 500000
+```
+
+- This command outputs blocks, transactions, logs, token_transfers to the console by default.
+- Entity types can be specified with the `-e` option, 
+e.g. `-e block,transaction,log,token_transfer,trace,contract,token`.
+- Use `--output` option to specify the Google Pub/Sub topic where to publish blockchain data, 
+e.g. `projects/<your-project>/topics/bitcoin_blockchain`. Data will be pushed to 
+`projects/<your-project>/topics/bitcoin_blockchain.blocks`, `projects/<your-project>/topics/bitcoin_blockchain.transactions` 
+etc. topics.
+- The command saves its state to `last_synced_block.txt` file where the last synced block number is saved periodically.
+- Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the 
+file where the block number, from which to start streaming the blockchain data, is saved.
+- Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to 
+handle chain reorganizations - they are less likely the further a block from the head.
+- You can tune `--period-seconds`, `--batch-size`, `--block-batch-size`, `--max-workers` for performance.
+- Refer to [blockchain-etl-streaming](https://github.com/blockchain-etl/blockchain-etl-streaming) for
+instructions on deploying it to Kubernetes. 
+
+Stream blockchain data continually to Google Pub/Sub:
+
+```bash
+> export GOOGLE_APPLICATION_CREDENTIALS=/path_to_credentials_file.json
+> ethereumetl stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+```
+
 ### Running Tests
 
 ```bash
-> pip3 install -e .[dev]
+> pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
 > pytest -vv
 ```
@@ -542,6 +600,10 @@ CREATE DATABASE ethereumetl;
   - logs: [schemas/aws/logs.sql](schemas/aws/logs.sql)
   - tokens: [schemas/aws/tokens.sql](schemas/aws/tokens.sql)
 
+### Airflow DAGs
+
+Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
+
 ### Tables for Parquet Files
 
 Read this article on how to convert CSVs to Parquet https://medium.com/@medvedev1088/converting-ethereum-etl-files-to-parquet-399e048ddd30
@@ -555,8 +617,6 @@ Note that DECIMAL type is limited to 38 digits in Hive https://cwiki.apache.org/
 so values greater than 38 decimals will be null.
 
 ## Querying in Google BigQuery
-
-Refer to https://github.com/medvedev1088/ethereum-etl-airflow for the instructions.
 
 ### Public Dataset
 
@@ -572,3 +632,9 @@ https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses
 
 Read this article 
 https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
+
+## Blockchain ETL in Media
+
+- A Technical Breakdown Of Google's New Blockchain Search Tools: https://www.forbes.com/sites/michaeldelcastillo/2019/02/05/google-launches-search-for-bitcoin-ethereum-bitcoin-cash-dash-dogecoin-ethereum-classic-litecoin-and-zcash/#394fc868c789
+- Navigating Bitcoin, Ethereum, XRP: How Google Is Quietly Making Blockchains Searchable: https://www.forbes.com/sites/michaeldelcastillo/2019/02/04/navigating-bitcoin-ethereum-xrp-how-google-is-quietly-making-blockchains-searchable/?ss=crypto-blockchain#49e111da4248
+

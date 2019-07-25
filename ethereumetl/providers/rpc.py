@@ -29,7 +29,7 @@ from web3.utils.request import make_post_request
 # Will be removed once batch feature is added to web3.py https://github.com/ethereum/web3.py/issues/832
 class BatchHTTPProvider(HTTPProvider):
 
-    def make_request(self, text):
+    def make_batch_request(self, text):
         self.logger.debug("Making request HTTP. URI: %s, Request: %s",
                           self.endpoint_uri, text)
         request_data = text.encode('utf-8')

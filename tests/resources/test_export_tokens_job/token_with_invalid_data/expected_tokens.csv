@@ -1,2 +1,2 @@
-address,symbol,name,decimals,total_supply
-0xf763be8b3263c268e9789abfb3934564a7b80054,ETH,ETH,18,6547475210000000000
+address,symbol,name,decimals,total_supply,block_number
+0xf763be8b3263c268e9789abfb3934564a7b80054,ETH,ETH,18,6547475210000000000,

@@ -39,3 +39,5 @@ class EthTrace(object):
         self.subtraces = 0
         self.trace_address = None
         self.error = None
+        self.status = None
+        self.trace_id = None

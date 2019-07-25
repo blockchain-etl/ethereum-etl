@@ -30,13 +30,12 @@ from ethereumetl.service.graph_operations import OutOfBoundsError
 from tests.helpers import skip_if_slow_tests_disabled
 
 
-@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("date,expected_start_block,expected_end_block", [
-    ('2015-07-30', 0, 6911),
-    ('2015-07-31', 6912, 13774),
-    ('2017-01-01', 2912407, 2918517),
-    ('2017-01-02', 2918518, 2924575),
-    ('2018-06-10', 5761663, 5767303)
+    skip_if_slow_tests_disabled(['2015-07-30', 0, 6911]),
+    skip_if_slow_tests_disabled(['2015-07-31', 6912, 13774]),
+    skip_if_slow_tests_disabled(['2017-01-01', 2912407, 2918517]),
+    skip_if_slow_tests_disabled(['2017-01-02', 2918518, 2924575]),
+    skip_if_slow_tests_disabled(['2018-06-10', 5761663, 5767303])
 ])
 def test_get_block_range_for_date(date, expected_start_block, expected_end_block):
     eth_service = get_new_eth_service()
@@ -45,10 +44,9 @@ def test_get_block_range_for_date(date, expected_start_block, expected_end_block
     assert blocks == (expected_start_block, expected_end_block)
 
 
-@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("date", [
-    '2015-07-29',
-    '2030-01-01'
+    skip_if_slow_tests_disabled(['2015-07-29']),
+    skip_if_slow_tests_disabled(['2030-01-01'])
 ])
 def test_get_block_range_for_date_fail(date):
     eth_service = get_new_eth_service()
@@ -57,10 +55,9 @@ def test_get_block_range_for_date_fail(date):
         eth_service.get_block_range_for_date(parsed_date)
 
 
-@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("start_timestamp,end_timestamp,expected_start_block,expected_end_block", [
-    (1438270128, 1438270128, 10, 10),
-    (1438270128, 1438270129, 10, 10)
+    skip_if_slow_tests_disabled([1438270128, 1438270128, 10, 10]),
+    skip_if_slow_tests_disabled([1438270128, 1438270129, 10, 10])
 ])
 def test_get_block_range_for_timestamps(start_timestamp, end_timestamp, expected_start_block, expected_end_block):
     eth_service = get_new_eth_service()
@@ -68,9 +65,8 @@ def test_get_block_range_for_timestamps(start_timestamp, end_timestamp, expected
     assert blocks == (expected_start_block, expected_end_block)
 
 
-@skip_if_slow_tests_disabled
 @pytest.mark.parametrize("start_timestamp,end_timestamp", [
-    (1438270129, 1438270131)
+    skip_if_slow_tests_disabled([1438270129, 1438270131])
 ])
 def test_get_block_range_for_timestamps_fail(start_timestamp, end_timestamp):
     eth_service = get_new_eth_service()

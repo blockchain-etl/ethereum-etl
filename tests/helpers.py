@@ -55,4 +55,7 @@ def read_file(path):
 
 run_slow_tests_variable = os.environ.get('ETHEREUM_ETL_RUN_SLOW_TESTS', 'False')
 run_slow_tests = run_slow_tests_variable.lower() in ['1', 'true', 'yes']
-skip_if_slow_tests_disabled = pytest.mark.skipif(not run_slow_tests, reason='Skipping slow running tests')
+
+
+def skip_if_slow_tests_disabled(data):
+    return pytest.param(*data, marks=pytest.mark.skipif(not run_slow_tests, reason='Skipping slow running tests'))

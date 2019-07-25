@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-from ethereumetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 BLOCK_FIELDS_TO_EXPORT = [
     'number',
@@ -55,7 +55,8 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'value',
     'gas',
     'gas_price',
-    'input'
+    'input',
+    'block_timestamp'
 ]
 
 
