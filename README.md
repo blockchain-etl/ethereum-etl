@@ -68,6 +68,7 @@ For the latest version, check out the repo and call
 - [Querying in Amazon Athena](#querying-in-amazon-athena)
 - [Querying in Google BigQuery](#querying-in-google-bigquery)
   - [Public Dataset](#public-dataset)
+  - [Useful Queries](#useful-queries)
   - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
   - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
 - [Blockchain ETL in Media](#blockchain-etl-in-media)
@@ -622,6 +623,10 @@ so values greater than 38 decimals will be null.
 
 You can query the data that's updated daily in the public BigQuery dataset
 https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300f579
+
+### Useful Queries
+
+https://github.com/blockchain-etl/useful-queries
 
 ### How to Query Balances for all Ethereum Addresses
 
