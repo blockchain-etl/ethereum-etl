@@ -626,7 +626,7 @@ https://medium.com/@medvedev1088/ethereum-blockchain-on-google-bigquery-283fb300
 
 ### Useful Queries
 
-https://github.com/blockchain-etl/useful-queries
+https://github.com/blockchain-etl/awesome-bigquery-views
 
 ### How to Query Balances for all Ethereum Addresses
 
