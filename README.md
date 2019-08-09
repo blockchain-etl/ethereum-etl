@@ -71,6 +71,7 @@ For the latest version, check out the repo and call
   - [Useful Queries](#useful-queries)
   - [How to Query Balances for all Ethereum Addresses](#how-to-query-balances-for-all-ethereum-addresses)
   - [Building Token Recommender in Google Cloud Platform](#building-token-recommender-in-google-cloud-platform)
+- [Querying in Kaggle](#querying-in-kaggle)
 - [Blockchain ETL in Media](#blockchain-etl-in-media)
 
 
@@ -637,6 +638,10 @@ https://medium.com/google-cloud/how-to-query-balances-for-all-ethereum-addresses
 
 Read this article 
 https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb
+
+### Querying in Kaggle
+
+You can access the Ethereum dataset in Kaggle https://www.kaggle.com/bigquery/ethereum-blockchain.
 
 ## Blockchain ETL in Media
 
