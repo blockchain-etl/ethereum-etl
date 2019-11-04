@@ -29,6 +29,7 @@ from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.utils import check_classic_provider_uri
+from ethereumetl.chain import CoinPriceType
 
 logging_basic_config()
 
@@ -47,8 +48,10 @@ logging_basic_config()
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+@click.option('--coin-price-type', default=CoinPriceType.empty, type=int,
+              help='Enable querying CryptoCompare for coin prices. 0 for no price, 1 for daily price, 2 for hourly price.')
 def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
-                                   transactions_output, chain='ethereum'):
+                                   transactions_output, coin_price_type, chain='ethereum'):
     """Exports blocks and transactions."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     if blocks_output is None and transactions_output is None:
@@ -61,6 +64,8 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         max_workers=max_workers,
         item_exporter=blocks_and_transactions_item_exporter(blocks_output, transactions_output),
+        chain=chain,
         export_blocks=blocks_output is not None,
-        export_transactions=transactions_output is not None)
+        export_transactions=transactions_output is not None,
+        coin_price_type=coin_price_type)
     job.run()
