@@ -1,9 +1,9 @@
 # Ethereum ETL
 
-[![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/blockchain-etl/ethereum-etl.png)](https://travis-ci.org/blockchain-etl/ethereum-etl)
-[Telegram](https://t.me/joinchat/GsMpbA3mv1OJ6YMp3T5ORQ)
-[Discord](https://discord.gg/wukrezR)
+[![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Telegram](https://img.shields.io/badge/telegram-join%20group-orange.svg)](https://t.me/joinchat/GsMpbA3mv1OJ6YMp3T5ORQ)
+[![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/wukrezR)
 
 Install Ethereum ETL:
 
