@@ -32,9 +32,9 @@ class EthContractService:
             evm_code = EvmCode(contract=Contract(bytecode=bytecode), static_analysis=False, dynamic_analysis=False)
             evm_code.disassemble(bytecode)
             basic_blocks = evm_code.basicblocks
-            if basic_blocks and len(basic_blocks) > 0:
-                init_block = basic_blocks[0]
-                instructions = init_block.instructions
+            init_blocks = find_init_blocks(basic_blocks)
+            if init_blocks and len(init_blocks) > 0:
+                instructions = [instruction for init_block in init_blocks for instruction in init_block.instructions]
                 push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
                 return sorted(list(set('0x' + inst.operand for inst in push4_instructions)))
             else:
@@ -77,6 +77,18 @@ def clean_bytecode(bytecode):
         return bytecode[2:]
     else:
         return bytecode
+
+
+def find_init_blocks(basic_blocks):
+    init_blocks = []
+    if basic_blocks and len(basic_blocks) > 0:
+        for basic_block in basic_blocks:
+            instructions = basic_block.instructions
+            has_calldataload = any(instruction.name == 'CALLDATALOAD' for instruction in instructions)
+            if has_calldataload:
+                init_blocks.append(basic_block)
+
+    return init_blocks
 
 
 def get_function_sighash(signature):
