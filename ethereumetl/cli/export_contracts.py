@@ -35,15 +35,15 @@ logging_basic_config()
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
+@click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-c', '--contract-addresses', required=True, type=str,
               help='The file containing contract addresses, one per line.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', type=str,
+@click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
+@click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
-@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+@click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
 def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain='ethereum'):
     """Exports contracts bytecode and sighashes."""
     check_classic_provider_uri(chain, provider_uri)

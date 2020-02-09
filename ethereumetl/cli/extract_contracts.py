@@ -36,9 +36,9 @@ logging_basic_config()
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-t', '--traces', type=str, required=True, help='The CSV file containing traces.')
-@click.option('-b', '--batch-size', default=100, type=int, help='The number of blocks to filter at a time.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+@click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
+@click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
+@click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 def extract_contracts(traces, batch_size, output, max_workers):
     """Extracts contracts from traces file."""
 

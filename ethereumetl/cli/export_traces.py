@@ -35,18 +35,18 @@ logging_basic_config()
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-s', '--start-block', default=0, type=int, help='Start block')
+@click.option('-s', '--start-block', default=0, show_default=True, type=int, help='Start block')
 @click.option('-e', '--end-block', required=True, type=int, help='End block')
-@click.option('-b', '--batch-size', default=5, type=int, help='The number of blocks to filter at a time.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
-@click.option('-w', '--max-workers', default=5, type=int, help='The maximum number of workers.')
+@click.option('-b', '--batch-size', default=5, show_default=True, type=int, help='The number of blocks to filter at a time.')
+@click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
+@click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
-@click.option('--genesis-traces/--no-genesis-traces', default=False, help='Whether to include genesis traces')
-@click.option('--daofork-traces/--no-daofork-traces', default=False, help='Whether to include daofork traces')
-@click.option('-t', '--timeout', default=60, type=int, help='IPC or HTTP request timeout.')
-@click.option('-c', '--chain', default='ethereum', type=str, help='The chain network to connect to.')
+@click.option('--genesis-traces/--no-genesis-traces', default=False, show_default=True, help='Whether to include genesis traces')
+@click.option('--daofork-traces/--no-daofork-traces', default=False, show_default=True, help='Whether to include daofork traces')
+@click.option('-t', '--timeout', default=60, show_default=True, type=int, help='IPC or HTTP request timeout.')
+@click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
 def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri,
                   genesis_traces, daofork_traces, timeout=60, chain='ethereum'):
     """Exports traces from parity node."""
