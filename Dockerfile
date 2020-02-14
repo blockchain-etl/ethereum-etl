@@ -1,11 +1,15 @@
-FROM python:3.6-alpine
-MAINTAINER Eric Lim <elim0322@gmail.com>
+FROM python:3.6
+MAINTAINER Evgeny Medvedev <evge.medvedev@gmail.com>
 ENV PROJECT_DIR=ethereum-etl
 
 RUN mkdir /$PROJECT_DIR
 WORKDIR /$PROJECT_DIR
 COPY . .
-RUN apk add --no-cache gcc musl-dev  #for C libraries: <limits.h> <stdio.h>
-RUN pip install --upgrade pip && pip install -e /$PROJECT_DIR/
+RUN pip install --upgrade pip && pip install -e /$PROJECT_DIR/[streaming]
 
-ENTRYPOINT ["python", "ethereumetl"]
+# Add Tini
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+ENTRYPOINT ["/tini", "--", "python", "ethereumetl"]
