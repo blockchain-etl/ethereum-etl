@@ -298,7 +298,7 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 
 1. Run streaming to console or Pub/Sub
     ```bash
-    > docker build -t ethereum-etl:latest-streaming -f Dockerfile_with_streaming .
+    > docker build -t ethereum-etl:latest-streaming -f Dockerfile .
     > echo "Stream to console"
     > docker run ethereum-etl:latest-streaming stream --start-block 500000 --log-file log.txt
     > echo "Stream to Pub/Sub"
