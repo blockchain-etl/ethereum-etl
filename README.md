@@ -298,11 +298,11 @@ Read this article for details https://medium.com/@medvedev1088/how-to-export-the
 
 1. Run streaming to console or Pub/Sub
     ```bash
-    > docker build -t ethereum-etl:latest-streaming -f Dockerfile .
+    > docker build -t ethereum-etl:latest -f Dockerfile .
     > echo "Stream to console"
-    > docker run ethereum-etl:latest-streaming stream --start-block 500000 --log-file log.txt
+    > docker run ethereum-etl:latest stream --start-block 500000 --log-file log.txt
     > echo "Stream to Pub/Sub"
-    > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest-streaming stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+    > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
     ```
 
 ### Command Reference
