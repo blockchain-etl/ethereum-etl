@@ -649,4 +649,5 @@ You can access the Ethereum dataset in Kaggle https://www.kaggle.com/bigquery/et
 - A Technical Breakdown Of Google's New Blockchain Search Tools: https://www.forbes.com/sites/michaeldelcastillo/2019/02/05/google-launches-search-for-bitcoin-ethereum-bitcoin-cash-dash-dogecoin-ethereum-classic-litecoin-and-zcash/#394fc868c789
 - Navigating Bitcoin, Ethereum, XRP: How Google Is Quietly Making Blockchains Searchable: https://www.forbes.com/sites/michaeldelcastillo/2019/02/04/navigating-bitcoin-ethereum-xrp-how-google-is-quietly-making-blockchains-searchable/?ss=crypto-blockchain#49e111da4248
 - Querying the Ethereum Blockchain in Snowflake: https://community.snowflake.com/s/article/Querying-the-Ethereum-Blockchain-in-Snowflake
+- ConsenSys Grants funds third cohort of projects to benefit the Ethereum ecosystem https://www.cryptoninjas.net/2020/02/17/consensys-grants-funds-third-cohort-of-projects-to-benefit-the-ethereum-ecosystem/
 
