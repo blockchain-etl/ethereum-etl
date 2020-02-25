@@ -47,7 +47,7 @@ Stream blocks, transactions, logs, token_transfers continually to console:
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
-Find other commands [here](http://ethereum-etl.readthedocs.io/comman).
+Find other commands [here](http://ethereum-etl.readthedocs.io/commands).
 
 For the latest version, check out the repo and call 
 ```bash
