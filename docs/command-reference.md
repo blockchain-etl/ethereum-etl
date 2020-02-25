@@ -1,18 +1,5 @@
 # Command Reference
 
-- [export_blocks_and_transactions](#export_blocks_and_transactions)
-- [export_token_transfers](#export_token_transfers)
-- [extract_token_transfers](#extract_token_transfers)
-- [export_receipts_and_logs](#export_receipts_and_logs)
-- [export_contracts](#export_contracts)
-- [export_tokens](#export_tokens)
-- [export_traces](#export_traces)
-- [export_geth_traces](#export_geth_traces)
-- [extract_geth_traces](#extract_geth_traces)
-- [get_block_range_for_date](#get_block_range_for_date)
-- [get_keccak_hash](#get_keccak_hash)
-- [stream](#stream)
-
 All the commands accept `-h` parameter for help, e.g.:
 
 ```bash
@@ -52,7 +39,7 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Blocks and transactions schema](#blockscsv).
+[Blocks and transactions schema](/schema#blockscsv).
 
 #### export_token_transfers
 
@@ -74,7 +61,7 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Token transfers schema](#token_transferscsv).
+[Token transfers schema](/schema#token_transferscsv).
 
 #### export_receipts_and_logs
 
@@ -99,7 +86,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-[Receipts and logs schema](#receiptscsv).
+[Receipts and logs schema](/schema#receiptscsv).
 
 #### extract_token_transfers
 
@@ -113,7 +100,7 @@ Then extract transfers from the logs.csv file:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Token transfers schema](#token_transferscsv).
+[Token transfers schema](/schema#token_transferscsv).
 
 #### export_contracts
 
@@ -133,7 +120,7 @@ Then export contracts:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Contracts schema](#contractscsv).
+[Contracts schema](/schema#contractscsv).
 
 #### export_tokens
 
@@ -154,7 +141,7 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
-[Tokens schema](#tokenscsv).
+[Tokens schema](/schema#tokenscsv).
 
 #### export_traces
 
@@ -171,11 +158,11 @@ See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Traces schema](#tracescsv).
+[Traces schema](/schema#tracescsv).
 
 #### export_geth_traces
 
-Read [Differences between geth and parity traces.csv](#differences-between-geth-and-parity-tracescsv)
+Read [Differences between geth and parity traces.csv](/schema#differences-between-geth-and-parity-tracescsv)
 
 The API used in this command is not supported by Infura, 
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).

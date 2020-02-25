@@ -23,6 +23,8 @@ gas_used          | bigint             |
 timestamp         | bigint             |
 transaction_count | bigint             |
 
+---
+
 ## transactions.csv
 
 Column           |    Type     |
@@ -40,6 +42,8 @@ gas_price        | bigint      |
 input            | hex_string  |
 block_timestamp  | bigint      |
 
+---
+
 ## token_transfers.csv
 
 Column              |    Type     |
@@ -51,6 +55,8 @@ value               | numeric     |
 transaction_hash    | hex_string  |
 log_index           | bigint      |
 block_number        | bigint      |
+
+---
 
 ## receipts.csv
 
@@ -66,6 +72,8 @@ contract_address             | address     |
 root                         | hex_string  |
 status                       | bigint      |
 
+---
+
 ## logs.csv
 
 Column                   |    Type     |
@@ -79,6 +87,8 @@ address                  | address     |
 data                     | hex_string  |
 topics                   | string      |
 
+---
+
 ## contracts.csv
 
 Column                       |    Type     |
@@ -90,6 +100,8 @@ is_erc20                     | boolean     |
 is_erc721                    | boolean     |
 block_number                 | bigint      |
 
+---
+
 ## tokens.csv
 
 Column                       |    Type     |
@@ -99,6 +111,8 @@ symbol                       | string      |
 name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
+
+---
 
 ## traces.csv
 

@@ -1,8 +1,8 @@
 # Overview
 
-Convert blockchain data into convenient formats like CSVs and relational databases.
+Convert Ethereum blockchain data into convenient formats like CSVs and relational databases.
 
-Ethereum ETL is the most popular open source project for Ethereum data, with 700+ likes on Github.
+Ethereum ETL is the most popular open source project for Ethereum data, with 700+ likes on Github. Data is available for you to query right away in [Google BigQuery](https://goo.gl/oY5BCQ).
 
 ## Features
 
@@ -18,5 +18,5 @@ Easily export:
 * Internal transactions
 
 ## Projects using Ethereum ETL
-* Google - Public BigQuery Ethereum datasets
-* Nansen by D5 - Analytics platform for Ethereum
+* [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
+* [Nansen by D5](https://d5.ai/?ref=ethereumetl) - Analytics platform for Ethereum
