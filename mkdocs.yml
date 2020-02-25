@@ -7,7 +7,7 @@ nav:
   - Amazon Athena: amazon-athena.md
   - Ethereum Classic: ethereum-classic.md
   - References:
-    - Commands: command-reference.md
+    - Commands: commands.md
     - Schema: schema.md
     - Limitations: limitations.md
   - Project:

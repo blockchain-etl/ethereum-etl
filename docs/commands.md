@@ -1,4 +1,4 @@
-# Command Reference
+# Commands
 
 All the commands accept `-h` parameter for help, e.g.:
 
