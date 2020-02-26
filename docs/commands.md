@@ -39,7 +39,7 @@ Omit `--blocks-output` or `--transactions-output` options if you want to export 
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Blocks and transactions schema](/schema#blockscsv).
+[Blocks and transactions schema](schema.md#blockscsv).
 
 #### export_token_transfers
 
@@ -61,7 +61,7 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Token transfers schema](/schema#token_transferscsv).
+[Token transfers schema](schema.md#token_transferscsv).
 
 #### export_receipts_and_logs
 
@@ -86,7 +86,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Upvote this feature request https://github.com/paritytech/parity/issues/9075,
 it will make receipts and logs export much faster.
 
-[Receipts and logs schema](/schema#receiptscsv).
+[Receipts and logs schema](schema.md#receiptscsv).
 
 #### extract_token_transfers
 
@@ -100,7 +100,7 @@ Then extract transfers from the logs.csv file:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Token transfers schema](/schema#token_transferscsv).
+[Token transfers schema](schema.md#token_transferscsv).
 
 #### export_contracts
 
@@ -120,7 +120,7 @@ Then export contracts:
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Contracts schema](/schema#contractscsv).
+[Contracts schema](schema.md#contractscsv).
 
 #### export_tokens
 
@@ -141,7 +141,7 @@ Then export ERC20 / ERC721 tokens:
 
 You can tune `--max-workers` for performance.
 
-[Tokens schema](/schema#tokenscsv).
+[Tokens schema](schema.md#tokenscsv).
 
 #### export_traces
 
@@ -158,11 +158,11 @@ See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 
 You can tune `--batch-size`, `--max-workers` for performance.
 
-[Traces schema](/schema#tracescsv).
+[Traces schema](schema.md#tracescsv).
 
 #### export_geth_traces
 
-Read [Differences between geth and parity traces.csv](/schema#differences-between-geth-and-parity-tracescsv)
+Read [Differences between geth and parity traces.csv](schema.md#differences-between-geth-and-parity-tracescsv)
 
 The API used in this command is not supported by Infura, 
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --ipcapi debug`).
