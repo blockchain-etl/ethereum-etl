@@ -9,7 +9,9 @@ Ethereum ETL lets you convert blockchain data into convenient formats like CSVs 
 
 *Do you just want to query Ethereum data right away? Use the [public dataset in BigQuery](https://console.cloud.google.com/marketplace/details/ethereum/crypto-ethereum-blockchain).*
 
-Follow the instructions below to start ingesting Ethereum data yourself. [Full documentation available here](http://ethereum-etl.readthedocs.io/).
+[Full documentation available here](http://ethereum-etl.readthedocs.io/).
+
+## Quickstart
 
 Install Ethereum ETL:
 
