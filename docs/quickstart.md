@@ -34,7 +34,7 @@ Stream blocks, transactions, logs, token_transfers continually to console:
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
-Find all commands [here](/command-reference).
+Find all commands [here](/commands).
 
 ---
 
