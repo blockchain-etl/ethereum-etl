@@ -29,8 +29,8 @@ from blockchainetl.file_utils import smart_open
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-i', '--input', default='-', type=str, help='The input file. If not specified stdin is used.')
-@click.option('-o', '--output', default='-', type=str, help='The output file. If not specified stdout is used.')
+@click.option('-i', '--input', default='-', show_default=True, type=str, help='The input file. If not specified stdin is used.')
+@click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-c', '--column', required=True, type=str, help='The csv column name to extract.')
 def extract_csv_column(input, output, column):
     """Extracts column from given CSV file. Deprecated - use extract_field."""
