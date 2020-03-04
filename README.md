@@ -62,6 +62,7 @@ For the latest version, check out the repo and call
 - [Schema](http://ethereum-etl.readthedocs.io/schema)
 - [Command Reference](http://ethereum-etl.readthedocs.io/commands)
 - [Tests](http://ethereum-etl.readthedocs.io/tests)
+- [Documentation](http://ethereum-etl.readthedocs.io/)
 - [Exporting the Blockchain](http://ethereum-etl.readthedocs.io/exporting-the-blockchain)
 - [Running in Docker](http://ethereum-etl.readthedocs.io/docker)
 - [Querying in Amazon Athena](http://ethereum-etl.readthedocs.io/amazon-athena)
