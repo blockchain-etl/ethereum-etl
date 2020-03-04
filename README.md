@@ -57,7 +57,7 @@ For the latest version, check out the repo and call
 > python3 ethereumetl.py
 ```
 
-### Useful Links
+## Useful Links
 
 - [Schema](http://ethereum-etl.readthedocs.io/schema)
 - [Command Reference](http://ethereum-etl.readthedocs.io/commands)
