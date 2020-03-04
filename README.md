@@ -19,21 +19,21 @@ Install Ethereum ETL:
 pip3 install ethereum-etl
 ```
 
-Export blocks and transactions:
+Export blocks and transactions ([Schema](docs/schema.md#blockscsv), [Reference](docs/commands.md#export_blocks_and_transactions)):
 
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
-Export ERC20 and ERC721 transfers:
+Export ERC20 and ERC721 transfers ([Schema](docs/schema.md#token_transferscsv), [Reference](docs/commands.md##export_token_transfers)):
 
 ```bash
 > ethereumetl export_token_transfers --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
-Export traces:
+Export traces ([Schema](docs/schema.md#tracescsv), [Reference](docs/commands.md#export_traces)):
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
@@ -42,7 +42,7 @@ Export traces:
 
 ---
 
-Stream blocks, transactions, logs, token_transfers continually to console:
+Stream blocks, transactions, logs, token_transfers continually to console ([Reference](docs/commands.md#stream)):
 
 ```bash
 > pip3 install ethereum-etl[streaming]
@@ -56,3 +56,15 @@ For the latest version, check out the repo and call
 > pip3 install -e . 
 > python3 ethereumetl.py
 ```
+
+### Useful Links
+
+- [Schema](http://ethereum-etl.readthedocs.io/schema)
+- [Command Reference](http://ethereum-etl.readthedocs.io/commands)
+- [Tests](http://ethereum-etl.readthedocs.io/tests)
+- [Exporting the Blockchain](http://ethereum-etl.readthedocs.io/exporting-the-blockchain)
+- [Running in Docker](http://ethereum-etl.readthedocs.io/docker)
+- [Querying in Amazon Athena](http://ethereum-etl.readthedocs.io/amazon-athena)
+- [Querying in Google BigQuery](http://ethereum-etl.readthedocs.io/google-bigquery)
+- [Airflow DAGs](https://github.com/blockchain-etl/ethereum-etl-airflow)
+- [Postgres ETL](https://github.com/blockchain-etl/ethereum-etl-postgresql)
