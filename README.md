@@ -66,6 +66,7 @@ For the latest version, check out the repo and call
 - [Running in Docker](http://ethereum-etl.readthedocs.io/docker)
 - [Querying in Amazon Athena](http://ethereum-etl.readthedocs.io/amazon-athena)
 - [Querying in Google BigQuery](http://ethereum-etl.readthedocs.io/google-bigquery)
+- [Querying in Kaggle](https://www.kaggle.com/bigquery/ethereum-blockchain)
 - [Airflow DAGs](https://github.com/blockchain-etl/ethereum-etl-airflow)
 - [Postgres ETL](https://github.com/blockchain-etl/ethereum-etl-postgresql)
 
