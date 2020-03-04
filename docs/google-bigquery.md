@@ -12,5 +12,8 @@ Read [this article](https://medium.com/google-cloud/how-to-query-balances-for-al
 
 ### Building Token Recommender in Google Cloud Platform
 
-Read [this article](
-https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb).
+Read [this article](https://medium.com/google-cloud/building-token-recommender-in-google-cloud-platform-1be5a54698eb).
+
+### Awesome BigQuery Views
+
+https://github.com/blockchain-etl/awesome-bigquery-views
