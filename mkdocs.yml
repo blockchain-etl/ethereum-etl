@@ -1,0 +1,17 @@
+site_name: Ethereum ETL
+nav:
+  - Overview: index.md
+  - Quickstart: quickstart.md
+  - Exporting the Blockchain: exporting-the-blockchain.md
+  - Google BigQuery: google-bigquery.md
+  - Amazon Athena: amazon-athena.md
+  - Ethereum Classic: ethereum-classic.md
+  - References:
+    - Commands: commands.md
+    - Schema: schema.md
+    - Limitations: limitations.md
+  - Project:
+    - Contact Us: contact.md
+    - Media: media.md
+theme: readthedocs
+repo_url: https://github.com/blockchain-etl/ethereum-etl/
