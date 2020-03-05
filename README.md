@@ -49,7 +49,7 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
-Find other commands [here](http://ethereum-etl.readthedocs.io/commands).
+Find other commands [here](https://ethereum-etl.readthedocs.io/en/latest/commands/).
 
 For the latest version, check out the repo and call 
 ```bash
@@ -59,12 +59,12 @@ For the latest version, check out the repo and call
 
 ## Useful Links
 
-- [Schema](http://ethereum-etl.readthedocs.io/schema)
-- [Command Reference](http://ethereum-etl.readthedocs.io/commands)
-- [Documentation](http://ethereum-etl.readthedocs.io/)
-- [Exporting the Blockchain](http://ethereum-etl.readthedocs.io/exporting-the-blockchain)
-- [Querying in Amazon Athena](http://ethereum-etl.readthedocs.io/amazon-athena)
-- [Querying in Google BigQuery](http://ethereum-etl.readthedocs.io/google-bigquery)
+- [Schema](https://ethereum-etl.readthedocs.io/en/latest/schema/)
+- [Command Reference](https://ethereum-etl.readthedocs.io/en/latest/commands/)
+- [Documentation](https://ethereum-etl.readthedocs.io/)
+- [Exporting the Blockchain](https://ethereum-etl.readthedocs.io/en/latest/exporting-the-blockchain/)
+- [Querying in Amazon Athena](https://ethereum-etl.readthedocs.io/en/latest/amazon-athena/)
+- [Querying in Google BigQuery](https://ethereum-etl.readthedocs.io/en/latest/google-bigquery/)
 - [Querying in Kaggle](https://www.kaggle.com/bigquery/ethereum-blockchain)
 - [Airflow DAGs](https://github.com/blockchain-etl/ethereum-etl-airflow)
 - [Postgres ETL](https://github.com/blockchain-etl/ethereum-etl-postgresql)
