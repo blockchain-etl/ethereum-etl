@@ -24,6 +24,30 @@ from sqlalchemy import Table, Column, BigInteger, String, Numeric, MetaData, TIM
 
 metadata = MetaData()
 
+# SQL schema is here https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema
+
+BLOCKS = Table(
+    'blocks', metadata,
+    Column('timestamp', TIMESTAMP),
+    Column('number', BigInteger),
+    Column('hash', String, primary_key=True),
+    Column('parent_hash', String),
+    Column('nonce', String),
+    Column('sha3_uncles', String),
+    Column('logs_bloom', String),
+    Column('transactions_root', String),
+    Column('state_root', String),
+    Column('receipts_root', String),
+    Column('miner', String),
+    Column('difficulty', Numeric(38)),
+    Column('total_difficulty', Numeric(38)),
+    Column('size', BigInteger),
+    Column('extra_data', String),
+    Column('gas_limit', BigInteger),
+    Column('gas_used', BigInteger),
+    Column('transaction_count', BigInteger),
+)
+
 TOKEN_TRANSFERS = Table(
     'token_transfers', metadata,
     Column('token_address', String),

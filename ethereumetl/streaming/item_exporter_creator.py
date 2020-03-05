@@ -40,11 +40,12 @@ def create_item_exporter(output):
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
         from blockchainetl.jobs.exporters.converters.unix_timestamp_field_converter import UnixTimestampFieldConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_field_converter import IntToDecimalFieldConverter
-        from ethereumetl.streaming.postgres_tables import TOKEN_TRANSFERS
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TOKEN_TRANSFERS
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
-                'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS)
+                'block': create_insert_statement_for_table(BLOCKS),
+                'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
             },
             converters=[UnixTimestampFieldConverter(), IntToDecimalFieldConverter()])
     else:
