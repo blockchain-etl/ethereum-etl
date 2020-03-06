@@ -22,11 +22,10 @@
 
 from datetime import datetime
 
+from blockchainetl.jobs.exporters.converters.simple_item_converter import SimpleItemConverter
 
-class UnixTimestampFieldConverter:
 
-    def __init__(self):
-        pass
+class UnixTimestampItemConverter(SimpleItemConverter):
 
     def convert_field(self, key, value):
         if key is not None and key.endswith('timestamp'):

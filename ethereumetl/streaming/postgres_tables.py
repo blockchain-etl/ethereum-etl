@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from sqlalchemy import Table, Column, BigInteger, String, Numeric, MetaData, TIMESTAMP
+from sqlalchemy import Table, Column, Integer, BigInteger, String, Numeric, MetaData, TIMESTAMP
 
 metadata = MetaData()
 
@@ -48,6 +48,43 @@ BLOCKS = Table(
     Column('transaction_count', BigInteger),
 )
 
+TRANSACTIONS = Table(
+    'transactions', metadata,
+    Column('hash', String, primary_key=True),
+    Column('nonce', BigInteger),
+    Column('transaction_index', BigInteger),
+    Column('from_address', String),
+    Column('to_address', String),
+    Column('value', Numeric(38)),
+    Column('gas', BigInteger),
+    Column('gas_price', BigInteger),
+    Column('input', String),
+    Column('receipt_cumulative_gas_used', BigInteger),
+    Column('receipt_gas_used', BigInteger),
+    Column('receipt_contract_address', String),
+    Column('receipt_root', String),
+    Column('receipt_status', BigInteger),
+    Column('block_timestamp', TIMESTAMP),
+    Column('block_number', BigInteger),
+    Column('block_hash', String),
+)
+
+LOGS = Table(
+    'logs', metadata,
+    Column('log_index', BigInteger, primary_key=True),
+    Column('transaction_hash', String, primary_key=True),
+    Column('transaction_index', BigInteger),
+    Column('address', String),
+    Column('data', String),
+    Column('topic0', String),
+    Column('topic1', String),
+    Column('topic2', String),
+    Column('topic3', String),
+    Column('block_timestamp', TIMESTAMP),
+    Column('block_number', BigInteger),
+    Column('block_hash', String),
+)
+
 TOKEN_TRANSFERS = Table(
     'token_transfers', metadata,
     Column('token_address', String),
@@ -60,3 +97,28 @@ TOKEN_TRANSFERS = Table(
     Column('block_number', BigInteger),
     Column('block_hash', String),
 )
+
+TRACES = Table(
+    'traces', metadata,
+    Column('transaction_hash', String),
+    Column('transaction_index', BigInteger),
+    Column('from_address', String),
+    Column('to_address', String),
+    Column('value', Numeric(38)),
+    Column('input', String),
+    Column('output', String),
+    Column('trace_type', String),
+    Column('call_type', String),
+    Column('reward_type', String),
+    Column('gas', BigInteger),
+    Column('gas_used', BigInteger),
+    Column('subtraces', BigInteger),
+    Column('trace_address', String),
+    Column('error', String),
+    Column('status', Integer),
+    Column('block_timestamp', TIMESTAMP),
+    Column('block_number', BigInteger),
+    Column('block_hash', String),
+)
+
+

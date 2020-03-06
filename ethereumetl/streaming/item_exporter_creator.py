@@ -24,7 +24,7 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 
 
 def create_item_exporter(output):
-    if output is not None and output.startswith('project'):
+    if output is not None and output.startswith('projects'):
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
         item_exporter = GooglePubSubItemExporter(item_type_to_topic_mapping={
             'block': output + '.blocks',
@@ -38,16 +38,21 @@ def create_item_exporter(output):
     elif output is not None and output.startswith('postgresql'):
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
-        from blockchainetl.jobs.exporters.converters.unix_timestamp_field_converter import UnixTimestampFieldConverter
-        from blockchainetl.jobs.exporters.converters.int_to_decimal_field_converter import IntToDecimalFieldConverter
-        from ethereumetl.streaming.postgres_tables import BLOCKS, TOKEN_TRANSFERS
+        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter  import UnixTimestampItemConverter
+        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter  import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.list_item_converter import ListItemConverter
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
                 'block': create_insert_statement_for_table(BLOCKS),
+                'transaction': create_insert_statement_for_table(TRANSACTIONS),
+                'log': create_insert_statement_for_table(LOGS),
                 'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
+                'traces': create_insert_statement_for_table(TRACES),
             },
-            converters=[UnixTimestampFieldConverter(), IntToDecimalFieldConverter()])
+            converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
+                        ListItemConverter('topics', 'topic', fill=4)])
     else:
         item_exporter = ConsoleItemExporter()
 

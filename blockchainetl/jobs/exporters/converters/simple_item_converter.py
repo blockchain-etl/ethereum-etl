@@ -31,12 +31,15 @@
 # furnished to do so, subject to the following conditions:
 
 
-class CompositeFieldConverter:
+class SimpleItemConverter:
 
     def __init__(self, converters=()):
         self.converters = converters
 
+    def convert_item(self, item):
+        return {
+            key: self.convert_field(key, value) for key, value in item.items()
+        }
+
     def convert_field(self, key, value):
-        for converter in self.converters:
-            value = converter.convert_field(key, value)
         return value

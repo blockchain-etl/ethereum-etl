@@ -24,15 +24,16 @@ import collections
 
 from sqlalchemy import create_engine
 
-from blockchainetl.jobs.exporters.converters.composite_field_converter import CompositeFieldConverter
+from blockchainetl.jobs.exporters.converters.composite_item_converter import CompositeItemConverter
 
 
 class PostgresItemExporter:
 
-    def __init__(self, connection_url, item_type_to_insert_stmt_mapping, converters=()):
+    def __init__(self, connection_url, item_type_to_insert_stmt_mapping, converters=(), print_sql=True):
         self.connection_url = connection_url
         self.item_type_to_insert_stmt_mapping = item_type_to_insert_stmt_mapping
-        self.converter = CompositeFieldConverter(converters)
+        self.converter = CompositeItemConverter(converters)
+        self.print_sql = print_sql
 
         self.engine = self.create_engine()
 
@@ -51,12 +52,10 @@ class PostgresItemExporter:
 
     def convert_items(self, items):
         for item in items:
-            yield {
-                key: self.converter.convert_field(key, value) for key, value in item.items()
-            }
+            yield self.converter.convert_item(item)
 
     def create_engine(self):
-        engine = create_engine(self.connection_url, echo=True, pool_recycle=3600)
+        engine = create_engine(self.connection_url, echo=self.print_sql, pool_recycle=3600)
         return engine
 
     def close(self):
