@@ -24,7 +24,8 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 
 
 def create_item_exporter(output):
-    if output is not None and output.startswith('projects'):
+    item_exporter_type = determine_item_exporter_type(output)
+    if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
         item_exporter = GooglePubSubItemExporter(item_type_to_topic_mapping={
             'block': output + '.blocks',
@@ -35,7 +36,7 @@ def create_item_exporter(output):
             'contract': output + '.contracts',
             'token': output + '.tokens',
         })
-    elif output is not None and output.startswith('postgresql'):
+    elif item_exporter_type == ItemExporterType.POSTGRES:
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
@@ -53,7 +54,27 @@ def create_item_exporter(output):
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
-    else:
+    elif item_exporter_type == ItemExporterType.CONSOLE:
         item_exporter = ConsoleItemExporter()
+    else:
+        raise ValueError('Unable to determine item exporter type for output ' + output)
 
     return item_exporter
+
+
+def determine_item_exporter_type(output):
+    if output is not None and output.startswith('projects'):
+        return ItemExporterType.PUBSUB
+    elif output is not None and output.startswith('postgresql'):
+        return ItemExporterType.POSTGRES
+    elif output is None or output == 'console':
+        return ItemExporterType.CONSOLE
+    else:
+        return ItemExporterType.UNKNOWN
+
+
+class ItemExporterType:
+    PUBSUB = 'pubsub'
+    POSTGRES = 'postgres'
+    CONSOLE = 'console'
+    UNKNOWN = 'unknown'
