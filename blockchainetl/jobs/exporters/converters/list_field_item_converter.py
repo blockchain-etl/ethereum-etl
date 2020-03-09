@@ -31,7 +31,7 @@
 # furnished to do so, subject to the following conditions:
 
 
-class ListItemConverter:
+class ListFieldItemConverter:
 
     def __init__(self, field, new_field_prefix, fill=0, fill_with=None):
         self.field = field

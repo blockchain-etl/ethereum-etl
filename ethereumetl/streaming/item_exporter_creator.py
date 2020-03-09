@@ -38,9 +38,9 @@ def create_item_exporter(output):
     elif output is not None and output.startswith('postgresql'):
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
-        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter  import UnixTimestampItemConverter
-        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter  import IntToDecimalItemConverter
-        from blockchainetl.jobs.exporters.converters.list_item_converter import ListItemConverter
+        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
+        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
         from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES
 
         item_exporter = PostgresItemExporter(
@@ -52,7 +52,7 @@ def create_item_exporter(output):
                 'traces': create_insert_statement_for_table(TRACES),
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
-                        ListItemConverter('topics', 'topic', fill=4)])
+                        ListFieldItemConverter('topics', 'topic', fill=4)])
     else:
         item_exporter = ConsoleItemExporter()
 
