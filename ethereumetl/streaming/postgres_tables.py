@@ -119,6 +119,7 @@ TRACES = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    Column('trace_id', String, primary_key=True),
 )
 
 
