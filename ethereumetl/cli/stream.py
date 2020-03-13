@@ -37,7 +37,8 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output', type=str,
-              help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. '
+              help='Either Google PubSub topic path e.g. projects/your-project/topics/crypto_ethereum; '
+                   'or Postgres connection url e.g. postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum. '
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
@@ -54,8 +55,9 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     configure_logging(log_file)
     configure_signals()
     entity_types = parse_entity_types(entity_types)
+    validate_entity_types(entity_types, output)
 
-    from blockchainetl.streaming.streaming_utils import get_item_exporter
+    from ethereumetl.streaming.item_exporter_creator import create_item_exporter
     from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
     from blockchainetl.streaming.streamer import Streamer
 
@@ -65,7 +67,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=get_item_exporter(output),
+        item_exporter=create_item_exporter(output),
         batch_size=batch_size,
         max_workers=max_workers,
         entity_types=entity_types
@@ -93,6 +95,14 @@ def parse_entity_types(entity_types):
                     .format(entity_type, ','.join(EntityType.ALL_FOR_STREAMING)))
 
     return entity_types
+
+
+def validate_entity_types(entity_types, output):
+    from ethereumetl.streaming.item_exporter_creator import determine_item_exporter_type, ItemExporterType
+    item_exporter_type = determine_item_exporter_type(output)
+    if item_exporter_type == ItemExporterType.POSTGRES \
+            and (EntityType.CONTRACT in entity_types or EntityType.TOKEN in entity_types):
+        raise ValueError('contract and token are not yet supported entity types for postgres item exporter.')
 
 
 def pick_random_provider_uri(provider_uri):

@@ -11,7 +11,7 @@ long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 setup(
     name='ethereum-etl',
-    version='1.3.1',
+    version='1.4.0',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
     description='Tools for exporting Ethereum blockchain data to CSV or JSON',
@@ -43,7 +43,9 @@ setup(
     extras_require={
         'streaming': [
             'timeout-decorator==0.4.1',
-            'google-cloud-pubsub==0.39.1'
+            'google-cloud-pubsub==0.39.1',
+            'sqlalchemy==1.3.13',
+            'pg8000==1.13.2',
         ],
         'dev': [
             'pytest~=4.3.0'
