@@ -236,3 +236,7 @@ Stream blockchain data to a Postgres database:
 ```bash
 ethereumetl stream --start-block 500000 --output postgresql+pg8000://<user>:<password>@<host>:5432/<database>
 ```
+
+The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema) 
+and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this 
+repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres).
