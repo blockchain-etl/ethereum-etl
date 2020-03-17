@@ -135,6 +135,7 @@ subtraces                    | bigint      |
 trace_address                | string      |
 error                        | string      |
 status                       | bigint      |
+trace_id                     | string      |
 
 ### Differences between geth and parity traces.csv
 
