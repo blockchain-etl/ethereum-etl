@@ -12,6 +12,7 @@ from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
     enrich_contracts, enrich_tokens
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
+from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3
 
@@ -30,6 +31,7 @@ class EthStreamerAdapter:
         self.max_workers = max_workers
         self.entity_types = entity_types
         self.item_id_calculator = EthItemIdCalculator()
+        self.item_timestamp_calculator = EthItemTimestampCalculator()
 
     def open(self):
         self.item_exporter.open()
@@ -94,6 +96,7 @@ class EthStreamerAdapter:
             enriched_tokens
 
         self.calculate_item_ids(all_items)
+        self.calculate_item_timestamps(all_items)
 
         self.item_exporter.export_items(all_items)
 
@@ -209,6 +212,10 @@ class EthStreamerAdapter:
     def calculate_item_ids(self, items):
         for item in items:
             item['item_id'] = self.item_id_calculator.calculate(item)
+
+    def calculate_item_timestamps(self, items):
+        for item in items:
+            item['item_timestamp'] = self.item_timestamp_calculator.calculate(item)
 
     def close(self):
         self.item_exporter.close()
