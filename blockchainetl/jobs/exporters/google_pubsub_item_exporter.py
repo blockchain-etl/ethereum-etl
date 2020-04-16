@@ -29,7 +29,7 @@ from timeout_decorator import timeout_decorator
 
 class GooglePubSubItemExporter:
 
-    def __init__(self, item_type_to_topic_mapping, message_attributes=('item_id',)):
+    def __init__(self, item_type_to_topic_mapping, message_attributes=('item_id', 'item_timestamp')):
         self.item_type_to_topic_mapping = item_type_to_topic_mapping
         self.publisher = create_publisher()
         self.message_attributes = message_attributes
@@ -76,7 +76,7 @@ class GooglePubSubItemExporter:
 
         for attr_name in self.message_attributes:
             if item.get(attr_name) is not None:
-                attributes[attr_name] = item.get(attr_name)
+                attributes[attr_name] = str(item.get(attr_name))
 
         return attributes
 
