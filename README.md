@@ -47,7 +47,8 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 
 ```bash
 > pip3 install ethereum-etl[streaming]
-> ethereumetl stream --provider-uri https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872 --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
+> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt \
+--provider-uri https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872
 ```
 
 Find other commands [here](https://ethereum-etl.readthedocs.io/en/latest/commands/).
