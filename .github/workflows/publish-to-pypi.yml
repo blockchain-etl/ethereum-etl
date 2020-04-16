@@ -15,7 +15,7 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python setup.py sdist
       - name: Publish distribution to Test PyPI
-          uses: pypa/gh-action-pypi-publish@master
-          with:
-            password: ${{ secrets.test_pypi_password }}
-            repository_url: https://test.pypi.org/legacy/
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.test_pypi_password }}
+          repository_url: https://test.pypi.org/legacy/
