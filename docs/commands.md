@@ -186,7 +186,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 #### get_block_range_for_date
 
 ```bash
-> ethereumetl get_block_range_for_date --provider-uri=https://mainnet.infura.io --date 2018-01-01
+> ethereumetl get_block_range_for_date --provider-uri=https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872 --date 2018-01-01
 4832686,4838611
 ```
 
@@ -201,7 +201,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 ```bash
 > pip3 install ethereum-etl[streaming]
-> ethereumetl stream --provider-uri https://mainnet.infura.io --start-block 500000
+> ethereumetl stream --provider-uri https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872 --start-block 500000
 ```
 
 - This command outputs blocks, transactions, logs, token_transfers to the console by default.

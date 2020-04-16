@@ -23,7 +23,8 @@ Export blocks and transactions ([Schema](docs/schema.md#blockscsv), [Reference](
 
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
---provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
+--blocks-output blocks.csv --transactions-output transactions.csv \
+--provider-uri https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872
 ```
 
 Export ERC20 and ERC721 transfers ([Schema](docs/schema.md#token_transferscsv), [Reference](docs/commands.md##export_token_transfers)):
@@ -46,7 +47,7 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 
 ```bash
 > pip3 install ethereum-etl[streaming]
-> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
+> ethereumetl stream --provider-uri https://mainnet.infura.io/v3/239a1d18eba14f0f9dc1c882de0dc872 --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
 ```
 
 Find other commands [here](https://ethereum-etl.readthedocs.io/en/latest/commands/).
