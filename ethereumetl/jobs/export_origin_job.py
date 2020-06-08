@@ -8,7 +8,7 @@ from ethereumetl.service.origin_extractor import OriginEventExtractor
 
 
 # Addresses of the marketplace contracts.
-ORIGIN_MARKETPLACE_V0_CONTRACT_ADDRESS = '0x819bb9964b6ebf52361f1ae42cf4831b921510f9'
+ORIGIN_MARKETPLACE_V0_CONTRACT_ADDRESS = '0x819Bb9964B6eBF52361F1ae42CF4831B921510f9'
 ORIGIN_MARKETPLACE_V1_CONTRACT_ADDRESS = '0x698Ff47B84837d3971118a369c570172EE7e54c2'
 
 # Block number at which contracts were deployed to the Mainnet.
@@ -82,13 +82,13 @@ class ExportOriginJob(BaseJob):
             # The block range spans across 2 versions of the marketplace contract.
             batches.append({
                 'contract_address': ORIGIN_MARKETPLACE_V0_CONTRACT_ADDRESS,
-                'version': '000',
+                'contract_version': '000',
                 'from_block': from_block,
                 'to_block': ORIGIN_MARKETPLACE_V1_BLOCK_NUMBER_EPOCH - 1
             })
             batches.append({
                 'contract_address': ORIGIN_MARKETPLACE_V1_CONTRACT_ADDRESS,
-                'version': '001',
+                'contract_version': '001',
                 'from_block': ORIGIN_MARKETPLACE_V1_BLOCK_NUMBER_EPOCH,
                 'to_block': to_block
             })

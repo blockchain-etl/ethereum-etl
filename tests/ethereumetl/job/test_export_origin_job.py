@@ -11,11 +11,10 @@ from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_te
 
 from ethereumetl.jobs.export_origin_job import ExportOriginJob
 from ethereumetl.jobs.exporters.origin_exporter import origin_marketplace_listing_item_exporter, origin_shop_product_item_exporter
-from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.ipfs.origin import get_origin_ipfs_client
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 RESOURCE_GROUP = 'test_export_origin_job'
-
 
 def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)

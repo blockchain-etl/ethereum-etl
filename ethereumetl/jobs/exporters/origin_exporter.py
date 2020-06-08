@@ -28,7 +28,7 @@ SHOP_FIELDS_TO_EXPORT = [
     'title',
     'description',
     'price',
-    'currency'
+    'currency',
     'option1',
     'option2',
     'option3',

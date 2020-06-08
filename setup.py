@@ -39,7 +39,8 @@ setup(
         'python-dateutil==2.7.0',
         'click==7.0',
         'ethereum-dasm==0.1.4',
-        'requests'
+        'base58',
+        'requests',
     ],
     extras_require={
         'streaming': [
