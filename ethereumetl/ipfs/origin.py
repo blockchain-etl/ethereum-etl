@@ -70,9 +70,9 @@ def _get_origin_shop_products(receipt_log, listing_id, ipfs_client, shop_ipfs_ha
         result.description = product.get('description', '')
         result.price = product.get('price', '')
         result.currency = product.get('currency', 'fiat-USD')
-        result.option1 = ''
-        result.option2 = ''
-        result.option3 = ''
+        result.option1 = None
+        result.option2 = None
+        result.option3 = None
         result.image = product.get('image', '')
         results.append(result)
 
