@@ -38,7 +38,8 @@ setup(
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil==2.7.0',
         'click==7.0',
-        'ethereum-dasm==0.1.4'
+        'ethereum-dasm==0.1.4',
+        'requests'
     ],
     extras_require={
         'streaming': [
