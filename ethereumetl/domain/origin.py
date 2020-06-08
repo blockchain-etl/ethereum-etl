@@ -13,9 +13,9 @@ class OriginMarketplaceListing(object):
         self.block_number = None
         self.log_index = None
 
-class OriginShopListing(object):
+class OriginShopProduct(object):
     def __init__(self):
-        self.shop_id = None
+        self.listing_id = None
         self.product_id = None
         self.ipfs_path = None
         self.external_id = None
@@ -23,6 +23,7 @@ class OriginShopListing(object):
         self.title = None
         self.description = None
         self.price = None
+        self.currency = None
         self.image = None
         self.option1 = None
         self.option2 = None

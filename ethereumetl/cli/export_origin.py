@@ -1,9 +1,31 @@
+# A job to export data from Origin Protocol.
+#
+# Origin Protocol is a platform for implementing blockchain e-commerce.
+# More details at https://www.originprotool.com
+#
+# The core of the platform is the marketplace smart contract:
+#  - Code: https://etherscan.io/address/0x698ff47b84837d3971118a369c570172ee7e54c2
+#  - Address: https://github.com/OriginProtocol/origin/blob/master/packages/contracts/contracts/marketplace/V01_Marketplace.sol
+#
+# Transactional data is stored on-chain, while side-metadata is stored in IPFS.
+# See https://ipfs.io
+#
+# Given a range of block numbers, the job queries the blockchain for events emitted by the contract.
+# Every event includes a hash pointing to a marketplace listing metadata stored as a JSON file on IPFS.
+# A marketplace listing can either be a single self-contained listing, or the entry point for the entire
+# catalog of products from a shop.
+#
+# The job generates 2 data sets:
+#  - Marketplace listings
+#  - Shop products.
+#
+
 import click
 
 from web3 import Web3
 
 from ethereumetl.jobs.export_origin_job import ExportOriginJob
-from ethereumetl.jobs.exporters.origin_exporter import origin_marketplace_listing_item_exporter, origin_shop_listing_item_exporter
+from ethereumetl.jobs.exporters.origin_exporter import origin_marketplace_listing_item_exporter, origin_shop_product_item_exporter
 from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -28,6 +50,6 @@ def export_origin(start_block, end_block, batch_size, marketplace_output, shop_o
         batch_size=batch_size,
         web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
         marketplace_listing_exporter=origin_marketplace_listing_item_exporter(marketplace_output),
-        shop_listing_exporter=origin_shop_listing_item_exporter(shop_output),
+        shop_product_exporter=origin_shop_product_item_exporter(shop_output),
         max_workers=max_workers)
     job.run()

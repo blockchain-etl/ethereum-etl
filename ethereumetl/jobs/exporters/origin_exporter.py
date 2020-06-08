@@ -19,7 +19,7 @@ MARKETPLACE_FIELDS_TO_EXPORT = [
 SHOP_FIELDS_TO_EXPORT = [
     'block_number',
     'log_index',
-    'shop_id',
+    'listing_id',
     'product_id',
     'ipfs_path',
     'ipfs_hash',
@@ -28,6 +28,7 @@ SHOP_FIELDS_TO_EXPORT = [
     'title',
     'description',
     'price',
+    'currency'
     'option1',
     'option2',
     'option3',
@@ -44,13 +45,13 @@ def origin_marketplace_listing_item_exporter(output):
         }
     )
 
-def origin_shop_listing_item_exporter(output):
+def origin_shop_product_item_exporter(output):
     return CompositeItemExporter(
         filename_mapping={
-            'origin_shop_listing': output
+            'origin_shop_product': output
         },
         field_mapping={
-            'origin_shop_listing': SHOP_FIELDS_TO_EXPORT
+            'origin_shop_product': SHOP_FIELDS_TO_EXPORT
         }
     )
 

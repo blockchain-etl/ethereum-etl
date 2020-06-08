@@ -16,22 +16,23 @@ class OriginMarketplaceListingMapper(object):
             'log_index': listing.log_index
         }
 
-class OriginShopListingMapper(object):
-    def listing_to_dict(self, listing):
+class OriginShopProductMapper(object):
+    def product_to_dict(self, product):
         return {
-            'type': 'origin_shop_listing',
-            'shop_id': listing.shop_id,
-            'product_id': listing.product_id,
-            'ipfs_path': listing.ipfs_path,
-            'external_id': listing.external_id,
-            'parent_external_id': listing.parent_external_id,
-            'title': listing.title,
-            'description': listing.description,
-            'price': listing.price,
-            'option1': listing.option1,
-            'option2': listing.option2,
-            'option3': listing.option3,
-            'image': listing.image,
-            'block_number': listing.block_number,
-            'log_index': listing.log_index
+            'type': 'origin_shop_product',
+            'listing_id': product.listing_id,
+            'product_id': product.product_id,
+            'ipfs_path': product.ipfs_path,
+            'external_id': product.external_id,
+            'parent_external_id': product.parent_external_id,
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'currency': product.currency,
+            'option1': product.option1,
+            'option2': product.option2,
+            'option3': product.option3,
+            'image': product.image,
+            'block_number': product.block_number,
+            'log_index': product.log_index
         }
