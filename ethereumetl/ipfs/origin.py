@@ -64,16 +64,16 @@ def _get_origin_shop_products(receipt_log, listing_id, ipfs_client, shop_ipfs_ha
         result.listing_id = listing_id
         result.product_id = "{}-{}".format(listing_id, product_id)
         result.ipfs_path = product_base_path
-        result.external_id = str(product.get('externalId', ''))
-        result.parent_external_id = ''
-        result.title = product.get('title', '')
-        result.description = product.get('description', '')
-        result.price = product.get('price', '')
+        result.external_id = str(product.get('externalId')) if product.get('externalId') else None
+        result.parent_external_id = None
+        result.title = product.get('title')
+        result.description = product.get('description')
+        result.price = product.get('price')
         result.currency = product.get('currency', 'fiat-USD')
         result.option1 = None
         result.option2 = None
         result.option3 = None
-        result.image = product.get('image', '')
+        result.image = product.get('image')
         results.append(result)
 
         # Extract the variants, if any.
@@ -87,16 +87,16 @@ def _get_origin_shop_products(receipt_log, listing_id, ipfs_client, shop_ipfs_ha
                 result.listing_id = listing_id
                 result.product_id = "{}-{}".format(listing_id, variant.get('id'))
                 result.ipfs_path = product_base_path
-                result.external_id = str(variant.get('externalId', ''))
-                result.parent_external_id = str(product.get('externalId', ''))
-                result.title = variant.get('title', '')
-                result.description = product.get('description', '')
-                result.price = variant.get('price', '')
+                result.external_id = str(variant.get('externalId')) if variant.get('externalId') else None
+                result.parent_external_id = str(product.get('externalId')) if product.get('externalId') else None
+                result.title = variant.get('title')
+                result.description = product.get('description')
+                result.price = variant.get('price')
                 result.currency = product.get('currency', 'fiat-USD')
-                result.option1 = variant.get('option1', '')
-                result.option2 = variant.get('option2', '')
-                result.option3 = variant.get('option3', '')
-                result.image = variant.get('image', '')
+                result.option1 = variant.get('option1')
+                result.option2 = variant.get('option2')
+                result.option3 = variant.get('option3')
+                result.image = variant.get('image')
                 results.append(result)
 
     return results
