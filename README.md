@@ -107,3 +107,7 @@ For the latest version, check out the repo and call
         > docker run ethereum-etl:latest stream --start-block 500000 --log-file log.txt
         > echo "Stream to Pub/Sub"
         > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+
+## Projects using Ethereum ETL
+* [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
+* [Nansen by D5](https://nansen.d5.ai/?ref=ethereumetl) - Analytics platform for Ethereum
