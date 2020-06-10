@@ -10,19 +10,25 @@ Usage: ethereumetl export_blocks_and_transactions [OPTIONS]
   Export blocks and transactions.
 
 Options:
-  -s, --start-block INTEGER   Start block
-  -e, --end-block INTEGER     End block  [required]
-  -b, --batch-size INTEGER    The number of blocks to export at a time.
-  -p, --provider-uri TEXT     The URI of the web3 provider e.g.
-                              file://$HOME/Library/Ethereum/geth.ipc or
-                              https://mainnet.infura.io
-  -w, --max-workers INTEGER   The maximum number of workers.
-  --blocks-output TEXT        The output file for blocks. If not provided
-                              blocks will not be exported. Use "-" for stdout
-  --transactions-output TEXT  The output file for transactions. If not
-                              provided transactions will not be exported. Use
-                              "-" for stdout
-  -h, --help                  Show this message and exit.
+  -s, --start-block INTEGER          Start block
+  -e, --end-block INTEGER            End block  [required]
+  -b, --batch-size INTEGER           The number of blocks to export at a time.
+  -p, --provider-uri TEXT            The URI of the web3 provider e.g.
+                                     file://$HOME/Library/Ethereum/geth.ipc or
+                                     https://mainnet.infura.io
+  -w, --max-workers INTEGER          The maximum number of workers.
+  --blocks-output TEXT               The output file for blocks. If not provided
+                                     blocks will not be exported. Use "-" for stdout
+  --transactions-output TEXT         The output file for transactions. If not
+                                     provided transactions will not be exported. Use
+                                     "-" for stdout
+  -bs, --blocks-schema TEXT          Specify the block schema to export. Takes list 
+                                     delimited by commas. Leave blank to export 
+                                     entire schema.
+  -ts, --transactions-schema TEXT    Specify the transaction schema to export. Takes
+                                     list delimited by commas. Leave blank to export 
+                                     entire schema.      
+  -h, --help                         Show this message and exit.
 ```
 
 For the `--output` parameters the supported types are csv and json. The format type is inferred from the output file name.
@@ -32,10 +38,16 @@ For the `--output` parameters the supported types are csv and json. The format t
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc \
---blocks-output blocks.csv --transactions-output transactions.csv
+--blocks-output blocks.csv --transactions-output transactions.csv \ 
+--blocks-schema 'number,hash,parent_hash' \
+--transactions-schema 'hash,block_number,transaction_index,from_address,to_address,value'
 ```
 
 Omit `--blocks-output` or `--transactions-output` options if you want to export only transactions/blocks.
+
+Omit `--blocks-schema` or `--transactions-schema` options if you want to export the
+ entire schema for transactions/blocks.
+
 
 You can tune `--batch-size`, `--max-workers` for performance.
 

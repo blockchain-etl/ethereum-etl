@@ -42,7 +42,8 @@ class ExportBlocksJob(BaseJob):
             max_workers,
             item_exporter,
             export_blocks=True,
-            export_transactions=True):
+            export_transactions=True,
+            block_schema=''):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -59,6 +60,9 @@ class ExportBlocksJob(BaseJob):
 
         self.block_mapper = EthBlockMapper()
         self.transaction_mapper = EthTransactionMapper()
+
+        self.block_schema = block_schema
+        self.transaction_schema = ''
 
     def _start(self):
         self.item_exporter.open()

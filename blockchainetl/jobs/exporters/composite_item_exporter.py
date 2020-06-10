@@ -27,7 +27,7 @@ from blockchainetl.file_utils import get_file_handle, close_silently
 
 
 class CompositeItemExporter:
-    def __init__(self, filename_mapping, field_mapping=None):
+    def __init__(self, filename_mapping, field_mapping=None, field_to_export=None):
         self.filename_mapping = filename_mapping
         self.field_mapping = field_mapping or {}
 
@@ -35,12 +35,21 @@ class CompositeItemExporter:
         self.exporter_mapping = {}
         self.counter_mapping = {}
 
+        self.field_to_export = field_to_export or {}
+
         self.logger = logging.getLogger('CompositeItemExporter')
 
     def open(self):
         for item_type, filename in self.filename_mapping.items():
             file = get_file_handle(filename, binary=True)
             fields = self.field_mapping.get(item_type)
+            if self.field_to_export != {} and self.field_to_export.get(item_type) != None:
+                fields_to_export = self.field_to_export.get(item_type).split(',')
+                fields_to_export = list(set(fields).intersection(fields_to_export))
+                if len(fields_to_export) != 0:
+                    fields = fields_to_export
+                    EXPORT_ORDER = {key: count for count, key in enumerate(self.field_mapping.get(item_type))}
+                    fields.sort(key=lambda val: EXPORT_ORDER[val])
             self.file_mapping[item_type] = file
             if str(filename).endswith('.json'):
                 item_exporter = JsonLinesItemExporter(file, fields_to_export=fields)
