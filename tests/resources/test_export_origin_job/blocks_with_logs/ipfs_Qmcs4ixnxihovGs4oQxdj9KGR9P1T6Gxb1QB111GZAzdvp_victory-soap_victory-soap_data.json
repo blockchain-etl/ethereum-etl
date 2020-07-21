@@ -1,0 +1,39 @@
+{
+  "id": "victory-soap",
+  "title": "Victory Soap",
+  "byline": "Fight the virus. Support the cause. Smell fantastic.",
+  "description": "In World War II, “Victory Gardens” were a grassroots effort supporting food needs at home while canned goods went to support the troops on the front lines.",
+  "descriptionLong": "We are very much at war once more with the COVID-19 virus. We need all hands on deck and we mean clean hands! We also need ventilators and respirators, NOW!\n\nFight the Corona Virus on both fronts, with \"Victory Soap\" promoting hand washing while supporting the cause with 100% of proceeds going to <a href=\"https://www.thegivingblock.com/\">The Giving Block's</a> COVID-19 campaign.\n\nRight now, soap and social distancing could save countless lives. Do your part. Wash your hands and consider joining us in the cause.\n\nVictory Soap is an experimental “dCommerce” platform aiming to decentralize production and fulfillment closer to demand. <a href=\"https://www.creamcitysoapcompany.com/\">Cream City Soap</a> in Milwaukee, WI and <a href=\"http://crowdfounder.co/\">CrowdFounder</a> are teaming up to fulfill orders and onboard more soap makers as “nodes” around the USA. As such, the <b><u>product WILL vary</u></b> but it is guaranteed to smell great and most importantly <a href=\"https://www.nytimes.com/2020/03/13/health/soap-coronavirus-handwashing-germs.html\">kill Corona as plain old soap is proven to do</a>.\n\nThanks to <a href=\"https://www.originprotocol.com/en/\">Origin Protocol</a> for building this e-commerce storefront and being a bridge to web 3.0\n\nQuestions, comments, media inquiries? Complete this <a href=\"https://docs.google.com/forms/d/e/1FAIpQLSc_B9MaA-ufg-1tOr_e-8wwzkjBrUUM9tdypaCqQ98drGkWOg/viewform?usp=sf_link\">form</a>.",
+  "price": 1200,
+  "available": true,
+  "options": ["Pack Size"],
+  "images": ["soapy-fight-covid.png"],
+  "image": "soapy-fight-covid.png",
+  "variants": [
+    {
+      "id": 0,
+      "title": "3 pack",
+      "option1": "3 pack",
+      "option2": null,
+      "option3": null,
+      "image": "soapy-fight-covid.png",
+      "available": true,
+      "name": "3 pack",
+      "options": ["3 pack"],
+      "price": 3000
+    },
+
+    {
+      "id": 1,
+      "title": "1 bar",
+      "option1": "1 bar",
+      "option2": null,
+      "option3": null,
+      "image": "soapy-fight-covid.png",
+      "available": true,
+      "name": "1 bar",
+      "options": ["1 bar"],
+      "price": 1200
+    }
+  ]
+}

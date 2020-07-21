@@ -1,3 +1,5 @@
+import os
+
 from web3 import HTTPProvider
 
 from ethereumetl.providers.rpc import BatchHTTPProvider
@@ -14,10 +16,11 @@ def get_web3_provider(provider_type, read_resource_lambda=None, batch=False):
         else:
             provider = MockWeb3Provider(read_resource_lambda)
     elif provider_type == 'infura':
+        provider_url = os.environ.get('PROVIDER_URL', 'https://mainnet.infura.io')
         if batch:
-            provider = BatchHTTPProvider('https://mainnet.infura.io')
+            provider = BatchHTTPProvider(provider_url)
         else:
-            provider = HTTPProvider('https://mainnet.infura.io')
+            provider = HTTPProvider(provider_url)
     else:
         raise ValueError('Provider type {} is unexpected'.format(provider_type))
     return provider

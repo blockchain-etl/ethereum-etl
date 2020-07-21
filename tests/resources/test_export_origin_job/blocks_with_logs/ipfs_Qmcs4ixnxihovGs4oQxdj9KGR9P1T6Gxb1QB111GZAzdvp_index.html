@@ -1,0 +1,64 @@
+<html lang="en" dir="ltr">
+
+<head>
+  <title>Origin Protocol Store</title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no, user-scalable=no">
+  <meta http-equiv="Content-Language" content="en">
+
+  
+
+  
+
+  <link rel="data-dir" href="victory-soap" />
+
+  <link rel="icon" href="favicon.ico" />
+  
+  
+  <link rel="stylesheet" href="vendors~app.145db6de.css"
+    integrity="sha256-l08o0gboYfmogUa3K21cr+IPE75OV6FDKf3zAvo4hSs= sha384-x7DyZLKtp2J0M7mkmjghSlgpfQgBfvfrZE1BuiCuwUQJttn73myjh73r5CX7rpG3"
+    crossorigin="anonymous" />
+  
+  
+  
+  <link rel="stylesheet" href="app.145db6de.css"
+    integrity="sha256-lmA758nsjw0L4A300X49CWOGiuBeYFmAapRX3qKT2mI= sha384-2iP2UEO3CWAwR4mKXsHCHlabqCp+065kIO4hjFToylcd5+KmPubiqYpQEWSiUiZE"
+    crossorigin="anonymous" />
+  
+  
+</head>
+
+<body>
+  <div id="app">
+    <div class="loading-screen"></div>
+  </div>
+</body>
+<script crossorigin src="dist/openpgp.min.js"></script>
+<script>
+  if (typeof window.openpgp !== 'undefined') {
+    openpgp.config.show_comment = false
+    openpgp.config.show_version = false
+    openpgp.initWorker({ path: 'dist/openpgp.worker.min.js' })
+  }
+</script>
+<script>
+  localStorage.metaMaskEnabled = true
+  localStorage.ognNetwork = "mainnet"
+  localStorage.customConfig = '{"performanceMode":false,"proxyAccountsEnabled":false,"relayerEnabled":false,"provider":"https://eth-mainnet.alchemyapi.io/jsonrpc/jiMsUil28ebdRaLoJ8DK4EqHvCgE9yQ3"}'
+</script>
+
+
+<script src="dist/vendors~app.145db6de.bundle.js"
+  integrity="sha256-ZlOlo2WeRdNnzOfiieqB7WKcBz+WvapJs/WlzIO0//Q= sha384-GOhk37XHpUX4Z1NqZTeFh6gUsjy+f7CLsZCeoEzYdN3K7BhIqzkJfCvRP6RuR6oO"
+  crossorigin="anonymous"></script>
+
+
+
+<script src="app.145db6de.js"
+  integrity="sha256-3wtj6wLZfJj6bssS91kpab4pWE5rxASZ9oGnPsvtFJ8= sha384-uxSvTr8MjwcEAhTe34Nr7w9joOzFdywOUEZwDT+5zevJXmIoNv7r3n0UOUaXJoPh"
+  crossorigin="anonymous"></script>
+
+
+
+</html>
