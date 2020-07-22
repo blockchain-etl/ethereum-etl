@@ -1,4 +1,4 @@
-## Citing 
+## How to Cite 
 
 ```
 @misc{ethereumetl,
