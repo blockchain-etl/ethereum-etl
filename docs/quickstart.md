@@ -10,7 +10,7 @@ Export blocks and transactions:
 
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
---provider-uri https://mainnet.infura.io --blocks-output blocks.csv --transactions-output transactions.csv
+--provider-uri https://mainnet.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c --blocks-output blocks.csv --transactions-output transactions.csv
 ```
 
 Export ERC20 and ERC721 transfers:
