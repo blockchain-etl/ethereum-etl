@@ -8,6 +8,8 @@ matrix:
       env: TOX_POSARGS="-e py36"
     - python: "3.7"
       env: TOX_POSARGS="-e py37"
+    - python: "3.8"
+      env: TOX_POSARGS="-e py38"
 install:
   - travis_retry pip install tox
 script:
