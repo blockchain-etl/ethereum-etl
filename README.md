@@ -70,6 +70,7 @@ For the latest version, check out the repo and call
 - [Querying in Kaggle](https://www.kaggle.com/bigquery/ethereum-blockchain)
 - [Airflow DAGs](https://github.com/blockchain-etl/ethereum-etl-airflow)
 - [Postgres ETL](https://github.com/blockchain-etl/ethereum-etl-postgresql)
+- [Ethereum 2.0 ETL](https://github.com/blockchain-etl/ethereum2-etl)
 
 ## Running Tests
 
