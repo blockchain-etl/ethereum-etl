@@ -190,4 +190,5 @@ class EthTraceMapper(object):
             'error': trace.error,
             'status': trace.status,
             'trace_id': trace.trace_id,
+            'trace_index': trace.trace_index,
         }

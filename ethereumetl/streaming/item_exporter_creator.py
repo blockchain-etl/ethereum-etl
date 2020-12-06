@@ -35,7 +35,7 @@ def create_item_exporter(output):
             'trace': output + '.traces',
             'contract': output + '.contracts',
             'token': output + '.tokens',
-        })
+        }, enable_message_ordering=True)
     elif item_exporter_type == ItemExporterType.POSTGRES:
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
