@@ -21,6 +21,14 @@
 #  SOFTWARE.
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
+from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
+
+
+def create_item_exporters(outputs):
+    split_outputs = [output.strip() for output in outputs.split(',')]
+
+    item_exporters = [create_item_exporter(output) for output in split_outputs]
+    return MultiItemExporter(item_exporters)
 
 
 def create_item_exporter(output):
@@ -35,7 +43,7 @@ def create_item_exporter(output):
             'trace': output + '.traces',
             'contract': output + '.contracts',
             'token': output + '.tokens',
-        }, enable_message_ordering=True)
+        }, enable_message_ordering=False)
     elif item_exporter_type == ItemExporterType.POSTGRES:
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
@@ -54,6 +62,9 @@ def create_item_exporter(output):
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
+    elif item_exporter_type == ItemExporterType.GCS:
+        from blockchainetl.jobs.exporters.gcs_item_exporter import GcsItemExporter
+        item_exporter = GcsItemExporter(bucket=output.replace('gs://', ''))
     elif item_exporter_type == ItemExporterType.CONSOLE:
         item_exporter = ConsoleItemExporter()
     else:
@@ -67,6 +78,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.PUBSUB
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
+    elif output is not None and output.startswith('gs://'):
+        return ItemExporterType.GCS
     elif output is None or output == 'console':
         return ItemExporterType.CONSOLE
     else:
@@ -76,5 +89,6 @@ def determine_item_exporter_type(output):
 class ItemExporterType:
     PUBSUB = 'pubsub'
     POSTGRES = 'postgres'
+    GCS = 'gcs'
     CONSOLE = 'console'
     UNKNOWN = 'unknown'
