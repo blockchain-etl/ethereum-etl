@@ -13,5 +13,6 @@ nav:
   - Project:
     - Contact Us: contact.md
     - Media: media.md
+    - Citing: citing.md
 theme: readthedocs
 repo_url: https://github.com/blockchain-etl/ethereum-etl/

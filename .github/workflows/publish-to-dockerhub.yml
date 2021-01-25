@@ -17,5 +17,4 @@ jobs:
           name: blockchainetl/ethereum-etl
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "latest"
           tag_semver: true

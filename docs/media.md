@@ -8,3 +8,4 @@
 - [Querying the Ethereum Blockchain in Snowflake](https://community.snowflake.com/s/article/Querying-the-Ethereum-Blockchain-in-Snowflake)
 - [ConsenSys Grants funds third cohort of projects to benefit the Ethereum ecosystem](https://www.cryptoninjas.net/2020/02/17/consensys-grants-funds-third-cohort-of-projects-to-benefit-the-ethereum-ecosystem/)
 - [Ivan on Tech overviews crypto datasets in BigQuery](https://youtu.be/2IkJBNhsXNY?t=239)
+- [Unlocking the Power of Google BigQuery (Cloud Next '19)](https://youtu.be/KL_i5XZIaJg?t=131)
