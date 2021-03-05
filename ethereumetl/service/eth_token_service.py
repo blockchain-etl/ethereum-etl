@@ -38,10 +38,10 @@ class EthTokenService(object):
         checksum_address = self._web3.toChecksumAddress(token_address)
         contract = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI)
 
-        symbol = self._call_contract_function(contract.functions.symbol())
-        name = self._call_contract_function(contract.functions.name())
-        decimals = self._call_contract_function(contract.functions.decimals())
-        total_supply = self._call_contract_function(contract.functions.totalSupply())
+        symbol = self._get_first_result(contract.functions.symbol(), contract.functions.SYMBOL())
+        name = self._get_first_result(contract.functions.name(), contract.functions.NAME())
+        decimals = self._get_first_result(contract.functions.decimals(), contract.functions.DECIMALS())
+        total_supply = self._get_first_result(contract.functions.totalSupply())
 
         token = EthToken()
         token.address = token_address
@@ -51,6 +51,13 @@ class EthTokenService(object):
         token.total_supply = total_supply
 
         return token
+
+    def _get_first_result(self, *funcs):
+        for func in funcs:
+            result = self._call_contract_function(func)
+            if result is not None:
+                return result
+        return None
 
     def _call_contract_function(self, func):
         # BadFunctionCallOutput exception happens if the token doesn't implement a particular function
