@@ -64,6 +64,7 @@ For the latest version, check out the repo and call
 - [Schema](https://ethereum-etl.readthedocs.io/en/latest/schema/)
 - [Command Reference](https://ethereum-etl.readthedocs.io/en/latest/commands/)
 - [Documentation](https://ethereum-etl.readthedocs.io/)
+- [Public Datasets in BigQuery](https://github.com/blockchain-etl/public-datasets)  
 - [Exporting the Blockchain](https://ethereum-etl.readthedocs.io/en/latest/exporting-the-blockchain/)
 - [Querying in Amazon Athena](https://ethereum-etl.readthedocs.io/en/latest/amazon-athena/)
 - [Querying in Google BigQuery](https://ethereum-etl.readthedocs.io/en/latest/google-bigquery/)
