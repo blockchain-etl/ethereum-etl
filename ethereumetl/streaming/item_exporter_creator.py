@@ -35,6 +35,7 @@ def create_item_exporter(output):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
+        enable_message_ordering = 'sorted' in output
         item_exporter = GooglePubSubItemExporter(item_type_to_topic_mapping={
             'block': output + '.blocks',
             'transaction': output + '.transactions',
@@ -43,7 +44,7 @@ def create_item_exporter(output):
             'trace': output + '.traces',
             'contract': output + '.contracts',
             'token': output + '.tokens',
-        }, enable_message_ordering=False)
+        }, enable_message_ordering=enable_message_ordering)
     elif item_exporter_type == ItemExporterType.POSTGRES:
         from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
         from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
