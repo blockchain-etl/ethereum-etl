@@ -58,6 +58,20 @@ def generate_get_code_json_rpc(contract_addresses, block='latest'):
         )
 
 
+def generate_get_balance_json_rpc(contract_addresses, block='latest'):
+    for idx, contract_address in enumerate(contract_addresses):
+        yield generate_json_rpc(
+            method='eth_call',
+            params=[
+                {
+                    "to": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+                    "data": "0x70a08231000000000000000000000000" + contract_address.replace('0x', '')
+                },
+                block
+            ],
+            request_id=idx
+        )
+
 def generate_json_rpc(method, params, request_id=1):
     return {
         'jsonrpc': '2.0',

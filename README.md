@@ -112,3 +112,16 @@ For the latest version, check out the repo and call
 ## Projects using Ethereum ETL
 * [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
 * [Nansen by D5](https://nansen.d5.ai/?ref=ethereumetl) - Analytics platform for Ethereum
+
+
+```
+export_contracts
+--contract-addresses=addresses.txt
+--output=balances.csv
+--provider-uri
+https://mainnet.infura.io/v3/12dcb369f6fe452b9c303009bdd60fbf
+-w
+10
+-b
+1000
+```

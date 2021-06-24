@@ -36,19 +36,13 @@ class EthTokenService(object):
 
     def get_token(self, token_address):
         checksum_address = self._web3.toChecksumAddress(token_address)
-        contract = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI)
+        contract = self._web3.eth.contract(address='0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', abi=ERC20_ABI)
 
-        symbol = self._call_contract_function(contract.functions.symbol())
-        name = self._call_contract_function(contract.functions.name())
-        decimals = self._call_contract_function(contract.functions.decimals())
-        total_supply = self._call_contract_function(contract.functions.totalSupply())
+        balance = self._call_contract_function(contract.functions.balanceOf(checksum_address))
 
         token = EthToken()
         token.address = token_address
-        token.symbol = symbol
-        token.name = name
-        token.decimals = decimals
-        token.total_supply = total_supply
+        token.decimals = balance
 
         return token
 
