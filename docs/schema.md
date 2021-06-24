@@ -22,6 +22,7 @@ gas_limit         | bigint             |
 gas_used          | bigint             |
 timestamp         | bigint             |
 transaction_count | bigint             |
+baseFeePerGas     | bigint             |
 
 ---
 
