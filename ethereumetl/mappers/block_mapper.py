@@ -52,7 +52,7 @@ class EthBlockMapper(object):
         block.gas_limit = hex_to_dec(json_dict.get('gasLimit'))
         block.gas_used = hex_to_dec(json_dict.get('gasUsed'))
         block.timestamp = hex_to_dec(json_dict.get('timestamp'))
-        block.baseFeePerGas = hex_to_dec(json_dict.get('baseFeePerGas'))
+        block.base_fee_per_gas = hex_to_dec(json_dict.get('baseFeePerGas'))
 
         if 'transactions' in json_dict:
             block.transactions = [
@@ -86,5 +86,5 @@ class EthBlockMapper(object):
             'gas_used': block.gas_used,
             'timestamp': block.timestamp,
             'transaction_count': block.transaction_count,
-            'baseFeePerGas': block.baseFeePerGas
+            'base_fee_per_gas': block.base_fee_per_gas
         }
