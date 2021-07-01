@@ -32,7 +32,8 @@ RECEIPT_FIELDS_TO_EXPORT = [
     'gas_used',
     'contract_address',
     'root',
-    'status'
+    'status',
+    'effective_gas_price'
 ]
 
 LOG_FIELDS_TO_EXPORT = [

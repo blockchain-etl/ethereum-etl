@@ -75,6 +75,7 @@ gas_used                     | bigint      |
 contract_address             | address     |
 root                         | hex_string  |
 status                       | bigint      |
+effective_gas_price          | bigint      |
 
 ---
 
