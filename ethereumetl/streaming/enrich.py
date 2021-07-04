@@ -75,7 +75,8 @@ def enrich_transactions(transactions, receipts):
             'block_number',
             'block_hash',
             'max_fee_per_gas',
-            'max_priority_fee_per_gas'
+            'max_priority_fee_per_gas',
+            'transaction_type'
         ],
         right_fields=[
             ('cumulative_gas_used', 'receipt_cumulative_gas_used'),
