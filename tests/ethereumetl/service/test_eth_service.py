@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import os
 
 import pytest
 from dateutil.parser import parse
@@ -75,5 +75,6 @@ def test_get_block_range_for_timestamps_fail(start_timestamp, end_timestamp):
 
 
 def get_new_eth_service():
-    web3 = Web3(HTTPProvider('https://mainnet.infura.io'))
+    provider_url = os.environ.get('PROVIDER_URL', 'https://mainnet.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c')
+    web3 = Web3(HTTPProvider(provider_url))
     return EthService(web3)
