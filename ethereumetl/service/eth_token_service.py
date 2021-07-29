@@ -24,7 +24,7 @@ import logging
 from web3.exceptions import BadFunctionCallOutput
 
 from ethereumetl.domain.token import EthToken
-from ethereumetl.erc20_abi import ERC20_ABI
+from ethereumetl.erc20_abi import ERC20_ABI, ERC20_ABI_ALTERNATIVE_1
 
 logger = logging.getLogger('eth_token_service')
 
@@ -37,9 +37,26 @@ class EthTokenService(object):
     def get_token(self, token_address):
         checksum_address = self._web3.toChecksumAddress(token_address)
         contract = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI)
+        contract_alternative_1 = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI_ALTERNATIVE_1)
 
-        symbol = self._get_first_result(contract.functions.symbol(), contract.functions.SYMBOL())
-        name = self._get_first_result(contract.functions.name(), contract.functions.NAME())
+        symbol = self._get_first_result(
+            contract.functions.symbol(),
+            contract.functions.SYMBOL(),
+            contract_alternative_1.functions.symbol(),
+            contract_alternative_1.functions.SYMBOL(),
+        )
+        if isinstance(symbol, bytes):
+            symbol = self._function_call_result_transformer(bytes_to_string(symbol))
+
+        name = self._get_first_result(
+            contract.functions.name(),
+            contract.functions.NAME(),
+            contract_alternative_1.functions.name(),
+            contract_alternative_1.functions.NAME(),
+        )
+        if isinstance(name, bytes):
+            name = self._function_call_result_transformer(bytes_to_string(name))
+
         decimals = self._get_first_result(contract.functions.decimals(), contract.functions.DECIMALS())
         total_supply = self._get_first_result(contract.functions.totalSupply())
 
@@ -85,3 +102,9 @@ def call_contract_function(func, ignore_errors, default_value=None):
             return default_value
         else:
             raise ex
+
+
+def bytes_to_string(b):
+    if b is None:
+        return b
+    return b.decode('utf-8')
