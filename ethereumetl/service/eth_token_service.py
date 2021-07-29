@@ -46,7 +46,7 @@ class EthTokenService(object):
             contract_alternative_1.functions.SYMBOL(),
         )
         if isinstance(symbol, bytes):
-            symbol = self._function_call_result_transformer(bytes_to_string(symbol))
+            symbol = self._bytes_to_string(symbol)
 
         name = self._get_first_result(
             contract.functions.name(),
@@ -55,7 +55,7 @@ class EthTokenService(object):
             contract_alternative_1.functions.NAME(),
         )
         if isinstance(name, bytes):
-            name = self._function_call_result_transformer(bytes_to_string(name))
+            name = self._bytes_to_string(name)
 
         decimals = self._get_first_result(contract.functions.decimals(), contract.functions.DECIMALS())
         total_supply = self._get_first_result(contract.functions.totalSupply())
@@ -90,6 +90,14 @@ class EthTokenService(object):
         else:
             return result
 
+    def _bytes_to_string(self, b):
+        if b is None:
+            return b
+        b = b.decode('utf-8')
+        if self._function_call_result_transformer is not None:
+            b = self._function_call_result_transformer(b)
+        return b
+
 
 def call_contract_function(func, ignore_errors, default_value=None):
     try:
@@ -102,9 +110,3 @@ def call_contract_function(func, ignore_errors, default_value=None):
             return default_value
         else:
             raise ex
-
-
-def bytes_to_string(b):
-    if b is None:
-        return b
-    return b.decode('utf-8')
