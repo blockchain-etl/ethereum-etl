@@ -60,7 +60,7 @@ TRANSACTION_FIELDS_TO_EXPORT = [
 ]
 
 
-def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None):
+def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None, blocks_schema=None, transactions_schema=None):
     return CompositeItemExporter(
         filename_mapping={
             'block': blocks_output,
@@ -69,5 +69,9 @@ def blocks_and_transactions_item_exporter(blocks_output=None, transactions_outpu
         field_mapping={
             'block': BLOCK_FIELDS_TO_EXPORT,
             'transaction': TRANSACTION_FIELDS_TO_EXPORT
+        },
+        field_to_export={
+            'block':blocks_schema,
+            'transaction': transactions_schema,
         }
     )

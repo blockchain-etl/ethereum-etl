@@ -47,8 +47,17 @@ logging_basic_config()
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
+@click.option('-bs', '--blocks-schema', default='', show_default=True, type=str,
+              help='Specify the block schema to export. '
+                    'Takes list delimited by commas.'
+                    'Leave blank to export entire schema.')
+@click.option('-ts', '--transactions-schema', default='', show_default=True, type=str,
+              help='Specify the transaction schema to export. '
+                    'Takes list delimited by commas.'
+                    'Leave blank to export entire schema.')
+
 def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
-                                   transactions_output, chain='ethereum'):
+                                   transactions_output, chain='ethereum', blocks_schema=None, transactions_schema=None):
     """Exports blocks and transactions."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     if blocks_output is None and transactions_output is None:
@@ -60,7 +69,7 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
         batch_size=batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         max_workers=max_workers,
-        item_exporter=blocks_and_transactions_item_exporter(blocks_output, transactions_output),
+        item_exporter=blocks_and_transactions_item_exporter(blocks_output, transactions_output, blocks_schema, transactions_schema),
         export_blocks=blocks_output is not None,
         export_transactions=transactions_output is not None)
     job.run()
