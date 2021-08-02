@@ -33,9 +33,6 @@
 
 class SimpleItemConverter:
 
-    def __init__(self, converters=()):
-        self.converters = converters
-
     def convert_item(self, item):
         return {
             key: self.convert_field(key, value) for key, value in item.items()
