@@ -90,10 +90,19 @@ class EthTokenService(object):
         else:
             return result
 
-    def _bytes_to_string(self, b):
+    def _bytes_to_string(self, b, ignore_errors=True):
         if b is None:
             return b
-        b = b.decode('utf-8')
+
+        try:
+            b = b.decode('utf-8')
+        except UnicodeDecodeError as e:
+            if ignore_errors:
+                logger.exception('A UnicodeDecodeError exception occurred while trying to decode bytes to string')
+                b = None
+            else:
+                raise e
+
         if self._function_call_result_transformer is not None:
             b = self._function_call_result_transformer(b)
         return b
