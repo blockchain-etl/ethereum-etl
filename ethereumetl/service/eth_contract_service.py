@@ -89,6 +89,7 @@ class ContractWrapper:
 
     def implements(self, function_signature):
         sighash = get_function_sighash(function_signature)
+        print('loonking for sighash {} - {}'.format(function_signature, sighash))
         return sighash in self.sighashes
 
     def implements_any_of(self, *function_signatures):
