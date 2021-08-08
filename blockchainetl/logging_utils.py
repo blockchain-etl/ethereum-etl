@@ -7,3 +7,5 @@ def logging_basic_config(filename=None):
         logging.basicConfig(level=logging.INFO, format=format, filename=filename)
     else:
         logging.basicConfig(level=logging.INFO, format=format)
+
+    logging.getLogger('ethereum_dasm.evmdasm').setLevel(logging.ERROR)
