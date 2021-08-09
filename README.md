@@ -1,6 +1,6 @@
 # Ethereum ETL
 
-[![Build Status](https://travis-ci.org/blockchain-etl/ethereum-etl.png)](https://travis-ci.org/blockchain-etl/ethereum-etl)
+[![Build Status](https://travis-ci.com/blockchain-etl/ethereum-etl.png)](https://travis-ci.com/blockchain-etl/ethereum-etl)
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/joinchat/GsMpbA3mv1OJ6YMp3T5ORQ)
 [![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/wukrezR)
@@ -78,8 +78,9 @@ For the latest version, check out the repo and call
 ```bash
 > pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
+> export PROVIDER_URL=<your_porvider_uri>
 > pytest -vv
-```
+``` 
 
 ### Running Tox Tests
 

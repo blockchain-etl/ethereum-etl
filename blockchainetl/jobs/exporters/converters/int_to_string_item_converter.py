@@ -31,15 +31,16 @@
 # furnished to do so, subject to the following conditions:
 
 
-class CompositeItemConverter:
+from blockchainetl.jobs.exporters.converters.simple_item_converter import SimpleItemConverter
 
-    def __init__(self, converters=()):
-        self.converters = converters
 
-    def convert_item(self, item):
-        if self.converters is None:
-            return item
+class IntToStringItemConverter(SimpleItemConverter):
 
-        for converter in self.converters:
-            item = converter.convert_item(item)
-        return item
+    def __init__(self, keys=None):
+        self.keys = set(keys) if keys else None
+
+    def convert_field(self, key, value):
+        if isinstance(value, int) and (self.keys is None or key in self.keys):
+            return str(value)
+        else:
+            return value
