@@ -46,6 +46,7 @@ BLOCKS = Table(
     Column('gas_limit', BigInteger),
     Column('gas_used', BigInteger),
     Column('transaction_count', BigInteger),
+    Column('base_fee_per_gas', BigInteger),
 )
 
 TRANSACTIONS = Table(
@@ -67,6 +68,10 @@ TRANSACTIONS = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    Column('max_fee_per_gas', BigInteger),
+    Column('max_priority_fee_per_gas', BigInteger),
+    Column('transaction_type', BigInteger),
+    Column('receipt_effective_gas_price', BigInteger),
 )
 
 LOGS = Table(
