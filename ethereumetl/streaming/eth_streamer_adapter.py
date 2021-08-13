@@ -15,6 +15,7 @@ from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from web3 import Web3
+from web3.middleware import geth_poa_middleware
 
 
 class EthStreamerAdapter:
@@ -37,7 +38,9 @@ class EthStreamerAdapter:
         self.item_exporter.open()
 
     def get_current_block_number(self):
-        return int(Web3(self.batch_web3_provider).eth.getBlock("latest").number)
+        w3 = Web3(self.batch_web3_provider)
+        w3.middleware_stack.inject(geth_poa_middleware, layer=0)
+        return int(w3.eth.getBlock("latest").number)
 
     def export_all(self, start_block, end_block):
         # Export blocks and transactions
