@@ -52,9 +52,6 @@ from ethereumetl.service.eth_contract_service import EthContractService
 def test_get_function_sighashes(bytecode, expected_sighashes, is_erc20, is_erc721):
     eth_contract_service = EthContractService()
     sighashes = eth_contract_service.get_function_sighashes(bytecode)
-    print(bytecode)
-    print(expected_sighashes)
-    print(sighashes)
     assert expected_sighashes == sighashes
     assert eth_contract_service.is_erc20_contract(sighashes) == is_erc20
     assert eth_contract_service.is_erc721_contract(sighashes) == is_erc721
