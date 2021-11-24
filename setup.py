@@ -49,6 +49,7 @@ setup(
             'google-cloud-pubsub==0.39.1',
             'sqlalchemy==1.3.13',
             'pg8000==1.13.2',
+            'boto3==1.18.11',
         ],
         'dev': [
             'pytest~=4.3.0'
