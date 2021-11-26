@@ -14,7 +14,8 @@ export the data ~40 times faster, you will need to set up a local Ethereum node:
 Make sure it downloaded the blocks that you need by executing `eth.syncing` in the JS console.
 You can export blocks below `currentBlock`,
 there is no need to wait until the full sync as the state is not needed (unless you also need contracts bytecode
-and token details; for those you need to wait until the full sync).
+and token details; for those you need to wait until the full sync). Note that you may need to wait for another day or 
+   two for the node to download the states. See this issue https://github.com/blockchain-etl/ethereum-etl/issues/265#issuecomment-970451522
 
 1. Install Ethereum ETL: `> pip3 install ethereum-etl`
 
