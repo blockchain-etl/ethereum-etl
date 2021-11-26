@@ -103,13 +103,15 @@ For the latest version, check out the repo and call
         > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 0 -e 5499999 -b 100000 -p https://mainnet.infura.io
         > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://mainnet.infura.io
 
-4. Run streaming to console or Pub/Sub
+4. Run streaming to console or Pub/Sub or Aws S3
 
         > docker build -t ethereum-etl:latest -f Dockerfile .
         > echo "Stream to console"
         > docker run ethereum-etl:latest stream --start-block 500000 --log-file log.txt
         > echo "Stream to Pub/Sub"
         > docker run -v /path_to_credentials_file/:/ethereum-etl/ --env GOOGLE_APPLICATION_CREDENTIALS=/ethereum-etl/credentials_file.json ethereum-etl:latest stream --start-block 500000 --output projects/<your-project>/topics/crypto_ethereum
+        > echo "Stream to S3"
+        > docker run --env AWS_ACCESS_KEY="" AWS_SECRET_KEY="" ethereum-etl:latest stream --start-block 500000 --output s3://bucket --env prod --chain ethereum
 
 ## Projects using Ethereum ETL
 * [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
