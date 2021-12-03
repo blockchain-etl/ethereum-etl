@@ -30,6 +30,15 @@ def generate_get_block_by_number_json_rpc(block_numbers, include_transactions):
         )
 
 
+def generate_get_balances_json_rpc(address_with_block_numbers):
+    for idx, (address, block_number) in enumerate(address_with_block_numbers):
+        yield generate_json_rpc(
+            method='eth_getBalance',
+            params=[address, hex(block_number)],
+            request_id=idx
+        )
+
+
 def generate_trace_block_by_number_json_rpc(block_numbers):
     for block_number in block_numbers:
         yield generate_json_rpc(
