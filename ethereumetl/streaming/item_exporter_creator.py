@@ -23,7 +23,7 @@
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 
 
-def create_item_exporter(output):
+def create_item_exporter(output, connection_url):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
@@ -56,6 +56,18 @@ def create_item_exporter(output):
                         ListFieldItemConverter('topics', 'topic', fill=4)])
     elif item_exporter_type == ItemExporterType.CONSOLE:
         item_exporter = ConsoleItemExporter()
+    elif item_exporter_type == ItemExporterType.KAFKA:
+        from blockchainetl.jobs.exporters.kafka_expoerter import KafkaItemExporter
+        item_exporter = KafkaItemExporter(connection_url, item_type_to_topic_mapping={
+            'block': 'blocks',
+            'transaction': 'transactions',
+            'log': 'logs',
+            'token_transfer': 'token_transfers',
+            'trace': 'traces',
+            'contract': 'contracts',
+            'token': 'tokens',
+        })
+
     else:
         raise ValueError('Unable to determine item exporter type for output ' + output)
 
@@ -65,6 +77,8 @@ def create_item_exporter(output):
 def determine_item_exporter_type(output):
     if output is not None and output.startswith('projects'):
         return ItemExporterType.PUBSUB
+    if output is not None and output.startswith('kafka'):
+        return ItemExporterType.KAFKA
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
     elif output is None or output == 'console':
@@ -77,4 +91,5 @@ class ItemExporterType:
     PUBSUB = 'pubsub'
     POSTGRES = 'postgres'
     CONSOLE = 'console'
+    KAFKA = 'kafka'
     UNKNOWN = 'unknown'
