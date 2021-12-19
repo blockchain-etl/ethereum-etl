@@ -1,6 +1,6 @@
 # Ethereum ETL
 
-[![Build Status](https://travis-ci.org/blockchain-etl/ethereum-etl.png)](https://travis-ci.org/blockchain-etl/ethereum-etl)
+[![Build Status](https://app.travis-ci.com/blockchain-etl/ethereum-etl.svg?branch=develop)](https://travis-ci.com/github/blockchain-etl/ethereum-etl)
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/joinchat/GsMpbA3mv1OJ6YMp3T5ORQ)
 [![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/wukrezR)
@@ -64,6 +64,7 @@ For the latest version, check out the repo and call
 - [Schema](https://ethereum-etl.readthedocs.io/en/latest/schema/)
 - [Command Reference](https://ethereum-etl.readthedocs.io/en/latest/commands/)
 - [Documentation](https://ethereum-etl.readthedocs.io/)
+- [Public Datasets in BigQuery](https://github.com/blockchain-etl/public-datasets)  
 - [Exporting the Blockchain](https://ethereum-etl.readthedocs.io/en/latest/exporting-the-blockchain/)
 - [Querying in Amazon Athena](https://ethereum-etl.readthedocs.io/en/latest/amazon-athena/)
 - [Querying in Google BigQuery](https://ethereum-etl.readthedocs.io/en/latest/google-bigquery/)
@@ -77,8 +78,9 @@ For the latest version, check out the repo and call
 ```bash
 > pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
+> export PROVIDER_URL=<your_porvider_uri>
 > pytest -vv
-```
+``` 
 
 ### Running Tox Tests
 
@@ -89,7 +91,7 @@ For the latest version, check out the repo and call
 
 ## Running in Docker
 
-1. Install Docker https://docs.docker.com/install/
+1. Install Docker: https://docs.docker.com/install/
 
 2. Build a docker image
         
@@ -111,4 +113,4 @@ For the latest version, check out the repo and call
 
 ## Projects using Ethereum ETL
 * [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
-* [Nansen by D5](https://nansen.d5.ai/?ref=ethereumetl) - Analytics platform for Ethereum
+* [Nansen](https://www.nansen.ai/?ref=ethereumetl) - Analytics platform for Ethereum

@@ -37,8 +37,7 @@ class EthTokenTransferExtractor(object):
 
         topics = receipt_log.topics
         if topics is None or len(topics) < 1:
-            logger.warning("Topics are empty in log {} of transaction {}".format(receipt_log.log_index,
-                                                                                 receipt_log.transaction_hash))
+            # This is normal, topics can be empty for anonymous events
             return None
 
         if topics[0] == TRANSFER_EVENT_TOPIC:
