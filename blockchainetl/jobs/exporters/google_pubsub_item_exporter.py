@@ -29,14 +29,19 @@ from timeout_decorator import timeout_decorator
 
 class GooglePubSubItemExporter:
 
-    def __init__(
-            self,
-            item_type_to_topic_mapping,
-            message_attributes=('item_id', 'item_timestamp'),
+    def __init__(self, item_type_to_topic_mapping, message_attributes=(),
+            batch_max_bytes=1024 * 5, batch_max_latency=1, batch_max_messages=1000,
             enable_message_ordering=False):
         self.item_type_to_topic_mapping = item_type_to_topic_mapping
+
+        self.batch_max_bytes = batch_max_bytes
+        self.batch_max_latency = batch_max_latency
+        self.batch_max_messages = batch_max_messages
+
         self.enable_message_ordering = enable_message_ordering
-        self.publisher = create_publisher(enable_message_ordering)
+
+        self.publisher = self.create_publisher()
+
         self.message_attributes = message_attributes
 
     def open(self):
@@ -51,7 +56,7 @@ class GooglePubSubItemExporter:
             # details = "channel is in state TRANSIENT_FAILURE"
             # https://stackoverflow.com/questions/55552606/how-can-one-catch-exceptions-in-python-pubsub-subscriber-that-are-happening-in-i?noredirect=1#comment97849067_55552606
             logging.info('Recreating Pub/Sub publisher.')
-            self.publisher = create_publisher(self.enable_message_ordering)
+            self.publisher = self.create_publisher()
             raise e
 
     @timeout_decorator.timeout(300)
@@ -86,16 +91,15 @@ class GooglePubSubItemExporter:
 
         return attributes
 
+    def create_publisher(self):
+        batch_settings = pubsub_v1.types.BatchSettings(
+            max_bytes=self.batch_max_bytes,
+            max_latency=self.batch_max_latency,
+            max_messages=self.batch_max_messages,
+        )
+
+        publisher_options = pubsub_v1.types.PublisherOptions(enable_message_ordering=self.enable_message_ordering)
+        return pubsub_v1.PublisherClient(batch_settings=batch_settings, publisher_options=publisher_options)
+
     def close(self):
         pass
-
-
-def create_publisher(enable_message_ordering):
-    batch_settings = pubsub_v1.types.BatchSettings(
-        max_bytes=1024 * 5,  # 5 kilobytes
-        max_latency=1,  # 1 second
-        max_messages=1000,
-    )
-
-    publisher_options = pubsub_v1.types.PublisherOptions(enable_message_ordering=enable_message_ordering)
-    return pubsub_v1.PublisherClient(batch_settings=batch_settings, publisher_options=publisher_options)
