@@ -207,11 +207,13 @@ You can tune `--batch-size`, `--max-workers` for performance.
 - This command outputs blocks, transactions, logs, token_transfers to the console by default.
 - Entity types can be specified with the `-e` option, 
 e.g. `-e block,transaction,log,token_transfer,trace,contract,token`.
-- Use `--output` option to specify the Google Pub/Sub topic or Postgres database where to publish blockchain data, 
+- Use `--output` option to specify the Google Pub/Sub topic, Postgres database or GCS bucket where to publish blockchain data, 
     - For Google PubSub: `--output=projects/<your-project>/topics/crypto_ethereum`. 
     Data will be pushed to `projects/<your-project>/topics/crypto_ethereum.blocks`, `projects/<your-project>/topics/crypto_ethereum.transactions` etc. topics.
     - For Postgres: `--output=postgresql+pg8000://<user>:<password>@<host>:<port>/<database_name>`, 
-    e.g. `--output=postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum`. 
+    e.g. `--output=postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum`.
+    - For GCS:  `--output=gs://<bucket_name>`. Make sure to install and initialize `gcloud` cli.
+    - Those output types can be combined with a comma e.g. `--output=gs://<bucket_name>,projects/<your-project>/topics/crypto_ethereum`
     The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema) 
     and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this 
     repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres). 

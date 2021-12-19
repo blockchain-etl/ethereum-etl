@@ -87,13 +87,14 @@ class EthStreamerAdapter:
 
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
-        all_items = enriched_blocks + \
-            enriched_transactions + \
-            enriched_logs + \
-            enriched_token_transfers + \
-            enriched_traces + \
-            enriched_contracts + \
-            enriched_tokens
+        all_items = \
+            sort_by(enriched_blocks, 'number') + \
+            sort_by(enriched_transactions, ('block_number', 'transaction_index')) + \
+            sort_by(enriched_logs, ('block_number', 'log_index')) + \
+            sort_by(enriched_token_transfers, ('block_number', 'log_index')) + \
+            sort_by(enriched_traces, ('block_number', 'trace_index')) + \
+            sort_by(enriched_contracts, ('block_number',)) + \
+            sort_by(enriched_tokens, ('block_number',))
 
         self.calculate_item_ids(all_items)
         self.calculate_item_timestamps(all_items)
@@ -219,3 +220,9 @@ class EthStreamerAdapter:
 
     def close(self):
         self.item_exporter.close()
+
+
+def sort_by(arr, fields):
+    if isinstance(fields, tuple):
+        fields = tuple(fields)
+    return sorted(arr, key=lambda item: tuple(item.get(f) for f in fields))

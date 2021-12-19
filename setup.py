@@ -46,7 +46,8 @@ setup(
     extras_require={
         'streaming': [
             'timeout-decorator==0.4.1',
-            'google-cloud-pubsub==0.39.1',
+            'google-cloud-pubsub==2.1.0',
+            'google-cloud-storage==1.33.0',
             'sqlalchemy==1.3.13',
             'pg8000==1.13.2',
         ],

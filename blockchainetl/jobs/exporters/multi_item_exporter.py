@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2018 Evgeniy Filatov, evgeniyfilatov@gmail.com
+# Copyright (c) 2018 Evgeny Medvedev, evge.medvedev@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,24 +21,22 @@
 # SOFTWARE.
 
 
-class EthTrace(object):
-    def __init__(self):
-        self.block_number = None
-        self.transaction_hash = None
-        self.transaction_index = None
-        self.from_address = None
-        self.to_address = None
-        self.value = None
-        self.input = None
-        self.output = None
-        self.trace_type = None
-        self.call_type = None
-        self.reward_type = None
-        self.gas = None
-        self.gas_used = None
-        self.subtraces = 0
-        self.trace_address = None
-        self.error = None
-        self.status = None
-        self.trace_id = None
-        self.trace_index = None
+class MultiItemExporter:
+    def __init__(self, item_exporters):
+        self.item_exporters = item_exporters
+
+    def open(self):
+        for exporter in self.item_exporters:
+            exporter.open()
+
+    def export_items(self, items):
+        for exporter in self.item_exporters:
+            exporter.export_items(items)
+
+    def export_item(self, item):
+        for exporter in self.item_exporters:
+            exporter.export_item(item)
+
+    def close(self):
+        for exporter in self.item_exporters:
+            exporter.close()

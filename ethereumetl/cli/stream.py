@@ -27,6 +27,7 @@ from blockchainetl.streaming.streaming_utils import configure_signals, configure
 from ethereumetl.enumeration.entity_type import EntityType
 
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.streaming.item_exporter_creator import create_item_exporters
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 
@@ -67,7 +68,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=create_item_exporter(output),
+        item_exporter=create_item_exporters(output),
         batch_size=batch_size,
         max_workers=max_workers,
         entity_types=entity_types
@@ -98,9 +99,7 @@ def parse_entity_types(entity_types):
 
 
 def validate_entity_types(entity_types, output):
-    from ethereumetl.streaming.item_exporter_creator import determine_item_exporter_type, ItemExporterType
-    item_exporter_type = determine_item_exporter_type(output)
-    if item_exporter_type == ItemExporterType.POSTGRES \
+    if output is not None and 'postgres' in output \
             and (EntityType.CONTRACT in entity_types or EntityType.TOKEN in entity_types):
         raise ValueError('contract and token are not yet supported entity types for postgres item exporter.')
 
