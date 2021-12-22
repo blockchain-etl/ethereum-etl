@@ -40,6 +40,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-o', '--output', type=str,
               help='Either Google PubSub topic path e.g. projects/your-project/topics/crypto_ethereum; '
                    'or Postgres connection url e.g. postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum. '
+                   'or kafka, in case of kafka, specify connection_url '
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
