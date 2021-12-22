@@ -96,6 +96,7 @@ class ExportTracesJob(BaseJob):
 
         calculate_trace_statuses(all_traces)
         calculate_trace_ids(all_traces)
+        calculate_trace_indexes(all_traces)
 
         for trace in all_traces:
             self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
@@ -103,3 +104,9 @@ class ExportTracesJob(BaseJob):
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
+
+
+def calculate_trace_indexes(traces):
+    # Only works if traces were originally ordered correctly which is the case for Parity traces
+    for ind, trace in enumerate(traces):
+        trace.trace_index = ind
