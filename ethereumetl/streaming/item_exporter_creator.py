@@ -76,7 +76,7 @@ def create_item_exporter(output):
     elif item_exporter_type == ItemExporterType.CONSOLE:
         item_exporter = ConsoleItemExporter()
     elif item_exporter_type == ItemExporterType.KAFKA:
-        from blockchainetl.jobs.exporters.kafka_expoerter import KafkaItemExporter
+        from blockchainetl.jobs.exporters.kafka_exporter import KafkaItemExporter
         item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
             'block': 'blocks',
             'transaction': 'transactions',
