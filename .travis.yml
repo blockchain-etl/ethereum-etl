@@ -2,8 +2,6 @@ language: python
 dist: xenial
 matrix:
   include:
-    - python: "3.5"
-      env: TOX_POSARGS="-e py35"
     - python: "3.6"
       env: TOX_POSARGS="-e py36"
     - python: "3.7"
