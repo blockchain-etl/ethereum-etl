@@ -31,7 +31,7 @@ def create_item_exporters(outputs):
     return MultiItemExporter(item_exporters)
 
 
-def create_item_exporter(output, connection_url):
+def create_item_exporter(output):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
@@ -77,7 +77,7 @@ def create_item_exporter(output, connection_url):
         item_exporter = ConsoleItemExporter()
     elif item_exporter_type == ItemExporterType.KAFKA:
         from blockchainetl.jobs.exporters.kafka_expoerter import KafkaItemExporter
-        item_exporter = KafkaItemExporter(connection_url, item_type_to_topic_mapping={
+        item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
             'block': 'blocks',
             'transaction': 'transactions',
             'log': 'logs',
