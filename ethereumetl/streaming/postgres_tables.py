@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from sqlalchemy import Table, Column, Integer, BigInteger, String, Numeric, MetaData, VARCHAR, TIMESTAMP
+from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, MetaData, VARCHAR, TIMESTAMP
 from sqlalchemy.dialects.postgresql import ARRAY
 
 metadata = MetaData()
@@ -128,8 +128,6 @@ TRACES = Table(
     Column('trace_id', String, primary_key=True),
 )
 
-# @dev new tables for postgres support for tokens and contracts
-# note https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#sqlalchemy.dialects.postgresql.ARRAY
 TOKENS = Table(
     'tokens', metadata,
     Column('address', VARCHAR(42), primary_key=True),
@@ -137,6 +135,7 @@ TOKENS = Table(
     Column('symbol', String),
     Column('decimals', Integer),
     Column('function_sighashes', ARRAY(String)),
+    Column('total_supply', Numeric(78)),
 )
 
 CONTRACTS = Table(
@@ -144,4 +143,7 @@ CONTRACTS = Table(
     Column('address', VARCHAR(42), primary_key=True),
     Column('bytecode', String),
     Column('function_sighashes', ARRAY(String)),
+    Column('is_erc20', Boolean),
+    Column('is_erc721', Boolean),
+    Column('block_number', BigInteger),
 )

@@ -56,7 +56,6 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     configure_logging(log_file)
     configure_signals()
     entity_types = parse_entity_types(entity_types)
-    validate_entity_types(entity_types, output)
 
     from ethereumetl.streaming.item_exporter_creator import create_item_exporter
     from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
@@ -96,13 +95,6 @@ def parse_entity_types(entity_types):
                     .format(entity_type, ','.join(EntityType.ALL_FOR_STREAMING)))
 
     return entity_types
-
-
-def validate_entity_types(entity_types, output):
-    return
-    # if output is not None and 'postgres' in output \
-    #         and (EntityType.CONTRACT in entity_types or EntityType.TOKEN in entity_types):
-    #     raise ValueError('contract and token are not yet supported entity types for postgres item exporter.')
 
 
 def pick_random_provider_uri(provider_uri):
