@@ -99,9 +99,10 @@ def parse_entity_types(entity_types):
 
 
 def validate_entity_types(entity_types, output):
-    if output is not None and 'postgres' in output \
-            and (EntityType.CONTRACT in entity_types or EntityType.TOKEN in entity_types):
-        raise ValueError('contract and token are not yet supported entity types for postgres item exporter.')
+    return
+    # if output is not None and 'postgres' in output \
+    #         and (EntityType.CONTRACT in entity_types or EntityType.TOKEN in entity_types):
+    #     raise ValueError('contract and token are not yet supported entity types for postgres item exporter.')
 
 
 def pick_random_provider_uri(provider_uri):
