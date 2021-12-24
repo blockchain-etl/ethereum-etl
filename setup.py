@@ -40,6 +40,7 @@ setup(
         'ethereum-dasm==0.1.4',
         'base58',
         'requests',
+        "kafka-python==2.0.2"
     ],
     extras_require={
         'streaming': [
