@@ -13,4 +13,4 @@ matrix:
 install:
   - travis_retry pip install tox
 script:
-  - tox $TOX_POSARGS
+  - travis_wait tox $TOX_POSARGS
