@@ -22,7 +22,7 @@
 
 import pytest
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 import tests.resources
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
@@ -51,7 +51,7 @@ def test_export_traces_job(tmpdir, start_block, end_block, resource_group, web3_
     job = ExportTracesJob(
         start_block=start_block, end_block=end_block, batch_size=1,
         web3=ThreadLocalProxy(
-            lambda: Web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
+            lambda: build_web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
         ),
         max_workers=5,
         item_exporter=traces_item_exporter(traces_output_file),

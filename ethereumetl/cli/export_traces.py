@@ -23,7 +23,7 @@
 
 import click
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from blockchainetl.logging_utils import logging_basic_config
@@ -57,7 +57,7 @@ def export_traces(start_block, end_block, batch_size, output, max_workers, provi
         start_block=start_block,
         end_block=end_block,
         batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri, timeout=timeout))),
+        web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri, timeout=timeout))),
         item_exporter=traces_item_exporter(output),
         max_workers=max_workers,
         include_genesis_traces=genesis_traces,
