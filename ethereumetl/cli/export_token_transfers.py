@@ -23,7 +23,7 @@
 
 import click
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
@@ -49,7 +49,7 @@ def export_token_transfers(start_block, end_block, batch_size, output, max_worke
         start_block=start_block,
         end_block=end_block,
         batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+        web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
         item_exporter=token_transfers_item_exporter(output),
         max_workers=max_workers,
         tokens=tokens)

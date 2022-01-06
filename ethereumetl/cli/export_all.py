@@ -27,7 +27,7 @@ import re
 from datetime import datetime, timedelta
 
 from blockchainetl.logging_utils import logging_basic_config
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
@@ -74,7 +74,7 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
         day = timedelta(days=1)
 
         provider = get_provider_from_uri(provider_uri)
-        web3 = Web3(provider)
+        web3 = build_web3(provider)
         eth_service = EthService(web3)
 
         while start_date <= end_date:

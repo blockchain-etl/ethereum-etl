@@ -22,7 +22,7 @@
 
 
 import pytest
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 import tests.resources
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
@@ -47,7 +47,7 @@ def test_export_token_transfers_job(tmpdir, start_block, end_block, batch_size, 
     job = ExportTokenTransfersJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
         web3=ThreadLocalProxy(
-            lambda: Web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
+            lambda: build_web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
         ),
         item_exporter=token_transfers_item_exporter(output_file),
         max_workers=5
