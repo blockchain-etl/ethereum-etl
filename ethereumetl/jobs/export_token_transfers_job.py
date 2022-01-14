@@ -51,6 +51,7 @@ class ExportTokenTransfersJob(BaseJob):
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.token_transfer_mapper = EthTokenTransferMapper()
         self.token_transfer_extractor = EthTokenTransferExtractor()
+        self._supports_eth_newFilter = True
 
     def _start(self):
         self.item_exporter.open()
@@ -74,15 +75,23 @@ class ExportTokenTransfersJob(BaseJob):
         if self.tokens is not None and len(self.tokens) > 0:
             filter_params['address'] = self.tokens
 
-        event_filter = self.web3.eth.filter(filter_params)
-        events = event_filter.get_all_entries()
+        try:
+            event_filter = self.web3.eth.filter(filter_params)
+            events = event_filter.get_all_entries()
+        except ValueError as e:
+            if str(e) == "{'code': -32000, 'message': 'the method is currently not implemented: eth_newFilter'}":
+                self._supports_eth_newFilter = False
+                events = self.web3.eth.getLogs(filter_params)
+            else:
+                raise(e)
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
             token_transfer = self.token_transfer_extractor.extract_transfer_from_log(log)
             if token_transfer is not None:
                 self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
-        self.web3.eth.uninstallFilter(event_filter.filter_id)
+        if self._supports_eth_newFilter:
+            self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()
