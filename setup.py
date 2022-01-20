@@ -40,16 +40,19 @@ setup(
         'click==7.1.2',
         'ethereum-dasm==0.1.4',
         'base58',
-        'requests',
-        "kafka-python==2.0.2"
+        'requests'
     ],
     extras_require={
         'streaming': [
             'timeout-decorator==0.4.1',
             'google-cloud-pubsub==2.1.0',
             'google-cloud-storage==1.33.0',
+            'kafka-python==2.0.2',
             'sqlalchemy==1.3.13',
             'pg8000==1.13.2',
+            # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust,
+            # that's why  we lock the version here
+            'libcst==0.3.21'
         ],
         'dev': [
             'pytest~=4.3.0'
