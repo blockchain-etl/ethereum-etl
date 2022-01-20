@@ -11,7 +11,6 @@ matrix:
     - python: "3.9"
       env: TOX_POSARGS="-e py39"
 install:
-  - travis_retry pip install --upgrade pip
   - travis_retry pip install tox
 script:
   - travis_wait tox $TOX_POSARGS

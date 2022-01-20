@@ -50,6 +50,7 @@ setup(
             'google-cloud-storage==1.33.0',
             'sqlalchemy==1.3.13',
             'pg8000==1.13.2',
+            'libcst==0.3.21' # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust, that's why  we fix the version here
         ],
         'dev': [
             'pytest~=4.3.0'
