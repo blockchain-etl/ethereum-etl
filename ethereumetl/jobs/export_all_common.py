@@ -278,7 +278,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 job.run()
 
         # # # finish # # #
-        shutil.rmtree(os.path.dirname(cache_output_dir))
+        #shutil.rmtree(os.path.dirname(cache_output_dir))
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info('Exporting blocks {block_range} took {time_diff} seconds'.format(
