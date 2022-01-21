@@ -25,7 +25,6 @@ from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemEx
 
 FIELDS_TO_EXPORT = [
     'address',
-    'bytecode',
     'function_sighashes',
     'is_erc20',
     'is_erc721',
