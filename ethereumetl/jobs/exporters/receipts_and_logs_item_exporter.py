@@ -43,7 +43,6 @@ LOG_FIELDS_TO_EXPORT = [
     'block_hash',
     'block_number',
     'address',
-    'data',
     'topics'
 ]
 
