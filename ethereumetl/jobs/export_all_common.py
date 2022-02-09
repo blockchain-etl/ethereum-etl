@@ -26,9 +26,10 @@ import logging
 import os
 import shutil
 from time import time
-
 from ethereumetl.csv_utils import set_max_field_size_limit
 from blockchainetl.file_utils import smart_open
+from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
+from blockchainetl.jobs.exporters.converters.list_join_item_converter import ListJoinItemConverter
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
@@ -42,6 +43,10 @@ from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
+from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
+from sqlalchemy.dialects.postgresql import insert
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
+
 
 logger = logging.getLogger('export_all')
 
@@ -63,7 +68,17 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
-def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_size):
+def get_multi_item_exporter(item_exporters: list):
+    valid_item_exporters = []
+
+    for item_exporter in item_exporters:
+        if item_exporter is not None:
+            valid_item_exporters.append(item_exporter)
+
+    return MultiItemExporter(valid_item_exporters)
+
+
+def export_all_common(partitions, output_dir, postgres_connection_string, provider_uri, max_workers, batch_size):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
         # # # start # # #
@@ -112,13 +127,34 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             transactions_file=transactions_file,
         ))
 
+        blocks_and_transactions_file_exporter = blocks_and_transactions_item_exporter(
+            blocks_file, transactions_file)
+
+        postgres_exporter = None
+        if postgres_connection_string:
+            postgres_exporter = PostgresItemExporter(
+                postgres_connection_string, item_type_to_insert_stmt_mapping={
+                    'block': insert(BLOCKS),
+                    'transaction': insert(TRANSACTIONS),
+                    'log': insert(LOGS),
+                    'token_transfer': insert(TOKEN_TRANSFERS),
+                    'contract': insert(CONTRACTS),
+                    'receipt': insert(RECEIPTS),
+                    'token': insert(TOKENS),
+                },
+                converters=[ListJoinItemConverter('topics', ','),
+                            ListJoinItemConverter('function_sighashes', ',')]
+            )
+
         job = ExportBlocksJob(
             start_block=batch_start_block,
             end_block=batch_end_block,
             batch_size=batch_size,
-            batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+            batch_web3_provider=ThreadLocalProxy(
+                lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
-            item_exporter=blocks_and_transactions_item_exporter(blocks_file, transactions_file),
+            item_exporter=get_multi_item_exporter(
+                [blocks_and_transactions_file_exporter, postgres_exporter]),
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
         job.run()
@@ -131,7 +167,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 output_dir=output_dir,
                 partition_dir=partition_dir,
             )
-            os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
+            os.makedirs(os.path.dirname(
+                token_transfers_output_dir), exist_ok=True)
 
             token_transfers_file = '{token_transfers_output_dir}/token_transfers_{file_name_suffix}.csv'.format(
                 token_transfers_output_dir=token_transfers_output_dir,
@@ -142,12 +179,17 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 token_transfers_file=token_transfers_file,
             ))
 
+            token_transfers_file_exporter = token_transfers_item_exporter(
+                token_transfers_file)
+
             job = ExportTokenTransfersJob(
                 start_block=batch_start_block,
                 end_block=batch_end_block,
                 batch_size=batch_size,
-                web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
-                item_exporter=token_transfers_item_exporter(token_transfers_file),
+                web3=ThreadLocalProxy(lambda: build_web3(
+                    get_provider_from_uri(provider_uri))),
+                item_exporter=get_multi_item_exporter(
+                    [token_transfers_file_exporter, postgres_exporter]),
                 max_workers=max_workers)
             job.run()
 
@@ -166,7 +208,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
         logger.info('Extracting hash column from transaction file {transactions_file}'.format(
             transactions_file=transactions_file,
         ))
-        extract_csv_column_unique(transactions_file, transaction_hashes_file, 'hash')
+        extract_csv_column_unique(
+            transactions_file, transaction_hashes_file, 'hash')
 
         receipts_output_dir = '{output_dir}/receipts{partition_dir}'.format(
             output_dir=output_dir,
@@ -195,12 +238,19 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
         ))
 
         with smart_open(transaction_hashes_file, 'r') as transaction_hashes:
+
+            receipts_and_logs_file_exporter = receipts_and_logs_item_exporter(
+                receipts_file, logs_file)
+
             job = ExportReceiptsJob(
-                transaction_hashes_iterable=(transaction_hash.strip() for transaction_hash in transaction_hashes),
+                transaction_hashes_iterable=(
+                    transaction_hash.strip() for transaction_hash in transaction_hashes),
                 batch_size=batch_size,
-                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+                batch_web3_provider=ThreadLocalProxy(
+                    lambda: get_provider_from_uri(provider_uri, batch=True)),
                 max_workers=max_workers,
-                item_exporter=receipts_and_logs_item_exporter(receipts_file, logs_file),
+                item_exporter=get_multi_item_exporter(
+                    [receipts_and_logs_file_exporter, postgres_exporter]),
                 export_receipts=receipts_file is not None,
                 export_logs=logs_file is not None)
             job.run()
@@ -214,7 +264,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
         logger.info('Extracting contract_address from receipt file {receipts_file}'.format(
             receipts_file=receipts_file
         ))
-        extract_csv_column_unique(receipts_file, contract_addresses_file, 'contract_address')
+        extract_csv_column_unique(
+            receipts_file, contract_addresses_file, 'contract_address')
 
         contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
             output_dir=output_dir,
@@ -232,13 +283,17 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
         ))
 
         with smart_open(contract_addresses_file, 'r') as contract_addresses_file:
+            contracts_file_exporter = contracts_item_exporter(contracts_file)
+
             contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                                   if contract_address.strip())
             job = ExportContractsJob(
                 contract_addresses_iterable=contract_addresses,
                 batch_size=batch_size,
-                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-                item_exporter=contracts_item_exporter(contracts_file),
+                batch_web3_provider=ThreadLocalProxy(
+                    lambda: get_provider_from_uri(provider_uri, batch=True)),
+                item_exporter=get_multi_item_exporter(
+                    [contracts_file_exporter, postgres_exporter]),
                 max_workers=max_workers)
             job.run()
 
@@ -252,7 +307,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             logger.info('Extracting token_address from token_transfers file {token_transfers_file}'.format(
                 token_transfers_file=token_transfers_file,
             ))
-            extract_csv_column_unique(token_transfers_file, token_addresses_file, 'token_address')
+            extract_csv_column_unique(
+                token_transfers_file, token_addresses_file, 'token_address')
 
             tokens_output_dir = '{output_dir}/tokens{partition_dir}'.format(
                 output_dir=output_dir,
@@ -270,15 +326,20 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             ))
 
             with smart_open(token_addresses_file, 'r') as token_addresses:
+                tokens_file_exporter = tokens_item_exporter(tokens_file)
+
                 job = ExportTokensJob(
-                    token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
-                    web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
-                    item_exporter=tokens_item_exporter(tokens_file),
+                    token_addresses_iterable=(
+                        token_address.strip() for token_address in token_addresses),
+                    web3=ThreadLocalProxy(lambda: build_web3(
+                        get_provider_from_uri(provider_uri))),
+                    item_exporter=get_multi_item_exporter(
+                        [tokens_file_exporter, postgres_exporter]),
                     max_workers=max_workers)
                 job.run()
 
         # # # finish # # #
-        #shutil.rmtree(os.path.dirname(cache_output_dir))
+        shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info('Exporting blocks {block_range} took {time_diff} seconds'.format(

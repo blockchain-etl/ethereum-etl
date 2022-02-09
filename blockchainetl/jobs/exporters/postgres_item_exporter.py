@@ -40,6 +40,9 @@ class PostgresItemExporter:
     def open(self):
         pass
 
+    def export_item(self, item):
+        self.export_items([item])
+
     def export_items(self, items):
         items_grouped_by_type = group_by_item_type(items)
 
@@ -55,7 +58,8 @@ class PostgresItemExporter:
             yield self.converter.convert_item(item)
 
     def create_engine(self):
-        engine = create_engine(self.connection_url, echo=self.print_sql, pool_recycle=3600)
+        engine = create_engine(self.connection_url,
+                               echo=self.print_sql, pool_recycle=3600)
         return engine
 
     def close(self):

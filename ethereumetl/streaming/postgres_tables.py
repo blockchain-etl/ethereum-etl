@@ -59,7 +59,6 @@ TRANSACTIONS = Table(
     Column('value', Numeric(38)),
     Column('gas', BigInteger),
     Column('gas_price', BigInteger),
-    Column('input', String),
     Column('receipt_cumulative_gas_used', BigInteger),
     Column('receipt_gas_used', BigInteger),
     Column('receipt_contract_address', String),
@@ -80,11 +79,7 @@ LOGS = Table(
     Column('transaction_hash', String, primary_key=True),
     Column('transaction_index', BigInteger),
     Column('address', String),
-    Column('data', String),
-    Column('topic0', String),
-    Column('topic1', String),
-    Column('topic2', String),
-    Column('topic3', String),
+    Column('topics', String),
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
@@ -127,4 +122,35 @@ TRACES = Table(
     Column('trace_id', String, primary_key=True),
 )
 
+CONTRACTS = Table(
+    'contracts', metadata,
+    Column('address', String),
+    Column('function_sighashes', String),
+    Column('is_erc20', String),
+    Column('is_erc721', String),
+    Column('block_number', BigInteger),
+)
 
+RECEIPTS = Table(
+    'receipts', metadata,
+    Column('transaction_hash', String),
+    Column('transaction_index', BigInteger),
+    Column('block_hash', String),
+    Column('block_number', BigInteger),
+    Column('cumulative_gas_used', BigInteger),
+    Column('gas_used', BigInteger),
+    Column('contract_address', String),
+    Column('root', String),
+    Column('status', BigInteger),
+    Column('effective_gas_price', BigInteger),
+)
+
+TOKENS = Table(
+    'tokens', metadata,
+    Column('address', String),
+    Column('name', String),
+    Column('symbol', String),
+    Column('decimals', Integer),
+    Column('total_supply', String),
+    Column('block_number', BigInteger),
+)
