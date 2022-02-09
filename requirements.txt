@@ -8,4 +8,4 @@ ethereum-dasm==0.1.4
 base58
 requests
 sqlalchemy
-psycopg2
+psycopg2-binary
