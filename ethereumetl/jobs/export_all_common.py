@@ -71,6 +71,16 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
+def get_multi_item_exporter(item_exporters: list):
+    valid_item_exporters = []
+
+    for item_exporter in item_exporters:
+        if item_exporter is not None:
+            valid_item_exporters.append(item_exporter)
+
+    return MultiItemExporter(valid_item_exporters)
+
+
 def export_all_common(partitions, output_dir, postgres_connection_string, provider_uri, max_workers, batch_size):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
@@ -120,11 +130,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             transactions_file=transactions_file,
         ))
 
-        item_exporters = []
-
-        file_exporter = blocks_and_transactions_item_exporter(
+        blocks_and_transactions_file_exporter = blocks_and_transactions_item_exporter(
             blocks_file, transactions_file)
-        item_exporters.append(file_exporter)
 
         postgres_exporter = None
         if postgres_connection_string:
@@ -141,9 +148,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 converters=[ListJoinItemConverter('topics', ','),
                             ListJoinItemConverter('function_sighashes', ',')]
             )
-            item_exporters.append(postgres_exporter)
-
-        multi_item_exporter = MultiItemExporter(item_exporters)
 
         job = ExportBlocksJob(
             start_block=batch_start_block,
@@ -152,7 +156,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             batch_web3_provider=ThreadLocalProxy(
                 lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
-            item_exporter=multi_item_exporter,
+            item_exporter=get_multi_item_exporter(
+                [blocks_and_transactions_file_exporter, postgres_exporter]),
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
         job.run()
@@ -177,13 +182,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 token_transfers_file=token_transfers_file,
             ))
 
-            item_exporters = [token_transfers_item_exporter(
-                token_transfers_file)]
-
-            if postgres_exporter is not None:
-                item_exporters.append(postgres_exporter)
-
-            multi_item_exporter = MultiItemExporter(item_exporters)
+            token_transfers_file_exporter = token_transfers_item_exporter(
+                token_transfers_file)
 
             job = ExportTokenTransfersJob(
                 start_block=batch_start_block,
@@ -191,7 +191,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 batch_size=batch_size,
                 web3=ThreadLocalProxy(lambda: build_web3(
                     get_provider_from_uri(provider_uri))),
-                item_exporter=multi_item_exporter,
+                item_exporter=get_multi_item_exporter(
+                    [token_transfers_file_exporter, postgres_exporter]),
                 max_workers=max_workers)
             job.run()
 
@@ -241,13 +242,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
 
         with smart_open(transaction_hashes_file, 'r') as transaction_hashes:
 
-            item_exporters = [receipts_and_logs_item_exporter(
-                receipts_file, logs_file)]
-
-            if postgres_exporter is not None:
-                item_exporters.append(postgres_exporter)
-
-            multi_item_exporter = MultiItemExporter(item_exporters)
+            receipts_and_logs_file_exporter = receipts_and_logs_item_exporter(
+                receipts_file, logs_file)
 
             job = ExportReceiptsJob(
                 transaction_hashes_iterable=(
@@ -256,7 +252,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 batch_web3_provider=ThreadLocalProxy(
                     lambda: get_provider_from_uri(provider_uri, batch=True)),
                 max_workers=max_workers,
-                item_exporter=multi_item_exporter,
+                item_exporter=get_multi_item_exporter(
+                    [receipts_and_logs_file_exporter, postgres_exporter]),
                 export_receipts=receipts_file is not None,
                 export_logs=logs_file is not None)
             job.run()
@@ -289,12 +286,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         ))
 
         with smart_open(contract_addresses_file, 'r') as contract_addresses_file:
-            item_exporters = [contracts_item_exporter(contracts_file)]
-
-            if postgres_exporter is not None:
-                item_exporters.append(postgres_exporter)
-
-            multi_item_exporter = MultiItemExporter(item_exporters)
+            contracts_file_exporter = contracts_item_exporter(contracts_file)
 
             contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                                   if contract_address.strip())
@@ -303,7 +295,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 batch_size=batch_size,
                 batch_web3_provider=ThreadLocalProxy(
                     lambda: get_provider_from_uri(provider_uri, batch=True)),
-                item_exporter=multi_item_exporter,
+                item_exporter=get_multi_item_exporter(
+                    [contracts_file_exporter, postgres_exporter]),
                 max_workers=max_workers)
             job.run()
 
@@ -336,19 +329,15 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             ))
 
             with smart_open(token_addresses_file, 'r') as token_addresses:
-                item_exporters = [tokens_item_exporter(tokens_file)]
-
-                if postgres_exporter is not None:
-                    item_exporters.append(postgres_exporter)
-
-                multi_item_exporter = MultiItemExporter(item_exporters)
+                tokens_file_exporter = tokens_item_exporter(tokens_file)
 
                 job = ExportTokensJob(
                     token_addresses_iterable=(
                         token_address.strip() for token_address in token_addresses),
                     web3=ThreadLocalProxy(lambda: build_web3(
                         get_provider_from_uri(provider_uri))),
-                    item_exporter=multi_item_exporter,
+                    item_exporter=get_multi_item_exporter(
+                        [tokens_file_exporter, postgres_exporter]),
                     max_workers=max_workers)
                 job.run()
 
