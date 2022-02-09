@@ -339,7 +339,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 job.run()
 
         # # # finish # # #
-        shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
+        # shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info('Exporting blocks {block_range} took {time_diff} seconds'.format(
