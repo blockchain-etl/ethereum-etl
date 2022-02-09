@@ -45,9 +45,6 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
 from sqlalchemy.dialects.postgresql import insert
-from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
-from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
-from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
 from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
 
 
