@@ -7,3 +7,5 @@ click==7.1.2
 ethereum-dasm==0.1.4
 base58
 requests
+sqlalchemy
+psycopg2

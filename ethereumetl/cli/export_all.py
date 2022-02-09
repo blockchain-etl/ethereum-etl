@@ -78,8 +78,10 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
         eth_service = EthService(web3)
 
         while start_date <= end_date:
-            batch_start_block, batch_end_block = eth_service.get_block_range_for_date(start_date)
-            partition_dir = '/date={start_date!s}/'.format(start_date=start_date)
+            batch_start_block, batch_end_block = eth_service.get_block_range_for_date(
+                start_date)
+            partition_dir = '/date={start_date!s}/'.format(
+                start_date=start_date)
             yield batch_start_block, batch_end_block, partition_dir
             start_date += day
 
@@ -101,7 +103,8 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
             yield batch_start_block, batch_end_block, partition_dir
 
     else:
-        raise ValueError('start and end must be either block numbers or ISO dates or Unix times')
+        raise ValueError(
+            'start and end must be either block numbers or ISO dates or Unix times')
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
@@ -113,12 +116,13 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output-dir', default='output', show_default=True, type=str, help='Output directory, partitioned in Hive style.')
+@click.option('-P', '--postgres-connection-string', default='', show_default=False, type=str, help='Postgres connection string.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-B', '--export-batch-size', default=100, show_default=True, type=int, help='The number of requests in JSON RPC batches.')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size,
+def export_all(start, end, partition_batch_size, provider_uri, output_dir, postgres_connection_string, max_workers, export_batch_size,
                chain='ethereum'):
     """Exports all data for a range of blocks."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
-                      output_dir, provider_uri, max_workers, export_batch_size)
+                      output_dir, postgres_connection_string, provider_uri, max_workers, export_batch_size)
