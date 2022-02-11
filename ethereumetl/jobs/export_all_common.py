@@ -39,6 +39,7 @@ from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_ex
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
+from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
@@ -122,34 +123,6 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
         job.run()
-
-        # # # token_transfers # # #
-
-        token_transfers_file = None
-        if is_log_filter_supported(provider_uri):
-            token_transfers_output_dir = '{output_dir}/token_transfers{partition_dir}'.format(
-                output_dir=output_dir,
-                partition_dir=partition_dir,
-            )
-            os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
-
-            token_transfers_file = '{token_transfers_output_dir}/token_transfers_{file_name_suffix}.csv'.format(
-                token_transfers_output_dir=token_transfers_output_dir,
-                file_name_suffix=file_name_suffix,
-            )
-            logger.info('Exporting ERC20 transfers from blocks {block_range} to {token_transfers_file}'.format(
-                block_range=block_range,
-                token_transfers_file=token_transfers_file,
-            ))
-
-            job = ExportTokenTransfersJob(
-                start_block=batch_start_block,
-                end_block=batch_end_block,
-                batch_size=batch_size,
-                web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
-                item_exporter=token_transfers_item_exporter(token_transfers_file),
-                max_workers=max_workers)
-            job.run()
 
         # # # receipts_and_logs # # #
 
@@ -241,6 +214,46 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 item_exporter=contracts_item_exporter(contracts_file),
                 max_workers=max_workers)
             job.run()
+
+            # # # token_transfers # # #
+
+            logs_file = 'output/logs/start_block=14155621/end_block=14155721/logs_14155621_14155721.csv'
+
+            token_transfers_output_dir = '{output_dir}/token_transfers{partition_dir}'.format(
+                output_dir=output_dir,
+                partition_dir=partition_dir,
+            )
+            os.makedirs(os.path.dirname(token_transfers_output_dir), exist_ok=True)
+
+            token_transfers_file = '{token_transfers_output_dir}/token_transfers_{file_name_suffix}.csv'.format(
+                token_transfers_output_dir=token_transfers_output_dir,
+                file_name_suffix=file_name_suffix,
+            )
+            logger.info('Exporting ERC20 transfers from blocks {block_range} to {token_transfers_file}'.format(
+                block_range=block_range,
+                token_transfers_file=token_transfers_file,
+            ))
+
+            if is_log_filter_supported(provider_uri):
+                job = ExportTokenTransfersJob(
+                    start_block=batch_start_block,
+                    end_block=batch_end_block,
+                    batch_size=batch_size,
+                    web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
+                    item_exporter=token_transfers_item_exporter(token_transfers_file),
+                    max_workers=max_workers)
+
+                job.run()
+            else:
+                with smart_open(logs_file, 'r') as logs_file:
+                    logs_reader = csv.DictReader(logs_file)
+                    job = ExtractTokenTransfersJob(
+                        logs_iterable=logs_reader,
+                        batch_size=batch_size,
+                        max_workers=max_workers,
+                        item_exporter=token_transfers_item_exporter(token_transfers_file, converters=[]))
+
+                    job.run()
 
         # # # tokens # # #
 
