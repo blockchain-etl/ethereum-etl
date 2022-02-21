@@ -30,6 +30,7 @@ from ethereumetl.csv_utils import set_max_field_size_limit
 from blockchainetl.file_utils import smart_open
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 from blockchainetl.jobs.exporters.converters.list_join_item_converter import ListJoinItemConverter
+from blockchainetl.jobs.exporters.converters.numeric38_converter import Numeric38Converter
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
@@ -143,7 +144,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'token': insert(TOKENS),
                 },
                 converters=[ListJoinItemConverter('topics', ','),
-                            ListJoinItemConverter('function_sighashes', ',')]
+                            ListJoinItemConverter('function_sighashes', ','),
+                            Numeric38Converter('token_transfer', 'value')]
             )
 
         job = ExportBlocksJob(
