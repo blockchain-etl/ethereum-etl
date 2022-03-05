@@ -89,7 +89,7 @@ class ExportTracesJob(BaseJob):
         json_traces = self.web3.parity.traceBlock(block_number)
 
         if json_traces is None:
-            raise ValueError('Response from the node is None. Is the node fully synced?')
+            raise ValueError('Response from the node is None. Is the node fully synced? Is the node started with tracing enabled? Is trace_block API enabled?')
 
         traces = [self.trace_mapper.json_dict_to_trace(json_trace) for json_trace in json_traces]
         all_traces.extend(traces)

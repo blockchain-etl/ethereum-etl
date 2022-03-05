@@ -23,7 +23,7 @@
 
 import click
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 from blockchainetl.file_utils import smart_open
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
@@ -51,7 +51,7 @@ def export_tokens(token_addresses, output, max_workers, provider_uri, chain='eth
     with smart_open(token_addresses, 'r') as token_addresses_file:
         job = ExportTokensJob(
             token_addresses_iterable=(token_address.strip() for token_address in token_addresses_file),
-            web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+            web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
             item_exporter=tokens_item_exporter(output),
             max_workers=max_workers)
 

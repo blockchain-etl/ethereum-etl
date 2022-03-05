@@ -21,7 +21,7 @@
 
 import click
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.jobs.export_origin_job import ExportOriginJob
@@ -48,7 +48,7 @@ def export_origin(start_block, end_block, batch_size, marketplace_output, shop_o
         start_block=start_block,
         end_block=end_block,
         batch_size=batch_size,
-        web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+        web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
         ipfs_client=get_origin_ipfs_client(),
         marketplace_listing_exporter=origin_marketplace_listing_item_exporter(marketplace_output),
         shop_product_exporter=origin_shop_product_item_exporter(shop_output),

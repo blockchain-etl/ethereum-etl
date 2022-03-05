@@ -15,8 +15,9 @@ Make sure it downloaded the blocks that you need by executing `eth.syncing` in t
 You can export blocks below `currentBlock`,
 there is no need to wait until the full sync as the state is not needed (unless you also need contracts bytecode
 and token details; for those you need to wait until the full sync). Note that you may need to wait for another day or 
-   two for the node to download the states. See this issue https://github.com/blockchain-etl/ethereum-etl/issues/265#issuecomment-970451522
-
+   two for the node to download the states. See this issue https://github.com/blockchain-etl/ethereum-etl/issues/265#issuecomment-970451522. 
+Make sure to set `--txlookuplimit 0` if you use geth.
+ 
 1. Install Ethereum ETL: `> pip3 install ethereum-etl`
 
 1. Export all:

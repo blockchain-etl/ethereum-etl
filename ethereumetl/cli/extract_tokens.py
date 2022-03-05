@@ -33,7 +33,7 @@ from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
 from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 logging_basic_config()
 
@@ -59,7 +59,7 @@ def extract_tokens(contracts, provider_uri, output, max_workers, values_as_strin
         converters = [IntToStringItemConverter(keys=['decimals', 'total_supply'])] if values_as_strings else []
         job = ExtractTokensJob(
             contracts_iterable=contracts_iterable,
-            web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+            web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
             max_workers=max_workers,
             item_exporter=tokens_item_exporter(output, converters))
 

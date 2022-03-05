@@ -41,7 +41,7 @@ from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_trans
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 logger = logging.getLogger('export_all')
 
@@ -146,7 +146,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 start_block=batch_start_block,
                 end_block=batch_end_block,
                 batch_size=batch_size,
-                web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+                web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
                 item_exporter=token_transfers_item_exporter(token_transfers_file),
                 max_workers=max_workers)
             job.run()
@@ -272,7 +272,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             with smart_open(token_addresses_file, 'r') as token_addresses:
                 job = ExportTokensJob(
                     token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
-                    web3=ThreadLocalProxy(lambda: Web3(get_provider_from_uri(provider_uri))),
+                    web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
                     item_exporter=tokens_item_exporter(tokens_file),
                     max_workers=max_workers)
                 job.run()

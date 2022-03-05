@@ -14,7 +14,7 @@ from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enric
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 
 class EthStreamerAdapter:
@@ -37,7 +37,8 @@ class EthStreamerAdapter:
         self.item_exporter.open()
 
     def get_current_block_number(self):
-        return int(Web3(self.batch_web3_provider).eth.getBlock("latest").number)
+        w3 = build_web3(self.batch_web3_provider)
+        return int(w3.eth.getBlock("latest").number)
 
     def export_all(self, start_block, end_block):
         # Export blocks and transactions
@@ -151,7 +152,7 @@ class EthStreamerAdapter:
             start_block=start_block,
             end_block=end_block,
             batch_size=self.batch_size,
-            web3=ThreadLocalProxy(lambda: Web3(self.batch_web3_provider)),
+            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
             max_workers=self.max_workers,
             item_exporter=exporter
         )
@@ -175,7 +176,7 @@ class EthStreamerAdapter:
         exporter = InMemoryItemExporter(item_types=['token'])
         job = ExtractTokensJob(
             contracts_iterable=contracts,
-            web3=ThreadLocalProxy(lambda: Web3(self.batch_web3_provider)),
+            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
             max_workers=self.max_workers,
             item_exporter=exporter
         )

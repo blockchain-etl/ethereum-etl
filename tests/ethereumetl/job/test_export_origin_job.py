@@ -1,7 +1,7 @@
 import pytest
 import tests.resources
 
-from web3 import Web3
+from ethereumetl.web3_utils import build_web3
 
 import tests.resources
 
@@ -35,7 +35,7 @@ def test_export_origin(tmpdir, start_block, end_block, batch_size, output_format
         end_block=end_block,
         batch_size=batch_size,
         web3=ThreadLocalProxy(
-            lambda: Web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
+            lambda: build_web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
         ),
         ipfs_client=ipfs_client,
         marketplace_listing_exporter=origin_marketplace_listing_item_exporter(marketplace_output_file),
