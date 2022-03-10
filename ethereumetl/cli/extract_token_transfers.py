@@ -24,6 +24,7 @@
 import click
 import csv
 import json
+import sys
 
 from blockchainetl.file_utils import smart_open
 from blockchainetl.jobs.exporters.converters.int_to_string_item_converter import IntToStringItemConverter
@@ -32,6 +33,18 @@ from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJo
 from blockchainetl.logging_utils import logging_basic_config
 
 logging_basic_config()
+
+maxInt = sys.maxsize
+
+while True:
+    # decrease the maxInt value by factor 10
+    # as long as the OverflowError occurs.
+
+    try:
+        csv.field_size_limit(maxInt)
+        break
+    except OverflowError:
+        maxInt = int(maxInt/10)
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
