@@ -166,8 +166,10 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         transactions = inmemory_exporter.get_items('transaction')
         # transactions = enrich_transactions(blocks, transactions)
         blocks_and_transactions_exporters = get_multi_item_exporter([blocks_and_transactions_file_exporter, postgres_exporter])
+        blocks_and_transactions_exporters.open()
         blocks_and_transactions_exporters.export_items(blocks)
         blocks_and_transactions_exporters.export_items(transactions)
+        blocks_and_transactions_exporters.close()
 
         # # # token_transfers # # #
 
@@ -204,7 +206,9 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             token_transfers = inmemory_exporter.get_items('token_transfer')
             # token_transfers = enrich_token_transfers(blocks, token_transfers)
             token_transfers_exporters = get_multi_item_exporter([token_transfers_file_exporter, postgres_exporter])
+            token_transfers_exporters.open()
             token_transfers_exporters.export_items(token_transfers)
+            token_transfers_exporters.close()
 
         # # # receipts_and_logs # # #
 
@@ -255,7 +259,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             receipts_and_logs_file_exporter = receipts_and_logs_item_exporter(
                 receipts_file, logs_file)
 
-            receipts_and_logs_inmemory_exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
             job = ExportReceiptsJob(
                 transaction_hashes_iterable=(
                     transaction_hash.strip() for transaction_hash in transaction_hashes),
@@ -270,8 +273,10 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             logs = inmemory_exporter.get_items('log')
             # logs = enrich_logs(blocks, logs)
             receipts_and_logs_exporters = get_multi_item_exporter([receipts_and_logs_file_exporter, postgres_exporter])
+            receipts_and_logs_exporters.open()
             receipts_and_logs_exporters.export_items(inmemory_exporter.get_items('receipt'))
             receipts_and_logs_exporters.export_items(logs)
+            receipts_and_logs_exporters.close()
 
         # # # contracts # # #
 
@@ -317,7 +322,9 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             contracts = inmemory_exporter.get_items('contract')
             contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter([contracts_file_exporter, postgres_exporter])
+            contracts_exporters.open()
             contracts_exporters.export_items(contracts)
+            contracts_exporters.close()
 
         # # # tokens # # #
 
@@ -361,7 +368,11 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 tokens = inmemory_exporter.get_items('token')
                 tokens = enrich_tokens(blocks, tokens)
                 tokens_exporters = get_multi_item_exporter([tokens_file_exporter, postgres_exporter])
+                tokens_exporters.open()
                 tokens_exporters.export_items(tokens)
+                tokens_exporters.close()
+
+        inmemory_exporter.close()
 
         # # # finish # # #
         # shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
