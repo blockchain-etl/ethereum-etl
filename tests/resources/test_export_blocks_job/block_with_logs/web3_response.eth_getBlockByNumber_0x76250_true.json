@@ -43,6 +43,7 @@
                 "standardV": "0x0",
                 "to": "0xf4eced2f682ce333f96f2d8966c613ded8fc95dd",
                 "transactionIndex": "0x0",
+                "type": "0x0",
                 "v": "0x1b",
                 "value": "0x0"
             },
@@ -65,6 +66,7 @@
                 "standardV": "0x1",
                 "to": "0xf4eced2f682ce333f96f2d8966c613ded8fc95dd",
                 "transactionIndex": "0x1",
+                "type": "0x0",
                 "v": "0x1c",
                 "value": "0x0"
             },
@@ -87,6 +89,7 @@
                 "standardV": "0x1",
                 "to": "0x9e669f970ec0f49bb735f20799a7e7c4a1c274e2",
                 "transactionIndex": "0x2",
+                "type": "0x0",
                 "v": "0x1c",
                 "value": "0x2714d78692b000"
             },
@@ -109,6 +112,7 @@
                 "standardV": "0x0",
                 "to": "0x743b8aeedc163c0e3a0fe9f3910d146c48e70da8",
                 "transactionIndex": "0x3",
+                "type": "0x0",
                 "v": "0x1b",
                 "value": "0x153c6ea30e6ee800"
             }

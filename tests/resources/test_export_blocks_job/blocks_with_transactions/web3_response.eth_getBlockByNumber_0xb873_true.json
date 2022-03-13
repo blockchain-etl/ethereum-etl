@@ -43,6 +43,7 @@
         "standardV": "0x1",
         "to": "0xe25e3a1947405a1f82dd8e3048a9ca471dc782e1",
         "transactionIndex": "0x0",
+        "type": "0x0",
         "v": "0x1c",
         "value": "0x734506b87887f100"
       },
@@ -65,6 +66,7 @@
         "standardV": "0x1",
         "to": "0x32be343b94f860124dc4fee278fdcbd38c102d88",
         "transactionIndex": "0x1",
+        "type": "0x0",
         "v": "0x1c",
         "value": "0x1bbcddc457ade400"
       }
