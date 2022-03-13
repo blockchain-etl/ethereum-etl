@@ -26,6 +26,7 @@ import logging
 import os
 import shutil
 from time import time
+from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.csv_utils import set_max_field_size_limit
 from blockchainetl.file_utils import smart_open
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
@@ -42,6 +43,7 @@ from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
+from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_token_transfers, enrich_tokens, enrich_transactions
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
@@ -58,7 +60,6 @@ def is_log_filter_supported(provider_uri):
 
 def extract_csv_column_unique(input, output, column):
     set_max_field_size_limit()
-
     with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
         reader = csv.DictReader(input_file)
         seen = set()  # set for fast O(1) amortized lookup
@@ -148,6 +149,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                             Numeric38Converter('token_transfer', 'value')]
             )
 
+        inmemory_exporter = InMemoryItemExporter(item_types=['block', 'transaction', 'log', 'token_transfer', 'contract', 'receipt', 'token'])
+
         job = ExportBlocksJob(
             start_block=batch_start_block,
             end_block=batch_end_block,
@@ -155,11 +158,16 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             batch_web3_provider=ThreadLocalProxy(
                 lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
-            item_exporter=get_multi_item_exporter(
-                [blocks_and_transactions_file_exporter, postgres_exporter]),
+            item_exporter=inmemory_exporter,
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
         job.run()
+        blocks = inmemory_exporter.get_items('block')
+        transactions = inmemory_exporter.get_items('transaction')
+        # transactions = enrich_transactions(blocks, transactions)
+        blocks_and_transactions_exporters = get_multi_item_exporter([blocks_and_transactions_file_exporter, postgres_exporter])
+        blocks_and_transactions_exporters.export_items(blocks)
+        blocks_and_transactions_exporters.export_items(transactions)
 
         # # # token_transfers # # #
 
@@ -190,10 +198,13 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 batch_size=batch_size,
                 web3=ThreadLocalProxy(lambda: build_web3(
                     get_provider_from_uri(provider_uri))),
-                item_exporter=get_multi_item_exporter(
-                    [token_transfers_file_exporter, postgres_exporter]),
+                item_exporter=inmemory_exporter,
                 max_workers=max_workers)
             job.run()
+            token_transfers = inmemory_exporter.get_items('token_transfer')
+            # token_transfers = enrich_token_transfers(blocks, token_transfers)
+            token_transfers_exporters = get_multi_item_exporter([token_transfers_file_exporter, postgres_exporter])
+            token_transfers_exporters.export_items(token_transfers)
 
         # # # receipts_and_logs # # #
 
@@ -244,6 +255,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             receipts_and_logs_file_exporter = receipts_and_logs_item_exporter(
                 receipts_file, logs_file)
 
+            receipts_and_logs_inmemory_exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
             job = ExportReceiptsJob(
                 transaction_hashes_iterable=(
                     transaction_hash.strip() for transaction_hash in transaction_hashes),
@@ -251,11 +263,15 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 batch_web3_provider=ThreadLocalProxy(
                     lambda: get_provider_from_uri(provider_uri, batch=True)),
                 max_workers=max_workers,
-                item_exporter=get_multi_item_exporter(
-                    [receipts_and_logs_file_exporter, postgres_exporter]),
+                item_exporter=inmemory_exporter,
                 export_receipts=receipts_file is not None,
                 export_logs=logs_file is not None)
             job.run()
+            logs = inmemory_exporter.get_items('log')
+            # logs = enrich_logs(blocks, logs)
+            receipts_and_logs_exporters = get_multi_item_exporter([receipts_and_logs_file_exporter, postgres_exporter])
+            receipts_and_logs_exporters.export_items(inmemory_exporter.get_items('receipt'))
+            receipts_and_logs_exporters.export_items(logs)
 
         # # # contracts # # #
 
@@ -289,15 +305,19 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
 
             contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
                                   if contract_address.strip())
+
             job = ExportContractsJob(
                 contract_addresses_iterable=contract_addresses,
                 batch_size=batch_size,
                 batch_web3_provider=ThreadLocalProxy(
                     lambda: get_provider_from_uri(provider_uri, batch=True)),
-                item_exporter=get_multi_item_exporter(
-                    [contracts_file_exporter, postgres_exporter]),
+                item_exporter=inmemory_exporter,
                 max_workers=max_workers)
             job.run()
+            contracts = inmemory_exporter.get_items('contract')
+            contracts = enrich_contracts(blocks, contracts)
+            contracts_exporters = get_multi_item_exporter([contracts_file_exporter, postgres_exporter])
+            contracts_exporters.export_items(contracts)
 
         # # # tokens # # #
 
@@ -335,10 +355,13 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                         token_address.strip() for token_address in token_addresses),
                     web3=ThreadLocalProxy(lambda: build_web3(
                         get_provider_from_uri(provider_uri))),
-                    item_exporter=get_multi_item_exporter(
-                        [tokens_file_exporter, postgres_exporter]),
+                    item_exporter=inmemory_exporter,
                     max_workers=max_workers)
                 job.run()
+                tokens = inmemory_exporter.get_items('token')
+                tokens = enrich_tokens(blocks, tokens)
+                tokens_exporters = get_multi_item_exporter([tokens_file_exporter, postgres_exporter])
+                tokens_exporters.export_items(tokens)
 
         # # # finish # # #
         # shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
