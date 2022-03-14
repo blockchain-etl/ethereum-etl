@@ -320,6 +320,11 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 max_workers=max_workers)
             job.run()
             contracts = inmemory_exporter.get_items('contract')
+            # HACKHACK: add block_number to contracts when processing a single block
+            if len(blocks) == 1:
+                for contract in contracts:
+                    contract['block_number'] = blocks[0]['number']
+
             contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter([contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
@@ -366,6 +371,10 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     max_workers=max_workers)
                 job.run()
                 tokens = inmemory_exporter.get_items('token')
+                # HACKHACK: add block_number to tokens when processing a single block
+                if len(blocks) == 1:
+                    for token in tokens:
+                        token['block_number'] = blocks[0]['number']
                 tokens = enrich_tokens(blocks, tokens)
                 tokens_exporters = get_multi_item_exporter([tokens_file_exporter, postgres_exporter])
                 tokens_exporters.open()
