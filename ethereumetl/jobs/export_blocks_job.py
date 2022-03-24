@@ -84,8 +84,8 @@ class ExportBlocksJob(BaseJob):
         blocks = [self.block_mapper.json_dict_to_block(
             result) for result in results]
 
-        # Getting a receipt to inform effective gas price
         for block in blocks:
+            # Getting receipts to inform effective gas price
             receipts_rpc = list(generate_get_receipt_json_rpc([tx.hash for tx in block.transactions]))
             response = self.batch_web3_provider.make_batch_request(json.dumps(receipts_rpc))
             results = rpc_response_batch_to_results(response)
