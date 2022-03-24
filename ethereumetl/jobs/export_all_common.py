@@ -144,8 +144,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'receipt': insert(RECEIPTS),
                     'token': insert(TOKENS),
                 },
-                converters=[ListJoinItemConverter('topics', ','),
-                            ListJoinItemConverter('function_sighashes', ','),
+                converters=[ListJoinItemConverter('function_sighashes', ','),
                             Numeric38Converter('token_transfer', 'value')]
             )
 

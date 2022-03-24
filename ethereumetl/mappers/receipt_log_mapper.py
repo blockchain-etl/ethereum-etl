@@ -27,42 +27,42 @@ from ethereumetl.utils import hex_to_dec
 
 class EthReceiptLogMapper(object):
 
-    def json_dict_to_receipt_log(self, json_dict):
+    def json_dict_to_receipt_log(self, json_dict) -> EthReceiptLog:
         receipt_log = EthReceiptLog()
 
         receipt_log.log_index = hex_to_dec(json_dict.get('logIndex'))
         receipt_log.transaction_hash = json_dict.get('transactionHash')
         receipt_log.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
-        receipt_log.block_hash = json_dict.get('blockHash')
-        receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber'))
         receipt_log.address = json_dict.get('address')
         receipt_log.data = json_dict.get('data')
         receipt_log.topics = json_dict.get('topics')
+        receipt_log.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        receipt_log.block_hash = json_dict.get('blockHash')
 
         return receipt_log
 
-    def web3_dict_to_receipt_log(self, dict):
+    def web3_dict_to_receipt_log(self, web3_dict) -> EthReceiptLog:
 
         receipt_log = EthReceiptLog()
 
-        receipt_log.log_index = dict.get('logIndex')
+        receipt_log.log_index = web3_dict.get('logIndex')
 
-        transaction_hash = dict.get('transactionHash')
+        transaction_hash = web3_dict.get('transactionHash')
         if transaction_hash is not None:
             transaction_hash = transaction_hash.hex()
         receipt_log.transaction_hash = transaction_hash
 
-        block_hash = dict.get('blockHash')
+        block_hash = web3_dict.get('blockHash')
         if block_hash is not None:
             block_hash = block_hash.hex()
         receipt_log.block_hash = block_hash
 
-        receipt_log.block_number = dict.get('blockNumber')
-        receipt_log.address = dict.get('address')
-        receipt_log.data = dict.get('data')
+        receipt_log.block_number = web3_dict.get('blockNumber')
+        receipt_log.address = web3_dict.get('address')
+        receipt_log.data = web3_dict.get('data')
 
-        if 'topics' in dict:
-            receipt_log.topics = [topic.hex() for topic in dict['topics']]
+        if 'topics' in web3_dict:
+            receipt_log.topics = [topic.hex() for topic in web3_dict['topics']]
 
         return receipt_log
 
@@ -79,18 +79,18 @@ class EthReceiptLogMapper(object):
             'topics': receipt_log.topics
         }
 
-    def dict_to_receipt_log(self, dict):
+    def dict_to_receipt_log(self, web3_dict) -> EthReceiptLog:
         receipt_log = EthReceiptLog()
 
-        receipt_log.log_index = dict.get('log_index')
-        receipt_log.transaction_hash = dict.get('transaction_hash')
-        receipt_log.transaction_index = dict.get('transaction_index')
-        receipt_log.block_hash = dict.get('block_hash')
-        receipt_log.block_number = dict.get('block_number')
-        receipt_log.address = dict.get('address')
-        receipt_log.data = dict.get('data')
+        receipt_log.log_index = web3_dict.get('log_index')
+        receipt_log.transaction_hash = web3_dict.get('transaction_hash')
+        receipt_log.transaction_index = web3_dict.get('transaction_index')
+        receipt_log.block_hash = web3_dict.get('block_hash')
+        receipt_log.block_number = web3_dict.get('block_number')
+        receipt_log.address = web3_dict.get('address')
+        receipt_log.data = web3_dict.get('data')
 
-        topics = dict.get('topics')
+        topics = web3_dict.get('topics')
         if isinstance(topics, str):
             if len(topics.strip()) == 0:
                 receipt_log.topics = []

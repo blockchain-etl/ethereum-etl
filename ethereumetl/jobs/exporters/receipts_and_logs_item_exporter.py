@@ -40,10 +40,11 @@ LOG_FIELDS_TO_EXPORT = [
     'log_index',
     'transaction_hash',
     'transaction_index',
-    'block_hash',
-    'block_number',
     'address',
-    'topics'
+    'data',
+    'topics',
+    'block_number',
+    'block_hash'
 ]
 
 

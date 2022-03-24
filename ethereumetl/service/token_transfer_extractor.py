@@ -24,6 +24,7 @@
 import logging
 from builtins import map
 
+from ethereumetl.domain.receipt_log import EthReceiptLog
 from ethereumetl.domain.token_transfer import EthTokenTransfer
 from ethereumetl.utils import chunk_string, hex_to_dec, to_normalized_address
 
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class EthTokenTransferExtractor(object):
-    def extract_transfer_from_log(self, receipt_log):
+    def extract_transfer_from_log(self, receipt_log: EthReceiptLog) -> EthTokenTransfer:
 
         topics = receipt_log.topics
         if topics is None or len(topics) < 1:
@@ -56,7 +57,9 @@ class EthTokenTransferExtractor(object):
             token_transfer.value = hex_to_dec(topics_with_data[3])
             token_transfer.transaction_hash = receipt_log.transaction_hash
             token_transfer.log_index = receipt_log.log_index
+            token_transfer.block_timestamp = receipt_log.block_timestamp
             token_transfer.block_number = receipt_log.block_number
+            token_transfer.block_hash = receipt_log.block_hash
             return token_transfer
 
         return None
