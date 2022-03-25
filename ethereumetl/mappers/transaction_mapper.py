@@ -25,14 +25,12 @@ from ethereumetl.domain.transaction import EthTransaction
 from ethereumetl.utils import hex_to_dec, to_normalized_address
 
 
-class EthTransactionMapper(object):
-    def json_dict_to_transaction(self, json_dict, **kwargs):
+class EthTransactionMapper:
+    @staticmethod
+    def json_dict_to_transaction(json_dict, **kwargs):
         transaction = EthTransaction()
         transaction.hash = json_dict.get('hash')
         transaction.nonce = hex_to_dec(json_dict.get('nonce'))
-        transaction.block_hash = json_dict.get('blockHash')
-        transaction.block_number = hex_to_dec(json_dict.get('blockNumber'))
-        transaction.block_timestamp = kwargs.get('block_timestamp')
         transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
         transaction.from_address = to_normalized_address(json_dict.get('from'))
         transaction.to_address = to_normalized_address(json_dict.get('to'))
@@ -40,19 +38,27 @@ class EthTransactionMapper(object):
         transaction.gas = hex_to_dec(json_dict.get('gas'))
         transaction.gas_price = hex_to_dec(json_dict.get('gasPrice'))
         transaction.input = json_dict.get('input')
+        transaction.block_timestamp = kwargs.get('block_timestamp')
+        transaction.block_number = hex_to_dec(json_dict.get('blockNumber'))
+        transaction.block_hash = json_dict.get('blockHash')
         transaction.max_fee_per_gas = hex_to_dec(json_dict.get('maxFeePerGas'))
         transaction.max_priority_fee_per_gas = hex_to_dec(json_dict.get('maxPriorityFeePerGas'))
         transaction.transaction_type = hex_to_dec(json_dict.get('type'))
+        if 'receipt' in json_dict:
+            receipt_dict = json_dict.get('receipt')
+            transaction.receipt_cumulative_gas_used = hex_to_dec(receipt_dict.get('cumulativeGasUsed'))
+            transaction.receipt_gas_used = hex_to_dec(receipt_dict.get('gasUsed'))
+            transaction.receipt_contract_address = to_normalized_address(receipt_dict.get('contractAddress'))
+            transaction.receipt_root = to_normalized_address(receipt_dict.get('root'))
+            transaction.receipt_effective_gas_price = hex_to_dec(receipt_dict.get('effectiveGasPrice'))
         return transaction
 
-    def transaction_to_dict(self, transaction: EthTransaction):
+    @staticmethod
+    def transaction_to_dict(transaction: EthTransaction):
         return {
             'type': 'transaction',
             'hash': transaction.hash,
             'nonce': transaction.nonce,
-            'block_hash': transaction.block_hash,
-            'block_number': transaction.block_number,
-            'block_timestamp': transaction.block_timestamp,
             'transaction_index': transaction.transaction_index,
             'from_address': transaction.from_address,
             'to_address': transaction.to_address,
@@ -60,8 +66,16 @@ class EthTransactionMapper(object):
             'gas': transaction.gas,
             'gas_price': transaction.gas_price,
             'input': transaction.input,
+            'receipt_cumulative_gas_used': transaction.receipt_cumulative_gas_used,
+            'receipt_gas_used': transaction.receipt_gas_used,
+            'receipt_contract_': transaction.receipt_contract_address,
+            'receipt_root': transaction.receipt_root,
+            'receipt_status': transaction.receipt_status,
+            'receipt_effective_gas_price': transaction.receipt_effective_gas_price,
+            'block_timestamp': transaction.block_timestamp,
+            'block_number': transaction.block_number,
+            'block_hash': transaction.block_hash,
             'max_fee_per_gas': transaction.max_fee_per_gas,
             'max_priority_fee_per_gas': transaction.max_priority_fee_per_gas,
-            'transaction_type': transaction.transaction_type,
-            'receipt_effective_gas_price': transaction.receipt_effective_gas_price
+            'transaction_type': transaction.transaction_type
         }

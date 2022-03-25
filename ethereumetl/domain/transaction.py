@@ -25,8 +25,6 @@ class EthTransaction(object):
     def __init__(self):
         self.hash = None
         self.nonce = None
-        self.block_hash = None
-        self.block_number = None
         self.transaction_index = None
         self.from_address = None
         self.to_address = None
@@ -34,6 +32,14 @@ class EthTransaction(object):
         self.gas = None
         self.gas_price = None
         self.input = None
+        self.receipt_cumulative_gas_used = None
+        self.receipt_gas_used = None
+        self.receipt_contract_address = None
+        self.receipt_root = None
+        self.receipt_status = None
+        self.block_timestamp = None
+        self.block_number = None
+        self.block_hash = None
         self.max_fee_per_gas = None
         self.max_priority_fee_per_gas = None
         self.transaction_type = None
