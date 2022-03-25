@@ -24,14 +24,16 @@
 import csv
 import logging
 import os
-import shutil
 from time import time
+
+from sqlalchemy.dialects.postgresql import insert
+
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
-from ethereumetl.csv_utils import set_max_field_size_limit
+from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
 from blockchainetl.file_utils import smart_open
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 from blockchainetl.jobs.exporters.converters.list_join_item_converter import ListJoinItemConverter
-from blockchainetl.jobs.exporters.converters.numeric38_converter import Numeric38Converter
+from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
@@ -43,12 +45,10 @@ from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
-from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_token_transfers, enrich_tokens, enrich_transactions
+from ethereumetl.streaming.enrich import enrich_contracts, enrich_tokens
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
-from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
-from sqlalchemy.dialects.postgresql import insert
-from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
 
 
 logger = logging.getLogger('export_all')
@@ -58,9 +58,9 @@ def is_log_filter_supported(provider_uri):
     return 'infura' not in provider_uri
 
 
-def extract_csv_column_unique(input, output, column):
+def extract_csv_column_unique(input_path, output, column):
     set_max_field_size_limit()
-    with smart_open(input, 'r') as input_file, smart_open(output, 'w') as output_file:
+    with smart_open(input_path, 'r') as input_file, smart_open(output, 'w') as output_file:
         reader = csv.DictReader(input_file)
         seen = set()  # set for fast O(1) amortized lookup
         for row in reader:
@@ -141,7 +141,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'log': insert(LOGS),
                     'token_transfer': insert(TOKEN_TRANSFERS),
                     'contract': insert(CONTRACTS),
-                    'receipt': insert(RECEIPTS),
                     'token': insert(TOKENS),
                 },
                 converters=[ListJoinItemConverter('function_sighashes', ',')]

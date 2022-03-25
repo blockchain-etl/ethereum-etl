@@ -21,26 +21,41 @@
 # SOFTWARE.
 
 
-class EthTransaction(object):
-    def __init__(self):
-        self.hash = None
-        self.nonce = None
-        self.transaction_index = None
-        self.from_address = None
-        self.to_address = None
-        self.value = None
-        self.gas = None
-        self.gas_price = None
-        self.input = None
-        self.receipt_cumulative_gas_used = None
-        self.receipt_gas_used = None
-        self.receipt_contract_address = None
-        self.receipt_root = None
-        self.receipt_status = None
-        self.block_timestamp = None
-        self.block_number = None
-        self.block_hash = None
-        self.max_fee_per_gas = None
-        self.max_priority_fee_per_gas = None
-        self.transaction_type = None
-        self.receipt_effective_gas_price = None
+from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+
+RECEIPT_FIELDS_TO_EXPORT = [
+    'transaction_hash',
+    'transaction_index',
+    'block_hash',
+    'block_number',
+    'cumulative_gas_used',
+    'gas_used',
+    'contract_address',
+    'root',
+    'status',
+    'effective_gas_price'
+]
+
+LOG_FIELDS_TO_EXPORT = [
+    'log_index',
+    'transaction_hash',
+    'transaction_index',
+    'address',
+    'data',
+    'topics',
+    'block_number',
+    'block_hash'
+]
+
+
+def receipts_and_logs_item_exporter(receipts_output=None, logs_output=None):
+    return CompositeItemExporter(
+        filename_mapping={
+            'receipt': receipts_output,
+            'log': logs_output
+        },
+        field_mapping={
+            'receipt': RECEIPT_FIELDS_TO_EXPORT,
+            'log': LOG_FIELDS_TO_EXPORT
+        }
+    )
