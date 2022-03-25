@@ -81,7 +81,6 @@ class ExportBlocksJob(BaseJob):
         results = rpc_response_batch_to_results(response)
         blocks = []
         for result in results:
-            print(result)
             if 'transactions' in result:
                 # Getting receipts to inform effective gas price
                 receipts_rpc = list(generate_get_receipt_json_rpc([tx['hash'] for tx in result['transactions']]))
@@ -89,7 +88,6 @@ class ExportBlocksJob(BaseJob):
                 transaction_results = rpc_response_batch_to_results(response)
                 for transaction, transaction_dict in zip(result['transactions'], transaction_results):
                     transaction['receipt'] = transaction_dict
-            print(result)
             blocks.append(self.block_mapper.json_dict_to_block(result))
 
         for block in blocks:
