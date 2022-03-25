@@ -28,6 +28,7 @@ class EthReceiptLog(object):
         self.transaction_index = None
         self.block_hash = None
         self.block_number = None
+        self.block_timestamp = None
         self.address = None
         self.data = None
         self.topics = []

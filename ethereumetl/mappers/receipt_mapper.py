@@ -33,7 +33,7 @@ class EthReceiptMapper(object):
         else:
             self.receipt_log_mapper = receipt_log_mapper
 
-    def json_dict_to_receipt(self, json_dict):
+    def json_dict_to_receipt(self, json_dict) -> EthReceipt:
         receipt = EthReceipt()
 
         receipt.transaction_hash = json_dict.get('transactionHash')

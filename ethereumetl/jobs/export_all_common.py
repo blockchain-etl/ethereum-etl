@@ -144,12 +144,11 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'receipt': insert(RECEIPTS),
                     'token': insert(TOKENS),
                 },
-                converters=[ListJoinItemConverter('topics', ','),
-                            ListJoinItemConverter('function_sighashes', ','),
-                            Numeric38Converter('token_transfer', 'value')]
+                converters=[ListJoinItemConverter('function_sighashes', ',')]
             )
 
-        inmemory_exporter = InMemoryItemExporter(item_types=['block', 'transaction', 'log', 'token_transfer', 'contract', 'receipt', 'token'])
+        inmemory_exporter = InMemoryItemExporter(item_types=[
+            'block', 'transaction', 'log', 'token_transfer', 'contract', 'receipt', 'token'])
 
         job = ExportBlocksJob(
             start_block=batch_start_block,

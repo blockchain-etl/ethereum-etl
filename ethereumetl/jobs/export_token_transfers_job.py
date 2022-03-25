@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
+from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor, TRANSFER_EVENT_TOPIC
@@ -76,8 +76,10 @@ class ExportTokenTransfersJob(BaseJob):
 
         event_filter = self.web3.eth.filter(filter_params)
         events = event_filter.get_all_entries()
+        blocks = {block_number: self.web3.eth.getBlock(block_number) for block_number in block_number_batch}
         for event in events:
             log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
+            log.block_timestamp = blocks[log.block_number]['timestamp']
             token_transfer = self.token_transfer_extractor.extract_transfer_from_log(log)
             if token_transfer is not None:
                 self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))

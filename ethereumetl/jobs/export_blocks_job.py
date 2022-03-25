@@ -23,13 +23,15 @@
 
 import json
 
-from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
-from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
+from ethereumetl.domain.block import EthBlock
+from ethereumetl.domain.transaction import EthTransaction
+from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
+from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc, generate_get_receipt_json_rpc
 from ethereumetl.mappers.block_mapper import EthBlockMapper
+from ethereumetl.mappers.receipt_mapper import EthReceiptMapper
 from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import rpc_response_batch_to_results, validate_range
-from ethereumetl.domain.block import EthBlock
 
 
 # Exports blocks and transactions
@@ -60,6 +62,7 @@ class ExportBlocksJob(BaseJob):
                 'At least one of export_blocks or export_transactions must be True')
 
         self.block_mapper = EthBlockMapper()
+        self.receipt_mapper = EthReceiptMapper()
         self.transaction_mapper = EthTransactionMapper()
 
     def _start(self):
@@ -82,6 +85,13 @@ class ExportBlocksJob(BaseJob):
             result) for result in results]
 
         for block in blocks:
+            # Getting receipts to inform effective gas price
+            receipts_rpc = list(generate_get_receipt_json_rpc([tx.hash for tx in block.transactions]))
+            response = self.batch_web3_provider.make_batch_request(json.dumps(receipts_rpc))
+            results = rpc_response_batch_to_results(response)
+            for transaction, result in zip(block.transactions, results):
+                transaction.receipt_effective_gas_price = self.receipt_mapper.json_dict_to_receipt(
+                    result).effective_gas_price
             self._export_block(block)
 
     def _export_block(self, block: EthBlock):

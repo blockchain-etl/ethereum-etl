@@ -20,9 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from ethereumetl.domain.token_transfer import EthTokenTransfer
+
 
 class EthTokenTransferMapper(object):
-    def token_transfer_to_dict(self, token_transfer):
+    def token_transfer_to_dict(self, token_transfer) -> EthTokenTransfer:
         return {
             'type': 'token_transfer',
             'token_address': token_transfer.token_address,
@@ -31,5 +33,7 @@ class EthTokenTransferMapper(object):
             'value': token_transfer.value,
             'transaction_hash': token_transfer.transaction_hash,
             'log_index': token_transfer.log_index,
+            'block_timestamp': token_transfer.block_timestamp,
             'block_number': token_transfer.block_number,
+            'block_hash': token_transfer.block_hash,
         }
