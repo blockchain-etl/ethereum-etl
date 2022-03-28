@@ -45,7 +45,7 @@ from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
-from ethereumetl.streaming.enrich import enrich_contracts, enrich_tokens
+from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_tokens
 from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
@@ -269,7 +269,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 export_logs=logs_file is not None)
             job.run()
             logs = inmemory_exporter.get_items('log')
-            # logs = enrich_logs(blocks, logs)
+            
+            logs = enrich_logs(blocks, logs)
             receipts_and_logs_exporters = get_multi_item_exporter([receipts_and_logs_file_exporter, postgres_exporter])
             receipts_and_logs_exporters.open()
             receipts_and_logs_exporters.export_items(inmemory_exporter.get_items('receipt'))
