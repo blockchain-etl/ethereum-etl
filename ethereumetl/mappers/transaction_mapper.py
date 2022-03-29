@@ -49,7 +49,8 @@ class EthTransactionMapper:
             transaction.receipt_cumulative_gas_used = hex_to_dec(receipt_dict.get('cumulativeGasUsed'))
             transaction.receipt_gas_used = hex_to_dec(receipt_dict.get('gasUsed'))
             transaction.receipt_contract_address = to_normalized_address(receipt_dict.get('contractAddress'))
-            transaction.receipt_root = to_normalized_address(receipt_dict.get('root'))
+            transaction.receipt_root = receipt_dict.get('root')
+            transaction.receipt_status = hex_to_dec(receipt_dict.get('status'))
             transaction.receipt_effective_gas_price = hex_to_dec(receipt_dict.get('effectiveGasPrice'))
         return transaction
 
@@ -68,7 +69,7 @@ class EthTransactionMapper:
             'input': transaction.input,
             'receipt_cumulative_gas_used': transaction.receipt_cumulative_gas_used,
             'receipt_gas_used': transaction.receipt_gas_used,
-            'receipt_contract_': transaction.receipt_contract_address,
+            'receipt_contract_address': transaction.receipt_contract_address,
             'receipt_root': transaction.receipt_root,
             'receipt_status': transaction.receipt_status,
             'receipt_effective_gas_price': transaction.receipt_effective_gas_price,
