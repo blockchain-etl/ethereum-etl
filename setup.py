@@ -48,7 +48,7 @@ setup(
             'google-cloud-pubsub==2.1.0',
             'google-cloud-storage==1.33.0',
             'kafka-python==2.0.2',
-            'sqlalchemy==1.3.13',
+            'sqlalchemy==1.4',
             'pg8000==1.13.2',
             # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust,
             # that's why  we lock the version here
