@@ -28,7 +28,7 @@ metadata = MetaData()
 
 BLOCKS = Table(
     'blocks', metadata,
-    Column('timestamp', TIMESTAMP),
+    Column('timestamp', BigInteger),
     Column('number', BigInteger),
     Column('hash', String, primary_key=True),
     Column('parent_hash', String),
@@ -65,7 +65,7 @@ TRANSACTIONS = Table(
     Column('receipt_contract_address', String),
     Column('receipt_root', String),
     Column('receipt_status', BigInteger),
-    Column('block_timestamp', TIMESTAMP),
+    Column('block_timestamp', BigInteger),
     Column('block_number', BigInteger),
     Column('block_hash', String),
     Column('max_fee_per_gas', BigInteger),
@@ -82,7 +82,7 @@ LOGS = Table(
     Column('address', String),
     Column('topics', String),
     Column('data', String),
-    Column('block_timestamp', TIMESTAMP),
+    Column('block_timestamp', BigInteger),
     Column('block_number', BigInteger),
     Column('block_hash', String),
 )
@@ -95,7 +95,7 @@ TOKEN_TRANSFERS = Table(
     Column('value', String),
     Column('transaction_hash', String, primary_key=True),
     Column('log_index', BigInteger, primary_key=True),
-    Column('block_timestamp', TIMESTAMP),
+    Column('block_timestamp', BigInteger),
     Column('block_number', BigInteger),
     Column('block_hash', String),
 )

@@ -24,6 +24,7 @@
 import csv
 import logging
 import os
+import shutil
 from time import time
 
 from sqlalchemy.dialects.postgresql import insert
@@ -33,6 +34,7 @@ from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExpo
 from blockchainetl.file_utils import smart_open
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 from blockchainetl.jobs.exporters.converters.list_join_item_converter import ListJoinItemConverter
+from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
 from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
@@ -46,7 +48,7 @@ from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_trans
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_tokens
-from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, RECEIPTS, TOKENS
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, TOKENS
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
@@ -136,12 +138,12 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         if postgres_connection_string:
             postgres_exporter = PostgresItemExporter(
                 postgres_connection_string, item_type_to_insert_stmt_mapping={
-                    'block': insert(BLOCKS),
-                    'transaction': insert(TRANSACTIONS),
-                    'log': insert(LOGS),
-                    'token_transfer': insert(TOKEN_TRANSFERS),
-                    'contract': insert(CONTRACTS),
-                    'token': insert(TOKENS),
+                    'block': create_insert_statement_for_table(BLOCKS),
+                    'transaction': create_insert_statement_for_table(TRANSACTIONS),
+                    'log': create_insert_statement_for_table(LOGS),
+                    'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
+                    'contract': create_insert_statement_for_table(CONTRACTS),
+                    'token': create_insert_statement_for_table(TOKENS),
                 },
                 converters=[ListJoinItemConverter('function_sighashes', ',')]
             )
@@ -163,7 +165,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         blocks = inmemory_exporter.get_items('block')
         transactions = inmemory_exporter.get_items('transaction')
         # transactions = enrich_transactions(blocks, transactions)
-        blocks_and_transactions_exporters = get_multi_item_exporter([blocks_and_transactions_file_exporter, postgres_exporter])
+        blocks_and_transactions_exporters = get_multi_item_exporter(
+            [blocks_and_transactions_file_exporter, postgres_exporter])
         blocks_and_transactions_exporters.open()
         blocks_and_transactions_exporters.export_items(blocks)
         blocks_and_transactions_exporters.export_items(transactions)
@@ -203,7 +206,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             job.run()
             token_transfers = inmemory_exporter.get_items('token_transfer')
             # token_transfers = enrich_token_transfers(blocks, token_transfers)
-            token_transfers_exporters = get_multi_item_exporter([token_transfers_file_exporter, postgres_exporter])
+            token_transfers_exporters = get_multi_item_exporter(
+                [token_transfers_file_exporter, postgres_exporter])
             token_transfers_exporters.open()
             token_transfers_exporters.export_items(token_transfers)
             token_transfers_exporters.close()
@@ -269,11 +273,13 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 export_logs=logs_file is not None)
             job.run()
             logs = inmemory_exporter.get_items('log')
-            
+
             logs = enrich_logs(blocks, logs)
-            receipts_and_logs_exporters = get_multi_item_exporter([receipts_and_logs_file_exporter, postgres_exporter])
+            receipts_and_logs_exporters = get_multi_item_exporter(
+                [receipts_and_logs_file_exporter, postgres_exporter])
             receipts_and_logs_exporters.open()
-            receipts_and_logs_exporters.export_items(inmemory_exporter.get_items('receipt'))
+            receipts_and_logs_exporters.export_items(
+                inmemory_exporter.get_items('receipt'))
             receipts_and_logs_exporters.export_items(logs)
             receipts_and_logs_exporters.close()
 
@@ -324,7 +330,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 for contract in contracts:
                     contract['block_number'] = blocks[0]['number']
                     contracts = enrich_contracts(blocks, contracts)
-            contracts_exporters = get_multi_item_exporter([contracts_file_exporter, postgres_exporter])
+            contracts_exporters = get_multi_item_exporter(
+                [contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
             contracts_exporters.export_items(contracts)
             contracts_exporters.close()
@@ -374,7 +381,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     for token in tokens:
                         token['block_number'] = blocks[0]['number']
                     tokens = enrich_tokens(blocks, tokens)
-                tokens_exporters = get_multi_item_exporter([tokens_file_exporter, postgres_exporter])
+                tokens_exporters = get_multi_item_exporter(
+                    [tokens_file_exporter, postgres_exporter])
                 tokens_exporters.open()
                 tokens_exporters.export_items(tokens)
                 tokens_exporters.close()
@@ -382,7 +390,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         inmemory_exporter.close()
 
         # # # finish # # #
-        # shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
+        shutil.rmtree(os.path.dirname(cache_output_dir), ignore_errors=True)
         end_time = time()
         time_diff = round(end_time - start_time, 5)
         logger.info('Exporting blocks {block_range} took {time_diff} seconds'.format(
