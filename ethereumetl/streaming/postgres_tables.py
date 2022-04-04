@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from sqlalchemy import Table, Column, Integer, BigInteger, String, Numeric, MetaData, TIMESTAMP
+from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, MetaData, TIMESTAMP
 
 metadata = MetaData()
 
@@ -126,11 +126,13 @@ TRACES = Table(
 
 CONTRACTS = Table(
     'contracts', metadata,
-    Column('address', String),
+    Column('address', String, primary_key=True),
     Column('function_sighashes', String),
-    Column('is_erc20', String),
-    Column('is_erc721', String),
+    Column('is_erc20', Boolean),
+    Column('is_erc721', Boolean),
     Column('block_number', BigInteger),
+    Column('block_timestamp', BigInteger),
+    Column('block_hash', String, primary_key=True),
 )
 
 RECEIPTS = Table(
