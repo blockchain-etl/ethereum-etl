@@ -326,12 +326,9 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             job.run()
             contracts = inmemory_exporter.get_items('contract')
             # HACKHACK: add block_number to contracts when processing a single block
-            if len(blocks) == 1:
-                for contract in contracts:
-                    contract['block_number'] = blocks[0]['number']
-                    contract['block_hash'] = blocks[0]['hash']
-                    contract['block_timestamp'] = blocks[0]['timestamp']
-                    contracts = enrich_contracts(blocks, contracts)
+            for contract in contracts:
+                contract['block_number'] = blocks[0]['number']
+                contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
                 [contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
