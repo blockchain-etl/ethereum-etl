@@ -325,11 +325,11 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 max_workers=max_workers)
             job.run()
             contracts = inmemory_exporter.get_items('contract')
-            # HACKHACK: add block_number to contracts when processing a single block
-            if len(blocks) == 1:
-                for contract in contracts:
-                    contract['block_number'] = blocks[0]['number']
-                    contracts = enrich_contracts(blocks, contracts)
+            for contract in contracts:
+                contract_block_number = next((transaction["block_number"]
+                                              for transaction in transactions if transaction["receipt_contract_address"] == contract["address"]))
+                contract['block_number'] = contract_block_number
+                contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
                 [contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
