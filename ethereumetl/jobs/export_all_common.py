@@ -329,7 +329,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 contract_block_number = next((transaction["block_number"]
                                               for transaction in transactions if transaction["receipt_contract_address"] == contract["address"]))
                 contract['block_number'] = contract_block_number
-                contracts = enrich_contracts(blocks, contracts)
+            contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
                 [contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
