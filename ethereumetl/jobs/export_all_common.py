@@ -329,6 +329,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             if len(blocks) == 1:
                 for contract in contracts:
                     contract['block_number'] = blocks[0]['number']
+                    contract['block_hash'] = blocks[0]['hash']
+                    contract['block_timestamp'] = blocks[0]['timestamp']
                     contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
                 [contracts_file_exporter, postgres_exporter])
