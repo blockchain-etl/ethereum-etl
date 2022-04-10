@@ -16,4 +16,4 @@ Read [this article](https://medium.com/google-cloud/building-token-recommender-i
 
 ### Awesome BigQuery Views
 
-https://github.com/blockchain-etl/awesome-bigquery-views
+[https://github.com/blockchain-etl/awesome-bigquery-views](https://github.com/blockchain-etl/awesome-bigquery-views)
