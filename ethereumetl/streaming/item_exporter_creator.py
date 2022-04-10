@@ -88,6 +88,17 @@ def create_item_exporter(output):
             'contract': 'contracts',
             'token': 'tokens',
         })
+    elif item_exporter_type == ItemExporterType.PULSAR:
+        from blockchainetl.jobs.exporters.pulsar_exporter import PulsarItemExporter
+        item_exporter = PulsarItemExporter(output, item_type_to_topic_mapping={
+            'block': 'blocks',
+            'transaction': 'transactions',
+            'log': 'logs',
+            'token_transfer': 'token-transfers',
+            'trace': 'traces',
+            'contract': 'contracts',
+            'token': 'tokens',
+        })
 
     else:
         raise ValueError('Unable to determine item exporter type for output ' + output)
@@ -113,6 +124,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.KAFKA
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
+    elif output is not None and output.startswith('pulsar'):
+            return ItemExporterType.PULSAR
     elif output is not None and output.startswith('gs://'):
         return ItemExporterType.GCS
     elif output is None or output == 'console':
@@ -128,3 +141,4 @@ class ItemExporterType:
     CONSOLE = 'console'
     KAFKA = 'kafka'
     UNKNOWN = 'unknown'
+    PULSAR = 'pulsar'
