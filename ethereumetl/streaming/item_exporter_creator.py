@@ -24,14 +24,14 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 
 
-def create_item_exporters(outputs, token):
+def create_item_exporters(outputs, token, topic_prefix):
     split_outputs = [output.strip() for output in outputs.split(',')] if outputs else ['console']
 
-    item_exporters = [create_item_exporter(output, token) for output in split_outputs]
+    item_exporters = [create_item_exporter(output, token, topic_prefix) for output in split_outputs]
     return MultiItemExporter(item_exporters)
 
 
-def create_item_exporter(output, token):
+def create_item_exporter(output, token, topic_prefix):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
@@ -92,13 +92,13 @@ def create_item_exporter(output, token):
     elif item_exporter_type == ItemExporterType.PULSAR:
         from blockchainetl.jobs.exporters.pulsar_exporter import PulsarItemExporter
         item_exporter = PulsarItemExporter(output, token, item_type_to_topic_mapping={
-            'block': 'persistent://eth-etl/default/blocks',
-            'transaction': 'persistent://eth-etl/default/transactions',
-            'log': 'persistent://eth-etl/default/logs',
-            'token_transfer': 'persistent://eth-etl/default/token-transfers',
-            'trace': 'persistent://eth-etl/default/traces',
-            'contract': 'persistent://eth-etl/default/contracts',
-            'token': 'persistent://eth-etl/default/tokens',
+            'block': topic_prefix + '/blocks',
+            'transaction': topic_prefix + '/transactions',
+            'log': topic_prefix + '/logs',
+            'token_transfer': topic_prefix + '/token-transfers',
+            'trace': topic_prefix + '/traces',
+            'contract': topic_prefix + '/contracts',
+            'token': topic_prefix + '/tokens',
         })
 
     else:
