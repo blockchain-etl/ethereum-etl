@@ -24,14 +24,14 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 
 
-def create_item_exporters(outputs):
+def create_item_exporters(outputs, token):
     split_outputs = [output.strip() for output in outputs.split(',')] if outputs else ['console']
 
-    item_exporters = [create_item_exporter(output) for output in split_outputs]
+    item_exporters = [create_item_exporter(output, token) for output in split_outputs]
     return MultiItemExporter(item_exporters)
 
 
-def create_item_exporter(output):
+def create_item_exporter(output, token):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
@@ -57,7 +57,8 @@ def create_item_exporter(output):
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
         from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
-        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, \
+            CONTRACTS
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
@@ -90,14 +91,14 @@ def create_item_exporter(output):
         })
     elif item_exporter_type == ItemExporterType.PULSAR:
         from blockchainetl.jobs.exporters.pulsar_exporter import PulsarItemExporter
-        item_exporter = PulsarItemExporter(output, item_type_to_topic_mapping={
-            'block': 'blocks',
-            'transaction': 'transactions',
-            'log': 'logs',
-            'token_transfer': 'token-transfers',
-            'trace': 'traces',
-            'contract': 'contracts',
-            'token': 'tokens',
+        item_exporter = PulsarItemExporter(output, token, item_type_to_topic_mapping={
+            'block': 'persistent://eth-etl/default/blocks',
+            'transaction': 'persistent://eth-etl/default/transactions',
+            'log': 'persistent://eth-etl/default/logs',
+            'token_transfer': 'persistent://eth-etl/default/token-transfers',
+            'trace': 'persistent://eth-etl/default/traces',
+            'contract': 'persistent://eth-etl/default/contracts',
+            'token': 'persistent://eth-etl/default/tokens',
         })
 
     else:
@@ -125,7 +126,7 @@ def determine_item_exporter_type(output):
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
     elif output is not None and output.startswith('pulsar'):
-            return ItemExporterType.PULSAR
+        return ItemExporterType.PULSAR
     elif output is not None and output.startswith('gs://'):
         return ItemExporterType.GCS
     elif output is None or output == 'console':
@@ -140,5 +141,5 @@ class ItemExporterType:
     GCS = 'gcs'
     CONSOLE = 'console'
     KAFKA = 'kafka'
-    UNKNOWN = 'unknown'
     PULSAR = 'pulsar'
+    UNKNOWN = 'unknown'
