@@ -14,6 +14,10 @@ class PulsarItemExporter:
         self.connection_url = self.get_connection_url(output)
         self.token = self.get_connection_token(token)
         self.client = pulsar.Client(self.connection_url, authentication=pulsar.AuthenticationToken(self.token))
+        self.producer_map = {}
+
+        for item_type in self.item_type_to_topic_mapping:
+            self.producer_map[item_type] = self.client.create_producer(topic=item_type_to_topic_mapping[item_type])
 
     def get_connection_url(self, output):
         try:
@@ -37,12 +41,8 @@ class PulsarItemExporter:
     def export_item(self, item):
         item_type = item.get('type')
         if item_type is not None and item_type in self.item_type_to_topic_mapping:
-            producer_endpoint = self.item_type_to_topic_mapping[item_type]
             data = json.dumps(item).encode('utf-8')
-            producer = self.client.create_producer(
-                topic=producer_endpoint
-            )
-            return producer.send(data)
+            return self.producer_map[item_type].send(data)
         else:
             logging.warning('Topic for item type "{}" is not configured.'.format(item_type))
 

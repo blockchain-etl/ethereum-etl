@@ -45,7 +45,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
                    'If not specified will print to console')
 @click.option('-t', '--token', type=str,
               help='A token must be provided if output is set for Pulsar')
-@click.option('-tp', '--topic-profix', type=str,
+@click.option('-tp', '--topic-prefix', type=str,
               help='A topic prefix must be set for Pulsar')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
