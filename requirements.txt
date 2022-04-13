@@ -1,8 +1,0 @@
-web3~=4.7.2
-python-dateutil~=2.8.2
-setuptools~=60.2.0
-click~=7.1.2
-requests~=2.27.1
-base58~=2.1.1
-six~=1.16.0
-pulsar~=2.7.0
