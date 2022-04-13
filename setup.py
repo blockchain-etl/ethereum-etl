@@ -47,7 +47,7 @@ setup(
             'timeout-decorator==0.4.1',
             'google-cloud-pubsub==2.1.0',
             'google-cloud-storage==1.33.0',
-            'pulsar==2.7.0',
+            'pulsar-client==2.10.0',
             'kafka-python==2.0.2',
             'sqlalchemy==1.4',
             'pg8000==1.13.2',
