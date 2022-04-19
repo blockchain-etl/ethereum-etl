@@ -142,8 +142,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'transaction': create_insert_statement_for_table(TRANSACTIONS),
                     'log': create_insert_statement_for_table(LOGS),
                     'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
-                    'contract': create_insert_statement_for_table(CONTRACTS),
-                    'token': create_insert_statement_for_table(TOKENS),
+                    #'contract': create_insert_statement_for_table(CONTRACTS),
+                    #'token': create_insert_statement_for_table(TOKENS),
                 },
                 converters=[ListJoinItemConverter('function_sighashes', ',')]
             )
@@ -331,7 +331,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 contract['block_number'] = contract_block_number
             contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
-                [contracts_file_exporter, postgres_exporter])
+                [contracts_file_exporter])
             contracts_exporters.open()
             contracts_exporters.export_items(contracts)
             contracts_exporters.close()
@@ -382,7 +382,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                         token['block_number'] = blocks[0]['number']
                     tokens = enrich_tokens(blocks, tokens)
                 tokens_exporters = get_multi_item_exporter(
-                    [tokens_file_exporter, postgres_exporter])
+                    [tokens_file_exporter])
                 tokens_exporters.open()
                 tokens_exporters.export_items(tokens)
                 tokens_exporters.close()
