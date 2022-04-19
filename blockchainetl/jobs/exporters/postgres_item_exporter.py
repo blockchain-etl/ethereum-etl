@@ -51,7 +51,11 @@ class PostgresItemExporter:
             if item_group:
                 connection = self.engine.connect()
                 converted_items = list(self.convert_items(item_group))
-                connection.execute(insert_stmt, converted_items)
+                if type(insert_stmt) == list:
+                    for insert in insert_stmt:
+                        connection.execute(insert, converted_items)
+                else:
+                    connection.execute(insert_stmt, converted_items)
 
     def convert_items(self, items):
         for item in items:

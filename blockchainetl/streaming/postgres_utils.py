@@ -9,7 +9,8 @@ def create_insert_statement_for_table(table):
         insert_stmt = insert_stmt.on_conflict_do_update(
             index_elements=primary_key_fields,
             set_={
-                column.name: insert_stmt.excluded[column.name] for column in table.columns if not column.primary_key
+                column.name: insert_stmt.excluded[column.name] for column in table.columns 
+                                if not column.primary_key and not ("immutable" in column.info and column.info["immutable"])
             }
         )
 

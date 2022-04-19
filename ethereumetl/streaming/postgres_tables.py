@@ -124,15 +124,16 @@ TRACES = Table(
     Column('trace_id', String, primary_key=True),
 )
 
-CONTRACTS = Table(
-    'contracts', metadata,
+CONTRACT_CREATIONS = Table(
+    'contract_creations', metadata,
     Column('address', String, primary_key=True),
+    Column('bytecode', String),
     Column('function_sighashes', String),
     Column('is_erc20', Boolean),
     Column('is_erc721', Boolean),
     Column('block_number', BigInteger),
     Column('block_timestamp', BigInteger),
-    Column('block_hash', String, primary_key=True),
+    Column('block_hash', String),
 )
 
 RECEIPTS = Table(
@@ -151,10 +152,27 @@ RECEIPTS = Table(
 
 TOKENS = Table(
     'tokens', metadata,
-    Column('address', String),
+    Column('address', String, primary_key=True),
+    Column('name', String),
+    Column('symbol', String),
+    Column('decimals', Integer),
+    Column('total_supply', String),
+    Column('block_number', BigInteger, info={"immutable": True}),
+    Column('block_timestamp', BigInteger, info={"immutable": True}),
+    Column('block_hash', String, info={"immutable": True}),
+    Column('updated_block_number', BigInteger),
+    Column('updated_block_timestamp', BigInteger),
+    Column('updated_block_hash', String),
+)
+
+TOKEN_UPDATES = Table(
+    'token_updates', metadata,
+    Column('address', String, primary_key=True),
     Column('name', String),
     Column('symbol', String),
     Column('decimals', Integer),
     Column('total_supply', String),
     Column('block_number', BigInteger),
+    Column('block_timestamp', BigInteger),
+    Column('block_hash', String, primary_key=True),
 )

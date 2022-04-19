@@ -48,7 +48,7 @@ from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_trans
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_tokens
-from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, TOKENS
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACT_CREATIONS, TOKENS, TOKEN_UPDATES
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
@@ -60,7 +60,7 @@ def is_log_filter_supported(provider_uri):
     return 'infura' not in provider_uri
 
 
-def extract_csv_column_unique(input_path, output, column):
+def extract_csv_column_unique(input_path, output, column, other_columns = None):
     set_max_field_size_limit()
     with smart_open(input_path, 'r') as input_file, smart_open(output, 'w') as output_file:
         reader = csv.DictReader(input_file)
@@ -69,7 +69,12 @@ def extract_csv_column_unique(input_path, output, column):
             if row[column] in seen:
                 continue
             seen.add(row[column])
-            output_file.write(row[column] + '\n')
+
+            output = row[column]
+            if other_columns:
+                for other_column in other_columns:
+                    output = output + "," + row[other_column]
+            output_file.write(output + '\n')
 
 
 def get_multi_item_exporter(item_exporters: list):
@@ -142,10 +147,9 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'transaction': create_insert_statement_for_table(TRANSACTIONS),
                     'log': create_insert_statement_for_table(LOGS),
                     'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
-                    #'contract': create_insert_statement_for_table(CONTRACTS),
-                    #'token': create_insert_statement_for_table(TOKENS),
+                    'contract': create_insert_statement_for_table(CONTRACT_CREATIONS),
+                    'token': [create_insert_statement_for_table(TOKENS), create_insert_statement_for_table(TOKEN_UPDATES)],
                 },
-                converters=[ListJoinItemConverter('function_sighashes', ',')]
             )
 
         inmemory_exporter = InMemoryItemExporter(item_types=[
@@ -331,7 +335,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 contract['block_number'] = contract_block_number
             contracts = enrich_contracts(blocks, contracts)
             contracts_exporters = get_multi_item_exporter(
-                [contracts_file_exporter])
+                [contracts_file_exporter, postgres_exporter])
             contracts_exporters.open()
             contracts_exporters.export_items(contracts)
             contracts_exporters.close()
@@ -347,7 +351,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 token_transfers_file=token_transfers_file,
             ))
             extract_csv_column_unique(
-                token_transfers_file, token_addresses_file, 'token_address')
+                token_transfers_file, token_addresses_file, 'token_address', ['block_number'])
 
             tokens_output_dir = '{output_dir}/tokens{partition_dir}'.format(
                 output_dir=output_dir,
@@ -367,22 +371,23 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             with smart_open(token_addresses_file, 'r') as token_addresses:
                 tokens_file_exporter = tokens_item_exporter(tokens_file)
 
+                token_addresses_iterable = csv.DictReader(token_addresses, fieldnames=["token_address", "block_number"])
+
                 job = ExportTokensJob(
-                    token_addresses_iterable=(
-                        token_address.strip() for token_address in token_addresses),
+                    token_addresses_iterable=token_addresses_iterable,
                     web3=ThreadLocalProxy(lambda: build_web3(
                         get_provider_from_uri(provider_uri))),
                     item_exporter=inmemory_exporter,
                     max_workers=max_workers)
                 job.run()
                 tokens = inmemory_exporter.get_items('token')
-                # HACKHACK: add block_number to tokens when processing a single block
-                if len(blocks) == 1:
-                    for token in tokens:
-                        token['block_number'] = blocks[0]['number']
-                    tokens = enrich_tokens(blocks, tokens)
+                tokens = enrich_tokens(blocks, tokens)
+                for token in tokens:
+                    token["updated_block_number"] = token["block_number"]
+                    token["updated_block_timestamp"] = token["block_timestamp"]
+                    token["updated_block_hash"] = token["block_hash"]
                 tokens_exporters = get_multi_item_exporter(
-                    [tokens_file_exporter])
+                    [tokens_file_exporter, postgres_exporter])
                 tokens_exporters.open()
                 tokens_exporters.export_items(tokens)
                 tokens_exporters.close()
