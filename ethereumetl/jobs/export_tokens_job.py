@@ -44,7 +44,10 @@ class ExportTokensJob(BaseJob):
 
     def _export_tokens(self, token_addresses):
         for token_address in token_addresses:
-            self._export_token(token_address)
+            if type(token_address) is dict:
+                self._export_token(token_address["token_address"], int(token_address["block_number"]))
+            else:
+                self._export_token(token_address)
 
     def _export_token(self, token_address, block_number=None):
         token = self.token_service.get_token(token_address)
