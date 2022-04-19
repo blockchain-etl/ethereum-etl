@@ -48,7 +48,7 @@ from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_trans
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_tokens
-from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACTS, TOKENS, TOKEN_UPDATES
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACT_CREATIONS, TOKENS, TOKEN_UPDATES
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
@@ -147,7 +147,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'transaction': create_insert_statement_for_table(TRANSACTIONS),
                     'log': create_insert_statement_for_table(LOGS),
                     'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
-                    'contract': create_insert_statement_for_table(CONTRACTS),
+                    'contract': create_insert_statement_for_table(CONTRACT_CREATIONS),
                     'token': [create_insert_statement_for_table(TOKENS), create_insert_statement_for_table(TOKEN_UPDATES)],
                 },
             )
@@ -383,9 +383,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 tokens = inmemory_exporter.get_items('token')
                 tokens = enrich_tokens(blocks, tokens)
                 for token in tokens:
-                    token["creation_block_number"] = token["block_number"]
-                    token["creation_block_timestamp"] = token["block_timestamp"]
-                    token["creation_block_hash"] = token["block_hash"]
                     token["updated_block_number"] = token["block_number"]
                     token["updated_block_timestamp"] = token["block_timestamp"]
                     token["updated_block_hash"] = token["block_hash"]
