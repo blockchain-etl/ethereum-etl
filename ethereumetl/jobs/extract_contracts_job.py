@@ -53,21 +53,33 @@ class ExtractContractsJob(BaseJob):
         self.batch_work_executor.execute(self.traces_iterable, self._extract_contracts)
 
     def _extract_contracts(self, traces):
-        for trace in traces:
-            trace['status'] = to_int_or_none(trace.get('status'))
-            trace['block_number'] = to_int_or_none(trace.get('block_number'))
+        ## TODO: take into account receipt to see if transaction failed or not
+        contract_creation_traces = []
+        def process_call(transaction_trace, block_number):
+            if "calls" in transaction_trace:
+                for sub_call in transaction_trace["calls"]:
+                    process_call(sub_call, block_number)
 
-        contract_creation_traces = [trace for trace in traces
-                                    if trace.get('trace_type') == 'create' and trace.get('to_address') is not None
-                                    and len(trace.get('to_address')) > 0 and trace.get('status') == 1]
+            # CREATE vs CREATE2: https://blog.cotten.io/ethereums-eip-1014-create-2-d17b1a184498
+            if transaction_trace["type"].lower() == "create" or \
+               transaction_trace["type"].lower() == "create2":
+                if len(transaction_trace["to"]) == 0:
+                    return
+                transaction_trace["block_number"] = block_number
+                contract_creation_traces.append(transaction_trace)
+
+        for geth_block_trace in traces:
+            trace_block_number = geth_block_trace["block_number"]
+            for transaction_trace in geth_block_trace["transaction_traces"]:
+                process_call(transaction_trace, trace_block_number)
 
         contracts = []
         for trace in contract_creation_traces:
             contract = EthContract()
-            contract.address = trace.get('to_address')
-            bytecode = trace.get('output')
+            contract.address = trace["to"]
+            bytecode = trace['output']
             contract.bytecode = bytecode
-            contract.block_number = trace.get('block_number')
+            contract.block_number = trace['block_number']
 
             function_sighashes = self.contract_service.get_function_sighashes(bytecode)
 
