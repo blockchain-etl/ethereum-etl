@@ -53,16 +53,18 @@ class ExtractContractsJob(BaseJob):
         self.batch_work_executor.execute(self.traces_iterable, self._extract_contracts)
 
     def _extract_contracts(self, traces):
-        ## TODO: take into account receipt to see if transaction failed or not
         contract_creation_traces = []
+
+        # Geth returns traces as a tree starting with the top-level transactions
         def process_call(transaction_trace, block_number):
             if "calls" in transaction_trace:
                 for sub_call in transaction_trace["calls"]:
                     process_call(sub_call, block_number)
 
             # CREATE vs CREATE2: https://blog.cotten.io/ethereums-eip-1014-create-2-d17b1a184498
-            if transaction_trace["type"].lower() == "create" or \
-               transaction_trace["type"].lower() == "create2":
+            if transaction_trace["type"].lower() == "create" or transaction_trace["type"].lower() == "create2":
+                if "error" in transaction_trace:
+                    return
                 if len(transaction_trace["to"]) == 0:
                     return
                 transaction_trace["block_number"] = block_number
