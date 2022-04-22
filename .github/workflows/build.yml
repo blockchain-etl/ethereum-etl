@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    branches:
+      - trunk
+      - develop
+      - release-*
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - trunk
+      - develop
+      - release-*
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: Build a binary wheel and a source tarball
+        run: python setup.py sdist
