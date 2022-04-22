@@ -1,8 +1,6 @@
 web3==5.29.0
 eth-utils==1.10.0
 eth-abi==2.1.1
-# TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
-python-dateutil==2.8.1
 click==8.1.2
 ethereum-dasm==0.1.5
 base58
