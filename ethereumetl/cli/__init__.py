@@ -46,7 +46,7 @@ logging_basic_config()
 
 
 @click.group()
-@click.version_option(version='1.10.1-spicehq/release/v1.0.12')
+@click.version_option(version='1.11.0-spicehq/release/v1.0.12')
 @click.pass_context
 def cli(ctx):
     pass

@@ -6,6 +6,7 @@
         "blockNumber": "0x1ac9f3",
         "contractAddress": null,
         "cumulativeGasUsed": "0xe04a",
+        "effectiveGasPrice": "0x4a817c800",
         "from": "0x3763e6e1228bfeab94191c856412d1bb0a8e6996",
         "gasUsed": "0x5208",
         "logs": [],

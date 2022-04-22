@@ -91,7 +91,7 @@ For the latest version, check out the repo and call
 
 ## Running in Docker
 
-1. Install Docker: https://docs.docker.com/install/
+1. Install Docker: https://docs.docker.com/get-docker/
 
 2. Build a docker image
         
