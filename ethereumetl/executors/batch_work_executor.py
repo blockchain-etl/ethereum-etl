@@ -24,7 +24,7 @@ import logging
 import time
 
 from requests.exceptions import Timeout as RequestsTimeout, HTTPError, TooManyRedirects
-from web3.utils.threads import Timeout as Web3Timeout
+from web3._utils.threads import Timeout as Web3Timeout
 
 from ethereumetl.executors.bounded_executor import BoundedExecutor
 from ethereumetl.executors.fail_safe_executor import FailSafeExecutor
