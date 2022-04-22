@@ -11,7 +11,7 @@ long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 setup(
     name='ethereum-etl',
-    version='1.10.1',
+    version='1.11.0',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
     description='Tools for exporting Ethereum blockchain data to CSV or JSON',
@@ -48,7 +48,7 @@ setup(
             'google-cloud-pubsub==2.1.0',
             'google-cloud-storage==1.33.0',
             'kafka-python==2.0.2',
-            'sqlalchemy==1.3.13',
+            'sqlalchemy==1.4',
             'pg8000==1.13.2',
             # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust,
             # that's why  we lock the version here

@@ -20,7 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, MetaData, TIMESTAMP
+from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, \
+    MetaData, PrimaryKeyConstraint, VARCHAR, TIMESTAMP
+from sqlalchemy.dialects.postgresql import ARRAY
 
 metadata = MetaData()
 
