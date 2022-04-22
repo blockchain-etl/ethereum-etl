@@ -2,11 +2,23 @@ name: build
 
 on:
   push:
+    branches:
+      - trunk
+      - develop
+      - release-*
     tags:
       - '*'
+  pull_request:
+    branches:
+      - trunk
+      - develop
+      - release-*
+
+  workflow_dispatch:
 
 jobs:
-  build-n-publish:
+  build:
+    runs-on: ubuntu-latest
     name: Build
     steps:
       - uses: actions/checkout@v3
