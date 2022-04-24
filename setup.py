@@ -29,7 +29,7 @@ setup(
         'Programming Language :: Python :: 3.9'
     ],
     keywords='ethereum',
-    python_requires='>=3.7,<4',
+    python_requires='>=3.7.2,<4',
     install_requires=[
         'web3>=5.29,<6',
         'eth-utils==1.10',
