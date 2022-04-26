@@ -155,6 +155,7 @@ RECEIPTS = Table(
 TOKENS = Table(
     'tokens', metadata,
     Column('address', String, primary_key=True),
+    Column('token_id', String, primary_key=True),
     Column('name', String),
     Column('symbol', String),
     Column('decimals', Integer),
