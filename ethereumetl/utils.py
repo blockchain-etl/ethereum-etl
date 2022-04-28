@@ -25,6 +25,7 @@ import itertools
 import warnings
 
 from ethereumetl.misc.retriable_value_error import RetriableValueError
+from ethereumetl.misc.historical_stata_unavailable_error import HistoricalStateUnavailableError
 
 
 def hex_to_dec(hex_string):
@@ -80,6 +81,8 @@ def rpc_response_to_result(response):
             # When nodes are behind a load balancer it makes sense to retry the request in hopes it will go to other,
             # synced node
             raise RetriableValueError(error_message)
+        elif response.get('error') is not None and response.get('error').get('message').startswith("required historical state unavailable"):
+            raise HistoricalStateUnavailableError(error_message)
         elif response.get('error') is not None and is_retriable_error(response.get('error').get('code')):
             raise RetriableValueError(error_message)
         raise ValueError(error_message)

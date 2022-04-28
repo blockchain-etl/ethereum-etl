@@ -1,0 +1,2 @@
+class HistoricalStateUnavailableError(Exception):
+  pass
