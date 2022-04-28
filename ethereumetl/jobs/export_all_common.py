@@ -308,23 +308,23 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         except HistoricalStateUnavailableError:
             geth_traces_available = False
 
+        contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
+            output_dir=output_dir,
+            partition_dir=partition_dir,
+        )
+        os.makedirs(os.path.dirname(contracts_output_dir), exist_ok=True)
+
+        contracts_file = '{contracts_output_dir}/contracts_{file_name_suffix}.csv'.format(
+            contracts_output_dir=contracts_output_dir,
+            file_name_suffix=file_name_suffix,
+        )
+        logger.info('Exporting contracts from blocks {block_range} to {contracts_file}'.format(
+            block_range=block_range,
+            contracts_file=contracts_file,
+        ))
+
         if geth_traces_available:
             # # # contracts (geth traces) # # #
-            contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
-                output_dir=output_dir,
-                partition_dir=partition_dir,
-            )
-            os.makedirs(os.path.dirname(contracts_output_dir), exist_ok=True)
-
-            contracts_file = '{contracts_output_dir}/contracts_{file_name_suffix}.csv'.format(
-                contracts_output_dir=contracts_output_dir,
-                file_name_suffix=file_name_suffix,
-            )
-            logger.info('Exporting contracts from blocks {block_range} to {contracts_file}'.format(
-                block_range=block_range,
-                contracts_file=contracts_file,
-            ))
-
             contracts_file_exporter = contracts_item_exporter(contracts_file)
 
             geth_traces = inmemory_exporter.get_items('geth_trace')
@@ -354,21 +354,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             ))
             extract_csv_column_unique(
                 receipts_file, contract_addresses_file, 'contract_address')
-
-            contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
-                output_dir=output_dir,
-                partition_dir=partition_dir,
-            )
-            os.makedirs(os.path.dirname(contracts_output_dir), exist_ok=True)
-
-            contracts_file = '{contracts_output_dir}/contracts_{file_name_suffix}.csv'.format(
-                contracts_output_dir=contracts_output_dir,
-                file_name_suffix=file_name_suffix,
-            )
-            logger.info('Exporting contracts from blocks {block_range} to {contracts_file}'.format(
-                block_range=block_range,
-                contracts_file=contracts_file,
-            ))
 
             with smart_open(contract_addresses_file, 'r') as contract_addresses_file:
                 contracts_file_exporter = contracts_item_exporter(contracts_file)
