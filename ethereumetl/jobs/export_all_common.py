@@ -424,7 +424,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 tokens = inmemory_exporter.get_items('token')
                 tokens = enrich_tokens(blocks, tokens)
                 for token in tokens:
-                    token["token_id"] = token["address"]
                     token["updated_block_number"] = token["block_number"]
                     token["updated_block_timestamp"] = token["block_timestamp"]
                     token["updated_block_hash"] = token["block_hash"]
