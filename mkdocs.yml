@@ -16,3 +16,4 @@ nav:
     - Citing: citing.md
 theme: readthedocs
 repo_url: https://github.com/blockchain-etl/ethereum-etl/
+edit_uri: edit/develop/docs
