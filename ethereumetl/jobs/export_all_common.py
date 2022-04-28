@@ -38,6 +38,7 @@ from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
+from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
@@ -49,6 +50,7 @@ from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_t
 from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACT_CREATIONS, TOKENS, TOKEN_UPDATES
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
+from ethereumetl.misc.historical_stata_unavailable_error import HistoricalStateUnavailableError
 
 
 logger = logging.getLogger('export_all')
@@ -291,6 +293,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             block_range=block_range
         ))
 
+        geth_traces_available = True
         job = ExportGethTracesJob(
             start_block=batch_start_block,
             end_block=batch_end_block,
@@ -300,9 +303,10 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             max_workers=max_workers,
             item_exporter=inmemory_exporter
         )
-        job.run()
-
-        # # # contracts # # #
+        try:
+            job.run()
+        except HistoricalStateUnavailableError:
+            geth_traces_available = False
 
         contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
             output_dir=output_dir,
@@ -319,23 +323,63 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
             contracts_file=contracts_file,
         ))
 
-        contracts_file_exporter = contracts_item_exporter(contracts_file)
+        if geth_traces_available:
+            # # # contracts (geth traces) # # #
+            contracts_file_exporter = contracts_item_exporter(contracts_file)
 
-        geth_traces = inmemory_exporter.get_items('geth_trace')
+            geth_traces = inmemory_exporter.get_items('geth_trace')
 
-        job = ExtractContractsJob(
-            traces_iterable=geth_traces,
-            batch_size=batch_size,
-            item_exporter=inmemory_exporter,
-            max_workers=max_workers)
-        job.run()
-        contracts = inmemory_exporter.get_items('contract')
-        contracts = enrich_contracts(blocks, contracts)
-        contracts_exporters = get_multi_item_exporter(
-            [contracts_file_exporter, postgres_exporter])
-        contracts_exporters.open()
-        contracts_exporters.export_items(contracts)
-        contracts_exporters.close()
+            job = ExtractContractsJob(
+                traces_iterable=geth_traces,
+                batch_size=batch_size,
+                item_exporter=inmemory_exporter,
+                max_workers=max_workers)
+            job.run()
+            contracts = inmemory_exporter.get_items('contract')
+            contracts = enrich_contracts(blocks, contracts)
+            contracts_exporters = get_multi_item_exporter(
+                [contracts_file_exporter, postgres_exporter])
+            contracts_exporters.open()
+            contracts_exporters.export_items(contracts)
+            contracts_exporters.close()
+
+        else:
+            # # # contracts (no-geth traces) # # #
+            contract_addresses_file = '{cache_output_dir}/contract_addresses_{file_name_suffix}.csv'.format(
+                cache_output_dir=cache_output_dir,
+                file_name_suffix=file_name_suffix,
+            )
+            logger.info('Extracting contract_address from receipt file {receipts_file}'.format(
+                receipts_file=receipts_file
+            ))
+            extract_csv_column_unique(
+                receipts_file, contract_addresses_file, 'contract_address')
+
+            with smart_open(contract_addresses_file, 'r') as contract_addresses_file:
+                contracts_file_exporter = contracts_item_exporter(contracts_file)
+
+                contract_addresses = (contract_address.strip() for contract_address in contract_addresses_file
+                                    if contract_address.strip())
+
+                job = ExportContractsJob(
+                    contract_addresses_iterable=contract_addresses,
+                    batch_size=batch_size,
+                    batch_web3_provider=ThreadLocalProxy(
+                        lambda: get_provider_from_uri(provider_uri, batch=True)),
+                    item_exporter=inmemory_exporter,
+                    max_workers=max_workers)
+                job.run()
+                contracts = inmemory_exporter.get_items('contract')
+                for contract in contracts:
+                    contract_block_number = next((transaction["block_number"]
+                                                for transaction in transactions if transaction["receipt_contract_address"] == contract["address"]))
+                    contract['block_number'] = contract_block_number
+                contracts = enrich_contracts(blocks, contracts)
+                contracts_exporters = get_multi_item_exporter(
+                    [contracts_file_exporter, postgres_exporter])
+                contracts_exporters.open()
+                contracts_exporters.export_items(contracts)
+                contracts_exporters.close()
 
         # # # tokens # # #
 
@@ -380,6 +424,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 tokens = inmemory_exporter.get_items('token')
                 tokens = enrich_tokens(blocks, tokens)
                 for token in tokens:
+                    token["token_id"] = token["address"]
                     token["updated_block_number"] = token["block_number"]
                     token["updated_block_timestamp"] = token["block_timestamp"]
                     token["updated_block_hash"] = token["block_hash"]
