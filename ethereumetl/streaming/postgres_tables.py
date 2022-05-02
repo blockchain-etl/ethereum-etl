@@ -166,15 +166,3 @@ TOKENS = Table(
     Column('updated_block_timestamp', BigInteger),
     Column('updated_block_hash', String),
 )
-
-TOKEN_UPDATES = Table(
-    'token_updates', metadata,
-    Column('address', String, primary_key=True),
-    Column('name', String),
-    Column('symbol', String),
-    Column('decimals', Integer),
-    Column('total_supply', String),
-    Column('block_number', BigInteger),
-    Column('block_timestamp', BigInteger),
-    Column('block_hash', String, primary_key=True),
-)
