@@ -47,7 +47,7 @@ from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.enrich import enrich_contracts, enrich_logs, enrich_tokens
-from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACT_CREATIONS, TOKENS, TOKEN_UPDATES
+from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, CONTRACT_CREATIONS, TOKENS
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 from ethereumetl.misc.historical_stata_unavailable_error import HistoricalStateUnavailableError
@@ -148,7 +148,7 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'log': create_insert_statement_for_table(LOGS),
                     'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
                     'contract': create_insert_statement_for_table(CONTRACT_CREATIONS),
-                    'token': [create_insert_statement_for_table(TOKENS), create_insert_statement_for_table(TOKEN_UPDATES)],
+                    'token': create_insert_statement_for_table(TOKENS),
                 },
             )
 
