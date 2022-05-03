@@ -27,6 +27,8 @@ import os
 import shutil
 from time import time
 
+from requests import HTTPError
+
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
 from blockchainetl.file_utils import smart_open
@@ -306,6 +308,8 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
         try:
             job.run()
         except HistoricalStateUnavailableError:
+            geth_traces_available = False
+        except HTTPError:
             geth_traces_available = False
 
         contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
