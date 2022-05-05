@@ -89,7 +89,7 @@ def get_multi_item_exporter(item_exporters: list):
     return MultiItemExporter(valid_item_exporters)
 
 
-def export_all_common(partitions, output_dir, postgres_connection_string, provider_uri, max_workers, batch_size):
+def export_all_common(partitions, output_dir, postgres_connection_string, provider_uri, max_workers, batch_size, skip_geth_traces):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
         # # # start # # #
@@ -291,26 +291,28 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
 
         # # # geth traces # # #
 
-        logger.info('Exporting geth traces from blocks {block_range}'.format(
-            block_range=block_range
-        ))
+        geth_traces_available = False
+        if not skip_geth_traces:
+            logger.info('Exporting geth traces from blocks {block_range}'.format(
+                block_range=block_range
+            ))
 
-        geth_traces_available = True
-        job = ExportGethTracesJob(
-            start_block=batch_start_block,
-            end_block=batch_end_block,
-            batch_size=batch_size,
-            batch_web3_provider=ThreadLocalProxy(
-                    lambda: get_provider_from_uri(provider_uri, batch=True)),
-            max_workers=max_workers,
-            item_exporter=inmemory_exporter
-        )
-        try:
-            job.run()
-        except HistoricalStateUnavailableError:
-            geth_traces_available = False
-        except HTTPError:
-            geth_traces_available = False
+            geth_traces_available = True
+            job = ExportGethTracesJob(
+                start_block=batch_start_block,
+                end_block=batch_end_block,
+                batch_size=batch_size,
+                batch_web3_provider=ThreadLocalProxy(
+                        lambda: get_provider_from_uri(provider_uri, batch=True)),
+                max_workers=max_workers,
+                item_exporter=inmemory_exporter
+            )
+            try:
+                job.run()
+            except HistoricalStateUnavailableError:
+                geth_traces_available = False
+            except HTTPError:
+                geth_traces_available = False
 
         contracts_output_dir = '{output_dir}/contracts{partition_dir}'.format(
             output_dir=output_dir,

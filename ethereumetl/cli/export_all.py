@@ -119,10 +119,11 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 @click.option('-P', '--postgres-connection-string', default='', show_default=False, type=str, help='Postgres connection string.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
 @click.option('-B', '--export-batch-size', default=100, show_default=True, type=int, help='The number of requests in JSON RPC batches.')
+@click.option('--skip-geth-traces', default=False, show_default=True, type=bool, help='Whether to skip using geth traces to get contracts')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
 def export_all(start, end, partition_batch_size, provider_uri, output_dir, postgres_connection_string, max_workers, export_batch_size,
-               chain='ethereum'):
+               chain='ethereum', skip_geth_traces=False):
     """Exports all data for a range of blocks."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
-                      output_dir, postgres_connection_string, provider_uri, max_workers, export_batch_size)
+                      output_dir, postgres_connection_string, provider_uri, max_workers, export_batch_size, skip_geth_traces)
