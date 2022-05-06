@@ -24,17 +24,16 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9'
     ],
     keywords='ethereum',
-    python_requires='>=3.6,<4',
+    python_requires='>=3.7.2,<4',
     install_requires=[
-        'web3==4.7.2',
-        'eth-utils==1.10.0',
-        'eth-abi==1.3.0',
+        'web3>=5.29,<6',
+        'eth-utils==1.10',
+        'eth-abi==2.1.1',
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil>=2.8.0,<3',
         'click==8.0.4',
