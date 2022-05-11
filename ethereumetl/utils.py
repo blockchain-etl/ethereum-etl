@@ -66,14 +66,14 @@ def validate_range(range_start_incl, range_end_incl):
         raise ValueError('range_end must be greater or equal to range_start')
 
 
-def rpc_response_batch_to_results(response):
+def rpc_response_batch_to_results(response, allow_no_response=False):
     for response_item in response:
-        yield rpc_response_to_result(response_item)
+        yield rpc_response_to_result(response_item, allow_no_response)
 
 
-def rpc_response_to_result(response):
+def rpc_response_to_result(response, allow_no_response=False):
     result = response.get('result')
-    if result is None:
+    if result is None and not allow_no_response:
         error_message = 'result is None in response {}.'.format(response)
         if response.get('error') is None:
             error_message = error_message + ' Make sure Ethereum node is synced.'

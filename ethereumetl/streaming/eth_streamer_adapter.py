@@ -87,6 +87,15 @@ class EthStreamerAdapter:
             if EntityType.TOKEN in self.entity_types else []
 
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
+        logging.info('Export counts. Blocks: {blocks}. Transactions: {transactions}. Logs: {logs}. Token transfers: {token_transfers}. Traces: {traces}. Contracts: {contracts}. Tokens: {tokens}'.format(
+            blocks=len(enriched_blocks),
+            transactions=len(enriched_transactions),
+            logs=len(enriched_logs),
+            token_transfers=len(enriched_token_transfers),
+            traces=len(enriched_traces),
+            contracts=len(enriched_contracts),
+            tokens=len(enriched_tokens),
+        ))
 
         all_items = \
             sort_by(enriched_blocks, 'number') + \
