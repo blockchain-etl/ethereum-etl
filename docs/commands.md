@@ -56,7 +56,7 @@ Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g
 ```bash
 > ethereumetl export_token_transfers --start-block 0 --end-block 500000 \
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv \
---tokens 0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0 --tokens 0x06012c8cf97bead5deae237070f9587f8e7a266d
+--tokens 0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C --tokens 0x80fB784B7eD66730e8b1DBd9820aFD29931aab03
 ```
 
 You can tune `--batch-size`, `--max-workers` for performance.
