@@ -33,6 +33,7 @@
                 "s": "0x3d3f4367d6906993f9b2f2e54741cc3e86356cfb81085c3ff656b82a79d87153",
                 "to": "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac",
                 "transactionIndex": "0x0",
+                "type": "0x0",
                 "v": "0x1b",
                 "value": "0x0"
             },
@@ -49,6 +50,7 @@
                 "s": "0x5f17d3dd1010dd6fd13a1300e9a4fca00d900670cdaeabbeec75a904506b404e",
                 "to": "0xec1ebac9da3430213281c80fa6d46378341a96ae",
                 "transactionIndex": "0x1",
+                "type": "0x0",
                 "v": "0x1b",
                 "value": "0x5a178a89b930e00"
             }

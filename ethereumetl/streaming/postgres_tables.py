@@ -20,7 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from sqlalchemy import Table, Column, Integer, BigInteger, String, Numeric, MetaData, TIMESTAMP
+from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, \
+    MetaData, PrimaryKeyConstraint, VARCHAR, TIMESTAMP
+from sqlalchemy.dialects.postgresql import ARRAY
 
 metadata = MetaData()
 
@@ -127,4 +129,25 @@ TRACES = Table(
     Column('trace_id', String, primary_key=True),
 )
 
+TOKENS = Table(
+    'tokens', metadata,
+    Column('address', VARCHAR(42)),
+    Column('name', String),
+    Column('symbol', String),
+    Column('decimals', Integer),
+    Column('function_sighashes', ARRAY(String)),
+    Column('total_supply', Numeric(78)),
+    Column('block_number', BigInteger),
+    PrimaryKeyConstraint('address', 'block_number', name='tokens_pk'),
+)
 
+CONTRACTS = Table(
+    'contracts', metadata,
+    Column('address', VARCHAR(42)),
+    Column('bytecode', String),
+    Column('function_sighashes', ARRAY(String)),
+    Column('is_erc20', Boolean),
+    Column('is_erc721', Boolean),
+    Column('block_number', BigInteger),
+    PrimaryKeyConstraint('address', 'block_number', name='contracts_pk'),
+)
