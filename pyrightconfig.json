@@ -1,0 +1,12 @@
+{
+	"venv": "/Users/prasanna/codeBase/ethereum-etl/.venv/bin/python",
+	"pythonVersion": "3.9",
+	"include": [
+		"blockchainetl",
+		"ethereumetl",
+		"tests",
+		"schemas"
+	],
+	"useLibraryCodeForTypes": true,
+	"typeCheckingMode": "basic"
+}

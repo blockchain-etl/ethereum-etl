@@ -18,6 +18,17 @@ def get_item_exporter(output):
             'contract': output + '.contracts',
             'token': output + '.tokens',
         })
+    elif output is "kafka":
+        from blockchainetl.jobs.exporters.kafka_item_exporter import KafkaItemExporter
+        item_exporter = KafkaItemExporter(item_type_to_topic_mapping={
+            'block': output + '.blocks',
+            'transaction': output + '.transactions',
+            'log': output + '.logs',
+            'token_transfer': output + '.token_transfers',
+            'trace': output + '.traces',
+            'contract': output + '.contracts',
+            'token': output + '.tokens',
+        })
     else:
         item_exporter = ConsoleItemExporter()
 
