@@ -67,7 +67,6 @@ class KafkaItemExporter:
     @timeout_decorator.timeout(300)
     def _export_items_with_timeout(self, items):
         for item in items:
-            logging.info(f"exporting items with timeout config {item}")
             self.export_item(item)
 
     def export_item(self, item):
