@@ -20,7 +20,7 @@ def get_item_exporter(output,lag = 0):
         })
     elif output == "kafka":
         from blockchainetl.jobs.exporters.kafka_item_exporter import KafkaItemExporter
-        prefix = "ethereum"
+        prefix = "eth"
         suffix = "hot"
         if lag > 0:
             suffix = "warm"
@@ -28,7 +28,7 @@ def get_item_exporter(output,lag = 0):
             'block': prefix + '-blocks-'+suffix,
             'transaction': prefix + '-transactions-'+suffix,
             'log': prefix + '-logs-'+suffix,
-            'token_transfer': prefix + '-token_transfers-'+suffix,
+            'token_transfer': prefix + '-token-transfers-'+suffix,
             'trace': prefix + '-traces-'+suffix,
             'contract': prefix + '-contracts-'+suffix,
             'token': prefix + '-tokens-'+suffix,

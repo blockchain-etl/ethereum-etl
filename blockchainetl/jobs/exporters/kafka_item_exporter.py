@@ -29,23 +29,25 @@ import json
 
 
 class KafkaItemExporter:
-    def __init__(self, item_type_to_topic_mapping,message_attributes=('item_id',)) -> None:
+    def __init__(
+        self, item_type_to_topic_mapping, message_attributes=("item_id",)
+    ) -> None:
         logging.basicConfig(
             level=logging.INFO,
             filename="msessage-publish.log",
             format='{"time" : "%(asctime)s", "level" : "%(levelname)s" , "message" : "%(message)s"}',
         )
-
+        pwd = "46RfgGhqkZcgnj9e0XplI3FsL98GZmSWvTOkmVmJPecrceOD72mkSiuFzxl4q4xA"
         conf = {
             "bootstrap.servers": "pkc-3w22w.us-central1.gcp.confluent.cloud:9092",
             "security.protocol": "SASL_SSL",
-            "sasl.mechanisms":"PLAIN",
+            "sasl.mechanisms": "PLAIN",
             "client.id": socket.gethostname(),
-            "message.max.bytes" : 5242880,
-            "sasl.username":"J7VXXU374KGW672N",
-            "sasl.password":"46RfgGhqkZcgnj9e0XplI3FsL98GZmSWvTOkmVmJPecrceOD72mkSiuFzxl4q4xA",
+            "message.max.bytes": 5242880,
+            "sasl.username": "J7VXXU374KGW672N",
+            "sasl.password": pwd,
         }
-        
+
         producer = Producer(conf)
         self.item_type_to_topic_mapping = item_type_to_topic_mapping
         self.producer = producer
@@ -59,19 +61,14 @@ class KafkaItemExporter:
         try:
             self._export_items_with_timeout(items)
         except timeout_decorator.TimeoutError as e:
-            logging.info('Recreating Pub/Sub publisher.')
+            logging.info("Recreating Pub/Sub publisher.")
             raise e
 
     @timeout_decorator.timeout(300)
     def _export_items_with_timeout(self, items):
-        #futures = []
         for item in items:
-            message_future = self.export_item(item)
-            #futures.append(message_future)
-
-        #for future in futures:
-            # result() blocks until the message is published.
-            # future.result()
+            logging.info(f"exporting items with timeout config {item}")
+            self.export_item(item)
 
     def export_item(self, item):
         item_type = item.get("type")
@@ -80,10 +77,10 @@ class KafkaItemExporter:
         if has_item_type and item_type in self.item_type_to_topic_mapping:
             data = json.dumps(item).encode("utf-8")
             topic = self.item_type_to_topic_mapping[item_type]
-            message_future = self.write_txns(data.decode("utf-8"),topic=topic)
+            message_future = self.write_txns(data.decode("utf-8"), topic=topic)
             return message_future
         else:
-            logging.warning('Topic for item type "{}" is not configured.')
+            logging.error('Topic for item type "{item_type}" is not configured.')
 
     def get_message_attributes(self, item):
         attributes = {}
@@ -97,7 +94,7 @@ class KafkaItemExporter:
     def close(self):
         pass
 
-    def write_txns(self, enriched_data: str,topic: str):
+    def write_txns(self, enriched_data: str, topic: str):
         def acked(err, msg):
             if err is not None:
                 self.logging.error(
@@ -105,6 +102,6 @@ class KafkaItemExporter:
                 )
             else:
                 self.logging.info("Message produced: %s" % msg)
-        print(enriched_data , topic)
-        # self.producer.produce(topic, key="", value=enriched_data, callback=acked)
-        # self.producer.poll(1)
+
+        self.producer.produce(topic, key="", value=enriched_data, callback=acked)
+        self.producer.poll(1)
