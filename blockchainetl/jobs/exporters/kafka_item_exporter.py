@@ -22,7 +22,6 @@
 from confluent_kafka import Producer
 from timeout_decorator import timeout_decorator
 
-# from kafka import KafkaProducer
 import logging
 
 import socket
