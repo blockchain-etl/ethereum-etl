@@ -47,3 +47,6 @@ coverage.xml
 .venv
 venv/
 ENV/
+
+last_synced_block.txt
+pyrightconfig.json
