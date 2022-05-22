@@ -69,6 +69,14 @@ class EthContractService:
                c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)') and \
                c.implements('approve(address,uint256)')
 
+    # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md
+    # https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol
+    def is_erc1155_contract(self, function_sighashes):
+        c = ContractWrapper(function_sighashes)
+        return c.implements('balanceOf(address,uint256)') and \
+               c.implements('safeTransferFrom(address,address,uint256,uint256,bytes)') and \
+               c.implements('safeBatchTransferFrom(address,address,uint256[],uint256[],bytes')
+
 
 def clean_bytecode(bytecode):
     if bytecode is None or bytecode == '0x':

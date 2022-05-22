@@ -128,11 +128,11 @@ First extract token addresses from `contracts.json`
 (Exported with [export_contracts](#export_contracts)):
 
 ```bash
-> ethereumetl filter_items -i contracts.json -p "item['is_erc20'] or item['is_erc721']" | \
+> ethereumetl filter_items -i contracts.json -p "item['is_erc20'] or item['is_erc721'] or item['is_erc1155']" | \
 ethereumetl extract_field -f address -o token_addresses.txt
 ```
 
-Then export ERC20 / ERC721 tokens:
+Then export ERC20 / ERC721 / ERC1155 tokens:
 
 ```bash
 > ethereumetl export_tokens --token-addresses token_addresses.txt \
