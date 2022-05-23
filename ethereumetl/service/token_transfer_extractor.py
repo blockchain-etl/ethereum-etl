@@ -40,7 +40,7 @@ class EthTokenTransferExtractor(object):
             # This is normal, topics can be empty for anonymous events
             return None
 
-        if topics[0] == TRANSFER_EVENT_TOPIC:
+        if (topics[0]).casefold() == TRANSFER_EVENT_TOPIC:
             # Handle unindexed event fields
             topics_with_data = topics + split_to_words(receipt_log.data)
             # if the number of topics and fields in data part != 4, then it's a weird event
