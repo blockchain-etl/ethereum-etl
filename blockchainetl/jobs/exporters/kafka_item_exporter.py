@@ -71,7 +71,7 @@ class KafkaItemExporter:
 
     def export_item(self, item):
         item_type = item.get("type")
-        logging.info("publishing " + item_type)
+        # logging.info("publishing " + item_type)
         has_item_type = item_type is not None
         if has_item_type and item_type in self.item_type_to_topic_mapping:
             data = json.dumps(item).encode("utf-8")
@@ -96,11 +96,14 @@ class KafkaItemExporter:
     def write_txns(self, enriched_data: str, topic: str):
         def acked(err, msg):
             if err is not None:
-                self.logging.error(
-                    "Failed to deliver message: %s: %s" % (str(msg), str(err))
-                )
+                self.logging.error('%% Message failed delivery: %s\n' % err)
             else:
-                self.logging.info("Message produced: %s" % msg)
-
-        self.producer.produce(topic, key="", value=enriched_data, callback=acked)
-        self.producer.poll(1)
+                self.logging.info('%% Message delivered to %s [%d] @ %d\n' %
+                             (msg.topic(), msg.partition(), msg.offset()))
+        try:
+            self.producer.produce(topic, key="", value=enriched_data, callback=acked)
+        except BufferError:
+            self.logging.error('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
+                             len(self.producer))
+        self.producer.poll(0)
+        # self.logging.info("published "+msgsPublished)

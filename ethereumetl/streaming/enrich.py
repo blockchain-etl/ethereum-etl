@@ -132,7 +132,7 @@ def enrich_token_transfers(blocks, token_transfers):
         ]))
 
     if len(result) != len(token_transfers):
-        raise ValueError('The number of token transfers is wrong ' + str(result))
+        raise ValueError(f'The number of token transfers is wrong expected len of result {len(result)} received {len(token_transfers)}' )
 
     return result
 
