@@ -19,5 +19,3 @@ ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
 LOCATION 's3://<your_bucket>/export/transactions/';
 
 MSCK REPAIR TABLE transactions;
-SHOW PARTITIONS anton_test.transactions;
-SELECT * FROM anton_test.transactions;

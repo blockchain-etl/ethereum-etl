@@ -24,8 +24,3 @@ ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
 LOCATION 's3://<your_bucket>/export/blocks/';
 
 MSCK REPAIR TABLE blocks;
-
-select *
-from blocks
-where block_date = '2015-10-01'
-;

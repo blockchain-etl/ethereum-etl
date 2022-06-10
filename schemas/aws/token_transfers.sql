@@ -12,7 +12,3 @@ ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
 LOCATION 's3://<your_bucket>/export/token_transfers/';
 
 MSCK REPAIR TABLE token_transfers;
-select *
-from token_transfers
-where block_date = '2015-11-13'
-;
