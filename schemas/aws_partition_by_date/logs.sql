@@ -6,19 +6,16 @@ CREATE EXTERNAL TABLE IF NOT EXISTS logs (
     block_number BIGINT,
     address STRING,
     data STRING,
-    topics STRING
+    topics ARRAY<STRING>
 )
-PARTITIONED BY (date STRING)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = ',',
-    'field.delim' = ',',
-    'escape.delim' = '\\'
-)
-STORED AS TEXTFILE
-LOCATION 's3://<your_bucket>/ethereumetl/export/logs'
-TBLPROPERTIES (
-  'skip.header.line.count' = '1'
-);
+PARTITIONED BY (block_date STRING)
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+LOCATION 's3://<your_bucket>/export/logs/';
 
 MSCK REPAIR TABLE logs;
+
+show partitions logs;
+select *
+from logs
+where block_date = '2015-11-08'
+;
