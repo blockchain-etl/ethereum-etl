@@ -150,12 +150,11 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                     'log': create_insert_statement_for_table(LOGS),
                     'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
                     'contract': create_insert_statement_for_table(CONTRACT_CREATIONS),
-                    'token': create_insert_statement_for_table(TOKENS),
                 },
             )
 
         inmemory_exporter = InMemoryItemExporter(item_types=[
-            'block', 'transaction', 'log', 'token_transfer', 'contract', 'receipt', 'token', 'geth_trace'])
+            'block', 'transaction', 'log', 'token_transfer', 'contract', 'receipt', 'geth_trace'])
 
         job = ExportBlocksJob(
             start_block=batch_start_block,
@@ -386,58 +385,6 @@ def export_all_common(partitions, output_dir, postgres_connection_string, provid
                 contracts_exporters.open()
                 contracts_exporters.export_items(contracts)
                 contracts_exporters.close()
-
-        # # # tokens # # #
-
-        if token_transfers_file is not None:
-            token_addresses_file = '{cache_output_dir}/token_addresses_{file_name_suffix}'.format(
-                cache_output_dir=cache_output_dir,
-                file_name_suffix=file_name_suffix,
-            )
-            logger.info('Extracting token_address from token_transfers file {token_transfers_file}'.format(
-                token_transfers_file=token_transfers_file,
-            ))
-            extract_csv_column_unique(
-                token_transfers_file, token_addresses_file, 'token_address', ['block_number'])
-
-            tokens_output_dir = '{output_dir}/tokens{partition_dir}'.format(
-                output_dir=output_dir,
-                partition_dir=partition_dir,
-            )
-            os.makedirs(os.path.dirname(tokens_output_dir), exist_ok=True)
-
-            tokens_file = '{tokens_output_dir}/tokens_{file_name_suffix}.csv'.format(
-                tokens_output_dir=tokens_output_dir,
-                file_name_suffix=file_name_suffix,
-            )
-            logger.info('Exporting tokens from blocks {block_range} to {tokens_file}'.format(
-                block_range=block_range,
-                tokens_file=tokens_file,
-            ))
-
-            with smart_open(token_addresses_file, 'r') as token_addresses:
-                tokens_file_exporter = tokens_item_exporter(tokens_file)
-
-                token_addresses_iterable = csv.DictReader(token_addresses, fieldnames=["token_address", "block_number"])
-
-                job = ExportTokensJob(
-                    token_addresses_iterable=token_addresses_iterable,
-                    web3=ThreadLocalProxy(lambda: build_web3(
-                        get_provider_from_uri(provider_uri))),
-                    item_exporter=inmemory_exporter,
-                    max_workers=max_workers)
-                job.run()
-                tokens = inmemory_exporter.get_items('token')
-                tokens = enrich_tokens(blocks, tokens)
-                for token in tokens:
-                    token["updated_block_number"] = token["block_number"]
-                    token["updated_block_timestamp"] = token["block_timestamp"]
-                    token["updated_block_hash"] = token["block_hash"]
-                tokens_exporters = get_multi_item_exporter(
-                    [tokens_file_exporter, postgres_exporter])
-                tokens_exporters.open()
-                tokens_exporters.export_items(tokens)
-                tokens_exporters.close()
 
         inmemory_exporter.close()
 
