@@ -53,6 +53,10 @@ setup(
             # that's why  we lock the version here
             'libcst==0.3.21'
         ],
+        'streaming-kinesis': [
+            'boto3==1.24.11',
+            'botocore==1.27.11',
+        ],
         'dev': [
             'pytest~=4.3.0'
         ]
