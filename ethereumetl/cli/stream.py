@@ -42,6 +42,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
                    'or Postgres connection url e.g. postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum; '
                    'or GCS bucket e.g. gs://your-bucket-name; '
                    'or kafka, output name and connection host:port e.g. kafka/127.0.0.1:9092 '
+                   'or Kinesis, e.g. kinesis://your-data-stream-name'
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
