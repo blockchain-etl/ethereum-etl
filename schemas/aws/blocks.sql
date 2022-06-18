@@ -16,19 +16,11 @@ CREATE EXTERNAL TABLE IF NOT EXISTS blocks (
     gas_limit BIGINT,
     gas_used BIGINT,
     timestamp BIGINT,
-    transaction_count BIGINT
+    transaction_count BIGINT,
+    base_fee_per_gas BIGINT
 )
-PARTITIONED BY (start_block BIGINT, end_block BIGINT)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-    'serialization.format' = ',',
-    'field.delim' = ',',
-    'escape.delim' = '\\'
-)
-STORED AS TEXTFILE
-LOCATION 's3://<your_bucket>/ethereumetl/export/blocks'
-TBLPROPERTIES (
-  'skip.header.line.count' = '1'
-);
+PARTITIONED BY (block_date STRING)
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+LOCATION 's3://<your_bucket>/export/blocks/';
 
 MSCK REPAIR TABLE blocks;
