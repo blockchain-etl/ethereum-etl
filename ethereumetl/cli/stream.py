@@ -37,8 +37,10 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output', type=str,
-              help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. '
-                   'If not specified will print to console')
+              help='pubsub or kafka, if empty defaults to printing to console')
+@click.option('-t', '--topic-prefix', type=str,
+              help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. OR'
+                   'Kakfa topic prefix e.g. {chain}.{facet}.{hot/warm}')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), type=str,
               help='The list of entity types to export.')
@@ -48,7 +50,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-w', '--max-workers', default=5, type=int, help='The number of workers')
 @click.option('--log-file', default=None, type=str, help='Log file')
 @click.option('--pid-file', default=None, type=str, help='pid file')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
+def stream(last_synced_block_file, lag, provider_uri, output, topic_prefix, start_block, entity_types,
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
@@ -65,7 +67,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=get_item_exporter(output,lag),
+        item_exporter=get_item_exporter(output, topic_prefix),
         batch_size=batch_size,
         max_workers=max_workers,
         entity_types=entity_types

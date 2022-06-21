@@ -178,7 +178,7 @@ class EthTraceMapper(object):
             'from_address': trace.from_address,
             'to_address': trace.to_address,
             'value': trace.value,
-            'input': trace.input,
+            'input': '', #trace.input,
             'output': trace.output,
             'trace_type': trace.trace_type,
             'call_type': trace.call_type,
@@ -190,4 +190,5 @@ class EthTraceMapper(object):
             'error': trace.error,
             'status': trace.status,
             'trace_id': trace.trace_id,
+            'token_address': '0x0000',
         }

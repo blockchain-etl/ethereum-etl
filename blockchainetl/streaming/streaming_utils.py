@@ -6,41 +6,27 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.logging_utils import logging_basic_config
 
 
-def get_item_exporter(output, lag=0):
+def get_item_exporter(output,
+                      topic_prefix
+                      ):
+    item_type_to_topic_mapping = {
+        "block": topic_prefix + ".blocks",
+        "transaction": topic_prefix + ".transactions",
+        "log": topic_prefix + ".logs",
+        "token_transfer": topic_prefix + ".token_transfers",
+        "trace": topic_prefix + ".traces",
+        "contract": topic_prefix + ".contracts",
+        "token": topic_prefix + ".tokens",
+    }
+
     if output == "gcp":
-        from blockchainetl.jobs.exporters.google_pubsub_item_exporter import (
-            GooglePubSubItemExporter,
-        )
+        from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
+        item_exporter = GooglePubSubItemExporter(item_type_to_topic_mapping)
 
-        item_exporter = GooglePubSubItemExporter(
-            item_type_to_topic_mapping={
-                "block": output + ".blocks",
-                "transaction": output + ".transactions",
-                "log": output + ".logs",
-                "token_transfer": output + ".token_transfers",
-                "trace": output + ".traces",
-                "contract": output + ".contracts",
-                "token": output + ".tokens",
-            }
-        )
-    elif output == "kafka":
+    elif topic_prefix == "kafka":
         from blockchainetl.jobs.exporters.kafka_item_exporter import KafkaItemExporter
+        item_exporter = KafkaItemExporter(item_type_to_topic_mapping)
 
-        prefix = "eth"
-        suffix = "hot"
-        if lag > 0:
-            suffix = "warm"
-        item_exporter = KafkaItemExporter(
-            item_type_to_topic_mapping={
-                "block": prefix + "-blocks-" + suffix,
-                "transaction": prefix + "-transactions-" + suffix,
-                "log": prefix + "-logs-" + suffix,
-                "token_transfer": prefix + "-token-transfers-" + suffix,
-                "trace": prefix + "-traces-" + suffix,
-                "contract": prefix + "-contracts-" + suffix,
-                "token": prefix + "-tokens-" + suffix,
-            }
-        )
     else:
         item_exporter = ConsoleItemExporter()
 

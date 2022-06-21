@@ -56,5 +56,6 @@ class EthTransactionMapper(object):
             'value': transaction.value,
             'gas': transaction.gas,
             'gas_price': transaction.gas_price,
-            'input': transaction.input,
+            'input': '', #transaction.input,
+            'token_address': '0x0000',
         }

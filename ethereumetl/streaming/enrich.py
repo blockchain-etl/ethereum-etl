@@ -73,7 +73,8 @@ def enrich_transactions(transactions, receipts):
             'input',
             'block_timestamp',
             'block_number',
-            'block_hash'
+            'block_hash',
+            'token_address'
         ],
         right_fields=[
             ('cumulative_gas_used', 'receipt_cumulative_gas_used'),
@@ -159,7 +160,8 @@ def enrich_traces(blocks, traces):
             'status',
             'transaction_hash',
             'block_number',
-            'trace_id'
+            'trace_id',
+            'token_address'
         ],
         [
             ('timestamp', 'block_timestamp'),

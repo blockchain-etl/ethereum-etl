@@ -37,6 +37,8 @@ class KafkaItemExporter:
             filename="msessage-publish.log",
             format='{"time" : "%(asctime)s", "level" : "%(levelname)s" , "message" : "%(message)s"}',
         )
+
+        #Doppler this
         pwd = "46RfgGhqkZcgnj9e0XplI3FsL98GZmSWvTOkmVmJPecrceOD72mkSiuFzxl4q4xA"
         conf = {
             "bootstrap.servers": "pkc-3w22w.us-central1.gcp.confluent.cloud:9092",
@@ -91,6 +93,7 @@ class KafkaItemExporter:
         return attributes
 
     def close(self):
+        self.producer.flush()
         pass
 
     def write_txns(self, enriched_data: str, topic: str):
