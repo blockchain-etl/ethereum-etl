@@ -23,7 +23,7 @@ def get_item_exporter(output,
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
         item_exporter = GooglePubSubItemExporter(item_type_to_topic_mapping)
 
-    elif topic_prefix == "kafka":
+    elif output == "kafka":
         from blockchainetl.jobs.exporters.kafka_item_exporter import KafkaItemExporter
         item_exporter = KafkaItemExporter(item_type_to_topic_mapping)
 

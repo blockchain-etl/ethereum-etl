@@ -34,7 +34,7 @@ class KafkaItemExporter:
     ) -> None:
         logging.basicConfig(
             level=logging.INFO,
-            filename="msessage-publish.log",
+            filename="message-publish.log",
             format='{"time" : "%(asctime)s", "level" : "%(levelname)s" , "message" : "%(message)s"}',
         )
 
@@ -109,4 +109,3 @@ class KafkaItemExporter:
             self.logging.error('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
                              len(self.producer))
         self.producer.poll(0)
-        # self.logging.info("published "+msgsPublished)
