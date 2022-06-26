@@ -1,4 +1,4 @@
-ETHEREUMETL_STREAMING_VERSION=1.0
+ETHEREUMETL_STREAMING_VERSION=1.0-test
 docker build -t merklescience/ethereum-etl-kafka:${ETHEREUMETL_STREAMING_VERSION} -f Dockerfile_with_streaming .
 docker tag merklescience/ethereum-etl-kafka:${ETHEREUMETL_STREAMING_VERSION} us.gcr.io/staging-btc-etl/merklescience/ethereum-etl-kafka:${ETHEREUMETL_STREAMING_VERSION}
 docker push us.gcr.io/staging-btc-etl/merklescience/ethereum-etl-kafka:${ETHEREUMETL_STREAMING_VERSION}

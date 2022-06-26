@@ -40,7 +40,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
               help='pubsub or kafka, if empty defaults to printing to console')
 @click.option('-t', '--topic-prefix', type=str,
               help='Google PubSub topic path e.g. projects/your-project/topics/ethereum_blockchain. OR'
-                   'Kakfa topic prefix e.g. {chain}.{facet}.{hot/warm}')
+                   'Kakfa topic prefix e.g. {chain}.{hot/warm}.{facet}')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), type=str,
               help='The list of entity types to export.')
