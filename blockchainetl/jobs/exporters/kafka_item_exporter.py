@@ -102,9 +102,6 @@ class KafkaItemExporter:
         def acked(err, msg):
             if err is not None:
                 self.logging.error('%% Message failed delivery: %s\n' % err)
-            else:
-                self.logging.info('%% Message delivered to %s [%d] @ %d\n' %
-                             (msg.topic(), msg.partition(), msg.offset()))
         try:
             self.producer.produce(topic, key=key, value=value, callback=acked)
         except BufferError:
