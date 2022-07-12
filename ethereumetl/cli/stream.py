@@ -37,6 +37,8 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
+@click.option('-P', '--prefix', default='', show_default=True, type=str, 
+              help='The prefix of the output files. Can be useful when streaming multiple blockchains.')
 @click.option('-o', '--output', type=str,
               help='Either Google PubSub topic path e.g. projects/your-project/topics/crypto_ethereum; '
                    'or Postgres connection url e.g. postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum; '
@@ -68,7 +70,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=create_item_exporters(output),
+        item_exporter=create_item_exporters(output, prefix),
         batch_size=batch_size,
         max_workers=max_workers,
         entity_types=entity_types

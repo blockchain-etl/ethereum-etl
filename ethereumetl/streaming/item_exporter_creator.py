@@ -24,7 +24,7 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 
 
-def create_item_exporters(outputs):
+def create_item_exporters(outputs, prefix):
     split_outputs = [output.strip() for output in outputs.split(',')] if outputs else ['console']
 
     item_exporters = [create_item_exporter(output) for output in split_outputs]
@@ -38,13 +38,13 @@ def create_item_exporter(output):
         enable_message_ordering = 'sorted' in output or 'ordered' in output
         item_exporter = GooglePubSubItemExporter(
             item_type_to_topic_mapping={
-                'block': output + '.blocks',
-                'transaction': output + '.transactions',
-                'log': output + '.logs',
-                'token_transfer': output + '.token_transfers',
-                'trace': output + '.traces',
-                'contract': output + '.contracts',
-                'token': output + '.tokens',
+                'block': output + f'.{prefix}blocks',
+                'transaction': output + f'.{prefix}transactions',
+                'log': output + f'.{prefix}logs',
+                'token_transfer': output + f'.{prefix}token_transfers',
+                'trace': output + f'.{prefix}traces',
+                'contract': output + f'.{prefix}contracts',
+                'token': output + f'.{prefix}tokens',
             },
             message_attributes=('item_id', 'item_timestamp'),
             batch_max_bytes=1024 * 1024 * 5,
@@ -80,13 +80,13 @@ def create_item_exporter(output):
     elif item_exporter_type == ItemExporterType.KAFKA:
         from blockchainetl.jobs.exporters.kafka_exporter import KafkaItemExporter
         item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
-            'block': 'blocks',
-            'transaction': 'transactions',
-            'log': 'logs',
-            'token_transfer': 'token_transfers',
-            'trace': 'traces',
-            'contract': 'contracts',
-            'token': 'tokens',
+            'block': f'{prefix}blocks',
+            'transaction': f'{prefix}transactions',
+            'log': f'{prefix}logs',
+            'token_transfer': f'{prefix}token_transfers',
+            'trace': f'{prefix}traces',
+            'contract': f'{prefix}contracts',
+            'token': f'{prefix}tokens',
         })
 
     else:
