@@ -10,7 +10,7 @@ from blockchainetl.jobs.exporters.converters.composite_item_converter import Com
 class KafkaItemExporter:
 
     def __init__(self, output, item_type_to_topic_mapping, converters=()):
-        self.item_type_to_topic_mapping = item_type_to_topic_mapping
+        self.item_type_to_topπic_mapping = item_type_to_topic_mapping
         self.converter = CompositeItemConverter(converters)
         self.connection_url = self.get_connection_url(output)
         self.topic_prefix = self.get_topic_prefix(output)
@@ -20,13 +20,13 @@ class KafkaItemExporter:
     def get_connection_url(self, output):
         try:
             return output.split('/')[1]
-        except KeyError:
+        except IndexError:
             raise Exception('Invalid kafka output param, It should be in format of "kafka/127.0.0.1:9092" or "kafka/127.0.0.1:9092/<topic-prefix>"')
 
     def get_topic_prefix(self, output):
         try:
             return output.split('/')[2] + "."
-        except KeyError:
+        except IndexError:
             return ''
 
     def open(self):
@@ -51,7 +51,6 @@ class KafkaItemExporter:
 
     def close(self):
         pass
-
 
 def group_by_item_type(items):
     result = collections.defaultdict(list)
