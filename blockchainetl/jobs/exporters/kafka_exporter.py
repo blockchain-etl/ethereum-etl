@@ -2,7 +2,7 @@ import collections
 import json
 import logging
 
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 
 from blockchainetl.jobs.exporters.converters.composite_item_converter import CompositeItemConverter
 
@@ -10,12 +10,15 @@ from blockchainetl.jobs.exporters.converters.composite_item_converter import Com
 class KafkaItemExporter:
 
     def __init__(self, output, item_type_to_topic_mapping, converters=()):
-        self.item_type_to_topπic_mapping = item_type_to_topic_mapping
+        self.item_type_to_topic_mapping = item_type_to_topic_mapping
         self.converter = CompositeItemConverter(converters)
         self.connection_url = self.get_connection_url(output)
         self.topic_prefix = self.get_topic_prefix(output)
         print(self.connection_url, self.topic_prefix)
-        self.producer = KafkaProducer(bootstrap_servers=self.connection_url)
+        self.producer = Producer({
+            'bootstrap.servers': self.connection_url,
+            'transactional.id': 'ethereumetl'
+        })
 
     def get_connection_url(self, output):
         try:
@@ -30,18 +33,20 @@ class KafkaItemExporter:
             return ''
 
     def open(self):
-        pass
+        self.producer.init_transactions()
 
     def export_items(self, items):
+        self.producer.begin_transaction()
         for item in items:
             self.export_item(item)
-
+        self.producer.commit_transaction()
+        
     def export_item(self, item):
         item_type = item.get('type')
         if item_type is not None and item_type in self.item_type_to_topic_mapping:
             data = json.dumps(item).encode('utf-8')
-            print(data)
-            return self.producer.send(self.topic_prefix + self.item_type_to_topic_mapping[item_type], value=data)
+            logging.debug(data)
+            return self.producer.produce(self.topic_prefix + self.item_type_to_topic_mapping[item_type], data)
         else:
             logging.warning('Topic for item type "{}" is not configured.'.format(item_type))
 
@@ -50,8 +55,8 @@ class KafkaItemExporter:
             yield self.converter.convert_item(item)
 
     def close(self):
-        pass
-
+       pass
+        
 def group_by_item_type(items):
     result = collections.defaultdict(list)
     for item in items:
