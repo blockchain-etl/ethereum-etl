@@ -17,7 +17,8 @@ class KafkaItemExporter:
         print(self.connection_url, self.topic_prefix)
         self.producer = Producer({
             'bootstrap.servers': self.connection_url,
-            'transactional.id': 'ethereumetl'
+            'transactional.id': 'ethereumetl',
+            'enable.idempotence': True,
         })
 
     def get_connection_url(self, output):
