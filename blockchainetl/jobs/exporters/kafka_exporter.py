@@ -10,7 +10,7 @@ from blockchainetl.jobs.exporters.converters.composite_item_converter import Com
 class KafkaItemExporter:
 
     def __init__(self, output, item_type_to_topic_mapping, converters=()):
-        self.item_type_to_topπic_mapping = item_type_to_topic_mapping
+        self.item_type_to_topic_mapping = item_type_to_topic_mapping
         self.converter = CompositeItemConverter(converters)
         self.connection_url = self.get_connection_url(output)
         self.topic_prefix = self.get_topic_prefix(output)
