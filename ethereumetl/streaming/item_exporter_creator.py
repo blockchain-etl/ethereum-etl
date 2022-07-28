@@ -79,14 +79,15 @@ def create_item_exporter(output):
         item_exporter = ConsoleItemExporter()
     elif item_exporter_type == ItemExporterType.KAFKA:
         from blockchainetl.jobs.exporters.kafka_exporter import KafkaItemExporter
+        prefix = 'gc_eth_'
         item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
-            'block': 'blocks',
-            'transaction': 'transactions',
-            'log': 'logs',
-            'token_transfer': 'token_transfers',
-            'trace': 'traces',
-            'contract': 'contracts',
-            'token': 'tokens',
+            'block': prefix + 'blocks',
+            'transaction': prefix + 'transactions',
+            'log': prefix + 'logs',
+            'token_transfer': prefix + 'token_transfers',
+            'trace': prefix + 'traces',
+            'contract': prefix + 'contracts',
+            'token': prefix + 'tokens',
         })
 
     else:

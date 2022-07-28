@@ -57,6 +57,9 @@ class EthTokenTransferExtractor(object):
             token_transfer.transaction_hash = receipt_log.transaction_hash
             token_transfer.log_index = receipt_log.log_index
             token_transfer.block_number = receipt_log.block_number
+            token_transfer.block_hash = receipt_log.block_hash
+            token_transfer.transaction_index = receipt_log.transaction_index
+            #token_transfer.block_timestamp = receipt_log.block_timestamp
             return token_transfer
 
         return None
