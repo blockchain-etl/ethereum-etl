@@ -46,7 +46,7 @@ logging_basic_config()
               help='The output file for receipts. If not provided receipts will not be exported. Use "-" for stdout')
 @click.option('--logs-output', default=None, show_default=True, type=str,
               help='The output file for receipt logs. '
-                   'aIf not provided receipt logs will not be exported. Use "-" for stdout')
+                   'If not provided receipt logs will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
 def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output,
                              chain='ethereum'):
