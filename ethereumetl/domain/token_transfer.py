@@ -32,4 +32,3 @@ class EthTokenTransfer(object):
         self.block_number = None
         self.block_hash = None
         self.transaction_index = None
-        #self.block_timestamp = None
