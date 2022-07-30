@@ -103,6 +103,7 @@ TOKEN_TRANSFERS = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    Column('transaction_index', BigInteger),
 )
 
 TRACES = Table(

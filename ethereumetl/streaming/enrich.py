@@ -133,6 +133,7 @@ def enrich_token_transfers(blocks, token_transfers):
         [
             ('timestamp', 'block_timestamp'),
             ('hash', 'block_hash'),
+            ('transaction_index', 'transaction_index'),
         ]))
 
     if len(result) != len(token_transfers):
