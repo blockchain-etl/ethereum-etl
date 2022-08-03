@@ -42,13 +42,15 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
-def export_geth_traces(start_block, end_block, batch_size, output, max_workers, provider_uri):
+@click.option('-t', '--timeout', default=60, show_default=True, type=int, help='IPC or HTTP request timeout.')
+def export_geth_traces(start_block, end_block, batch_size, output, max_workers, provider_uri, timeout=60):
     """Exports traces from geth node."""
     job = ExportGethTracesJob(
         start_block=start_block,
         end_block=end_block,
         batch_size=batch_size,
-        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_provider_from_uri(provider_uri, batch=True, timeout=timeout)),
         max_workers=max_workers,
         item_exporter=geth_traces_item_exporter(output))
 
