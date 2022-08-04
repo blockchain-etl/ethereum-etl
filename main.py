@@ -1,6 +1,6 @@
 import argparse
 
-from ethereumetl.cli import streaming
+from ethereumetl.streaming.streaming import streaming
 from hypernative.consts import NODE_PROVIDER
 from hypernative.multi_node import get_block_indexes
 from hypernative.output import generate_postgres_output
