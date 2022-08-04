@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8
 MAINTAINER Evgeny Medvedev <evge.medvedev@gmail.com>
 ENV PROJECT_DIR=ethereum-etl
 

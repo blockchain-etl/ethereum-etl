@@ -54,7 +54,7 @@ setup(
             # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust,
             # that's why  we lock the version here
             'libcst==0.3.21',
-            'pandas==1.3.5',
+            'pandas==1.4.3',
         ],
         'dev': [
             'pytest~=4.3.0'
