@@ -2,6 +2,7 @@ import logging
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
+from blockchainetl.streaming.streamer_adapter_stub import StreamerAdapterStub
 from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
@@ -15,9 +16,10 @@ from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
+from hypernative.utils import timer, debug_timer
 
 
-class EthStreamerAdapter:
+class EthStreamerAdapter(StreamerAdapterStub):
     def __init__(
             self,
             batch_web3_provider,
@@ -36,10 +38,12 @@ class EthStreamerAdapter:
     def open(self):
         self.item_exporter.open()
 
+    @debug_timer
     def get_current_block_number(self):
         w3 = build_web3(self.batch_web3_provider)
         return int(w3.eth.getBlock("latest").number)
 
+    @timer
     def export_all(self, start_block, end_block):
         # Export blocks and transactions
         blocks, transactions = [], []
@@ -102,6 +106,7 @@ class EthStreamerAdapter:
 
         self.item_exporter.export_items(all_items)
 
+    @timer
     def _export_blocks_and_transactions(self, start_block, end_block):
         blocks_and_transactions_item_exporter = InMemoryItemExporter(item_types=['block', 'transaction'])
         blocks_and_transactions_job = ExportBlocksJob(
@@ -119,6 +124,7 @@ class EthStreamerAdapter:
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
 
+    @timer
     def _export_receipts_and_logs(self, transactions):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
         job = ExportReceiptsJob(
@@ -135,6 +141,7 @@ class EthStreamerAdapter:
         logs = exporter.get_items('log')
         return receipts, logs
 
+    @debug_timer
     def _extract_token_transfers(self, logs):
         exporter = InMemoryItemExporter(item_types=['token_transfer'])
         job = ExtractTokenTransfersJob(
@@ -146,6 +153,7 @@ class EthStreamerAdapter:
         token_transfers = exporter.get_items('token_transfer')
         return token_transfers
 
+    @timer
     def _export_traces(self, start_block, end_block):
         exporter = InMemoryItemExporter(item_types=['trace'])
         job = ExportTracesJob(
@@ -160,6 +168,7 @@ class EthStreamerAdapter:
         traces = exporter.get_items('trace')
         return traces
 
+    @debug_timer
     def _export_contracts(self, traces):
         exporter = InMemoryItemExporter(item_types=['contract'])
         job = ExtractContractsJob(
@@ -172,6 +181,7 @@ class EthStreamerAdapter:
         contracts = exporter.get_items('contract')
         return contracts
 
+    @debug_timer
     def _extract_tokens(self, contracts):
         exporter = InMemoryItemExporter(item_types=['token'])
         job = ExtractTokensJob(
@@ -211,10 +221,12 @@ class EthStreamerAdapter:
 
         raise ValueError('Unexpected entity type ' + entity_type)
 
+    @debug_timer
     def calculate_item_ids(self, items):
         for item in items:
             item['item_id'] = self.item_id_calculator.calculate(item)
 
+    @debug_timer
     def calculate_item_timestamps(self, items):
         for item in items:
             item['item_timestamp'] = self.item_timestamp_calculator.calculate(item)
@@ -223,6 +235,7 @@ class EthStreamerAdapter:
         self.item_exporter.close()
 
 
+@debug_timer
 def sort_by(arr, fields):
     if isinstance(fields, tuple):
         fields = tuple(fields)
