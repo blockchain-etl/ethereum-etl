@@ -9,5 +9,8 @@ class StreamerAdapterStub:
     def export_all(self, start_block, end_block):
         pass
 
+    def export_items(self, items):
+        pass
+
     def close(self):
         pass

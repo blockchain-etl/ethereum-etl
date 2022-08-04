@@ -38,14 +38,30 @@ def smart_open(filename=None, mode='w', binary=False, create_parent_dirs=True):
         fh.close()
 
 
+def get_s3():
+    from s3fs import S3FileSystem
+
+    if not hasattr(get_s3, 's3'):
+        get_s3.s3 = S3FileSystem()
+    return get_s3.s3
+
+
 def get_file_handle(filename, mode='w', binary=False, create_parent_dirs=True):
-    if create_parent_dirs and filename is not None:
+    is_s3 = filename and filename.startswith(r's3://')
+
+    if create_parent_dirs and filename is not None and not is_s3:
         dirname = os.path.dirname(filename)
         pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
     full_mode = mode + ('b' if binary else '')
     is_file = filename and filename != '-'
+
     if is_file:
-        fh = open(filename, full_mode)
+        if is_s3:
+            s3 = get_s3()
+            fh = s3.open(filename, full_mode)
+        else:
+            fh = open(filename, full_mode)
+
     elif filename == '-':
         fd = sys.stdout.fileno() if mode == 'w' else sys.stdin.fileno()
         fh = os.fdopen(fd, full_mode)
