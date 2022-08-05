@@ -44,7 +44,7 @@ class EthStreamerAdapter(StreamerAdapterStub):
         return int(w3.eth.getBlock("latest").number)
 
     @timer
-    def export_all(self, start_block, end_block):
+    def export_all(self, start_block, end_block, calculate_item_metadata=False):
         # Export blocks and transactions
         blocks, transactions = [], []
         if self._should_export(EntityType.BLOCK) or self._should_export(EntityType.TRANSACTION):
@@ -101,8 +101,9 @@ class EthStreamerAdapter(StreamerAdapterStub):
             sort_by(enriched_contracts, ('block_number',)) + \
             sort_by(enriched_tokens, ('block_number',))
 
-        self.calculate_item_ids(all_items)
-        self.calculate_item_timestamps(all_items)
+        if calculate_item_metadata:
+            self.calculate_item_ids(all_items)
+            self.calculate_item_timestamps(all_items)
 
         self.item_exporter.export_items(all_items)
 
