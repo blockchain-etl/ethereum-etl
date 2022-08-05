@@ -24,7 +24,7 @@ from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Nume
     MetaData, PrimaryKeyConstraint, VARCHAR, TIMESTAMP
 from sqlalchemy.dialects.postgresql import ARRAY
 
-metadata = MetaData()
+metadata = MetaData(schema='ethereum_etl')
 
 # SQL schema is here https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema
 
