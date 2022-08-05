@@ -18,6 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('-provider', '--provider_uri', type=str, default=NODE_PROVIDER, help='provider uri')
     parser.add_argument('-b', '--batch_size', type=int, default=1000, help='block size')
     parser.add_argument('-bb', '--block_batch_size', type=int, default=1, help='block batch size')
+    parser.add_argument('-o', '--output', type=str, default='postgres', help='output sinks')
 
     args = parser.parse_args()
 
@@ -41,11 +42,10 @@ if __name__ == '__main__':
 
     # TODO: add types from args?
     entity_types = "block,transaction,log,contract,trace"
-    # TODO: add parquet output, possibility for multiple outputs?
-    postgres_output = generate_postgres_output()
+    output = generate_postgres_output(args.output)
 
     streaming(
-        output=postgres_output,
+        output=output,
         entity_types=entity_types,
         provider_uri=args.provider_uri,
         max_workers=args.max_workers,

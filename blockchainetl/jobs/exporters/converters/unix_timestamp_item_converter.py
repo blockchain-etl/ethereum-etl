@@ -21,17 +21,9 @@
 # SOFTWARE.
 
 from datetime import datetime
+from enum import Enum
 
 from blockchainetl.jobs.exporters.converters.simple_item_converter import SimpleItemConverter
-
-
-class UnixTimestampItemConverter(SimpleItemConverter):
-
-    def convert_field(self, key, value):
-        if key is not None and key.endswith('timestamp'):
-            return to_timestamp(value)
-        else:
-            return value
 
 
 def to_timestamp(value):
@@ -39,3 +31,27 @@ def to_timestamp(value):
         return datetime.utcfromtimestamp(value).strftime('%Y-%m-%d %H:%M:%S')
     else:
         return value
+
+
+def to_datetime(value):
+    if isinstance(value, int):
+        return datetime.utcfromtimestamp(value)
+    else:
+        return value
+
+
+class TimestampConversionFunctions(Enum):
+    DATETIME = to_datetime
+    TIMESTAMP_STRING = to_timestamp
+
+
+class UnixTimestampItemConverter(SimpleItemConverter):
+    def __init__(self,
+                 conversion_function: TimestampConversionFunctions = TimestampConversionFunctions.TIMESTAMP_STRING):
+        self.conversion_function = conversion_function
+
+    def convert_field(self, key, value):
+        if key is not None and key.endswith('timestamp'):
+            return self.conversion_function(value)
+        else:
+            return value

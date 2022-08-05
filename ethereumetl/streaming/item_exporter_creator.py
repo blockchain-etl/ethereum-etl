@@ -21,7 +21,9 @@
 #  SOFTWARE.
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
+from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import TimestampConversionFunctions
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
+from blockchainetl.jobs.exporters.parquet_item_exporter import ParquetItemExporter
 
 
 def create_item_exporters(outputs):
@@ -71,6 +73,29 @@ def create_item_exporter(output):
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
+    elif item_exporter_type == ItemExporterType.PARQUETS3:
+        from blockchainetl.jobs.exporters.postgres_item_exporter import PostgresItemExporter
+        from blockchainetl.streaming.postgres_utils import create_insert_statement_for_table
+        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
+        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+
+        item_exporter = ParquetItemExporter(
+            output, item_type_to_insert_stmt_mapping={
+                'block': create_insert_statement_for_table(BLOCKS),
+                'transaction': create_insert_statement_for_table(TRANSACTIONS),
+                'log': create_insert_statement_for_table(LOGS),
+                'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
+                'trace': create_insert_statement_for_table(TRACES),
+                'token': create_insert_statement_for_table(TOKENS),
+                'contract': create_insert_statement_for_table(CONTRACTS),
+            },
+            converters=[
+                UnixTimestampItemConverter(TimestampConversionFunctions.DATETIME),
+                IntToDecimalItemConverter(match_fields=['difficulty', 'total_difficulty', 'value', 'total_supply']),
+                ListFieldItemConverter('topics', 'topic', fill=4)]  # TODO: check if we want this
+        )
     elif item_exporter_type == ItemExporterType.GCS:
         from blockchainetl.jobs.exporters.gcs_item_exporter import GcsItemExporter
         bucket, path = get_bucket_and_path_from_gcs_output(output)
@@ -115,6 +140,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.POSTGRES
     elif output is not None and output.startswith('gs://'):
         return ItemExporterType.GCS
+    elif output is not None and output.startswith('parquet'):
+        return ItemExporterType.PARQUETS3
     elif output is None or output == 'console':
         return ItemExporterType.CONSOLE
     else:
@@ -128,3 +155,4 @@ class ItemExporterType:
     CONSOLE = 'console'
     KAFKA = 'kafka'
     UNKNOWN = 'unknown'
+    PARQUETS3 = 'parquets3'
