@@ -16,8 +16,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--node_index', type=int, default=0, help='index of current node')
     parser.add_argument('-w', '--max_workers', type=int, default=5, help='number of workers per process')
     parser.add_argument('-provider', '--provider_uri', type=str, default=NODE_PROVIDER, help='provider uri')
-    parser.add_argument('-b', '--batch_size', type=int, default=1000, help='block size')
-    parser.add_argument('-bb', '--block_batch_size', type=int, default=1, help='block batch size')
+    parser.add_argument('-b', '--batch_size', type=int, default=100, help='items per request')
+    parser.add_argument('-bb', '--block_batch_size', type=int, default=1, help='blocks per batch')
     parser.add_argument('-o', '--output', type=str, default='postgres', help='output sinks')
 
     args = parser.parse_args()
