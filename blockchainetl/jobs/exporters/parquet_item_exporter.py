@@ -21,21 +21,31 @@
 # SOFTWARE.
 
 import collections
+from dataclasses import dataclass, field
+from typing import List, Dict
 
 import pandas as pd
+import awswrangler as wr
 
 from blockchainetl.jobs.exporters.converters.composite_item_converter import CompositeItemConverter
+from hypernative.consts import ETHEREUM_ETL_BUCKET, ETHEREUM_ETL_ATHENA_DB_NAME
+
+
+@dataclass
+class ParquetExporterTableArgs:
+    s3_prefix: str
+    table_name: str
+    schema: Dict[str, str]
+    to_drop_columns: List[str] = field(default_factory=lambda: ['type', 'item_id', 'item_timestamp'])
 
 
 class ParquetItemExporter:
 
-    def __init__(self, connection_url, item_type_to_insert_stmt_mapping, converters=(), print_sql=True):
+    def __init__(self, connection_url, item_type_to_parquet_export_args_mapping, converters=()):
         self.connection_url = connection_url
-        self.item_type_to_insert_stmt_mapping = item_type_to_insert_stmt_mapping
+        self.item_type_to_parquet_export_args_mapping: Dict[str, ParquetExporterTableArgs] = \
+            item_type_to_parquet_export_args_mapping
         self.converter = CompositeItemConverter(converters)
-        self.print_sql = print_sql
-
-        # self.engine = self.create_engine()
 
     def open(self):
         pass
@@ -43,32 +53,25 @@ class ParquetItemExporter:
     def export_items(self, items):
         items_grouped_by_type = group_by_item_type(items)
 
-        BASE_PATH = "s3://hypernative-srulik/parq-test"
-        BASE_PATH = "/Users/asrulik/hypernative-srulik/parq-test"
-
-        for item_type, insert_stmt in self.item_type_to_insert_stmt_mapping.items():
+        for item_type, parquet_export_args in self.item_type_to_parquet_export_args_mapping.items():
             item_group = items_grouped_by_type.get(item_type)
             if item_group:
-                import pyarrow.parquet as pq
-                # connection = self.engine.connect()
                 converted_items = list(self.convert_items(item_group))
                 df = pd.DataFrame.from_dict(converted_items)
-                df.drop(['type', 'item_id', 'item_timestamp'], axis=1).to_parquet(f"{BASE_PATH}/{df['type'][0]}/1")
-                print(df.dtypes)
-                p_df = pd.read_parquet(f"{BASE_PATH}/{df['type'][0]}/1")
-                print(p_df.dtypes)
-                sc = pq.read_metadata(f"{BASE_PATH}/{df['type'][0]}/1")
-                i = 1
-                # connection.execute(insert_stmt, converted_items)
-                # TODO: format and write to s3
+                wr.s3.to_parquet(
+                    df=df.drop(parquet_export_args.to_drop_columns, axis=1),
+                    path=f"s3://{ETHEREUM_ETL_BUCKET}/{parquet_export_args.s3_prefix}/",
+                    dataset=True,
+                    partition_cols=['date'],
+                    mode="append",
+                    database=ETHEREUM_ETL_ATHENA_DB_NAME,
+                    table=parquet_export_args.table_name,
+                    dtype=parquet_export_args.schema
+                )
 
     def convert_items(self, items):
         for item in items:
             yield self.converter.convert_item(item)
-
-    # def create_engine(self):
-        # engine = create_engine(self.connection_url, echo=self.print_sql, pool_recycle=3600)
-        # return engine
 
     def close(self):
         pass

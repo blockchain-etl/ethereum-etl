@@ -55,7 +55,8 @@ setup(
             # that's why  we lock the version here
             'libcst==0.3.21',
             'pandas==1.4.3',
-            'pyarrow==9.0.0'
+            'pyarrow==9.0.0',
+            'awswrangler==2.16.1',
         ],
         'dev': [
             'pytest~=4.3.0'
