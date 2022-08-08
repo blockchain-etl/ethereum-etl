@@ -40,3 +40,11 @@ def debug_timer(function=None, logging_function=logging.debug, action=None):
 def get_job_path_prefix(job_name, start_block_index, end_block_index, num_nodes):
     return f's3://{OFFSETS_BUCKET}/{ETHEREUM_NODE_OFFSETS_PREFIX}/' \
            f'{job_name}_{start_block_index}_{end_block_index}_n{num_nodes}'
+
+
+def natural_number(user_input):
+    if type(user_input, int) and user_input >= 0:
+        return user_input
+    else:
+        return None
+
