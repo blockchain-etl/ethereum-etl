@@ -43,7 +43,7 @@ def get_job_path_prefix(job_name, start_block_index, end_block_index, num_nodes)
 
 
 def natural_number(user_input):
-    if type(user_input, int) and user_input >= 0:
+    if isinstance(user_input, int) and user_input >= 0:
         return user_input
     else:
         return None
