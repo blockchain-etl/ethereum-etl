@@ -49,8 +49,8 @@ if __name__ == '__main__':
         max_workers=args.max_workers,
         batch_size=args.batch_size,
         block_batch_size=args.block_batch_size,
-        start_block=start_block,
-        end_block=end_block,
+        start_block=_start_block_index,
+        end_block=_end_block_index,
         node_index=args.node_index,
         job_path_prefix=_job_path_prefix
     )
