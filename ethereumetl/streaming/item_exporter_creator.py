@@ -57,7 +57,8 @@ def create_item_exporter(output):
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
         from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
-        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, \
+            CONTRACTS
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
@@ -71,6 +72,60 @@ def create_item_exporter(output):
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
+    elif item_exporter_type == ItemExporterType.PARQUETS3:
+        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter, \
+            TimestampConversionFunctions
+        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.date_enrichment_item_converter import DateEnrichmentItemConverter
+        from blockchainetl.jobs.exporters.parquet_item_exporter import ParquetItemExporter, ParquetExporterTableArgs
+        from blockchainetl.streaming.parquet_utils import blocks_schema, transactions_schema, logs_schema, \
+            token_transfers_schema, traces_schema, tokens_schema, contracts_schema
+
+        item_exporter = ParquetItemExporter(
+            output, item_type_to_parquet_export_args_mapping={
+                'block': ParquetExporterTableArgs(
+                    s3_prefix='blocks',
+                    table_name='blocks',
+                    schema=blocks_schema
+                ),
+                'transaction': ParquetExporterTableArgs(
+                    s3_prefix='transactions',
+                    table_name='transactions',
+                    schema=transactions_schema
+                ),
+                'log': ParquetExporterTableArgs(
+                    s3_prefix='logs',
+                    table_name='logs',
+                    schema=logs_schema
+                ),
+                'token_transfer': ParquetExporterTableArgs(
+                    s3_prefix='token_transfers',
+                    table_name='token_transfers',
+                    schema=token_transfers_schema
+                ),
+                'trace': ParquetExporterTableArgs(
+                    s3_prefix='traces',
+                    table_name='traces',
+                    schema=traces_schema,
+                    to_drop_columns=['type', 'item_timestamp']
+                ),
+                'token': ParquetExporterTableArgs(
+                    s3_prefix='tokens',
+                    table_name='tokens',
+                    schema=tokens_schema
+                ),
+                'contract': ParquetExporterTableArgs(
+                    s3_prefix='contracts',
+                    table_name='contracts',
+                    schema=contracts_schema
+                ),
+            },
+            converters=[
+                DateEnrichmentItemConverter(match_fields=['timestamp', 'block_timestamp']),
+                UnixTimestampItemConverter(TimestampConversionFunctions.DATETIME),
+                IntToDecimalItemConverter(match_fields=['difficulty', 'total_difficulty', 'value', 'total_supply']),
+            ]
+        )
     elif item_exporter_type == ItemExporterType.GCS:
         from blockchainetl.jobs.exporters.gcs_item_exporter import GcsItemExporter
         bucket, path = get_bucket_and_path_from_gcs_output(output)
@@ -115,6 +170,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.POSTGRES
     elif output is not None and output.startswith('gs://'):
         return ItemExporterType.GCS
+    elif output is not None and output.startswith('parquet'):
+        return ItemExporterType.PARQUETS3
     elif output is None or output == 'console':
         return ItemExporterType.CONSOLE
     else:
@@ -128,3 +185,4 @@ class ItemExporterType:
     CONSOLE = 'console'
     KAFKA = 'kafka'
     UNKNOWN = 'unknown'
+    PARQUETS3 = 'parquets3'
