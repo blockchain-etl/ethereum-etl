@@ -9,6 +9,6 @@ def get_block_indexes(general_start_block_index, general_end_block_index, num_wo
     start_block_index = general_start_block_index + worker_index * blocks_per_node
 
     if worker_index < num_workers - 1:
-        return start_block_index, general_start_block_index + (worker_index + 1) * blocks_per_node
+        return start_block_index, general_start_block_index + (worker_index + 1) * blocks_per_node - 1
     else:
         return start_block_index, general_end_block_index
