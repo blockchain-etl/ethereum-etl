@@ -40,12 +40,21 @@ def generate_trace_block_by_number_json_rpc(block_numbers):
         )
 
 
-def generate_get_receipt_json_rpc(block_numbers):
+def generate_get_block_receipt_json_rpc(block_numbers):
     for block_number in block_numbers:
         yield generate_json_rpc(
             method='eth_getBlockReceipts',
             params=[block_number],
             request_id=block_number,
+        )
+
+
+def generate_get_receipt_json_rpc(transaction_hashes):
+    for idx, transaction_hash in enumerate(transaction_hashes):
+        yield generate_json_rpc(
+            method='eth_getTransactionReceipt',
+            params=[transaction_hash],
+            request_id=idx
         )
 
 

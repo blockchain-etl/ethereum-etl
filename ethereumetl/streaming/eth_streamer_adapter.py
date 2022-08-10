@@ -4,6 +4,7 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from blockchainetl.streaming.streamer_adapter_stub import StreamerAdapterStub
 from ethereumetl.enumeration.entity_type import EntityType
+from ethereumetl.jobs.export_block_receipts_job import ExportBlockReceiptsJob
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
@@ -130,7 +131,7 @@ class EthStreamerAdapter(StreamerAdapterStub):
     @timer
     def _export_receipts_and_logs(self, start_block, end_block):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
-        job = ExportReceiptsJob(
+        job = ExportBlockReceiptsJob(
             start_block=start_block,
             end_block=end_block,
             batch_size=self.batch_size,
