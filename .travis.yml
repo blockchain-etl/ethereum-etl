@@ -8,8 +8,6 @@ matrix:
       env: TOX_POSARGS="-e py38"
     - python: "3.9"
       env: TOX_POSARGS="-e py39"
-before_install:
-  - sudo apt-get install python-dev
 install:
   - travis_retry pip install tox
 script:
