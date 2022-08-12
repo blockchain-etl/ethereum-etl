@@ -51,7 +51,9 @@ setup(
             'pg8000==1.16.6',
             # This library is a dependency for google-cloud-pubsub, starting from 0.3.22 it requires Rust,
             # that's why  we lock the version here
-            'libcst==0.3.21'
+            'libcst==0.3.21',
+            # Later versions break the build in Travis CI for Python 3.7.2
+            'grpcio==1.46.3'
         ],
         'dev': [
             'pytest~=4.3.0'
