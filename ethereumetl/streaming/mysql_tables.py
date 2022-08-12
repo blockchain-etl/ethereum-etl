@@ -1,7 +1,6 @@
 
 from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, \
-    MetaData, PrimaryKeyConstraint, VARCHAR, DATETIME
-from sqlalchemy.dialects.postgresql import ARRAY
+    MetaData, PrimaryKeyConstraint, VARCHAR, DATETIME, MEDIUMTEXT
 
 metadata = MetaData()
 
@@ -114,7 +113,7 @@ TOKENS = Table(
     Column('name', String),
     Column('symbol', String),
     Column('decimals', Integer),
-    Column('function_sighashes', ARRAY(String)),
+    Column('function_sighashes', MEDIUMTEXT),
     Column('total_supply', Numeric(18)),
     Column('block_number', BigInteger, primary_key=True),
 )
@@ -123,7 +122,7 @@ CONTRACTS = Table(
     'contracts', metadata,
     Column('address', VARCHAR(42), primary_key=True),
     Column('bytecode', VARCHAR),
-    Column('function_sighashes', ARRAY(String)),
+    Column('function_sighashes', MEDIUMTEXT),
     Column('is_erc20', Boolean),
     Column('is_erc721', Boolean),
     Column('block_number', BigInteger, primary_key=True),
