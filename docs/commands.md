@@ -165,7 +165,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 Read [Differences between geth and parity traces.csv](schema.md#differences-between-geth-and-parity-tracescsv)
 
 The API used in this command is not supported by Infura, 
-so you will need a local Geth archive node (`geth --gcmode archive --syncmode full`).
+so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --txlookuplimit 0`).
 When using rpc, add `--rpc --rpcapi debug` options.
 
 ```bash
