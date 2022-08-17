@@ -82,7 +82,7 @@ class ExportTokenTransfersJob(BaseJob):
             if token_transfer is not None:
                 self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
-        self.web3.eth.uninstallFilter(event_filter.filter_id)
+        self.web3.eth.uninstall_filter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()

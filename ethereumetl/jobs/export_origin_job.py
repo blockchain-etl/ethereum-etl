@@ -112,7 +112,7 @@ class ExportOriginJob(BaseJob):
                     item = self.shop_listing_mapper.product_to_dict(product)
                     self.shop_product_exporter.export_item(item)
 
-            self.web3.eth.uninstallFilter(event_filter.filter_id)
+            self.web3.eth.uninstall_filter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()
