@@ -1,0 +1,12 @@
+steps:
+
+  - id: build-image
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile', '.', '-t', 'gcr.io/$PROJECT_ID/ethereum-etl:${_TAG_NAME}']
+
+  - id: push-image
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ethereum-etl:${_TAG_NAME}']
+    waitFor: ['build-image']
+
+timeout: 600s
