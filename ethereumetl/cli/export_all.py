@@ -114,11 +114,12 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output-dir', default='output', show_default=True, type=str, help='Output directory, partitioned in Hive style.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('-B', '--export-batch-size', default=100, show_default=True, type=int, help='The number of requests in JSON RPC batches.')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, export_batch_size,
+def export_all(start, end, partition_batch_size, provider_uri, output_dir, max_workers, max_retries, export_batch_size,
                chain='ethereum'):
     """Exports all data for a range of blocks."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
     export_all_common(get_partitions(start, end, partition_batch_size, provider_uri),
-                      output_dir, provider_uri, max_workers, export_batch_size)
+                      output_dir, provider_uri, max_workers, export_batch_size, max_retries)

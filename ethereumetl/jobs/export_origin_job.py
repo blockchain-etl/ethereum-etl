@@ -26,7 +26,8 @@ class ExportOriginJob(BaseJob):
             ipfs_client,
             marketplace_listing_exporter,
             shop_product_exporter,
-            max_workers):
+            max_workers,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -36,7 +37,11 @@ class ExportOriginJob(BaseJob):
         self.marketplace_listing_exporter = marketplace_listing_exporter
         self.shop_product_exporter = shop_product_exporter
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+                        starting_batch_size=batch_size, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
 
         self.event_extractor = OriginEventExtractor(ipfs_client)
 

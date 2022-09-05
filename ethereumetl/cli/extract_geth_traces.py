@@ -37,7 +37,9 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
-def extract_geth_traces(input, batch_size, output, max_workers):
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
+
+def extract_geth_traces(input, batch_size, output, max_workers, max_retries):
     """Extracts geth traces from JSON lines file."""
     with smart_open(input, 'r') as geth_traces_file:
         if input.endswith('.json'):
@@ -48,6 +50,7 @@ def extract_geth_traces(input, batch_size, output, max_workers):
             traces_iterable=traces_iterable,
             batch_size=batch_size,
             max_workers=max_workers,
+            max_retries=max_retries,
             item_exporter=traces_item_exporter(output))
 
         job.run()

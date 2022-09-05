@@ -39,8 +39,9 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('--values-as-strings', default=False, show_default=True, is_flag=True, help='Whether to convert values to strings.')
-def extract_token_transfers(logs, batch_size, output, max_workers, values_as_strings=False):
+def extract_token_transfers(logs, batch_size, output, max_workers, max_retries, values_as_strings=False):
     """Extracts ERC20/ERC721 transfers from logs file."""
     with smart_open(logs, 'r') as logs_file:
         if logs.endswith('.json'):
@@ -52,6 +53,7 @@ def extract_token_transfers(logs, batch_size, output, max_workers, values_as_str
             logs_iterable=logs_reader,
             batch_size=batch_size,
             max_workers=max_workers,
+            max_retries=max_retries,
             item_exporter=token_transfers_item_exporter(output, converters=converters))
 
         job.run()

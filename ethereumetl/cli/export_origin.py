@@ -40,9 +40,10 @@ logging_basic_config()
 @click.option('--marketplace-output', default='-', show_default=True, type=str, help='The output file for marketplace data. If not specified stdout is used.')
 @click.option('--shop-output', default='-', show_default=True, type=str, help='The output file for shop data. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
-def export_origin(start_block, end_block, batch_size, marketplace_output, shop_output, max_workers, provider_uri):
+def export_origin(start_block, end_block, batch_size, marketplace_output, shop_output, max_workers, max_retries, provider_uri):
     """Exports Origin Protocol data."""
     job = ExportOriginJob(
         start_block=start_block,
@@ -52,5 +53,6 @@ def export_origin(start_block, end_block, batch_size, marketplace_output, shop_o
         ipfs_client=get_origin_ipfs_client(),
         marketplace_listing_exporter=origin_marketplace_listing_item_exporter(marketplace_output),
         shop_product_exporter=origin_shop_product_item_exporter(shop_output),
-        max_workers=max_workers)
+        max_workers=max_workers,
+        max_retries=max_retries)
     job.run()

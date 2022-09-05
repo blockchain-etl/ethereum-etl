@@ -38,14 +38,19 @@ class ExportGethTracesJob(BaseJob):
             batch_size,
             batch_web3_provider,
             max_workers,
-            item_exporter):
+            item_exporter,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
 
         self.batch_web3_provider = batch_web3_provider
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+            starting_batch_size=batch_size, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
         self.item_exporter = item_exporter
 
         self.geth_trace_mapper = EthGethTraceMapper()

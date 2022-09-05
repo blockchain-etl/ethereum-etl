@@ -42,13 +42,14 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('--receipts-output', default=None, show_default=True, type=str,
               help='The output file for receipts. If not provided receipts will not be exported. Use "-" for stdout')
 @click.option('--logs-output', default=None, show_default=True, type=str,
               help='The output file for receipt logs. '
                    'If not provided receipt logs will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, receipts_output, logs_output,
+def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_workers, max_retries, receipts_output, logs_output,
                              chain='ethereum'):
     """Exports receipts and logs."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
@@ -58,6 +59,7 @@ def export_receipts_and_logs(batch_size, transaction_hashes, provider_uri, max_w
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
+            max_retries=max_retries,
             item_exporter=receipts_and_logs_item_exporter(receipts_output, logs_output),
             export_receipts=receipts_output is not None,
             export_logs=logs_output is not None)
