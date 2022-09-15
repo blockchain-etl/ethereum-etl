@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
@@ -86,7 +87,16 @@ class ExportTracesJob(BaseJob):
 
         # TODO: Change to traceFilter when this issue is fixed
         # https://github.com/paritytech/parity-ethereum/issues/9822
-        json_traces = self.web3.parity.traceBlock(block_number)
+        try:
+            json_traces = self.web3.parity.traceBlock(block_number)
+        except ValueError as e:
+            if 'insufficient funds' in str(e):
+                logging.exception(f'An "insufficient funds" error occurred while tracing block {block_number}. '
+                                  f'See here for more details: https://github.com/ledgerwatch/erigon/issues/5284. '
+                                  f'The block will be skipped.')
+                return
+            else:
+                raise e
 
         if json_traces is None:
             raise ValueError('Response from the node is None. Is the node fully synced? Is the node started with tracing enabled? Is trace_block API enabled?')
