@@ -2,7 +2,7 @@ import collections
 import json
 import logging
 
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 
 from blockchainetl.jobs.exporters.converters.composite_item_converter import CompositeItemConverter
 
@@ -13,28 +13,41 @@ class KafkaItemExporter:
         self.item_type_to_topic_mapping = item_type_to_topic_mapping
         self.converter = CompositeItemConverter(converters)
         self.connection_url = self.get_connection_url(output)
-        print(self.connection_url)
-        self.producer = KafkaProducer(bootstrap_servers=self.connection_url)
+        self.topic_prefix = self.get_topic_prefix(output)
+        print(self.connection_url, self.topic_prefix)
+        self.producer = Producer({
+            'bootstrap.servers': self.connection_url,
+            'transactional.id': 'ethereumetl',
+            'enable.idempotence': True,
+        })
 
     def get_connection_url(self, output):
         try:
             return output.split('/')[1]
-        except KeyError:
-            raise Exception('Invalid kafka output param, It should be in format of "kafka/127.0.0.1:9092"')
+        except IndexError:
+            raise Exception('Invalid kafka output param, It should be in format of "kafka/127.0.0.1:9092" or "kafka/127.0.0.1:9092/<topic-prefix>"')
+
+    def get_topic_prefix(self, output):
+        try:
+            return output.split('/')[2] + "."
+        except IndexError:
+            return ''
 
     def open(self):
-        pass
+        self.producer.init_transactions()
 
     def export_items(self, items):
+        self.producer.begin_transaction()
         for item in items:
             self.export_item(item)
-
+        self.producer.commit_transaction()
+        
     def export_item(self, item):
         item_type = item.get('type')
         if item_type is not None and item_type in self.item_type_to_topic_mapping:
             data = json.dumps(item).encode('utf-8')
-            print(data)
-            return self.producer.send(self.item_type_to_topic_mapping[item_type], value=data)
+            logging.debug(data)
+            return self.producer.produce(self.topic_prefix + self.item_type_to_topic_mapping[item_type], data)
         else:
             logging.warning('Topic for item type "{}" is not configured.'.format(item_type))
 
@@ -43,9 +56,8 @@ class KafkaItemExporter:
             yield self.converter.convert_item(item)
 
     def close(self):
-        pass
-
-
+       pass
+        
 def group_by_item_type(items):
     result = collections.defaultdict(list)
     for item in items:
