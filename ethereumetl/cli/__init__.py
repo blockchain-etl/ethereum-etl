@@ -48,7 +48,7 @@ from ethereumetl.cli.stream import stream
 
 
 @click.group()
-@click.version_option(version='2.0.5')
+@click.version_option(version='2.0.6')
 @click.pass_context
 def cli(ctx):
     pass
