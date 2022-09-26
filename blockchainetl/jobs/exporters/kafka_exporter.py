@@ -33,7 +33,7 @@ class KafkaItemExporter:
         item_type = item.get('type')
         if item_type is not None and item_type in self.item_type_to_topic_mapping:
             data = json.dumps(item).encode('utf-8')
-            print(data)
+            logging.debug(data)
             return self.producer.send(self.item_type_to_topic_mapping[item_type], value=data)
         else:
             logging.warning('Topic for item type "{}" is not configured.'.format(item_type))
