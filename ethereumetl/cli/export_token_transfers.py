@@ -25,6 +25,7 @@ import click
 
 from ethereumetl.web3_utils import build_web3
 
+from ethereumetl.csv_utils import set_max_field_size_limit
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from blockchainetl.logging_utils import logging_basic_config
@@ -45,6 +46,7 @@ logging_basic_config()
 @click.option('-t', '--tokens', default=None, show_default=True, type=str, multiple=True, help='The list of token addresses to filter by.')
 def export_token_transfers(start_block, end_block, batch_size, output, max_workers, provider_uri, tokens):
     """Exports ERC20/ERC721 transfers."""
+    set_max_field_size_limit()
     job = ExportTokenTransfersJob(
         start_block=start_block,
         end_block=end_block,
