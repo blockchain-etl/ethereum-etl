@@ -116,6 +116,7 @@ symbol                       | string      |
 name                         | string      |
 decimals                     | bigint      |
 total_supply                 | numeric     |
+block_number                 | bigint     |
 
 ---
 
