@@ -55,6 +55,10 @@ setup(
             # Later versions break the build in Travis CI for Python 3.7.2
             'grpcio==1.46.3'
         ],
+        'streaming-kinesis': [
+            'boto3==1.24.11',
+            'botocore==1.27.11',
+        ],
         'dev': [
             'pytest~=4.3.0'
         ]
