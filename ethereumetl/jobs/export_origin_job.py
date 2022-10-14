@@ -43,6 +43,7 @@ class ExportOriginJob(BaseJob):
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.marketplace_listing_mapper = OriginMarketplaceListingMapper()
         self.shop_listing_mapper = OriginShopProductMapper()
+        self._supports_eth_newFilter = True
 
 
     def _start(self):
@@ -100,8 +101,18 @@ class ExportOriginJob(BaseJob):
                 'fromBlock': batch['from_block'],
                 'toBlock': batch['to_block']
             }
-            event_filter = self.web3.eth.filter(filter_params)
-            events = event_filter.get_all_entries()
+            if self._supports_eth_newFilter:
+                try:
+                    event_filter = self.web3.eth.filter(filter_params)
+                    events = event_filter.get_all_entries()
+                except ValueError as e:
+                    if str(e) == "{'code': -32000, 'message': 'the method is currently not implemented: eth_newFilter'}":
+                        self._supports_eth_newFilter = False
+                        events = self.web3.eth.getLogs(filter_params)
+                    else:
+                        raise(e)
+            else:
+                events = self.web3.eth.getLogs(filter_params)
             for event in events:
                 log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
                 listing, shop_products = self.event_extractor.extract_event_from_log(log, batch['contract_version'])
@@ -112,7 +123,8 @@ class ExportOriginJob(BaseJob):
                     item = self.shop_listing_mapper.product_to_dict(product)
                     self.shop_product_exporter.export_item(item)
 
-            self.web3.eth.uninstallFilter(event_filter.filter_id)
+            if self._supports_eth_newFilter:
+                self.web3.eth.uninstallFilter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()
