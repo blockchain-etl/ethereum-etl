@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
+import sys
+sys.setrecursionlimit(1000000)
 import json
 import socket
 
@@ -46,6 +47,7 @@ class BatchIPCProvider(IPCProvider):
         with self._lock, self._socket as sock:
             try:
                 sock.sendall(request)
+                sock.settimeout(600)
             except BrokenPipeError:
                 # one extra attempt, then give up
                 sock = self._socket.reset()
