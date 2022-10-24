@@ -93,7 +93,9 @@ def create_item_exporter(output):
             'contract': 'contracts',
             'token': 'tokens',
         })
-
+    elif item_exporter_type == ItemExporterType.RABBITMQ:
+        from blockchainetl.jobs.exporters.rabbitmq_exporter import RabbitMQItemExporter
+        item_exporter = RabbitMQItemExporter(output)
     else:
         raise ValueError('Unable to determine item exporter type for output ' + output)
 
@@ -118,6 +120,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.KINESIS
     if output is not None and output.startswith('kafka'):
         return ItemExporterType.KAFKA
+    if output is not None and output.startswith('rabbitmq'):
+        return ItemExporterType.RABBITMQ
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
     elif output is not None and output.startswith('gs://'):
@@ -135,4 +139,5 @@ class ItemExporterType:
     GCS = 'gcs'
     CONSOLE = 'console'
     KAFKA = 'kafka'
+    RABBITMQ = 'rabbitmq'
     UNKNOWN = 'unknown'
