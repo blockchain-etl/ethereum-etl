@@ -32,7 +32,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('-l', '--last-synced-block-file', default='last_synced_block.txt', show_default=True, type=str, help='')
+@click.option('-l', '--last-synced-block-file', default='sync/last_synced_block.txt', show_default=True, type=str, help='')
 @click.option('--lag', default=0, show_default=True, type=int, help='The number of blocks to lag behind the network.')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
