@@ -21,8 +21,6 @@ parts/
 sdist/
 var/
 wheels/
-/.idea/
-
 *.egg-info/
 .installed.cfg
 *.egg
@@ -51,4 +49,4 @@ venv/
 ENV/
 
 # etl
-sync/
+/last_synced_block.txt

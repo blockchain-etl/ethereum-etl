@@ -48,7 +48,7 @@ def read_resource(resource_group, file_name):
 ])
 def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, entity_types, provider_type):
     try:
-        os.remove('sync/last_synced_block.txt')
+        os.remove('last_synced_block.txt')
     except OSError:
         pass
 

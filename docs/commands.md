@@ -219,7 +219,7 @@ e.g. `-e block,transaction,log,token_transfer,trace,contract,token`.
     The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema) 
     and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this 
     repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres). 
-- The command saves its state to `sync/last_synced_block.txt` file where the last synced block number is saved periodically.
+- The command saves its state to `last_synced_block.txt` file where the last synced block number is saved periodically.
 - Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the 
 file where the block number, from which to start streaming the blockchain data, is saved.
 - Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to 
