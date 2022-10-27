@@ -24,7 +24,7 @@ Export blocks and transactions ([Schema](docs/schema.md#blockscsv), [Reference](
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --blocks-output blocks.csv --transactions-output transactions.csv \
---provider-uri https://eth-mainnet.g.alchemy.com/v2/AvOXKWd4q-6_tMsGFMi2fLp2EM-HHTsK
+--provider-uri https://eth-mainnet.g.alchemy.com/v2/alchemy_api_key
 ```
 
 Export ERC20 and ERC721 transfers ([Schema](docs/schema.md#token_transferscsv), [Reference](docs/commands.md##export_token_transfers)):
@@ -48,7 +48,7 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 ```bash
 > pip3 install ethereum-etl[streaming]
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt \
---provider-uri https://eth-mainnet.g.alchemy.com/v2/AvOXKWd4q-6_tMsGFMi2fLp2EM-HHTsK
+--provider-uri https://eth-mainnet.g.alchemy.com/v2/alchemy_api_key
 ```
 
 Find other commands [here](https://ethereum-etl.readthedocs.io/en/latest/commands/).
