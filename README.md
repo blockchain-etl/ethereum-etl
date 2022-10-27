@@ -24,7 +24,7 @@ Export blocks and transactions ([Schema](docs/schema.md#blockscsv), [Reference](
 ```bash
 > ethereumetl export_blocks_and_transactions --start-block 0 --end-block 500000 \
 --blocks-output blocks.csv --transactions-output transactions.csv \
---provider-uri https://mainnet.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c
+--provider-uri https://eth-mainnet.g.alchemy.com/v2/AvOXKWd4q-6_tMsGFMi2fLp2EM-HHTsK
 ```
 
 Export ERC20 and ERC721 transfers ([Schema](docs/schema.md#token_transferscsv), [Reference](docs/commands.md##export_token_transfers)):
@@ -48,7 +48,7 @@ Stream blocks, transactions, logs, token_transfers continually to console ([Refe
 ```bash
 > pip3 install ethereum-etl[streaming]
 > ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt \
---provider-uri https://mainnet.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c
+--provider-uri https://eth-mainnet.g.alchemy.com/v2/AvOXKWd4q-6_tMsGFMi2fLp2EM-HHTsK
 ```
 
 Find other commands [here](https://ethereum-etl.readthedocs.io/en/latest/commands/).
@@ -78,7 +78,7 @@ For the latest version, check out the repo and call
 ```bash
 > pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
-> export PROVIDER_URL=<your_porvider_uri>
+> export PROVIDER_URL=<your_provider_uri>
 > pytest -vv
 ``` 
 
@@ -100,8 +100,8 @@ For the latest version, check out the repo and call
         
 3. Run a container out of the image
 
-        > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 0 -e 5499999 -b 100000 -p https://mainnet.infura.io
-        > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://mainnet.infura.io
+        > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 0 -e 5499999 -b 100000 -p https://eth-mainnet.g.alchemy.com/v2/
+        > docker run -v $HOME/output:/ethereum-etl/output ethereum-etl:latest export_all -s 2018-01-01 -e 2018-01-01 -p https://eth-mainnet.g.alchemy.com/v2/
 
 4. Run streaming to console or Pub/Sub
 
