@@ -28,6 +28,15 @@ from web3 import IPCProvider, HTTPProvider
 from ethereumetl.providers.ipc import BatchIPCProvider
 from ethereumetl.providers.rpc import BatchHTTPProvider
 
+
+from requests import (
+    Session,
+)
+from requests.adapters import (
+    HTTPAdapter,
+)
+
+
 DEFAULT_TIMEOUT = 60
 
 
@@ -40,10 +49,14 @@ def get_provider_from_uri(uri_string, timeout=DEFAULT_TIMEOUT, batch=False):
             return IPCProvider(uri.path, timeout=timeout)
     elif uri.scheme == 'http' or uri.scheme == 'https':
         request_kwargs = {'timeout': timeout}
+        adapter = HTTPAdapter(pool_maxsize=128)
+        session = Session()
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
         if batch:
-            return BatchHTTPProvider(uri_string, request_kwargs=request_kwargs)
+            return BatchHTTPProvider(uri_string, session=session, request_kwargs=request_kwargs)
         else:
-            return HTTPProvider(uri_string, request_kwargs=request_kwargs)
+            return HTTPProvider(uri_string, session=session, request_kwargs=request_kwargs)
     else:
         raise ValueError('Unknown uri scheme {}'.format(uri_string))
 
