@@ -57,7 +57,11 @@ class RabbitMQItemExporter:
 
         try:
             self._publish(msg)
-        except (pika.exceptions.ConnectionClosed, pika.exceptions.ChannelWrongStateError):
+        except (
+                pika.exceptions.ConnectionClosed,
+                pika.exceptions.ChannelWrongStateError,
+                pika.exceptions.StreamLostError
+        ):
             logging.debug('reconnecting to queue')
             self.connect()
             self._publish(msg)
