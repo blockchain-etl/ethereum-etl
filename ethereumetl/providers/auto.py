@@ -49,7 +49,7 @@ def get_provider_from_uri(uri_string, timeout=DEFAULT_TIMEOUT, batch=False):
             return IPCProvider(uri.path, timeout=timeout)
     elif uri.scheme == 'http' or uri.scheme == 'https':
         request_kwargs = {'timeout': timeout}
-        adapter = HTTPAdapter(pool_maxsize=128)
+        adapter = HTTPAdapter(pool_connections=128, pool_maxsize=128)
         session = Session()
         session.mount("http://", adapter)
         session.mount("https://", adapter)
