@@ -33,10 +33,13 @@ class EthContractService:
             evm_code.disassemble(bytecode)
             basic_blocks = evm_code.basicblocks
             if basic_blocks and len(basic_blocks) > 0:
-                init_block = basic_blocks[0]
-                instructions = init_block.instructions
-                push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
-                return sorted(list(set('0x' + inst.operand for inst in push4_instructions)))
+                push4_instructions = set()
+                for block in basic_blocks:
+                    instructions = block.instructions
+                    block_push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
+                    push4_instructions.update(block_push4_instructions)
+                
+                return sorted(list({'0x' + inst.operand for inst in push4_instructions}))
             else:
                 return []
         else:
