@@ -62,12 +62,13 @@ def create_item_exporter(output):
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
         from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
-        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, RECEIPTS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
                 'block': create_insert_statement_for_table(BLOCKS),
                 'transaction': create_insert_statement_for_table(TRANSACTIONS),
+                'receipt': create_insert_statement_for_table(RECEIPTS),
                 'log': create_insert_statement_for_table(LOGS),
                 'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
                 'trace': create_insert_statement_for_table(TRACES),

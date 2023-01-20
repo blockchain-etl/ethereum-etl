@@ -54,6 +54,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
 
     blocks_output_file = str(tmpdir.join('actual_blocks.json'))
     transactions_output_file = str(tmpdir.join('actual_transactions.json'))
+    receipts_output_file = str(tmpdir.join('actual_receipts.json'))
     logs_output_file = str(tmpdir.join('actual_logs.json'))
     token_transfers_output_file = str(tmpdir.join('actual_token_transfers.json'))
     traces_output_file = str(tmpdir.join('actual_traces.json'))
@@ -71,6 +72,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
             filename_mapping={
                 'block': blocks_output_file,
                 'transaction': transactions_output_file,
+                'receipt': receipts_output_file,
                 'log': logs_output_file,
                 'token_transfer': token_transfers_output_file,
                 'trace': traces_output_file,
@@ -100,6 +102,13 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
         print(read_file(transactions_output_file))
         compare_lines_ignore_order(
             read_resource(resource_group, 'expected_transactions.json'), read_file(transactions_output_file)
+        )
+
+    if 'receipt' in entity_types:
+        print('=====================')
+        print(read_file(receipts_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_receipts.json'), read_file(receipts_output_file)
         )
 
     if 'log' in entity_types:

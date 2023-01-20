@@ -57,38 +57,31 @@ def join(left, right, join_fields, left_fields, right_fields):
             yield result_item
 
 
-def enrich_transactions(transactions, receipts):
+def enrich_transactions(transactions):
+    return transactions
+
+def enrich_receipts(blocks, receipts):
     result = list(join(
-        transactions, receipts, ('hash', 'transaction_hash'),
-        left_fields=[
+        receipts, blocks, ('block_number', 'number'),
+        [
             'type',
-            'hash',
-            'nonce',
+            'transaction_hash',
             'transaction_index',
-            'from_address',
-            'to_address',
-            'value',
-            'gas',
-            'gas_price',
-            'input',
-            'block_timestamp',
             'block_number',
-            'block_hash',
-            'max_fee_per_gas',
-            'max_priority_fee_per_gas',
-            'transaction_type'
+            'cumulative_gas_used',
+            'gas_used',
+            'contract_address',
+            'root',
+            'status',
+            'effective_gas_price',
         ],
-        right_fields=[
-            ('cumulative_gas_used', 'receipt_cumulative_gas_used'),
-            ('gas_used', 'receipt_gas_used'),
-            ('contract_address', 'receipt_contract_address'),
-            ('root', 'receipt_root'),
-            ('status', 'receipt_status'),
-            ('effective_gas_price', 'receipt_effective_gas_price')
+        [
+            ('timestamp', 'block_timestamp'),
+            ('hash', 'block_hash'),
         ]))
 
-    if len(result) != len(transactions):
-        raise ValueError('The number of transactions is wrong ' + str(result))
+    if len(result) != len(receipts):
+        raise ValueError('The number of receipts is wrong ' + str(result))
 
     return result
 

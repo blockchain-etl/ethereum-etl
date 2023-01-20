@@ -62,18 +62,27 @@ TRANSACTIONS = Table(
     Column('gas', BigInteger),
     Column('gas_price', BigInteger),
     Column('input', String),
-    Column('receipt_cumulative_gas_used', BigInteger),
-    Column('receipt_gas_used', BigInteger),
-    Column('receipt_contract_address', String),
-    Column('receipt_root', String),
-    Column('receipt_status', BigInteger),
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
     Column('max_fee_per_gas', BigInteger),
     Column('max_priority_fee_per_gas', BigInteger),
     Column('transaction_type', BigInteger),
-    Column('receipt_effective_gas_price', BigInteger),
+)
+
+RECEIPTS = Table(
+    'receipts', metadata,
+    Column('transaction_hash', String, primary_key=True),
+    Column('transaction_index', BigInteger),
+    Column('cumulative_gas_used', BigInteger),
+    Column('gas_used', BigInteger),
+    Column('contract_address', String),
+    Column('root', String),
+    Column('status', BigInteger),
+    Column('effective_gas_price', BigInteger),
+    Column('block_timestamp', TIMESTAMP),
+    Column('block_number', BigInteger),
+    Column('block_hash', String),
 )
 
 LOGS = Table(
