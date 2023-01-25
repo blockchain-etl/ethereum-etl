@@ -53,7 +53,7 @@ BLOCKS = Table(
 
 TRANSACTIONS = Table(
     'transactions', metadata,
-    Column('hash', String, primary_key=True),
+    Column('hash', String),
     Column('nonce', BigInteger),
     Column('transaction_index', BigInteger),
     Column('from_address', String),
@@ -68,11 +68,12 @@ TRANSACTIONS = Table(
     Column('max_fee_per_gas', BigInteger),
     Column('max_priority_fee_per_gas', BigInteger),
     Column('transaction_type', BigInteger),
+    PrimaryKeyConstraint('block_number', 'hash', name='transactions_pk'),
 )
 
 RECEIPTS = Table(
     'receipts', metadata,
-    Column('transaction_hash', String, primary_key=True),
+    Column('transaction_hash', String),
     Column('transaction_index', BigInteger),
     Column('cumulative_gas_used', BigInteger),
     Column('gas_used', BigInteger),
@@ -83,12 +84,13 @@ RECEIPTS = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    PrimaryKeyConstraint('block_number', 'transaction_hash', name='receipts_pk')
 )
 
 LOGS = Table(
     'logs', metadata,
-    Column('log_index', BigInteger, primary_key=True),
-    Column('transaction_hash', String, primary_key=True),
+    Column('log_index', BigInteger),
+    Column('transaction_hash', String),
     Column('transaction_index', BigInteger),
     Column('address', String),
     Column('data', String),
@@ -99,6 +101,7 @@ LOGS = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    PrimaryKeyConstraint('log_index', 'transaction_hash','address', name='logs_pk')
 )
 
 TOKEN_TRANSFERS = Table(
@@ -107,11 +110,13 @@ TOKEN_TRANSFERS = Table(
     Column('from_address', String),
     Column('to_address', String),
     Column('value', Numeric(78)),
-    Column('transaction_hash', String, primary_key=True),
-    Column('log_index', BigInteger, primary_key=True),
+    Column('transaction_hash', String),
+    Column('log_index', BigInteger),
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
+    PrimaryKeyConstraint('token_address', 'transaction_hash', 'log_index', name='token_transfers_pk'),
+
 )
 
 TRACES = Table(
@@ -135,7 +140,8 @@ TRACES = Table(
     Column('block_timestamp', TIMESTAMP),
     Column('block_number', BigInteger),
     Column('block_hash', String),
-    Column('trace_id', String, primary_key=True),
+    Column('trace_id', String),
+    PrimaryKeyConstraint('block_number', 'trace_id', name='traces_pk')
 )
 
 TOKENS = Table(
@@ -144,9 +150,10 @@ TOKENS = Table(
     Column('name', String),
     Column('symbol', String),
     Column('decimals', Integer),
-    Column('function_sighashes', ARRAY(String)),
     Column('total_supply', Numeric(78)),
     Column('block_number', BigInteger),
+    Column('block_hash',VARCHAR(66)),
+    Column('block_timestamp',TIMESTAMP),
     PrimaryKeyConstraint('address', 'block_number', name='tokens_pk'),
 )
 

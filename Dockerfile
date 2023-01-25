@@ -5,7 +5,7 @@ ENV PROJECT_DIR=ethereum-etl
 RUN mkdir /$PROJECT_DIR
 WORKDIR /$PROJECT_DIR
 COPY . .
-RUN pip install --upgrade pip && pip install -e /$PROJECT_DIR/[streaming]
+RUN pip install --upgrade pip && pip install -e /$PROJECT_DIR/[streaming] psycopg2
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
