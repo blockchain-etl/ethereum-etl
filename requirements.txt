@@ -3,7 +3,7 @@ eth-utils==1.10.0
 eth-abi==2.1.1
 click==8.1.2
 ethereum-dasm==0.1.5
-base58
-requests
-sqlalchemy
-psycopg2
+base58==2.1.1
+requests==2.28.2
+sqlalchemy==1.4.46
+psycopg2==2.9.5
