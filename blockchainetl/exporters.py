@@ -119,9 +119,16 @@ class CsvItemExporter(BaseItemExporter):
         return serializer(value)
 
     def _join_if_needed(self, value):
+        def to_string(x):
+            if isinstance(x, dict):
+                # Separators without whitespace for compact format.
+                return JSONEncoder(separators=(',', ':')).encode(x)
+            else:
+                return str(x)
+
         if isinstance(value, (list, tuple)):
             try:
-                return self._join_multivalued.join(str(x) for x in value)
+                return self._join_multivalued.join(to_string(x) for x in value)
             except TypeError:  # list in value may not contain strings
                 pass
         return value

@@ -21,6 +21,12 @@ def get_web3_provider(provider_type, read_resource_lambda=None, batch=False):
             provider = BatchHTTPProvider(provider_url)
         else:
             provider = HTTPProvider(provider_url)
+    elif provider_type == 'goerli':
+        provider_url = os.environ.get('GOERLI_PROVIDER_URL', 'https://goerli.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c')
+        if batch:
+            provider = BatchHTTPProvider(provider_url)
+        else:
+            provider = HTTPProvider(provider_url)
     else:
         raise ValueError('Provider type {} is unexpected'.format(provider_type))
     return provider
