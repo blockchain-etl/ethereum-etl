@@ -21,4 +21,4 @@ Easily export:
 
 ## Projects using Ethereum ETL
 * [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
-* [Nansen](https://nansen.ai/?ref=ethereumetl) - Analytics platform for Ethereum
+* [Nansen](https://nansen.ai/query?ref=ethereumetl) - Analytics platform for Ethereum
