@@ -36,18 +36,21 @@ def read_resource(resource_group, file_name):
     return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
 
 
-@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group,web3_provider_type", [
-    (0, 0, 1, 'block_without_transactions', 'mock'),
-    (483920, 483920, 1, 'block_with_logs', 'mock'),
-    (47218, 47219, 1, 'blocks_with_transactions', 'mock'),
-    (47218, 47219, 2, 'blocks_with_transactions', 'mock'),
-    skip_if_slow_tests_disabled((0, 0, 1, 'block_without_transactions', 'infura')),
-    skip_if_slow_tests_disabled((483920, 483920, 1, 'block_with_logs', 'infura')),
-    skip_if_slow_tests_disabled((47218, 47219, 2, 'blocks_with_transactions', 'infura')),
+@pytest.mark.parametrize("start_block,end_block,batch_size,resource_group,web3_provider_type,format", [
+    (0, 0, 1, 'block_without_transactions', 'mock', 'csv'),
+    (483920, 483920, 1, 'block_with_logs', 'mock', 'csv'),
+    (47218, 47219, 1, 'blocks_with_transactions', 'mock', 'csv'),
+    (47218, 47219, 2, 'blocks_with_transactions', 'mock', 'csv'),
+    skip_if_slow_tests_disabled((0, 0, 1, 'block_without_transactions', 'infura', 'csv')),
+    skip_if_slow_tests_disabled((483920, 483920, 1, 'block_with_logs', 'infura', 'csv')),
+    skip_if_slow_tests_disabled((47218, 47219, 2, 'blocks_with_transactions', 'infura', 'csv')),
+    # TODO: Update these tests after Shanghai:
+    skip_if_slow_tests_disabled((8656134, 8656135, 2, 'blocks_with_transactions_goerli', 'goerli', 'csv')),
+    skip_if_slow_tests_disabled((8656134, 8656135, 2, 'blocks_with_transactions_goerli', 'goerli', 'json')),
 ])
-def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type):
-    blocks_output_file = str(tmpdir.join('actual_blocks.csv'))
-    transactions_output_file = str(tmpdir.join('actual_transactions.csv'))
+def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type, format):
+    blocks_output_file = str(tmpdir.join(f'actual_blocks.{format}'))
+    transactions_output_file = str(tmpdir.join(f'actual_transactions.{format}'))
 
     job = ExportBlocksJob(
         start_block=start_block, end_block=end_block, batch_size=batch_size,
@@ -62,9 +65,9 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
     job.run()
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_blocks.csv'), read_file(blocks_output_file)
+        read_resource(resource_group, f'expected_blocks.{format}'), read_file(blocks_output_file)
     )
 
     compare_lines_ignore_order(
-        read_resource(resource_group, 'expected_transactions.csv'), read_file(transactions_output_file)
+        read_resource(resource_group, f'expected_transactions.{format}'), read_file(transactions_output_file)
     )

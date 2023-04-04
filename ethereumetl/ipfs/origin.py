@@ -6,7 +6,7 @@ from ethereumetl.ipfs.client import IpfsClient
 
 logger = logging.getLogger('origin')
 
-IPFS_PRIMARY_GATEWAY_URL = 'https://ipfs-prod.ogn.app/ipfs'
+IPFS_PRIMARY_GATEWAY_URL = 'https://cf-ipfs.com/ipfs'
 IPFS_SECONDARY_GATEWAY_URL = 'https://gateway.ipfs.io/ipfs'
 
 # Returns an IPFS client that can be used to fetch Origin Protocol's data.
