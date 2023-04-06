@@ -21,6 +21,7 @@ CREATE DATABASE ethereumetl;
   - blocks: [schemas/aws/blocks.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/blocks.sql)
   - transactions: [schemas/aws/transactions.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/transactions.sql)
   - token_transfers: [schemas/aws/token_transfers.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/token_transfers.sql)
+  - token_approvals: [schemas/aws/token_approvals.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/token_approvals.sql)
   - contracts: [schemas/aws/contracts.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/contracts.sql)
   - receipts: [schemas/aws/receipts.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/receipts.sql)
   - logs: [schemas/aws/logs.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/logs.sql)
@@ -38,5 +39,6 @@ Read [this article](https://medium.com/@medvedev1088/converting-ethereum-etl-fil
   - parquet_blocks: [schemas/aws/parquet/parquet_blocks.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/parquet/parquet_blocks.sql)
   - parquet_transactions: [schemas/aws/parquet/parquet_transactions.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/parquet/parquet_transactions.sql)
   - parquet_token_transfers: [schemas/aws/parquet/parquet_token_transfers.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/parquet/parquet_token_transfers.sql)
+  - parquet_token_approvals: [schemas/aws/parquet/parquet_token_approvals.sql](https://github.com/blockchain-etl/ethereum-etl/blob/master/schemas/aws/parquet/parquet_token_approvals.sql)
 
 Note that [DECIMAL type is limited to 38 digits in Hive](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-decimal) so values greater than 38 decimals will be null.

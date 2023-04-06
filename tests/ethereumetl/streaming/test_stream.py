@@ -45,8 +45,6 @@ def read_resource(resource_group, file_name):
     skip_if_slow_tests_disabled([1755634, 1755635, 1, 'blocks_1755634_1755635', EntityType.ALL_FOR_INFURA, 'infura']),
     (508110, 508110, 1, 'blocks_508110_508110', ['trace', 'contract', 'token'], 'mock'),
     (2112234, 2112234, 1, 'blocks_2112234_2112234', ['trace', 'contract', 'token'], 'mock'),
-    # TODO: Update these tests after Shanghai:
-    skip_if_slow_tests_disabled([8656134, 8656135, 1, 'blocks_8656134_8656135_goerli', EntityType.ALL_FOR_INFURA, 'goerli']),
 ])
 def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, entity_types, provider_type):
     try:
@@ -58,6 +56,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
     transactions_output_file = str(tmpdir.join('actual_transactions.json'))
     logs_output_file = str(tmpdir.join('actual_logs.json'))
     token_transfers_output_file = str(tmpdir.join('actual_token_transfers.json'))
+    token_approvals_output_file = str(tmpdir.join('actual_token_approvals.json'))
     traces_output_file = str(tmpdir.join('actual_traces.json'))
     contracts_output_file = str(tmpdir.join('actual_contracts.json'))
     tokens_output_file = str(tmpdir.join('actual_tokens.json'))
@@ -75,6 +74,7 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
                 'transaction': transactions_output_file,
                 'log': logs_output_file,
                 'token_transfer': token_transfers_output_file,
+                'token_approval': token_approvals_output_file,
                 'trace': traces_output_file,
                 'contract': contracts_output_file,
                 'token': tokens_output_file,
@@ -116,6 +116,13 @@ def test_stream(tmpdir, start_block, end_block, batch_size, resource_group, enti
         print(read_file(token_transfers_output_file))
         compare_lines_ignore_order(
             read_resource(resource_group, 'expected_token_transfers.json'), read_file(token_transfers_output_file)
+        )
+
+    if 'token_approval' in entity_types:
+        print('=====================')
+        print(read_file(token_approvals_output_file))
+        compare_lines_ignore_order(
+            read_resource(resource_group, 'expected_token_approvals.json'), read_file(token_approvals_output_file)
         )
 
     if 'trace' in entity_types:

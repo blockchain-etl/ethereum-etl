@@ -21,26 +21,15 @@
 # SOFTWARE.
 
 
-class EthBlock(object):
-    def __init__(self):
-        self.number = None
-        self.hash = None
-        self.parent_hash = None
-        self.nonce = None
-        self.sha3_uncles = None
-        self.logs_bloom = None
-        self.transactions_root = None
-        self.state_root = None
-        self.receipts_root = None
-        self.miner = None
-        self.difficulty = None
-        self.total_difficulty = None
-        self.size = None
-        self.extra_data = None
-        self.gas_limit = None
-        self.gas_used = None
-        self.timestamp = None
-
-        self.transactions = []
-        self.transaction_count = 0
-        self.base_fee_per_gas = 0
+class EthTokenApprovalMapper(object):
+    def token_approval_to_dict(self, token_approval):
+        return {
+            'type': 'token_approval',
+            'token_address': token_approval.token_address,
+            'owner_address': token_approval.owner_address,
+            'spender_address': token_approval.spender_address,
+            'value': token_approval.value,
+            'transaction_hash': token_approval.transaction_hash,
+            'log_index': token_approval.log_index,
+            'block_number': token_approval.block_number,
+        }

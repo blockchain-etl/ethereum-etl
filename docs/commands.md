@@ -63,6 +63,28 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 [Token transfers schema](schema.md#token_transferscsv).
 
+#### export_token_approvals
+
+The API used in this command is not supported by Infura, so you will need a local node.
+If you want to use Infura for exporting ERC20 approvals refer to [extract_token_approvals](#extract_token_approvals)
+
+```bash
+> ethereumetl export_token_approvals --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --batch-size 100 --output token_approvals.csv
+```
+
+Include `--tokens <token1> --tokens <token2>` to filter only certain tokens, e.g.
+
+```bash
+> ethereumetl export_token_approvals --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_approvals.csv \
+--tokens 0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C --tokens 0x80fB784B7eD66730e8b1DBd9820aFD29931aab03
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
+
+[Token approvals schema](schema.md#token_approvalscsv).
+
 #### export_receipts_and_logs
 
 First extract transaction hashes from `transactions.csv`
@@ -101,6 +123,20 @@ Then extract transfers from the logs.csv file:
 You can tune `--batch-size`, `--max-workers` for performance.
 
 [Token transfers schema](schema.md#token_transferscsv).
+
+#### extract_token_approvals
+
+First export receipt logs with [export_receipts_and_logs](#export_receipts_and_logs).
+
+Then extract transfers from the logs.csv file:
+
+```bash
+> ethereumetl extract_token_approvals --logs logs.csv --output token_approvals.csv
+```
+
+You can tune `--batch-size`, `--max-workers` for performance.
+
+[Token transfers schema](schema.md#token_approvalscsv).
 
 #### export_contracts
 
@@ -146,10 +182,10 @@ You can tune `--max-workers` for performance.
 #### export_traces
 
 Also called internal transactions.
-The API used in this command is not supported by Infura, 
-so you will need a local Parity archive node (`parity --tracing on`). 
-Make sure your node has at least 8GB of memory, or else you will face timeout errors. 
-See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137) 
+The API used in this command is not supported by Infura,
+so you will need a local Parity archive node (`parity --tracing on`).
+Make sure your node has at least 8GB of memory, or else you will face timeout errors.
+See [this issue](https://github.com/blockchain-etl/ethereum-etl/issues/137)
 
 ```bash
 > ethereumetl export_traces --start-block 0 --end-block 500000 \
@@ -164,7 +200,7 @@ You can tune `--batch-size`, `--max-workers` for performance.
 
 Read [Differences between geth and parity traces.csv](schema.md#differences-between-geth-and-parity-tracescsv)
 
-The API used in this command is not supported by Infura, 
+The API used in this command is not supported by Infura,
 so you will need a local Geth archive node (`geth --gcmode archive --syncmode full --txlookuplimit 0`).
 When using rpc, add `--rpc --rpcapi debug` options.
 
@@ -204,29 +240,29 @@ You can tune `--batch-size`, `--max-workers` for performance.
 > ethereumetl stream --provider-uri https://mainnet.infura.io/v3/7aef3f0cd1f64408b163814b22cc643c --start-block 500000
 ```
 
-- This command outputs blocks, transactions, logs, token_transfers to the console by default.
-- Entity types can be specified with the `-e` option, 
-e.g. `-e block,transaction,log,token_transfer,trace,contract,token`.
-- Use `--output` option to specify the Google Pub/Sub topic, Postgres database or GCS bucket where to publish blockchain data, 
-    - For Google PubSub: `--output=projects/<your-project>/topics/crypto_ethereum`. 
+- This command outputs blocks, transactions, logs, token_transfers, token_approvals to the console by default.
+- Entity types can be specified with the `-e` option,
+  e.g. `-e block,transaction,log,token_transfer,token_approval,trace,contract,token`.
+- Use `--output` option to specify the Google Pub/Sub topic, Postgres database or GCS bucket where to publish blockchain data,
+  - For Google PubSub: `--output=projects/<your-project>/topics/crypto_ethereum`.
     Data will be pushed to `projects/<your-project>/topics/crypto_ethereum.blocks`, `projects/<your-project>/topics/crypto_ethereum.transactions` etc. topics.
-    - For Postgres: `--output=postgresql+pg8000://<user>:<password>@<host>:<port>/<database_name>`, 
+  - For Postgres: `--output=postgresql+pg8000://<user>:<password>@<host>:<port>/<database_name>`,
     e.g. `--output=postgresql+pg8000://postgres:admin@127.0.0.1:5432/ethereum`.
-    - For GCS:  `--output=gs://<bucket_name>`. Make sure to install and initialize `gcloud` cli.
-    - For Kafka:  `--output=kafka/<host>:<port>`, e.g. `--output=kafka/127.0.0.1:9092`
-    - Those output types can be combined with a comma e.g. `--output=gs://<bucket_name>,projects/<your-project>/topics/crypto_ethereum`
-    
-    The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema) 
-    and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this 
-    repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres). 
+  - For GCS: `--output=gs://<bucket_name>`. Make sure to install and initialize `gcloud` cli.
+  - For Kafka: `--output=kafka/<host>:<port>`, e.g. `--output=kafka/127.0.0.1:9092`
+  - Those output types can be combined with a comma e.g. `--output=gs://<bucket_name>,projects/<your-project>/topics/crypto_ethereum`
+    The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema)
+    and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this
+    repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres).
 - The command saves its state to `last_synced_block.txt` file where the last synced block number is saved periodically.
-- Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the 
-file where the block number, from which to start streaming the blockchain data, is saved.
-- Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to 
-handle chain reorganizations - they are less likely the further a block from the head.
+- Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the
+  file where the block number, from which to start streaming the blockchain data, is saved.
+- Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to
+  handle chain reorganizations - they are less likely the further a block from the head.
+- Use `--stream-type continuous` to make the stream continuously running or use `--stream-type once` to run the stream once, only till the latest block. If no value is specified, `continuous` will be considered as the default value.
 - You can tune `--period-seconds`, `--batch-size`, `--block-batch-size`, `--max-workers` for performance.
 - Refer to [blockchain-etl-streaming](https://github.com/blockchain-etl/blockchain-etl-streaming) for
-instructions on deploying it to Kubernetes. 
+  instructions on deploying it to Kubernetes.
 
 Stream blockchain data continually to Google Pub/Sub:
 
@@ -241,6 +277,6 @@ Stream blockchain data to a Postgres database:
 ethereumetl stream --start-block 500000 --output postgresql+pg8000://<user>:<password>@<host>:5432/<database>
 ```
 
-The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema) 
-and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this 
+The [schema](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/schema)
+and [indexes](https://github.com/blockchain-etl/ethereum-etl-postgres/tree/master/indexes) can be found in this
 repo [ethereum-etl-postgres](https://github.com/blockchain-etl/ethereum-etl-postgres).

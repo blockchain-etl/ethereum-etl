@@ -105,6 +105,19 @@ TOKEN_TRANSFERS = Table(
     Column('block_hash', String),
 )
 
+TOKEN_APPROVALS = Table(
+    'token_approvals', metadata,
+    Column('token_address', String),
+    Column('owner_address', String),
+    Column('sender_address', String),
+    Column('value', Numeric(78)),
+    Column('transaction_hash', String, primary_key=True),
+    Column('log_index', BigInteger, primary_key=True),
+    Column('block_timestamp', TIMESTAMP),
+    Column('block_number', BigInteger),
+    Column('block_hash', String),
+)
+
 TRACES = Table(
     'traces', metadata,
     Column('transaction_hash', String),

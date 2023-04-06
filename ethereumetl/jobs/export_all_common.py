@@ -33,11 +33,14 @@ from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
+from ethereumetl.jobs.export_token_approvals_job import ExportTokenApprovalsJob
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
 from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
+from ethereumetl.jobs.exporters.token_approvals_item_exporter import token_approvals_item_exporter
+
 from ethereumetl.jobs.exporters.tokens_item_exporter import tokens_item_exporter
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -148,6 +151,34 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 batch_size=batch_size,
                 web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
                 item_exporter=token_transfers_item_exporter(token_transfers_file),
+                max_workers=max_workers)
+            job.run()
+
+        # # # token_approvals # # #
+
+        token_approvals_file = None
+        if is_log_filter_supported(provider_uri):
+            token_approvals_output_dir = '{output_dir}/token_approvals{partition_dir}'.format(
+                output_dir=output_dir,
+                partition_dir=partition_dir,
+            )
+            os.makedirs(os.path.dirname(token_approvals_output_dir), exist_ok=True)
+
+            token_approvals_file = '{token_approvals_output_dir}/token_approvals_{file_name_suffix}.csv'.format(
+                token_approvals_output_dir=token_approvals_output_dir,
+                file_name_suffix=file_name_suffix,
+            )
+            logger.info('Exporting ERC20 approvals from blocks {block_range} to {token_approvals_file}'.format(
+                block_range=block_range,
+                token_approvals_file=token_approvals_file,
+            ))
+
+            job = ExportTokenApprovalsJob(
+                start_block=batch_start_block,
+                end_block=batch_end_block,
+                batch_size=batch_size,
+                web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
+                item_exporter=token_approvals_item_exporter(token_approvals_file),
                 max_workers=max_workers)
             job.run()
 

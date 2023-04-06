@@ -8,8 +8,9 @@ from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from ethereumetl.jobs.extract_token_approvals_job import ExtractTokenApprovalsJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
-from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
+from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_token_approvals, enrich_traces, \
     enrich_contracts, enrich_tokens
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
@@ -56,6 +57,11 @@ class EthStreamerAdapter:
         if self._should_export(EntityType.TOKEN_TRANSFER):
             token_transfers = self._extract_token_transfers(logs)
 
+        # Extract token approvals
+        token_approvals = []
+        if self._should_export(EntityType.TOKEN_APPROVAL):
+            token_approvals = self._extract_token_approvals(logs)
+
         # Export traces
         traces = []
         if self._should_export(EntityType.TRACE):
@@ -79,6 +85,8 @@ class EthStreamerAdapter:
             if EntityType.LOG in self.entity_types else []
         enriched_token_transfers = enrich_token_transfers(blocks, token_transfers) \
             if EntityType.TOKEN_TRANSFER in self.entity_types else []
+        enriched_token_approvals = enrich_token_approvals(blocks, token_approvals) \
+            if EntityType.TOKEN_APPROVAL in self.entity_types else []
         enriched_traces = enrich_traces(blocks, traces) \
             if EntityType.TRACE in self.entity_types else []
         enriched_contracts = enrich_contracts(blocks, contracts) \
@@ -86,21 +94,53 @@ class EthStreamerAdapter:
         enriched_tokens = enrich_tokens(blocks, tokens) \
             if EntityType.TOKEN in self.entity_types else []
 
+        cleaned_blocks = self._remove_null_values(items=enriched_blocks)
+        cleaned_transactions = self._remove_null_values(items=enriched_transactions)
+        cleaned_logs = self._remove_null_values(items=enriched_logs)
+        cleaned_token_transfers = self._remove_null_values(items=enriched_token_transfers)
+        cleaned_token_approvals = self._remove_null_values(items=enriched_token_approvals)
+        cleaned_traces = self._remove_null_values(items=enriched_traces)
+        cleaned_contracts = self._remove_null_values(items=enriched_contracts)
+        cleaned_tokens = self._remove_null_values(items=enriched_tokens)
+
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
         all_items = \
-            sort_by(enriched_blocks, 'number') + \
-            sort_by(enriched_transactions, ('block_number', 'transaction_index')) + \
-            sort_by(enriched_logs, ('block_number', 'log_index')) + \
-            sort_by(enriched_token_transfers, ('block_number', 'log_index')) + \
-            sort_by(enriched_traces, ('block_number', 'trace_index')) + \
-            sort_by(enriched_contracts, ('block_number',)) + \
-            sort_by(enriched_tokens, ('block_number',))
+            sort_by(cleaned_blocks, 'number') + \
+            sort_by(cleaned_transactions, ('block_number', 'transaction_index')) + \
+            sort_by(cleaned_logs, ('block_number', 'log_index')) + \
+            sort_by(cleaned_token_transfers, ('block_number', 'log_index')) + \
+            sort_by(cleaned_token_approvals, ('block_number', 'log_index')) + \
+            sort_by(cleaned_traces, ('block_number', 'trace_index')) + \
+            sort_by(cleaned_contracts, ('block_number',)) + \
+            sort_by(cleaned_tokens, ('block_number',))
 
         self.calculate_item_ids(all_items)
         self.calculate_item_timestamps(all_items)
 
         self.item_exporter.export_items(all_items)
+
+    def _remove_null_values(self, items):
+
+        new_items = []
+
+        for item in items:
+            new_item = {}
+            for key, value in item.copy().items():
+
+                # skip if value is none, since we dont want to send null values to stream
+                if value is None: continue
+
+                # convert to string if the value is int/float
+                if (isinstance(value, int) or isinstance(value, float)): updated_value = str(value)
+                else: updated_value = value
+
+                new_item[key] = updated_value
+
+            # if new_item is not empty, push it to list
+            if new_item != {}: new_items.append(new_item)
+                
+        return new_items
 
     def _export_blocks_and_transactions(self, start_block, end_block):
         blocks_and_transactions_item_exporter = InMemoryItemExporter(item_types=['block', 'transaction'])
@@ -145,6 +185,17 @@ class EthStreamerAdapter:
         job.run()
         token_transfers = exporter.get_items('token_transfer')
         return token_transfers
+
+    def _extract_token_approvals(self, logs):
+        exporter = InMemoryItemExporter(item_types=['token_approval'])
+        job = ExtractTokenApprovalsJob(
+            logs_iterable=logs,
+            batch_size=self.batch_size,
+            max_workers=self.max_workers,
+            item_exporter=exporter)
+        job.run()
+        token_approvals = exporter.get_items('token_approval')
+        return token_approvals
 
     def _export_traces(self, start_block, end_block):
         exporter = InMemoryItemExporter(item_types=['trace'])
@@ -192,13 +243,16 @@ class EthStreamerAdapter:
             return EntityType.TRANSACTION in self.entity_types or self._should_export(EntityType.LOG)
 
         if entity_type == EntityType.RECEIPT:
-            return EntityType.TRANSACTION in self.entity_types or self._should_export(EntityType.TOKEN_TRANSFER)
+            return EntityType.TRANSACTION in self.entity_types or self._should_export(EntityType.TOKEN_TRANSFER) or self._should_export(EntityType.TOKEN_APPROVAL)
 
         if entity_type == EntityType.LOG:
-            return EntityType.LOG in self.entity_types or self._should_export(EntityType.TOKEN_TRANSFER)
+            return EntityType.LOG in self.entity_types or self._should_export(EntityType.TOKEN_TRANSFER) or self._should_export(EntityType.TOKEN_APPROVAL)
 
         if entity_type == EntityType.TOKEN_TRANSFER:
             return EntityType.TOKEN_TRANSFER in self.entity_types
+
+        if entity_type == EntityType.TOKEN_APPROVAL:
+            return EntityType.TOKEN_APPROVAL in self.entity_types
 
         if entity_type == EntityType.TRACE:
             return EntityType.TRACE in self.entity_types or self._should_export(EntityType.CONTRACT)

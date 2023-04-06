@@ -21,7 +21,9 @@
 # SOFTWARE.
 
 
+import os
 from urllib.parse import urlparse
+from requests.auth import HTTPBasicAuth
 
 from web3 import IPCProvider, HTTPProvider
 
@@ -33,13 +35,21 @@ DEFAULT_TIMEOUT = 60
 
 def get_provider_from_uri(uri_string, timeout=DEFAULT_TIMEOUT, batch=False):
     uri = urlparse(uri_string)
+    
     if uri.scheme == 'file':
         if batch:
             return BatchIPCProvider(uri.path, timeout=timeout)
         else:
             return IPCProvider(uri.path, timeout=timeout)
     elif uri.scheme == 'http' or uri.scheme == 'https':
-        request_kwargs = {'timeout': timeout}
+        # set req headers according to auth headers
+        PROVIDER_USERNAME = os.environ.get('PROVIDER_USERNAME', '')
+        PROVIDER_PASSWORD = os.environ.get('PROVIDER_PASSWORD', '')
+        if PROVIDER_USERNAME != '' and PROVIDER_PASSWORD != '':
+            request_kwargs = { 'timeout': timeout, 'auth': HTTPBasicAuth(PROVIDER_USERNAME, PROVIDER_PASSWORD) }
+        else:
+            request_kwargs = { 'timeout': timeout }
+        
         if batch:
             return BatchHTTPProvider(uri_string, request_kwargs=request_kwargs)
         else:

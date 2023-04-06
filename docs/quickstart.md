@@ -20,6 +20,13 @@ Export ERC20 and ERC721 transfers:
 --provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_transfers.csv
 ```
 
+Export ERC20 and ERC721 approvals:
+
+```bash
+> ethereumetl export_token_approvals --start-block 0 --end-block 500000 \
+--provider-uri file://$HOME/Library/Ethereum/geth.ipc --output token_approvals.csv
+```
+
 Export traces:
 
 ```bash
@@ -27,11 +34,11 @@ Export traces:
 --provider-uri file://$HOME/Library/Ethereum/parity.ipc --output traces.csv
 ```
 
-Stream blocks, transactions, logs, token_transfers continually to console:
+Stream blocks, transactions, logs, token_transfers, token_approvals continually to console:
 
 ```bash
 > pip3 install ethereum-etl[streaming]
-> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer --log-file log.txt
+> ethereumetl stream --start-block 500000 -e block,transaction,log,token_transfer,token_approval --log-file log.txt
 ```
 
 Find all commands [here](commands.md).

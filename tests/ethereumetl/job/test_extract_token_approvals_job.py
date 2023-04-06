@@ -20,27 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import csv
+import io
 
-class EthBlock(object):
-    def __init__(self):
-        self.number = None
-        self.hash = None
-        self.parent_hash = None
-        self.nonce = None
-        self.sha3_uncles = None
-        self.logs_bloom = None
-        self.transactions_root = None
-        self.state_root = None
-        self.receipts_root = None
-        self.miner = None
-        self.difficulty = None
-        self.total_difficulty = None
-        self.size = None
-        self.extra_data = None
-        self.gas_limit = None
-        self.gas_used = None
-        self.timestamp = None
+import pytest
 
-        self.transactions = []
-        self.transaction_count = 0
-        self.base_fee_per_gas = 0
+import tests.resources
+from ethereumetl.jobs.exporters.token_approvals_item_exporter import token_approvals_item_exporter
+from ethereumetl.jobs.extract_token_approvals_job import ExtractTokenApprovalsJob
+from tests.helpers import compare_lines_ignore_order, read_file
+
+RESOURCE_GROUP = 'test_extract_token_approvals_job'
+
+
+def read_resource(resource_group, file_name):
+    return tests.resources.read_resource([RESOURCE_GROUP, resource_group], file_name)
+
+
+@pytest.mark.parametrize('resource_group', [
+    'logs'
+])
+def test_export_token_approvals_job(tmpdir, resource_group):
+    output_file = str(tmpdir.join('token_approvals.csv'))
+
+    logs_content = read_resource(resource_group, 'logs.csv')
+    logs_csv_reader = csv.DictReader(io.StringIO(logs_content))
+    job = ExtractTokenApprovalsJob(
+        logs_iterable=logs_csv_reader,
+        batch_size=2,
+        item_exporter=token_approvals_item_exporter(output_file),
+        max_workers=5
+    )
+    job.run()
+
+    compare_lines_ignore_order(
+        read_resource(resource_group, 'expected_token_approvals.csv'), read_file(output_file)
+    )

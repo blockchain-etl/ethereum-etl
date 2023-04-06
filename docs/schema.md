@@ -62,6 +62,20 @@ block_number        | bigint      |
 
 ---
 
+## token_approvals.csv
+
+Column              |    Type     |
+--------------------|-------------|
+token_address       | address     |
+owner_address       | address     |
+spender_address     | address     |
+value               | numeric     |
+transaction_hash    | hex_string  |
+log_index           | bigint      |
+block_number        | bigint      |
+
+---
+
 ## receipts.csv
 
 Column                       |    Type     |

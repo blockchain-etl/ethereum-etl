@@ -32,6 +32,7 @@ def build_block_bundles(items):
     transactions = defaultdict(list)
     logs = defaultdict(list)
     token_transfers = defaultdict(list)
+    token_approvals = defaultdict(list)
     traces = defaultdict(list)
     for item in items:
         item_type = item.get('type')
@@ -43,6 +44,8 @@ def build_block_bundles(items):
             logs[item.get('block_number')].append(item)
         elif item_type == 'token_transfer':
             token_transfers[item.get('block_number')].append(item)
+        elif item_type == 'token_approval':
+            token_approvals[item.get('block_number')].append(item)
         elif item_type == 'trace':
             traces[item.get('block_number')].append(item)
         else:
@@ -57,6 +60,7 @@ def build_block_bundles(items):
             'transactions': transactions[block_number],
             'logs': logs[block_number],
             'token_transfers': token_transfers[block_number],
+            'token_approvals': token_approvals[block_number],
             'traces': traces[block_number],
         })
 

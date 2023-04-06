@@ -42,6 +42,7 @@ def create_item_exporter(output):
                 'transaction': output + '.transactions',
                 'log': output + '.logs',
                 'token_transfer': output + '.token_transfers',
+                'token_approval': output + '.token_approvals',
                 'trace': output + '.traces',
                 'contract': output + '.contracts',
                 'token': output + '.tokens',
@@ -62,7 +63,7 @@ def create_item_exporter(output):
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
         from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
-        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+        from ethereumetl.streaming.postgres_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TOKEN_APPROVALS, TRACES, TOKENS, CONTRACTS
 
         item_exporter = PostgresItemExporter(
             output, item_type_to_insert_stmt_mapping={
@@ -70,6 +71,7 @@ def create_item_exporter(output):
                 'transaction': create_insert_statement_for_table(TRANSACTIONS),
                 'log': create_insert_statement_for_table(LOGS),
                 'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
+                'token_approval': create_insert_statement_for_table(TOKEN_APPROVALS),
                 'trace': create_insert_statement_for_table(TRACES),
                 'token': create_insert_statement_for_table(TOKENS),
                 'contract': create_insert_statement_for_table(CONTRACTS),
@@ -89,6 +91,7 @@ def create_item_exporter(output):
             'transaction': 'transactions',
             'log': 'logs',
             'token_transfer': 'token_transfers',
+            'token_approval': 'token_approvals',
             'trace': 'traces',
             'contract': 'contracts',
             'token': 'tokens',

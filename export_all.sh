@@ -104,6 +104,16 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 ethereumetl export_token_transfers --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --output=${token_transfers_file}
     quit_if_returned_error
 
+    ### token_approvals
+
+    token_approvals_output_dir=${output_dir}/token_approvals${partition_dir}
+    mkdir -p ${token_approvals_output_dir};
+
+    token_approvals_file=${token_approvals_output_dir}/token_approvals_${file_name_suffix}.csv
+    log "Exporting ERC20 approvals from blocks ${block_range} to ${token_approvals_file}"
+    python3 ethereumetl export_token_approvals --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --output=${token_approvals_file}
+    quit_if_returned_error
+
     ### receipts_and_logs
 
     transaction_hashes_output_dir=${output_dir}/transaction_hashes${partition_dir}
@@ -152,6 +162,11 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     token_addresses_file=${token_addresses_output_dir}/token_addresses_${file_name_suffix}
     log "Extracting token_address from token_transfers file ${token_transfers_file}"
     python3 ethereumetl extract_csv_column -i ${token_transfers_file} -c token_address -o - | sort | uniq > ${token_addresses_file}
+    quit_if_returned_error
+
+    token_addresses_file=${token_addresses_output_dir}/token_addresses_${file_name_suffix}
+    log "Extracting token_address from token_approvals file ${token_approvals_file}"
+    python3 ethereumetl extract_csv_column -i ${token_approvals_file} -c token_address -o - | sort | uniq > ${token_addresses_file}
     quit_if_returned_error
 
     tokens_output_dir=${output_dir}/tokens${partition_dir}
