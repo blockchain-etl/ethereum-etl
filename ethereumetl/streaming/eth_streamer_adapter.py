@@ -55,7 +55,7 @@ class EthStreamerAdapter:
         # Extract token transfers
         token_transfers = []
         if self._should_export(EntityType.TOKEN_TRANSFER):
-            token_transfers = self._extract_token_transfers(logs)
+            token_transfers = self._extract_token_transfers(logs, transactions)
 
         # Extract token approvals
         token_approvals = []
@@ -175,10 +175,11 @@ class EthStreamerAdapter:
         logs = exporter.get_items('log')
         return receipts, logs
 
-    def _extract_token_transfers(self, logs):
+    def _extract_token_transfers(self, logs, transactions):
         exporter = InMemoryItemExporter(item_types=['token_transfer'])
         job = ExtractTokenTransfersJob(
             logs_iterable=logs,
+            transactions_iterable=transactions,
             batch_size=self.batch_size,
             max_workers=self.max_workers,
             item_exporter=exporter)

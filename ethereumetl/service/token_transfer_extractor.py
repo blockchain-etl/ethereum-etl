@@ -62,6 +62,29 @@ class EthTokenTransferExtractor(object):
         return None
 
 
+    def extract_transfer_from_transaction(self, transaction, txn_logs):
+        # if there is no native token transfer, then return
+        if (transaction.get('value') == 0):
+            return None
+
+        # if logs contain a Transfer event #? then we skip extracting token_transfers from this transaction
+        # else #? we extract token_transfer as native currency transfer from this transaction
+        for txn_log in txn_logs:
+            if txn_log is None: continue
+            topics = txn_log['topics']
+            if (topics[0]).casefold() == TRANSFER_EVENT_TOPIC: return None
+
+        token_transfer = EthTokenTransfer()
+        token_transfer.token_address = to_normalized_address('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+        token_transfer.from_address = word_to_address(transaction.get('from_address'))
+        token_transfer.to_address = word_to_address(transaction.get('to_address'))
+        token_transfer.value = transaction.get('value')
+        token_transfer.transaction_hash = transaction.get('hash')
+        token_transfer.log_index = -1
+        token_transfer.block_number = transaction.get('block_number')
+
+        return token_transfer
+
 def split_to_words(data):
     if data and len(data) > 2:
         data_without_0x = data[2:]

@@ -24,6 +24,7 @@ from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
+from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
 from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor
 
 
@@ -33,8 +34,11 @@ class ExtractTokenTransfersJob(BaseJob):
             logs_iterable,
             batch_size,
             max_workers,
-            item_exporter):
+            item_exporter,
+            transactions_iterable=None,
+        ):
         self.logs_iterable = logs_iterable
+        self.transactions_iterable = transactions_iterable if transactions_iterable is not None else []
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
@@ -42,16 +46,29 @@ class ExtractTokenTransfersJob(BaseJob):
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.token_transfer_mapper = EthTokenTransferMapper()
         self.token_transfer_extractor = EthTokenTransferExtractor()
+        self.transactions_mapper = EthTransactionMapper()   
 
     def _start(self):
         self.item_exporter.open()
 
     def _export(self):
         self.batch_work_executor.execute(self.logs_iterable, self._extract_transfers)
+        self.batch_work_executor.execute(self.transactions_iterable, self._extract_transfers_from_txn)
 
-    def _extract_transfers(self, log_dicts):
+    def _extract_transfers(self, log_dicts):        
         for log_dict in log_dicts:
             self._extract_transfer(log_dict)
+
+    def _extract_transfers_from_txn(self, transaction_dicts):        
+        for transaction_dict in transaction_dicts:
+            txn_hash = transaction_dict.get('hash')
+            txn_logs = [log_dict for log_dict in self.logs_iterable if log_dict['transaction_hash'].lower() == txn_hash.lower()]
+            self._extract_transfer_from_txn(transaction_dict, txn_logs)
+
+    def _extract_transfer_from_txn(self, transaction_dict, txn_logs):
+        token_transfer = self.token_transfer_extractor.extract_transfer_from_transaction(transaction_dict, txn_logs)
+        if token_transfer is not None:
+            self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
     def _extract_transfer(self, log_dict):
         log = self.receipt_log_mapper.dict_to_receipt_log(log_dict)
