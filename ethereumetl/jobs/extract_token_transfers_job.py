@@ -75,6 +75,8 @@ class ExtractTokenTransfersJob(BaseJob):
 
     def _extract_transfer(self, log_dict):
         log = self.receipt_log_mapper.dict_to_receipt_log(log_dict)
+        txn = [txn_dict for txn_dict in self.transactions_iterable if txn_dict['hash'].lower() == log.transaction_hash.lower()]
+        log.block_timestamp = txn[0]['block_timestamp']
         token_transfer = self.token_transfer_extractor.extract_transfer_from_log(log)
         if token_transfer is not None:
             self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
@@ -83,7 +85,7 @@ class ExtractTokenTransfersJob(BaseJob):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
 
-    def _call_back(success, value):
+    def _call_back(self, success, value):
         """
         Callback to process results from multicall for a function.
         If call fails returns False (if changed to string throws error)
@@ -148,16 +150,14 @@ class ExtractTokenTransfersJob(BaseJob):
                     ]
                 )
 
-
-
             token_address_groups = [unique_token_addresses[i:i+5] for i in range(0, len(unique_token_addresses), 5)]
 
-            block_timestamp = transfers[0].block_timestamp
+            block_timestamp = transfers[0]['block_timestamp']
             if time.time() - block_timestamp > 3600 * 6:
-                defillama_url = "https://coins.llama.fi/prices/current/"
-            else:
                 defillama_url = f"https://coins.llama.fi/prices/historical/{block_timestamp}/"
-            
+            else:
+                defillama_url = "https://coins.llama.fi/prices/current/"
+                        
             token_price_dict = {}
 
             for group in token_address_groups:
@@ -180,11 +180,15 @@ class ExtractTokenTransfersJob(BaseJob):
 
             for transfer in transfers:
                 
+                token_address = transfer['token_address']
+
                 previous_block_balance_of = balance_of_multicall_result[f"{transfer['from_address']}.balanceOf"]
-                previous_block_total_supply = token_details_multicall_result[f"{transfer['token_address']}.totalSupply"]
-                token_symbol = token_details_multicall_result[f"{transfer['token_address']}.symbol"]
-                token_decimals = token_details_multicall_result[f"{transfer['token_address']}.decimals"]
-                token_price = token_address_groups[transfer['token_address']]
+                previous_block_total_supply = token_details_multicall_result[f"{token_address}.totalSupply"]
+                token_symbol = token_details_multicall_result[f"{token_address}.symbol"]
+                token_decimals = token_details_multicall_result[f"{token_address}.decimals"]
+
+                if token_address in token_price_dict: token_price = token_price_dict[token_address] 
+                else: token_price = 0
 
                 updated_token_transfers.append({
                     **transfer,

@@ -31,3 +31,4 @@ class EthReceiptLog(object):
         self.address = None
         self.data = None
         self.topics = []
+        self.block_timestamp = None
