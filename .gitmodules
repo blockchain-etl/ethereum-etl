@@ -1,0 +1,3 @@
+[submodule "multicall.py"]
+	path = multicall.py
+	url = https://github.com/Arda-finance/multicall.py
