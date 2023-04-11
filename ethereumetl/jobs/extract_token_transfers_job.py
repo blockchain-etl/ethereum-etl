@@ -116,22 +116,42 @@ class ExtractTokenTransfersJob(BaseJob):
         for block_number, transfers in grouped_token_transfers.items():
             
             token_addresses = {}
-            multicall_balance_of_calls = []
+            multicall_previous_block_calls = []
+            multicall_current_block_calls = []
+
             for transfer in transfers:
                 token_addresses[transfer['token_address']] = ''
-                multicall_balance_of_calls.append(
+                # balanceOf for previous block
+                multicall_previous_block_calls.append(
                     Call(
                         transfer['token_address'], 
                         ['balanceOf(address)(uint256)', transfer['from_address']], 
                         [(f"{transfer['from_address']}.balanceOf", self._call_back)]
-                    )
+                    ),
+                )
+                # balanceOf for current block
+                multicall_current_block_calls.append(
+                    Call(
+                        transfer['token_address'], 
+                        ['balanceOf(address)(uint256)', transfer['from_address']], 
+                        [(f"{transfer['from_address']}.balanceOf", self._call_back)]
+                    ),
                 )
 
-            multicall_token_details_calls = []
             unique_token_addresses = list(token_addresses)
             for token_address in unique_token_addresses:
-                multicall_token_details_calls.extend(
+                
+                # totalSupply() for previous block
+                multicall_previous_block_calls.append(
+                    Call(
+                        token_address, 
+                        ['totalSupply()(uint256)'],
+                        [(f"{token_address}.totalSupply", self._call_back)]
+                    ),
+                )
+                multicall_current_block_calls.extend(
                     [
+                        # totalSupply() for current block
                         Call(
                             token_address, 
                             ['totalSupply()(uint256)'],
@@ -172,28 +192,34 @@ class ExtractTokenTransfersJob(BaseJob):
 
             previous_block = block_number - 1 if block_number != 0 else 0
 
-            balance_of_multi_call = Multicall(multicall_balance_of_calls, _w3=web3, require_success=False, block_id=previous_block)
-            balance_of_multicall_result = balance_of_multi_call()
+            previous_block_multi_call = Multicall(multicall_previous_block_calls, _w3=web3, require_success=False, block_id=previous_block)
+            previous_block_multicall_result = previous_block_multi_call()
 
-            token_details_multi_call = Multicall(multicall_token_details_calls, _w3=web3, require_success=False, block_id=previous_block)
-            token_details_multicall_result = token_details_multi_call()
+            current_block_multi_call = Multicall(multicall_current_block_calls, _w3=web3, require_success=False)
+            current_block_multicall_result = current_block_multi_call()
 
             for transfer in transfers:
                 
                 token_address = transfer['token_address']
 
-                previous_block_balance_of = balance_of_multicall_result[f"{transfer['from_address']}.balanceOf"]
-                previous_block_total_supply = token_details_multicall_result[f"{token_address}.totalSupply"]
-                token_symbol = token_details_multicall_result[f"{token_address}.symbol"]
-                token_decimals = token_details_multicall_result[f"{token_address}.decimals"]
+                balance_of_from_before = previous_block_multicall_result[f"{transfer['from_address']}.balanceOf"]
+                total_supply_before = previous_block_multicall_result[f"{token_address}.totalSupply"]
+
+                balance_of_from_after = current_block_multicall_result[f"{transfer['from_address']}.balanceOf"]
+                total_supply_after = current_block_multicall_result[f"{token_address}.totalSupply"]
+                
+                token_symbol = current_block_multicall_result[f"{token_address}.symbol"]
+                token_decimals = current_block_multicall_result[f"{token_address}.decimals"]
 
                 if token_address in token_price_dict: token_price = token_price_dict[token_address] 
                 else: token_price = 0
 
                 updated_token_transfers.append({
                     **transfer,
-                    'previous_block_token_balance_of': previous_block_balance_of,
-                    'previous_block_token_total_supply': previous_block_total_supply,
+                    'balance_of_from_before': balance_of_from_before,
+                    'balance_of_from_after': balance_of_from_after,
+                    'total_supply_before': total_supply_before,
+                    'total_supply_after': total_supply_after,
                     'symbol': token_symbol,
                     'decimals': token_decimals,
                     'price': token_price
