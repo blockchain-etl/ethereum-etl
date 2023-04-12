@@ -20,13 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 import time
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
+from ethereumetl.json_rpc_requests import generate_get_balance_json_rpc, generate_get_code_json_rpc
 from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
 from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor
+from ethereumetl.utils import hex_to_dec, rpc_response_batch_to_results
+from ethereumetl.web3_utils import build_web3
 from multicall import Call, Multicall
 import requests
 
@@ -101,7 +105,9 @@ class ExtractTokenTransfersJob(BaseJob):
             return None
 
 
-    def add_extra_columns_in_token_transfers(self, token_transfers, web3):
+    def add_extra_columns_in_token_transfers(self, token_transfers, batch_web3_provider):
+
+        web3 = build_web3(batch_web3_provider)
 
         updated_token_transfers = []
         grouped_token_transfers = {}
@@ -115,28 +121,42 @@ class ExtractTokenTransfersJob(BaseJob):
 
         for block_number, transfers in grouped_token_transfers.items():
             
+            previous_block = block_number - 1 if block_number != 0 else 0
+
             token_addresses = {}
             multicall_previous_block_calls = []
             multicall_current_block_calls = []
 
+            eth_get_balance_addresses = []
+
             for transfer in transfers:
                 token_addresses[transfer['token_address']] = ''
-                # balanceOf for previous block
-                multicall_previous_block_calls.append(
-                    Call(
-                        transfer['token_address'], 
-                        ['balanceOf(address)(uint256)', transfer['from_address']], 
-                        [(f"{transfer['from_address']}.balanceOf", self._call_back)]
-                    ),
-                )
-                # balanceOf for current block
-                multicall_current_block_calls.append(
-                    Call(
-                        transfer['token_address'], 
-                        ['balanceOf(address)(uint256)', transfer['from_address']], 
-                        [(f"{transfer['from_address']}.balanceOf", self._call_back)]
-                    ),
-                )
+
+                token_address = transfer['token_address'].lower()
+                from_address = transfer['from_address'].lower()
+
+                # if the token is the native currency i.e ETH, then we have to call eth_getBalance and not balanceOf
+                if token_address.lower() == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'.lower():
+                    eth_get_balance_addresses.append(from_address)
+
+                # else since the token is an ERC token, we call balanceOf
+                else:
+                    # balanceOf for previous block
+                    multicall_previous_block_calls.append(
+                        Call(
+                            token_address, 
+                            ['balanceOf(address)(uint256)', from_address], 
+                            [(f"{token_address}.balanceOf.{from_address}", self._call_back)]
+                        ),
+                    )
+                    # balanceOf for current block
+                    multicall_current_block_calls.append(
+                        Call(
+                            token_address, 
+                            ['balanceOf(address)(uint256)', from_address], 
+                            [(f"{token_address}.balanceOf.{from_address}", self._call_back)]
+                        ),
+                    )
 
             unique_token_addresses = list(token_addresses)
             for token_address in unique_token_addresses:
@@ -170,27 +190,6 @@ class ExtractTokenTransfersJob(BaseJob):
                     ]
                 )
 
-            token_address_groups = [unique_token_addresses[i:i+5] for i in range(0, len(unique_token_addresses), 5)]
-
-            block_timestamp = transfers[0]['block_timestamp']
-            if time.time() - block_timestamp > 3600 * 6:
-                defillama_url = f"https://coins.llama.fi/prices/historical/{block_timestamp}/"
-            else:
-                defillama_url = "https://coins.llama.fi/prices/current/"
-                        
-            token_price_dict = {}
-
-            for group in token_address_groups:
-                request_url = defillama_url + ','.join([f"ethereum:{address}" for address in group])
-                response = requests.get(request_url)
-
-                if response.status_code == 200:
-                    coins = response.json()['coins']
-                    for key, value in coins.items():
-                        address = key[len("ethereum:"):].lower()
-                        token_price_dict[address] = value['price']
-
-            previous_block = block_number - 1 if block_number != 0 else 0
 
             previous_block_multi_call = Multicall(multicall_previous_block_calls, _w3=web3, require_success=False, block_id=previous_block)
             previous_block_multicall_result = previous_block_multi_call()
@@ -198,14 +197,28 @@ class ExtractTokenTransfersJob(BaseJob):
             current_block_multi_call = Multicall(multicall_current_block_calls, _w3=web3, require_success=False)
             current_block_multicall_result = current_block_multi_call()
 
+            # get token prices from defillama
+            token_price_dict = self._get_price_from_defillama(unique_token_addresses, transfers[0]['block_timestamp'])
+
+            # get eth_getBalance for `from` addresses using RPC for previous block and current block
+            eth_get_balance_result_before = self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, previous_block)
+            eth_get_balance_result_after = self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, block_number)
+           
             for transfer in transfers:
                 
                 token_address = transfer['token_address']
+                from_address = transfer['from_address']
 
-                balance_of_from_before = previous_block_multicall_result[f"{transfer['from_address']}.balanceOf"]
+                # if its eth transfer, we fetch details from eth_getBalance RPC
+                if (token_address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'):
+                    balance_of_from_before = eth_get_balance_result_before[from_address]
+                    balance_of_from_after = eth_get_balance_result_after[from_address]
+                # else we fetch it form token.balanceOf contract method call
+                else:
+                    balance_of_from_before = previous_block_multicall_result[f"{token_address}.balanceOf.{from_address}"]
+                    balance_of_from_after = current_block_multicall_result[f"{token_address}.balanceOf.{from_address}"]
+
                 total_supply_before = previous_block_multicall_result[f"{token_address}.totalSupply"]
-
-                balance_of_from_after = current_block_multicall_result[f"{transfer['from_address']}.balanceOf"]
                 total_supply_after = current_block_multicall_result[f"{token_address}.totalSupply"]
                 
                 token_symbol = current_block_multicall_result[f"{token_address}.symbol"]
@@ -226,3 +239,45 @@ class ExtractTokenTransfersJob(BaseJob):
                 })
         
         return updated_token_transfers
+
+    def _get_price_from_defillama(self, token_addresses, timestamp):
+        token_address_groups = [token_addresses[i:i+5] for i in range(0, len(token_addresses), 5)]
+
+        if time.time() - timestamp > 3600 * 6:
+            defillama_url = f"https://coins.llama.fi/prices/historical/{timestamp}/"
+        else:
+            defillama_url = "https://coins.llama.fi/prices/current/"
+                        
+        token_price_dict = {}
+
+        for group in token_address_groups:
+            request_url = defillama_url + ','.join([f"ethereum:{address}" for address in group])
+            response = requests.get(request_url)
+
+            if response.status_code == 200:
+                coins = response.json()['coins']
+                for key, value in coins.items():
+                    address = key[len("ethereum:"):].lower()
+                    token_price_dict[address] = value['price']
+        return token_price_dict
+
+    def _get_eth_balance_for_addresses(self, batch_web3_provider, addresses, block_number):
+
+        get_balance_rpc = list(generate_get_balance_json_rpc(addresses, block_number))
+        response_batch = batch_web3_provider.make_batch_request(json.dumps(get_balance_rpc))  
+        responses = list(response_batch)
+
+        responses_dict = {}
+
+        for response in responses:
+            id = response['id']
+            responses_dict[id] = response['result']
+
+        result = {}
+
+        for request in get_balance_rpc:
+            id = request['id']
+            address = request['params'][0]
+            result[address] = hex_to_dec(responses_dict[id])
+
+        return result

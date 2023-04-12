@@ -185,7 +185,7 @@ class EthStreamerAdapter:
             item_exporter=exporter)
         job.run()
         token_transfers = exporter.get_items('token_transfer')
-        token_transfers = job.add_extra_columns_in_token_transfers(token_transfers, build_web3(self.batch_web3_provider))
+        token_transfers = job.add_extra_columns_in_token_transfers(token_transfers, self.batch_web3_provider)
         return token_transfers
 
     def _extract_token_approvals(self, logs):

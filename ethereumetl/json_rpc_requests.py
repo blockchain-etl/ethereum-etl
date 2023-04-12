@@ -57,6 +57,14 @@ def generate_get_code_json_rpc(contract_addresses, block='latest'):
             request_id=idx
         )
 
+def generate_get_balance_json_rpc(address, block='latest'):
+    for idx, address in enumerate(address):
+        yield generate_json_rpc(
+            method='eth_getBalance',
+            params=[address, hex(block) if isinstance(block, int) else block],
+            request_id=idx
+        )
+
 
 def generate_json_rpc(method, params, request_id=1):
     return {
