@@ -32,8 +32,17 @@ from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtract
 from ethereumetl.utils import hex_to_dec, rpc_response_batch_to_results
 from ethereumetl.web3_utils import build_web3
 from multicall import Call, Multicall
-import requests
+import asyncio
+import aiohttp
+import nest_asyncio
 
+# asyncio does not allow its event loop to be nested. 
+# So, when in an environment where the event loop is already running, it’s impossible to run tasks and wait for the result. 
+# Trying to do so will give the error “RuntimeError: This event loop is already running”.
+# Multicall library has event loop already running, but we want to call it 2 times in parallel.
+# So since 1st multicall has event loop running, the 2nd multicall cannot run in parallel, and has to wait for the first to finish
+# In order to solve this, we use nest_asyncio
+nest_asyncio.apply()
 
 class ExtractTokenTransfersJob(BaseJob):
     def __init__(
@@ -191,20 +200,29 @@ class ExtractTokenTransfersJob(BaseJob):
                     ]
                 )
 
+            values = asyncio.run(
+                self._fetch_details_in_parallel(
+                    unique_token_addresses=unique_token_addresses,
+                    timestamp=transfers[0]['block_timestamp'], 
+                    batch_web3_provider=batch_web3_provider, 
+                    eth_get_balance_addresses=eth_get_balance_addresses,
+                    previous_block=previous_block,
+                    current_block=block_number,
+                    previous_block_multicall_calls=multicall_previous_block_calls,
+                    current_block_multicall_calls=multicall_current_block_calls,
+                    web3=web3,
+                    require_success=False,
+                )
+            )
 
-            previous_block_multi_call = Multicall(multicall_previous_block_calls, _w3=web3, require_success=False, block_id=previous_block)
-            previous_block_multicall_result = previous_block_multi_call()
+            previous_block_multicall_result = values[0]
+            current_block_multicall_result = values[1]
 
-            current_block_multi_call = Multicall(multicall_current_block_calls, _w3=web3, require_success=False)
-            current_block_multicall_result = current_block_multi_call()
+            token_price_dict = values[2]
+            
+            eth_get_balance_result_before =values[3]
+            eth_get_balance_result_after = values[4]
 
-            # get token prices from defillama
-            token_price_dict = self._get_price_from_defillama(unique_token_addresses, transfers[0]['block_timestamp'])
-
-            # get eth_getBalance for `from` addresses using RPC for previous block and current block
-            eth_get_balance_result_before = self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, previous_block)
-            eth_get_balance_result_after = self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, block_number)
-           
             for transfer in transfers:
                 
                 token_address = transfer['token_address'].lower()
@@ -227,12 +245,6 @@ class ExtractTokenTransfersJob(BaseJob):
                 if token_address in token_price_dict: token_price = token_price_dict[token_address] 
                 else: token_price = 0
 
-                # replace None with 0
-                balance_of_from_before = 0 if balance_of_from_before is None else balance_of_from_before
-                balance_of_from_after = 0 if balance_of_from_after is None else balance_of_from_after
-                total_supply_before = 0 if total_supply_before is None else total_supply_before
-                total_supply_after = 0 if total_supply_after is None else 0
-
                 updated_token_transfers.append({
                     **transfer,
                     'balance_of_from_before': balance_of_from_before,
@@ -246,28 +258,53 @@ class ExtractTokenTransfersJob(BaseJob):
         
         return updated_token_transfers
 
-    def _get_price_from_defillama(self, token_addresses, timestamp):
+    async def _fetch_details_in_parallel(self, unique_token_addresses, timestamp, batch_web3_provider, eth_get_balance_addresses, previous_block, current_block, previous_block_multicall_calls, current_block_multicall_calls, web3, require_success):
+        return await asyncio.gather(
+            self._multi_call(previous_block_multicall_calls, web3, require_success, previous_block),
+            self._multi_call(current_block_multicall_calls, web3, require_success, current_block),
+            self._get_price_from_defillama(unique_token_addresses, timestamp),
+            self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, previous_block),
+            self._get_eth_balance_for_addresses(batch_web3_provider, eth_get_balance_addresses, current_block) 
+        )
+
+    async def _fetch_price(self, session, url):
+        token_price_dict = {}
+        async with session.get(url) as response:
+            if response.status == 200:
+                res = await response.json()
+                for key, value in res['coins'].items():
+                    address = key[len("ethereum:"):].lower()
+                    token_price_dict[address] = value['price']
+            return token_price_dict
+
+    async def _get_price_from_defillama(self, token_addresses, timestamp):
         token_address_groups = [token_addresses[i:i+5] for i in range(0, len(token_addresses), 5)]
 
         if time.time() - timestamp > 3600 * 6:
             defillama_url = f"https://coins.llama.fi/prices/historical/{timestamp}/"
         else:
             defillama_url = "https://coins.llama.fi/prices/current/"
-                        
+
+        async with aiohttp.ClientSession() as session:
+            tasks = []
+            for group in token_address_groups:
+                request_url = defillama_url + ','.join([f"ethereum:{address}" for address in group])
+                task = asyncio.create_task(self._fetch_price(session, request_url))
+                tasks.append(task)
+
+            results = await asyncio.gather(*tasks)
+
         token_price_dict = {}
+        for result in results:
+            token_price_dict.update(result)
 
-        for group in token_address_groups:
-            request_url = defillama_url + ','.join([f"ethereum:{address}" for address in group])
-            response = requests.get(request_url)
-
-            if response.status_code == 200:
-                coins = response.json()['coins']
-                for key, value in coins.items():
-                    address = key[len("ethereum:"):].lower()
-                    token_price_dict[address] = value['price']
         return token_price_dict
 
-    def _get_eth_balance_for_addresses(self, batch_web3_provider, addresses, block_number):
+    async def _multi_call(self, calls, web3, require_success, block_id):
+        multi_call = Multicall(calls, _w3=web3, require_success=require_success, block_id=block_id)
+        return multi_call()
+
+    async def _get_eth_balance_for_addresses(self, batch_web3_provider, addresses, block_number):
 
         get_balance_rpc = list(generate_get_balance_json_rpc(addresses, block_number))
         response_batch = batch_web3_provider.make_batch_request(json.dumps(get_balance_rpc))  
