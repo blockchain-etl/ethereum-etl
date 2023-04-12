@@ -257,9 +257,10 @@ You can tune `--batch-size`, `--max-workers` for performance.
 - The command saves its state to `last_synced_block.txt` file where the last synced block number is saved periodically.
 - Specify either `--start-block` or `--last-synced-block-file` option. `--last-synced-block-file` should point to the
   file where the block number, from which to start streaming the blockchain data, is saved.
+- Specify `--end-block` option. This will be the block_number where the streaming will end at.
 - Use the `--lag` option to specify how many blocks to lag behind the head of the blockchain. It's the simplest way to
   handle chain reorganizations - they are less likely the further a block from the head.
-- Use `--stream-type continuous` to make the stream continuously running or use `--stream-type once` to run the stream once, only till the latest block. If no value is specified, `continuous` will be considered as the default value.
+- Use `--stream-type continuous` to make the stream continuously running or use `--stream-type once` to run the stream once, only till the latest block / end block. If no value is specified, `continuous` will be considered as the default value.
 - You can tune `--period-seconds`, `--batch-size`, `--block-batch-size`, `--max-workers` for performance.
 - Refer to [blockchain-etl-streaming](https://github.com/blockchain-etl/blockchain-etl-streaming) for
   instructions on deploying it to Kubernetes.
