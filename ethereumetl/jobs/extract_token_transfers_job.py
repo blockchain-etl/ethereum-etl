@@ -159,8 +159,9 @@ class ExtractTokenTransfersJob(BaseJob):
                     )
 
             unique_token_addresses = list(token_addresses)
-            for token_address in unique_token_addresses:
-                
+            for unique_token_address in unique_token_addresses:
+                token_address = unique_token_address.lower()
+
                 # totalSupply() for previous block
                 multicall_previous_block_calls.append(
                     Call(
@@ -206,8 +207,8 @@ class ExtractTokenTransfersJob(BaseJob):
            
             for transfer in transfers:
                 
-                token_address = transfer['token_address']
-                from_address = transfer['from_address']
+                token_address = transfer['token_address'].lower()
+                from_address = transfer['from_address'].lower()
 
                 # if its eth transfer, we fetch details from eth_getBalance RPC
                 if (token_address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'):
@@ -220,7 +221,6 @@ class ExtractTokenTransfersJob(BaseJob):
 
                 total_supply_before = previous_block_multicall_result[f"{token_address}.totalSupply"]
                 total_supply_after = current_block_multicall_result[f"{token_address}.totalSupply"]
-                
                 token_symbol = current_block_multicall_result[f"{token_address}.symbol"]
                 token_decimals = current_block_multicall_result[f"{token_address}.decimals"]
 

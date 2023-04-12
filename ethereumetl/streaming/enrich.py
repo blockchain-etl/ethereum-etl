@@ -129,10 +129,10 @@ def enrich_token_transfers(blocks, token_transfers):
             'transaction_hash',
             'log_index',
             'block_number',
-            'balance_of_from_before'
-            'balance_of_from_after'
-            'total_supply_before'
-            'total_supply_after'
+            'balance_of_from_before',
+            'balance_of_from_after',
+            'total_supply_before',
+            'total_supply_after',
             'symbol',
             'decimals',
             'price',
