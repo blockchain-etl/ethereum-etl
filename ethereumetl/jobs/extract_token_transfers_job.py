@@ -227,6 +227,12 @@ class ExtractTokenTransfersJob(BaseJob):
                 if token_address in token_price_dict: token_price = token_price_dict[token_address] 
                 else: token_price = 0
 
+                # replace None with 0
+                balance_of_from_before = 0 if balance_of_from_before is None else balance_of_from_before
+                balance_of_from_after = 0 if balance_of_from_after is None else balance_of_from_after
+                total_supply_before = 0 if total_supply_before is None else total_supply_before
+                total_supply_after = 0 if total_supply_after is None else 0
+
                 updated_token_transfers.append({
                     **transfer,
                     'balance_of_from_before': balance_of_from_before,
