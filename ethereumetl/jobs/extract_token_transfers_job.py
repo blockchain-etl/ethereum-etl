@@ -159,8 +159,9 @@ class ExtractTokenTransfersJob(BaseJob):
                     )
 
             unique_token_addresses = list(token_addresses)
-            for token_address in unique_token_addresses:
-                
+            for unique_token_address in unique_token_addresses:
+                token_address = unique_token_address.lower()
+
                 # totalSupply() for previous block
                 multicall_previous_block_calls.append(
                     Call(
@@ -206,8 +207,8 @@ class ExtractTokenTransfersJob(BaseJob):
            
             for transfer in transfers:
                 
-                token_address = transfer['token_address']
-                from_address = transfer['from_address']
+                token_address = transfer['token_address'].lower()
+                from_address = transfer['from_address'].lower()
 
                 # if its eth transfer, we fetch details from eth_getBalance RPC
                 if (token_address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'):
@@ -220,12 +221,17 @@ class ExtractTokenTransfersJob(BaseJob):
 
                 total_supply_before = previous_block_multicall_result[f"{token_address}.totalSupply"]
                 total_supply_after = current_block_multicall_result[f"{token_address}.totalSupply"]
-                
                 token_symbol = current_block_multicall_result[f"{token_address}.symbol"]
                 token_decimals = current_block_multicall_result[f"{token_address}.decimals"]
 
                 if token_address in token_price_dict: token_price = token_price_dict[token_address] 
                 else: token_price = 0
+
+                # replace None with 0
+                balance_of_from_before = 0 if balance_of_from_before is None else balance_of_from_before
+                balance_of_from_after = 0 if balance_of_from_after is None else balance_of_from_after
+                total_supply_before = 0 if total_supply_before is None else total_supply_before
+                total_supply_after = 0 if total_supply_after is None else 0
 
                 updated_token_transfers.append({
                     **transfer,
