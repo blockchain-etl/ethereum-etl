@@ -51,7 +51,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-b', '--batch-size', default=10, show_default=True, type=int, help='How many blocks to batch in single request')
 @click.option('-B', '--block-batch-size', default=1, show_default=True, type=int, help='How many blocks to batch in single sync round')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The number of workers')
-@click.option('-c', '--chain', default='ethereum', show_default=True, type=bool, help='The name of chain which will be synced')
+@click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The name of chain which will be synced')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
 def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
