@@ -23,7 +23,7 @@ import web3
 from eth_utils import function_signature_to_4byte_selector
 from ethereum_dasm.evmdasm import EvmCode, Contract
 
-w3 = web3.Web3(web3.HTTPProvider('http://10.0.5.2'))
+# w3 = web3.Web3(web3.HTTPProvider('http://34.93.183.233'))
 abi = [{
     "constant": True,
     "inputs": [{
@@ -58,7 +58,6 @@ class EthContractService:
                     instructions = init_block.instructions
                     push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
                     tmp = tmp + list(set('0x' + inst.operand for inst in push4_instructions))
-                # print("function_signature-",type(tmp[0]))
                 return sorted(list(set(tmp)))
             else:
                 return []
@@ -85,7 +84,7 @@ class EthContractService:
     # transferFrom(address,address,uint256)
     # safeTransferFrom(address,address,uint256)
     # safeTransferFrom(address,address,uint256,bytes)
-    def is_erc721_contract(self, contract_address):  # , function_sighashes):
+    def is_erc721_contract(self, contract_address, w3):
 
         cont = w3.eth.contract(address=web3.Web3.toChecksumAddress(contract_address), abi=abi)
         try:
@@ -105,7 +104,6 @@ def clean_bytecode(bytecode):
 
 
 def get_function_sighash(signature):
-    # print(signature, " : ", '0x' + function_signature_to_4byte_selector(signature).hex())
     return '0x' + function_signature_to_4byte_selector(signature).hex()
 
 
@@ -115,7 +113,6 @@ class ContractWrapper:
 
     def implements(self, function_signature):
         sighash = get_function_sighash(function_signature)
-        # print("sighash-", type(sighash))
         return sighash in self.sighashes
 
     def implements_any_of(self, *function_signatures):

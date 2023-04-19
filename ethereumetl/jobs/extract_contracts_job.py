@@ -37,7 +37,8 @@ class ExtractContractsJob(BaseJob):
             traces_iterable,
             batch_size,
             max_workers,
-            item_exporter):
+            item_exporter,
+            web3):
         self.traces_iterable = traces_iterable
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
@@ -45,6 +46,7 @@ class ExtractContractsJob(BaseJob):
 
         self.contract_service = EthContractService()
         self.contract_mapper = EthContractMapper()
+        self.web3 = web3
 
     def _start(self):
         self.item_exporter.open()
@@ -73,7 +75,7 @@ class ExtractContractsJob(BaseJob):
 
             contract.function_sighashes = function_sighashes
             contract.is_erc20 = self.contract_service.is_erc20_contract(function_sighashes)
-            contract.is_erc721 = self.contract_service.is_erc721_contract(contract.address)
+            contract.is_erc721 = self.contract_service.is_erc721_contract(contract.address, self.web3)
 
             contracts.append(contract)
 

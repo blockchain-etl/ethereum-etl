@@ -9,6 +9,7 @@ from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
+from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
     enrich_contracts, enrich_tokens
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
@@ -166,7 +167,8 @@ class EthStreamerAdapter:
             traces_iterable=traces,
             batch_size=self.batch_size,
             max_workers=self.max_workers,
-            item_exporter=exporter
+            item_exporter=exporter,
+            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider))
         )
         job.run()
         contracts = exporter.get_items('contract')

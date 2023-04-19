@@ -30,6 +30,7 @@ from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.utils import check_classic_provider_uri
+from ethereumetl.web3_utils import build_web3
 
 logging_basic_config()
 
@@ -55,6 +56,7 @@ def export_contracts(batch_size, contract_addresses, output, max_workers, provid
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             item_exporter=contracts_item_exporter(output),
-            max_workers=max_workers)
+            max_workers=max_workers,
+            web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))))
 
         job.run()
