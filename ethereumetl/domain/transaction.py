@@ -23,17 +23,20 @@
 
 class EthTransaction(object):
     def __init__(self):
-        self.hash = None
-        self.nonce = None
         self.block_hash = None
         self.block_number = None
-        self.transaction_index = None
-        self.from_address = None
-        self.to_address = None
-        self.value = None
-        self.gas = None
-        self.gas_price = None
-        self.input = None
-        self.max_fee_per_gas = None
-        self.max_priority_fee_per_gas = None
+        self.block_timestamp = None
+        self.class_hash = None
+        self.constructor_calldata = None
+        self.contract_address_salt = None
+        self.transaction_hash = None
         self.transaction_type = None
+        self.version = None
+        self.calldata = None
+        self.contract_address = None
+        self.entry_point_selector = None
+        self.max_fee = None
+        self.nonce = None
+        self.signature = None
+        self.sender_address = None
+

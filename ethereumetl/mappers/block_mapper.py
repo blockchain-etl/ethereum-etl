@@ -35,29 +35,17 @@ class EthBlockMapper(object):
 
     def json_dict_to_block(self, json_dict):
         block = EthBlock()
-        block.number = hex_to_dec(json_dict.get('number'))
-        block.hash = json_dict.get('hash')
-        block.parent_hash = json_dict.get('parentHash')
-        block.nonce = json_dict.get('nonce')
-        block.sha3_uncles = json_dict.get('sha3Uncles')
-        block.logs_bloom = json_dict.get('logsBloom')
-        block.transactions_root = json_dict.get('transactionsRoot')
-        block.state_root = json_dict.get('stateRoot')
-        block.receipts_root = json_dict.get('receiptsRoot')
-        block.miner = to_normalized_address(json_dict.get('miner'))
-        block.difficulty = hex_to_dec(json_dict.get('difficulty'))
-        block.total_difficulty = hex_to_dec(json_dict.get('totalDifficulty'))
-        block.size = hex_to_dec(json_dict.get('size'))
-        block.extra_data = json_dict.get('extraData')
-        block.gas_limit = hex_to_dec(json_dict.get('gasLimit'))
-        block.gas_used = hex_to_dec(json_dict.get('gasUsed'))
-        block.timestamp = hex_to_dec(json_dict.get('timestamp'))
-        block.base_fee_per_gas = hex_to_dec(json_dict.get('baseFeePerGas'))
-        block.withdrawals_root = json_dict.get('withdrawalsRoot')
+        block.block_number = json_dict.get('block_number')
+        block.block_hash = json_dict.get('block_hash')
+        block.new_root = json_dict.get('new_root')
+        block.parent_hash = json_dict.get('parent_hash')
+        block.sequencer_address = json_dict.get('sequencer_address')
+        block.status = json_dict.get('status')
+        block.timestamp = json_dict.get('timestamp')
 
         if 'transactions' in json_dict:
             block.transactions = [
-                self.transaction_mapper.json_dict_to_transaction(tx, block_timestamp=block.timestamp)
+                self.transaction_mapper.json_dict_to_transaction(tx, block_number=block.block_number, block_hash=block.block_hash, block_timestamp=block.timestamp)
                 for tx in json_dict['transactions']
                 if isinstance(tx, dict)
             ]
@@ -83,25 +71,11 @@ class EthBlockMapper(object):
     def block_to_dict(self, block):
         return {
             'type': 'block',
-            'number': block.number,
-            'hash': block.hash,
+            'block_number': block.block_number,
+            'block_hash': block.block_hash,
+            'new_root': block.new_root,
             'parent_hash': block.parent_hash,
-            'nonce': block.nonce,
-            'sha3_uncles': block.sha3_uncles,
-            'logs_bloom': block.logs_bloom,
-            'transactions_root': block.transactions_root,
-            'state_root': block.state_root,
-            'receipts_root': block.receipts_root,
-            'miner': block.miner,
-            'difficulty': block.difficulty,
-            'total_difficulty': block.total_difficulty,
-            'size': block.size,
-            'extra_data': block.extra_data,
-            'gas_limit': block.gas_limit,
-            'gas_used': block.gas_used,
-            'timestamp': block.timestamp,
-            'transaction_count': block.transaction_count,
-            'base_fee_per_gas': block.base_fee_per_gas,
-            'withdrawals_root': block.withdrawals_root,
-            'withdrawals': block.withdrawals,
+            'sequencer_address': block.sequencer_address,
+            'status': block.status,
+            'timestamp': block.timestamp
         }

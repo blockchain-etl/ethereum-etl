@@ -24,8 +24,8 @@
 def generate_get_block_by_number_json_rpc(block_numbers, include_transactions):
     for idx, block_number in enumerate(block_numbers):
         yield generate_json_rpc(
-            method='eth_getBlockByNumber',
-            params=[hex(block_number), include_transactions],
+            method='starknet_getBlockWithTxs',
+            params=[{'block_number': block_number}],
             request_id=idx
         )
 

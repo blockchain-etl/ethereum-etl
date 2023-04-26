@@ -24,45 +24,32 @@
 from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
 
 BLOCK_FIELDS_TO_EXPORT = [
-    'number',
-    'hash',
+    'block_number',
+    'block_hash',
+    'new_root',
     'parent_hash',
-    'nonce',
-    'sha3_uncles',
-    'logs_bloom',
-    'transactions_root',
-    'state_root',
-    'receipts_root',
-    'miner',
-    'difficulty',
-    'total_difficulty',
-    'size',
-    'extra_data',
-    'gas_limit',
-    'gas_used',
-    'timestamp',
-    'transaction_count',
-    'base_fee_per_gas',
-    'withdrawals_root',
-    'withdrawals'
+    'sequencer_address',
+    'status',
+    'timestamp'
 ]
 
 TRANSACTION_FIELDS_TO_EXPORT = [
-    'hash',
-    'nonce',
     'block_hash',
     'block_number',
-    'transaction_index',
-    'from_address',
-    'to_address',
-    'value',
-    'gas',
-    'gas_price',
-    'input',
     'block_timestamp',
-    'max_fee_per_gas',
-    'max_priority_fee_per_gas',
-    'transaction_type'
+    'class_hash',
+    'constructor_calldata',
+    'contract_address_salt',
+    'transaction_hash',
+    'transaction_type',
+    'version',
+    'calldata',
+    'contract_address',
+    'entry_point_selector',
+    'max_fee',
+    'nonce',
+    'signature',
+    'sender_address'
 ]
 
 
