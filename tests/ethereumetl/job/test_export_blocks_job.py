@@ -44,9 +44,8 @@ def read_resource(resource_group, file_name):
     skip_if_slow_tests_disabled((0, 0, 1, 'block_without_transactions', 'infura', 'csv')),
     skip_if_slow_tests_disabled((483920, 483920, 1, 'block_with_logs', 'infura', 'csv')),
     skip_if_slow_tests_disabled((47218, 47219, 2, 'blocks_with_transactions', 'infura', 'csv')),
-    # TODO: Update these tests after Shanghai:
-    skip_if_slow_tests_disabled((8656134, 8656135, 2, 'blocks_with_transactions_goerli', 'goerli', 'csv')),
-    skip_if_slow_tests_disabled((8656134, 8656135, 2, 'blocks_with_transactions_goerli', 'goerli', 'json')),
+    skip_if_slow_tests_disabled((17173049, 17173050, 2, 'blocks_with_transactions_and_withdrawals', 'infura', 'csv')),
+    skip_if_slow_tests_disabled((17173049, 17173050, 2, 'blocks_with_transactions_and_withdrawals', 'infura', 'json')),
 ])
 def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_group, web3_provider_type, format):
     blocks_output_file = str(tmpdir.join(f'actual_blocks.{format}'))
