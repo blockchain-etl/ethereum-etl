@@ -6,6 +6,7 @@ from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
+from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
@@ -21,11 +22,13 @@ class EthStreamerAdapter:
     def __init__(
             self,
             batch_web3_provider,
+            node_client,
             item_exporter=ConsoleItemExporter(),
             batch_size=100,
             max_workers=5,
             entity_types=tuple(EntityType.ALL_FOR_STREAMING)):
         self.batch_web3_provider = batch_web3_provider
+        self.node_client = node_client
         self.item_exporter = item_exporter
         self.batch_size = batch_size
         self.max_workers = max_workers
@@ -59,7 +62,7 @@ class EthStreamerAdapter:
         # Export traces
         traces = []
         if self._should_export(EntityType.TRACE):
-            traces = self._export_traces(start_block, end_block)
+            traces = self._export_traces(start_block, end_block, self.node_client)
 
         # Export contracts
         contracts = []
@@ -146,18 +149,30 @@ class EthStreamerAdapter:
         token_transfers = exporter.get_items('token_transfer')
         return token_transfers
 
-    def _export_traces(self, start_block, end_block):
-        exporter = InMemoryItemExporter(item_types=['trace'])
-        job = ExportTracesJob(
-            start_block=start_block,
-            end_block=end_block,
-            batch_size=self.batch_size,
-            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
-            max_workers=self.max_workers,
-            item_exporter=exporter
-        )
+    def _export_traces(self, start_block, end_block, node_client):
+        if node_client == "geth":
+            exporter = InMemoryItemExporter(item_types=['geth_trace'])
+            job = ExportGethTracesJob(
+                start_block=start_block,
+                end_block=end_block,
+                batch_size=self.batch_size,
+                batch_web3_provider=self.batch_web3_provider,
+                max_workers=self.max_workers,
+                item_exporter=exporter
+            )
+        else:
+            exporter = InMemoryItemExporter(item_types=['trace'])
+            job = ExportTracesJob(
+                start_block=start_block,
+                end_block=end_block,
+                batch_size=self.batch_size,
+                web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
+                max_workers=self.max_workers,
+                item_exporter=exporter
+            )
+
         job.run()
-        traces = exporter.get_items('trace')
+        traces = exporter.get_items('geth_trace' if node_client == "geth" else 'trace')
         return traces
 
     def _export_contracts(self, traces):

@@ -52,10 +52,11 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-B', '--block-batch-size', default=1, show_default=True, type=int, help='How many blocks to batch in single sync round')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The number of workers')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The name of chain which will be synced')
+@click.option('-n', '--node-client', default='erigon', show_default=True, type=str, help='The name of evm client which will be used')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
 def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
-           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, chain='ethereum', log_file=None, pid_file=None):
+           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, chain='ethereum', node_client='erigon', log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
     configure_signals()
@@ -70,6 +71,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+        node_client=node_client,
         item_exporter=create_item_exporters(output, chain),
         batch_size=batch_size,
         max_workers=max_workers,
