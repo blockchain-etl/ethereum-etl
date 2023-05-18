@@ -90,6 +90,7 @@ def create_item_exporter(output, chain):
             'log': '{}_logs'.format(chain),
             'token_transfer': '{}_token_transfers'.format(chain),
             'trace': '{}_traces'.format(chain),
+            'geth_trace': '{}_traces'.format(chain),
             'contract': '{}_contracts'.format(chain),
             'token': '{}_tokens'.format(chain),
         })
