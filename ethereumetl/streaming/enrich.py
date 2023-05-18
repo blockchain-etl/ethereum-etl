@@ -242,39 +242,6 @@ def enrich_traces_with_blocks_transactions(blocks, traces, transactions):
         raise ValueError('The number of traces is wrong ' + str(result))
 
     return result
-def enrich_traces_by_transactions(transactions, traces):
-    result = list(join(
-        traces, transactions, ('transaction_index', 'transaction_index'),
-        [
-            'type',
-            'transaction_index',
-            'from_address',
-            'to_address',
-            'value',
-            'input',
-            'output',
-            'trace_type',
-            'call_type',
-            'reward_type',
-            'gas',
-            'gas_used',
-            'subtraces',
-            'trace_address',
-            'error',
-            'status',
-            'block_number',
-            'trace_id',
-            'trace_index'
-        ],
-        [
-           ('hash', 'transaction_hash'),
-           
-        ]))
-
-    if len(result) != len(traces):
-        raise ValueError('The number of traces is wrong ' + str(result))
-
-    return result
 
 
 def enrich_contracts(blocks, contracts):

@@ -15,7 +15,7 @@ from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
 from ethereumetl.service.trace_id_calculator import calculate_trace_ids
 from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
-    enrich_contracts, enrich_tokens, enrich_traces_by_transactions, enrich_traces_with_blocks_transactions
+    enrich_contracts, enrich_tokens, enrich_traces_with_blocks_transactions
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -284,6 +284,8 @@ def dict_to_eth_trace(json_dict):
     trace.trace_id = json_dict['trace_id'] if 'trace_id' in json_dict else None
     trace.trace_index = json_dict['trace_index'] if 'trace_index' in json_dict else None
     return trace
+
+
 def eth_trace_to_dict(eth_trace):
     json_dict = {
         'transaction_hash': eth_trace.transaction_hash,
