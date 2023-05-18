@@ -150,8 +150,8 @@ class EthStreamerAdapter:
         return token_transfers
 
     def _export_traces(self, start_block, end_block, node_client):
+        exporter = InMemoryItemExporter(item_types=['trace'])
         if node_client == "geth":
-            exporter = InMemoryItemExporter(item_types=['geth_trace'])
             job = ExportGethTracesJob(
                 start_block=start_block,
                 end_block=end_block,
@@ -161,7 +161,6 @@ class EthStreamerAdapter:
                 item_exporter=exporter
             )
         else:
-            exporter = InMemoryItemExporter(item_types=['trace'])
             job = ExportTracesJob(
                 start_block=start_block,
                 end_block=end_block,
@@ -172,7 +171,7 @@ class EthStreamerAdapter:
             )
 
         job.run()
-        traces = exporter.get_items('geth_trace' if node_client == "geth" else 'trace')
+        traces = exporter.get_items('trace')
         return traces
 
     def _export_contracts(self, traces):
