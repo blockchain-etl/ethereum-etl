@@ -1,7 +1,7 @@
 # Optimism ETL
 ## NOTE: This is a fork of ethereum-etl that handles for Optimism data. Replace your `ethereum-etl` package with `ethereum-etl` from this repo
 
-** Fields Added **
+**Fields Added**
 - l1_fee: The total amount of ETH paid in a user's transaction for the L1 data fee
 - l1_gas_used: The amount of gas that the calldata (input data) of a transaction used.
 - l1_gas_used_paid: The total amount of gas that the user pays for on L1: `Fee Scalar * (Calldata gas + Overhead gas)`. This is derived via `l1_fee / l1_gas_price`.
