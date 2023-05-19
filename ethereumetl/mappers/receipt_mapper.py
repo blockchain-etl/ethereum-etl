@@ -50,6 +50,13 @@ class EthReceiptMapper(object):
 
         receipt.effective_gas_price = hex_to_dec(json_dict.get('effectiveGasPrice'))
 
+        receipt.l1_fee = hex_to_dec(json_dict.get('l1Fee'))
+        receipt.l1_gas_used = hex_to_dec(json_dict.get('l1GasUsed'))
+        receipt.l1_gas_used_paid = hex_to_dec(json_dict.get('l1Fee')) / hex_to_dec(json_dict.get('l1GasPrice'))
+        receipt.l1_gas_price = hex_to_dec(json_dict.get('l1GasPrice'))
+        receipt.l1_fee_scalar = hex_to_dec(json_dict.get('l1FeeScalar'))
+        
+
         if 'logs' in json_dict:
             receipt.logs = [
                 self.receipt_log_mapper.json_dict_to_receipt_log(log) for log in json_dict['logs']
@@ -69,5 +76,11 @@ class EthReceiptMapper(object):
             'contract_address': receipt.contract_address,
             'root': receipt.root,
             'status': receipt.status,
-            'effective_gas_price': receipt.effective_gas_price
+            'effective_gas_price': receipt.effective_gas_price,
+            'l1_fee': receipt.l1_fee,
+            'l1_gas_used': receipt.l1_gas_used,
+            'l1_gas_used_paid' : receipt.l1_gas_used_paid,
+            'l1_gas_price': receipt.l1_gas_price,
+            'l1_fee_scalar': receipt.l1_fee_scalar,
+            
         }
