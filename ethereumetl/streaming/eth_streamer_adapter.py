@@ -12,6 +12,7 @@ from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
+from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.service.trace_id_calculator import calculate_trace_ids
 from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
@@ -102,14 +103,15 @@ class EthStreamerAdapter:
             # 2) 补充trace_status
             # dict -> trace object
             trs = []
+            trace_mapper = EthTraceMapper()
             for tr in enriched_traces_by_blocks_transactions:
-                trs.append(dict_to_eth_trace(tr))
+                trs.append(trace_mapper.dict_to_trace(tr))
             calculate_trace_statuses(trs)
             calculate_trace_ids(trs)
             # calculate trace index
             for ind, trace in enumerate(trs):
                 trace.trace_index = ind
-                enriched_traces[ind] = eth_trace_to_dict(trace)
+                enriched_traces[ind] = trace_mapper.trace_to_dict(trace)
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
         all_items = \
@@ -262,48 +264,3 @@ def sort_by(arr, fields):
     if isinstance(fields, tuple):
         fields = tuple(fields)
     return sorted(arr, key=lambda item: tuple(item.get(f) for f in fields))
-
-
-def dict_to_eth_trace(json_dict):
-    trace = EthTrace()
-    trace.transaction_hash = json_dict['transaction_hash'] if 'transaction_hash' in json_dict else None
-    trace.transaction_index = json_dict['transaction_index'] if 'transaction_index' in json_dict else None
-    trace.from_address = json_dict['from_address'] if 'from_address' in json_dict else None
-    trace.to_address = json_dict['to_address'] if 'to_address' in json_dict else None
-    trace.value = json_dict['value'] if 'value' in json_dict else None
-    trace.input = json_dict['input'] if 'input' in json_dict else None
-    trace.output = json_dict['output'] if 'output' in json_dict else None
-    trace.trace_type = json_dict['trace_type'] if 'trace_type' in json_dict else None
-    trace.gas = json_dict['gas'] if 'gas' in json_dict else None
-    trace.gas_used = json_dict['gas_used'] if 'gas_used' in json_dict else None
-    trace.subtraces = json_dict['subtraces'] if 'subtraces' in json_dict else None
-    trace.trace_address = json_dict['trace_address'] if 'trace_address' in json_dict else None
-    trace.error = json_dict['error'] if 'error' in json_dict else None
-    trace.status = json_dict['status'] if 'status' in json_dict else None
-    trace.block_number = json_dict['block_number'] if 'block_number' in json_dict else None
-    trace.trace_id = json_dict['trace_id'] if 'trace_id' in json_dict else None
-    trace.trace_index = json_dict['trace_index'] if 'trace_index' in json_dict else None
-    return trace
-
-
-def eth_trace_to_dict(eth_trace):
-    json_dict = {
-        'transaction_hash': eth_trace.transaction_hash,
-        'transaction_index': eth_trace.transaction_index,
-        'from_address': eth_trace.from_address,
-        'to_address': eth_trace.to_address,
-        'value': eth_trace.value,
-        'input': eth_trace.input,
-        'output': eth_trace.output,
-        'trace_type': eth_trace.trace_type,
-        'gas': eth_trace.gas,
-        'gas_used': eth_trace.gas_used,
-        'subtraces': eth_trace.subtraces,
-        'trace_address': eth_trace.trace_address,
-        'error': eth_trace.error,
-        'status': eth_trace.status,
-        'block_number': eth_trace.block_number,
-        'trace_id': eth_trace.trace_id,
-        'trace_index': eth_trace.trace_index
-    }
-    return json_dict
