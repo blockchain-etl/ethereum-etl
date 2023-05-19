@@ -89,29 +89,14 @@ class EthStreamerAdapter:
             if EntityType.LOG in self.entity_types else []
         enriched_token_transfers = enrich_token_transfers(blocks, token_transfers) \
             if EntityType.TOKEN_TRANSFER in self.entity_types else []
-        enriched_traces = enrich_traces(blocks, traces) \
-            if EntityType.TRACE in self.entity_types else []
+        enriched_traces = (enrich_traces_with_blocks_transactions(blocks, traces, transactions)
+                           if EntityType.TRACE in self.entity_types and self.node_client == "geth"
+                           else enrich_traces(blocks, traces) if EntityType.TRACE in self.entity_types else [])
         enriched_contracts = enrich_contracts(blocks, contracts) \
             if EntityType.CONTRACT in self.entity_types else []
         enriched_tokens = enrich_tokens(blocks, tokens) \
             if EntityType.TOKEN in self.entity_types else []
-        
-        # enrich trace 
-        if self.node_client == "geth":
-            # 1) firsh enrich to get transactions_hash
-            enriched_traces_by_blocks_transactions = enrich_traces_with_blocks_transactions(blocks, traces, transactions)
-            # 2) 补充trace_status
-            # dict -> trace object
-            trs = []
-            trace_mapper = EthTraceMapper()
-            for tr in enriched_traces_by_blocks_transactions:
-                trs.append(trace_mapper.dict_to_trace(tr))
-            calculate_trace_statuses(trs)
-            calculate_trace_ids(trs)
-            # calculate trace index
-            for ind, trace in enumerate(trs):
-                trace.trace_index = ind
-                enriched_traces[ind] = trace_mapper.trace_to_dict(trace)
+
         logging.info('Exporting with ' + type(self.item_exporter).__name__)
 
         all_items = \
