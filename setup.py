@@ -10,7 +10,9 @@ def read(fname):
 long_description = read('README.md') if os.path.isfile("README.md") else ""
 
 setup(
-    name='ethereum-etl',
+    # In Airflow, we might include multiple variations of ethereum-etl, which can cause version conflicts.
+    # Therefore, we should modify its name to avoid this issue.
+    name='chainbase-ethereum-etl',
     version='2.2.1',
     author='Evgeny Medvedev',
     author_email='evge.medvedev@gmail.com',
