@@ -40,7 +40,7 @@ def generate_trace_block_by_number_json_rpc(block_numbers):
         )
 
 
-def generate_trace_block_by_number_json_rpc_with_timeout(block_numbers, time_out='30s'):
+def generate_trace_block_by_number_json_rpc_with_timeout(block_numbers, time_out='60s'):
     for block_number in block_numbers:
         yield generate_json_rpc(
             method='debug_traceBlockByNumber',
