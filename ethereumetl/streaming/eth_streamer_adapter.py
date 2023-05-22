@@ -92,6 +92,10 @@ class EthStreamerAdapter:
         enriched_traces = (enrich_traces_with_blocks_transactions(blocks, traces, transactions)
                            if EntityType.TRACE in self.entity_types and self.node_client == "geth"
                            else enrich_traces(blocks, traces) if EntityType.TRACE in self.entity_types else [])
+        # geth 直接拿到的trace 没有txs hash,status等信息，contract表的计算依赖status,因此需要在trace enrich之后，在计算一次
+        if self.node_client == "geth" and self._should_export(EntityType.CONTRACT):
+            contracts = self._export_contracts(enriched_traces)
+            
         enriched_contracts = enrich_contracts(blocks, contracts) \
             if EntityType.CONTRACT in self.entity_types else []
         enriched_tokens = enrich_tokens(blocks, tokens) \
