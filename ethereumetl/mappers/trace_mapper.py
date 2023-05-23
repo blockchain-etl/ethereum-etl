@@ -192,3 +192,24 @@ class EthTraceMapper(object):
             'trace_id': trace.trace_id,
             'trace_index': trace.trace_index,
         }
+
+    def dict_to_trace(self, json_dict):
+        trace = EthTrace()
+        trace.transaction_hash = json_dict['transaction_hash'] if 'transaction_hash' in json_dict else None
+        trace.transaction_index = json_dict['transaction_index'] if 'transaction_index' in json_dict else None
+        trace.from_address = json_dict['from_address'] if 'from_address' in json_dict else None
+        trace.to_address = json_dict['to_address'] if 'to_address' in json_dict else None
+        trace.value = json_dict['value'] if 'value' in json_dict else None
+        trace.input = json_dict['input'] if 'input' in json_dict else None
+        trace.output = json_dict['output'] if 'output' in json_dict else None
+        trace.trace_type = json_dict['trace_type'] if 'trace_type' in json_dict else None
+        trace.gas = json_dict['gas'] if 'gas' in json_dict else None
+        trace.gas_used = json_dict['gas_used'] if 'gas_used' in json_dict else None
+        trace.subtraces = json_dict['subtraces'] if 'subtraces' in json_dict else None
+        trace.trace_address = json_dict['trace_address'] if 'trace_address' in json_dict else None
+        trace.error = json_dict['error'] if 'error' in json_dict else None
+        trace.status = json_dict['status'] if 'status' in json_dict else None
+        trace.block_number = json_dict['block_number'] if 'block_number' in json_dict else None
+        trace.trace_id = json_dict['trace_id'] if 'trace_id' in json_dict else None
+        trace.trace_index = json_dict['trace_index'] if 'trace_index' in json_dict else None
+        return trace

@@ -23,9 +23,10 @@
 import json
 
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.json_rpc_requests import generate_trace_block_by_number_json_rpc
+from ethereumetl.json_rpc_requests import generate_trace_block_by_number_json_rpc_with_timeout
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.geth_trace_mapper import EthGethTraceMapper
+from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.utils import validate_range, rpc_response_to_result
 
 
@@ -49,6 +50,7 @@ class ExportGethTracesJob(BaseJob):
         self.item_exporter = item_exporter
 
         self.geth_trace_mapper = EthGethTraceMapper()
+        self.trace_mapper = EthTraceMapper()
 
     def _start(self):
         self.item_exporter.open()
@@ -61,7 +63,7 @@ class ExportGethTracesJob(BaseJob):
         )
 
     def _export_batch(self, block_number_batch):
-        trace_block_rpc = list(generate_trace_block_by_number_json_rpc(block_number_batch))
+        trace_block_rpc = list(generate_trace_block_by_number_json_rpc_with_timeout(block_number_batch))
         response = self.batch_web3_provider.make_batch_request(json.dumps(trace_block_rpc))
 
         for response_item in response:
@@ -72,8 +74,9 @@ class ExportGethTracesJob(BaseJob):
                 'block_number': block_number,
                 'transaction_traces': [tx_trace.get('result') for tx_trace in result],
             })
-
-            self.item_exporter.export_item(self.geth_trace_mapper.geth_trace_to_dict(geth_trace))
+            traces = self.trace_mapper.geth_trace_to_traces(geth_trace)
+            for trace in traces:
+                self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
 
     def _end(self):
         self.batch_work_executor.shutdown()

@@ -4,11 +4,18 @@ on:
   push:
     branches:
       - chainbase
+    tags:
+      - "*"
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+
       # Publish to AWS ECR
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -28,7 +35,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ethereum-etl
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

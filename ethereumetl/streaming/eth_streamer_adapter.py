@@ -2,16 +2,21 @@ import logging
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
+from ethereumetl.domain.trace import EthTrace
 from ethereumetl.enumeration.entity_type import EntityType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
+from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
+from ethereumetl.mappers.trace_mapper import EthTraceMapper
+from ethereumetl.service.trace_id_calculator import calculate_trace_ids
+from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
-    enrich_contracts, enrich_tokens
+    enrich_contracts, enrich_tokens, enrich_traces_with_blocks_transactions
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -62,6 +67,8 @@ class EthStreamerAdapter:
         # Export traces
         traces = []
         if self._should_export(EntityType.TRACE):
+            # use node client to check which client to get trace
+            # 直接在这里补trace status,index 等字段不行，这里raw_traces没有trx_hash只有enrich 之后才能继续提取
             traces = self._export_traces(start_block, end_block, self.node_client)
 
         # Export contracts
@@ -82,8 +89,13 @@ class EthStreamerAdapter:
             if EntityType.LOG in self.entity_types else []
         enriched_token_transfers = enrich_token_transfers(blocks, token_transfers) \
             if EntityType.TOKEN_TRANSFER in self.entity_types else []
-        enriched_traces = enrich_traces(blocks, traces) \
-            if EntityType.TRACE in self.entity_types else []
+        enriched_traces = (enrich_traces_with_blocks_transactions(blocks, traces, transactions)
+                           if EntityType.TRACE in self.entity_types and self.node_client == "geth"
+                           else enrich_traces(blocks, traces) if EntityType.TRACE in self.entity_types else [])
+        # geth 直接拿到的trace 没有txs hash,status等信息，contract表的计算依赖status,因此需要在trace enrich之后，在计算一次
+        if self.node_client == "geth" and self._should_export(EntityType.CONTRACT):
+            contracts = self._export_contracts(enriched_traces)
+            
         enriched_contracts = enrich_contracts(blocks, contracts) \
             if EntityType.CONTRACT in self.entity_types else []
         enriched_tokens = enrich_tokens(blocks, tokens) \
@@ -150,8 +162,8 @@ class EthStreamerAdapter:
         return token_transfers
 
     def _export_traces(self, start_block, end_block, node_client):
+        exporter = InMemoryItemExporter(item_types=['trace'])
         if node_client == "geth":
-            exporter = InMemoryItemExporter(item_types=['geth_trace'])
             job = ExportGethTracesJob(
                 start_block=start_block,
                 end_block=end_block,
@@ -161,7 +173,6 @@ class EthStreamerAdapter:
                 item_exporter=exporter
             )
         else:
-            exporter = InMemoryItemExporter(item_types=['trace'])
             job = ExportTracesJob(
                 start_block=start_block,
                 end_block=end_block,
@@ -172,7 +183,7 @@ class EthStreamerAdapter:
             )
 
         job.run()
-        traces = exporter.get_items('geth_trace' if node_client == "geth" else 'trace')
+        traces = exporter.get_items('trace')
         return traces
 
     def _export_contracts(self, traces):
