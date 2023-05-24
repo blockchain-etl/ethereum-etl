@@ -49,7 +49,10 @@ class EthStreamerAdapter:
         # Export receipts and logs
         receipts, logs = [], []
         if self._should_export(EntityType.RECEIPT) or self._should_export(EntityType.LOG):
-            receipts, logs = self._export_receipts_and_logs(transactions)
+            if len(transactions) > 30: # adapted to Quicknode CU prices (eth_getTransacrionReceipt - 2, eth_getBlockReceipts - 59)
+                receipts, logs = self._export_receipts_and_logs(blocks, use_block_receipts=True)
+            else:
+                receipts, logs = self._export_receipts_and_logs(transactions, use_block_receipts=False)
 
         # Extract token transfers
         token_transfers = []
@@ -119,16 +122,17 @@ class EthStreamerAdapter:
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
 
-    def _export_receipts_and_logs(self, transactions):
+    def _export_receipts_and_logs(self, iterable, use_block_receipts):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
         job = ExportReceiptsJob(
-            transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
+            iterable=(block['number'] for block in iterable) if use_block_receipts else (transaction['hash'] for transaction in iterable),
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
             item_exporter=exporter,
             export_receipts=self._should_export(EntityType.RECEIPT),
-            export_logs=self._should_export(EntityType.LOG)
+            export_logs=self._should_export(EntityType.LOG),
+            use_block_receipts=use_block_receipts
         )
         job.run()
         receipts = exporter.get_items('receipt')
