@@ -79,6 +79,6 @@ class EthReceiptMapper(object):
             'l1_fee': receipt.l1_fee,
             'l1_gas_used': receipt.l1_gas_used,
             'l1_gas_price': receipt.l1_gas_price,
-            'l1_fee_scalar': receipt.l1_fee_scalar,
+            'l1_fee_scalar': receipt.l1_fee_scalar
             
         }
