@@ -1,5 +1,3 @@
-# NOTE: This is a fork of ethereum-etl that handles for Optimism data. Replace your `ethereum-etl` package with `ethereum-etl` from this repo
-
 # Ethereum ETL
 
 [![Build Status](https://app.travis-ci.com/blockchain-etl/ethereum-etl.svg?branch=develop)](https://travis-ci.com/github/blockchain-etl/ethereum-etl)
