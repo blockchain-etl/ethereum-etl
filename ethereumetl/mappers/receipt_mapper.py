@@ -52,12 +52,6 @@ class EthReceiptMapper(object):
 
         receipt.l1_fee = hex_to_dec(json_dict.get('l1Fee'))
         receipt.l1_gas_used = hex_to_dec(json_dict.get('l1GasUsed'))
-        # Get L1 Gas Paid: Fee Scalar * (Calldata + Overhead)
-        if json_dict.get('l1Fee') is None or json_dict.get('l1GasPrice') is None:
-            receipt.l1_gas_used_paid = 0
-        else:
-            receipt.l1_gas_used_paid = hex_to_dec(json_dict.get('l1Fee')) / hex_to_dec(json_dict.get('l1GasPrice'))
-
         receipt.l1_gas_price = hex_to_dec(json_dict.get('l1GasPrice'))
         receipt.l1_fee_scalar = hex_to_dec(json_dict.get('l1FeeScalar'))
         
@@ -84,7 +78,6 @@ class EthReceiptMapper(object):
             'effective_gas_price': receipt.effective_gas_price,
             'l1_fee': receipt.l1_fee,
             'l1_gas_used': receipt.l1_gas_used,
-            'l1_gas_used_paid' : receipt.l1_gas_used_paid,
             'l1_gas_price': receipt.l1_gas_price,
             'l1_fee_scalar': receipt.l1_fee_scalar,
             
