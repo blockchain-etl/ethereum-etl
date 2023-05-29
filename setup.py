@@ -38,6 +38,7 @@ setup(
         'python-dateutil>=2.8.0,<3',
         'click>=8.0.4,<9',
         'ethereum-dasm==0.1.4',
+        'urllib3<2',
         'base58',
         'requests'
     ],
