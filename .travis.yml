@@ -1,5 +1,9 @@
 language: python
 dist: xenial
+before_install:
+  - sudo add-apt-repository -y ppa:deadsnakes/ppa
+  - sudo apt-get update
+  - sudo apt-get install -y libssl-dev
 matrix:
   include:
     - python: "3.7.2"
