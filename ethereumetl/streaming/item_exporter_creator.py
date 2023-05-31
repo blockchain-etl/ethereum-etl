@@ -90,6 +90,7 @@ def create_item_exporter(output):
             'log': 'logs',
             'token_transfer': 'token_transfers',
             'trace': 'traces',
+            'geth_trace': 'traces',
             'contract': 'contracts',
             'token': 'tokens',
         })
