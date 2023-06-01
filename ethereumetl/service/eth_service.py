@@ -40,7 +40,7 @@ class EthService(object):
         start_timestamp = int(start_timestamp)
         end_timestamp = int(end_timestamp)
         if start_timestamp > end_timestamp:
-            raise ValueError('start_timestamp must be greater or equal to end_timestamp')
+            raise ValueError('start_timestamp must be lesser than end_timestamp')
 
         try:
             start_block_bounds = self._graph_operations.get_bounds_for_y_coordinate(start_timestamp)
