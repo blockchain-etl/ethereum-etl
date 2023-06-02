@@ -21,7 +21,7 @@
 #  SOFTWARE.
 
 from sqlalchemy import Table, Column, Integer, BigInteger, Boolean, String, Numeric, \
-    MetaData, PrimaryKeyConstraint, VARCHAR, TIMESTAMP
+    MetaData, PrimaryKeyConstraint, VARCHAR, TIMESTAMP, Float
 from sqlalchemy.dialects.postgresql import ARRAY
 
 metadata = MetaData()
@@ -77,7 +77,7 @@ TRANSACTIONS = Table(
     Column('receipt_l1_fee', BigInteger),
     Column('receipt_l1_gas_used', BigInteger),
     Column('receipt_l1_gas_price', BigInteger),
-    Column('receipt_l1_fee_scalar', BigInteger),
+    Column('receipt_l1_fee_scalar', Float),
 )
 
 LOGS = Table(
