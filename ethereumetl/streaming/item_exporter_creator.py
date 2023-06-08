@@ -76,6 +76,27 @@ def create_item_exporter(output, chain):
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
+    elif item_exporter_type == ItemExporterType.MYSQL:
+        from blockchainetl.jobs.exporters.mysql_item_exporter import MySQLItemExporter
+        from blockchainetl.streaming.mysql_utils import create_insert_statement_for_table
+        from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
+        from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
+        from ethereumetl.streaming.mysql_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
+
+        item_exporter = MySQLItemExporter(
+            output, item_type_to_insert_stmt_mapping={
+                'block': create_insert_statement_for_table(BLOCKS),
+                'transaction': create_insert_statement_for_table(TRANSACTIONS),
+                'log': create_insert_statement_for_table(LOGS),
+                'token_transfer': create_insert_statement_for_table(TOKEN_TRANSFERS),
+                'trace': create_insert_statement_for_table(TRACES),
+                'token': create_insert_statement_for_table(TOKENS),
+                'contract': create_insert_statement_for_table(CONTRACTS),
+            },
+            converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
+                        ListFieldItemConverter('topics', 'topic', fill=4)])
+
     elif item_exporter_type == ItemExporterType.GCS:
         from blockchainetl.jobs.exporters.gcs_item_exporter import GcsItemExporter
         bucket, path = get_bucket_and_path_from_gcs_output(output)
@@ -121,6 +142,8 @@ def determine_item_exporter_type(output):
         return ItemExporterType.KAFKA
     elif output is not None and output.startswith('postgresql'):
         return ItemExporterType.POSTGRES
+    elif output is not None and output.startswith('mysql'):
+        return ItemExporterType.MYSQL
     elif output is not None and output.startswith('gs://'):
         return ItemExporterType.GCS
     elif output is None or output == 'console':
@@ -133,6 +156,7 @@ class ItemExporterType:
     PUBSUB = 'pubsub'
     KINESIS = 'kinesis'
     POSTGRES = 'postgres'
+    MYSQL = 'mysql'
     GCS = 'gcs'
     CONSOLE = 'console'
     KAFKA = 'kafka'
