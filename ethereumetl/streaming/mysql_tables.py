@@ -75,7 +75,7 @@ TOKEN_TRANSFERS = Table(
     Column('token_address', VARCHAR),
     Column('from_address', VARCHAR),
     Column('to_address', VARCHAR),
-    Column('value', Numeric(18)),
+    Column('value', VARCHAR(78)),
     Column('transaction_hash', VARCHAR, primary_key=True),
     Column('log_index', BigInteger, primary_key=True),
     Column('block_timestamp', DATETIME),
@@ -89,7 +89,7 @@ TRACES = Table(
     Column('transaction_index', BigInteger),
     Column('from_address', VARCHAR),
     Column('to_address', VARCHAR),
-    Column('value', Numeric(38)),
+    Column('value', VARCHAR(78)),
     Column('input', VARCHAR),
     Column('output', VARCHAR),
     Column('trace_type', VARCHAR),
@@ -114,7 +114,7 @@ TOKENS = Table(
     Column('symbol', String),
     Column('decimals', Integer),
     Column('function_sighashes', String),
-    Column('total_supply', Numeric(18)),
+    Column('total_supply', VARCHAR(78)),
     Column('block_number', BigInteger, primary_key=True),
 )
 
