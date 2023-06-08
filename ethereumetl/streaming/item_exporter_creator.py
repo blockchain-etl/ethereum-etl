@@ -81,6 +81,7 @@ def create_item_exporter(output, chain):
         from blockchainetl.streaming.mysql_utils import create_insert_statement_for_table
         from blockchainetl.jobs.exporters.converters.unix_timestamp_item_converter import UnixTimestampItemConverter
         from blockchainetl.jobs.exporters.converters.int_to_decimal_item_converter import IntToDecimalItemConverter
+        from blockchainetl.jobs.exporters.converters.list_to_string_item_converter import ListToStringItemConverter
         from blockchainetl.jobs.exporters.converters.list_field_item_converter import ListFieldItemConverter
         from ethereumetl.streaming.mysql_tables import BLOCKS, TRANSACTIONS, LOGS, TOKEN_TRANSFERS, TRACES, TOKENS, CONTRACTS
 
@@ -95,6 +96,7 @@ def create_item_exporter(output, chain):
                 'contract': create_insert_statement_for_table(CONTRACTS),
             },
             converters=[UnixTimestampItemConverter(), IntToDecimalItemConverter(),
+                        ListToStringItemConverter('function_sighashes'),
                         ListFieldItemConverter('topics', 'topic', fill=4)])
 
     elif item_exporter_type == ItemExporterType.GCS:
