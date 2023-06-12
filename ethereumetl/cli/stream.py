@@ -45,6 +45,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
                    'or Kinesis, e.g. kinesis://your-data-stream-name'
                    'If not specified will print to console')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
+@click.option('-end', '--end-block', default=None, show_default=True, type=int, help='End block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
               help='The list of entity types to export.')
 @click.option('--period-seconds', default=10, show_default=True, type=int, help='How many seconds to sleep between syncs')
@@ -55,7 +56,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-n', '--node-client', default='erigon', show_default=True, type=str, help='The name of evm client which will be used')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
+def stream(last_synced_block_file, lag, provider_uri, output, start_block, end_block, entity_types,
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, chain='ethereum', node_client='erigon', log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
@@ -82,6 +83,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         last_synced_block_file=last_synced_block_file,
         lag=lag,
         start_block=start_block,
+        end_block=end_block,
         period_seconds=period_seconds,
         block_batch_size=block_batch_size,
         pid_file=pid_file
