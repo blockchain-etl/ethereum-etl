@@ -28,7 +28,7 @@ from ethereumetl.json_rpc_requests import generate_trace_block_by_number_json_rp
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.geth_trace_mapper import EthGethTraceMapper
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
-from ethereumetl.service.trace_id_calculator import calculate_trace_ids
+from ethereumetl.service.trace_id_calculator import calculate_trace_ids, trace_address_to_str
 from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.utils import validate_range, rpc_response_to_result
 
@@ -92,6 +92,7 @@ class ExportGethTracesJob(BaseJob):
             for trace in traces:
                 trace = self.mapper.trace_to_dict(trace)
                 trace['type'] = 'geth_trace'
+                trace['trace_address'] = trace_address_to_str(trace['trace_address'])
                 self.item_exporter.export_item(trace)
 
 

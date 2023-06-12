@@ -27,7 +27,7 @@ from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
 from ethereumetl.mappers.trace_mapper import EthTraceMapper
 from ethereumetl.service.eth_special_trace_service import EthSpecialTraceService
 
-from ethereumetl.service.trace_id_calculator import calculate_trace_ids
+from ethereumetl.service.trace_id_calculator import calculate_trace_ids, trace_address_to_str
 from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.utils import validate_range
 
@@ -100,7 +100,9 @@ class ExportTracesJob(BaseJob):
         calculate_trace_indexes(all_traces)
 
         for trace in all_traces:
-            self.item_exporter.export_item(self.trace_mapper.trace_to_dict(trace))
+            trace = self.trace_mapper.trace_to_dict(trace)
+            trace['trace_address'] = trace_address_to_str(trace['trace_address'])
+            self.item_exporter.export_item(trace)
 
     def _end(self):
         self.batch_work_executor.shutdown()
