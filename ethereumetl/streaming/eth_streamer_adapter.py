@@ -1,24 +1,25 @@
 import logging
 
-from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
-from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
-from ethereumetl.domain.trace import EthTrace
+from blockchainetl.jobs.exporters.console_item_exporter import \
+    ConsoleItemExporter
+from blockchainetl.jobs.exporters.in_memory_item_exporter import \
+    InMemoryItemExporter
 from ethereumetl.enumeration.entity_type import EntityType
+from ethereumetl.jobs.export_block_receipts_job import ExportBlockReceiptsJob
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
+from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
-from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
-from ethereumetl.jobs.extract_geth_traces_job import ExtractGethTracesJob
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
-from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from ethereumetl.jobs.extract_token_transfers_job import \
+    ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
-from ethereumetl.mappers.trace_mapper import EthTraceMapper
-from ethereumetl.service.trace_id_calculator import calculate_trace_ids
-from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
-from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enrich_token_transfers, enrich_traces, \
+from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, \
+    enrich_token_transfers, enrich_traces, \
     enrich_contracts, enrich_tokens, enrich_traces_with_blocks_transactions
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
-from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
+from ethereumetl.streaming.eth_item_timestamp_calculator import \
+    EthItemTimestampCalculator
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
@@ -57,7 +58,7 @@ class EthStreamerAdapter:
         # Export receipts and logs
         receipts, logs = [], []
         if self._should_export(EntityType.RECEIPT) or self._should_export(EntityType.LOG):
-            receipts, logs = self._export_receipts_and_logs(transactions)
+            receipts, logs = self._export_receipts_and_logs_by_block(blocks)
 
         # Extract token transfers
         token_transfers = []
@@ -134,10 +135,10 @@ class EthStreamerAdapter:
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
 
-    def _export_receipts_and_logs(self, transactions):
+    def _export_receipts_and_logs_by_block(self, blocks):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
-        job = ExportReceiptsJob(
-            transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
+        job = ExportBlockReceiptsJob(
+            blocks_iterable=(block['number'] for block in blocks),
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
