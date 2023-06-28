@@ -3,9 +3,12 @@ import logging
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
 from ethereumetl.enumeration.entity_type import EntityType
+from ethereumetl.enumeration.node_client_type import NodeClientType
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_traces_job import ExportTracesJob
+from ethereumetl.jobs.export_geth_traces_job import ExportGethTracesJob
+from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.jobs.extract_contracts_job import ExtractContractsJob
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
 from ethereumetl.jobs.extract_tokens_job import ExtractTokensJob
@@ -24,12 +27,14 @@ class EthStreamerAdapter:
             item_exporter=ConsoleItemExporter(),
             batch_size=100,
             max_workers=5,
-            entity_types=tuple(EntityType.ALL_FOR_STREAMING)):
+            entity_types=tuple(EntityType.ALL_FOR_STREAMING),
+            node_client_type=NodeClientType.GETH):
         self.batch_web3_provider = batch_web3_provider
         self.item_exporter = item_exporter
         self.batch_size = batch_size
         self.max_workers = max_workers
         self.entity_types = entity_types
+        self.node_client_type = node_client_type
         self.item_id_calculator = EthItemIdCalculator()
         self.item_timestamp_calculator = EthItemTimestampCalculator()
 
@@ -148,14 +153,7 @@ class EthStreamerAdapter:
 
     def _export_traces(self, start_block, end_block):
         exporter = InMemoryItemExporter(item_types=['trace'])
-        job = ExportTracesJob(
-            start_block=start_block,
-            end_block=end_block,
-            batch_size=self.batch_size,
-            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
-            max_workers=self.max_workers,
-            item_exporter=exporter
-        )
+        job = self._traces_job(start_block, end_block, exporter)
         job.run()
         traces = exporter.get_items('trace')
         return traces
@@ -184,6 +182,28 @@ class EthStreamerAdapter:
         tokens = exporter.get_items('token')
         return tokens
 
+    def _traces_job(self, start_block, end_block, exporter):
+        if self.node_client_type == NodeClientType.PARITY:
+            return ExportTracesJob(
+                start_block=start_block,
+                end_block=end_block,
+                batch_size=self.batch_size,
+                web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
+                max_workers=self.max_workers,
+                item_exporter=exporter
+            )
+        elif self.node_client_type == NodeClientType.GETH:
+            return ExportGethTracesJob(
+                start_block=start_block,
+                end_block=end_block,
+                batch_size=self.batch_size,
+                batch_web3_provider=self.batch_web3_provider,
+                max_workers=self.max_workers,
+                item_exporter=exporter
+            )
+
+        raise Exception('traces job not supported: {}'.format(self.node_client_type))
+    
     def _should_export(self, entity_type):
         if entity_type == EntityType.BLOCK:
             return True

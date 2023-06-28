@@ -50,3 +50,4 @@ ENV/
 
 # etl
 /last_synced_block.txt
+.python-version

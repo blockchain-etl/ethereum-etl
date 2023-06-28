@@ -35,7 +35,7 @@ class EthGethTraceMapper(object):
 
     def geth_trace_to_dict(self, geth_trace):
         return {
-            'type': 'geth_trace',
+            'type': 'trace',
             'block_number': geth_trace.block_number,
             'transaction_traces': geth_trace.transaction_traces,
         }

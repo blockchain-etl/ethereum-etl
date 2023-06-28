@@ -25,6 +25,7 @@ import random
 import click
 from blockchainetl.streaming.streaming_utils import configure_signals, configure_logging
 from ethereumetl.enumeration.entity_type import EntityType
+from ethereumetl.enumeration.node_client_type import NodeClientType
 
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.item_exporter_creator import create_item_exporters
@@ -53,12 +54,14 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The number of workers')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
+@click.option('--node-client-type', default=NodeClientType.GETH, show_default=True, type=str, help='client node type:{}'.format(",".join(NodeClientType.ALL_NODE_CLIENT_TYPES)))
 def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
-           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None):
+           period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None, node_client_type=""):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
     configure_signals()
     entity_types = parse_entity_types(entity_types)
+    node_client_type = parse_node_client_type(node_client_type)
 
     from ethereumetl.streaming.eth_streamer_adapter import EthStreamerAdapter
     from blockchainetl.streaming.streamer import Streamer
@@ -72,7 +75,8 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         item_exporter=create_item_exporters(output),
         batch_size=batch_size,
         max_workers=max_workers,
-        entity_types=entity_types
+        entity_types=entity_types,
+        node_client_type=node_client_type
     )
     streamer = Streamer(
         blockchain_streamer_adapter=streamer_adapter,
@@ -98,6 +102,14 @@ def parse_entity_types(entity_types):
 
     return entity_types
 
+def parse_node_client_type(node_client_type):
+    # validate passed node client
+    if node_client_type not in NodeClientType.ALL_NODE_CLIENT_TYPES:
+        raise click.BadOptionUsage(
+            '--node-client', '{} is not an available node client type. supported clients are {}'
+                    .format(node_client_type, ','.join(NodeClientType.ALL_NODE_CLIENT_TYPES)))
+        
+    return node_client_type
 
 def pick_random_provider_uri(provider_uri):
     provider_uris = [uri.strip() for uri in provider_uri.split(',')]
