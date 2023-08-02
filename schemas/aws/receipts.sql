@@ -8,7 +8,11 @@ CREATE EXTERNAL TABLE IF NOT EXISTS receipts (
     contract_address STRING,
     root STRING,
     status BIGINT,
-    effective_gas_price BIGINT
+    effective_gas_price BIGINT,
+    l1_fee BIGINT,
+    l1_gas_used BIGINT,
+    l1_gas_price BIGINT,
+    l1_fee_scalar DECIMAL
 )
 PARTITIONED BY (block_date STRING)
 ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
