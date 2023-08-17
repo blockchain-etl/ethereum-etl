@@ -55,7 +55,7 @@ def to_float_or_none(val):
     try:
         return float(val)
     except ValueError:
-        print("can't cast to float: %s" % val)
+        print("can't cast %s to float" % val)
         return val
 
 def chunk_string(string, length):
