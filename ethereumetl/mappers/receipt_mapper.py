@@ -23,7 +23,7 @@
 
 from ethereumetl.domain.receipt import EthReceipt
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
-from ethereumetl.utils import hex_to_dec, to_normalized_address
+from ethereumetl.utils import hex_to_dec, to_normalized_address, to_float_or_none
 
 
 class EthReceiptMapper(object):
@@ -53,7 +53,7 @@ class EthReceiptMapper(object):
         receipt.l1_fee = hex_to_dec(json_dict.get('l1Fee'))
         receipt.l1_gas_used = hex_to_dec(json_dict.get('l1GasUsed'))
         receipt.l1_gas_price = hex_to_dec(json_dict.get('l1GasPrice'))
-        receipt.l1_fee_scalar = hex_to_dec(json_dict.get('l1FeeScalar'))
+        receipt.l1_fee_scalar = to_float_or_none(json_dict.get('l1FeeScalar'))
         
 
         if 'logs' in json_dict:

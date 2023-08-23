@@ -47,6 +47,16 @@ def to_int_or_none(val):
     except ValueError:
         return None
 
+def to_float_or_none(val):
+    if isinstance(val, float):
+        return val
+    if val is None or val == "":
+        return None
+    try:
+        return float(val)
+    except ValueError:
+        print("can't cast %s to float" % val)
+        return val
 
 def chunk_string(string, length):
     return (string[0 + i:length + i] for i in range(0, len(string), length))
