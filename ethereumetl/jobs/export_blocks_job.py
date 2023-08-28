@@ -37,6 +37,7 @@ class ExportBlocksJob(BaseJob):
             self,
             start_block,
             end_block,
+            chain_id,
             batch_size,
             batch_web3_provider,
             max_workers,
@@ -46,6 +47,7 @@ class ExportBlocksJob(BaseJob):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
+        self.chain_id = chain_id
 
         self.batch_web3_provider = batch_web3_provider
 
@@ -54,6 +56,7 @@ class ExportBlocksJob(BaseJob):
 
         self.export_blocks = export_blocks
         self.export_transactions = export_transactions
+
         if not self.export_blocks and not self.export_transactions:
             raise ValueError('At least one of export_blocks or export_transactions must be True')
 
@@ -74,8 +77,13 @@ class ExportBlocksJob(BaseJob):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(block_number_batch, self.export_transactions))
         response = self.batch_web3_provider.make_batch_request(json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
-        blocks = [self.block_mapper.json_dict_to_block(result) for result in results]
-
+        blocks = []
+        for result in results:
+            result['chain_id'] = self.chain_id
+            if 'transactions' in result:
+                for tx in result['transactions']:
+                    tx['chain_id'] = self.chain_id
+            blocks.append(self.block_mapper.json_dict_to_block(result))
         for block in blocks:
             self._export_block(block)
 

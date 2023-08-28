@@ -6,7 +6,7 @@ class StreamerAdapterStub:
     def get_current_block_number(self):
         return 0
 
-    def export_all(self, start_block, end_block):
+    def export_all(self, start_block, end_block, chain_id):
         pass
 
     def close(self):

@@ -24,7 +24,7 @@
 from ethereumetl.domain.block import EthBlock
 from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
 from ethereumetl.utils import hex_to_dec, to_normalized_address
-
+from web3 import Web3
 
 class EthBlockMapper(object):
     def __init__(self, transaction_mapper=None):
@@ -34,6 +34,7 @@ class EthBlockMapper(object):
             self.transaction_mapper = transaction_mapper
 
     def json_dict_to_block(self, json_dict):
+        #w3 = Web3(Web3.HTTPProvider('https://rpc.testnet.immutable.com/'))
         block = EthBlock()
         block.number = hex_to_dec(json_dict.get('number'))
         block.hash = json_dict.get('hash')
@@ -54,6 +55,7 @@ class EthBlockMapper(object):
         block.timestamp = hex_to_dec(json_dict.get('timestamp'))
         block.base_fee_per_gas = hex_to_dec(json_dict.get('baseFeePerGas'))
         block.withdrawals_root = json_dict.get('withdrawalsRoot')
+        block.chain_id = json_dict.get('chain_id')
 
         if 'transactions' in json_dict:
             block.transactions = [
@@ -104,4 +106,5 @@ class EthBlockMapper(object):
             'base_fee_per_gas': block.base_fee_per_gas,
             'withdrawals_root': block.withdrawals_root,
             'withdrawals': block.withdrawals,
+            'chain_id': block.chain_id
         }

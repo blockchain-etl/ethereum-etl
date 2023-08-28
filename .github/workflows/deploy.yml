@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - main
+
+name: Deploy blockchain-ethereum-etl
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.IM_DATA_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.IM_DATA_AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.IM_DATA_AWS_SESSION_TOKEN }}
+        aws-region: us-west-2
+
+    - name: Set env vars (prod)
+      if: endsWith(github.ref, '/main')
+      run: |
+          echo "ENV=prod" >> $GITHUB_ENV
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image-ecr
+      run: |
+        make ecr.push.action

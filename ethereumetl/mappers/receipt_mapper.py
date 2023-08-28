@@ -37,6 +37,7 @@ class EthReceiptMapper(object):
         receipt = EthReceipt()
 
         receipt.transaction_hash = json_dict.get('transactionHash')
+        receipt.chain_id = json_dict.get('chain_id')
         receipt.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
         receipt.block_hash = json_dict.get('blockHash')
         receipt.block_number = hex_to_dec(json_dict.get('blockNumber'))
@@ -67,6 +68,7 @@ class EthReceiptMapper(object):
         return {
             'type': 'receipt',
             'transaction_hash': receipt.transaction_hash,
+            'chain_id': receipt.chain_id,
             'transaction_index': receipt.transaction_index,
             'block_hash': receipt.block_hash,
             'block_number': receipt.block_number,

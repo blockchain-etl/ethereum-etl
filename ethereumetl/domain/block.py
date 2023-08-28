@@ -41,6 +41,7 @@ class EthBlock(object):
         self.gas_used = None
         self.timestamp = None
         self.withdrawals_root = None
+        self.chain_id = None
 
         self.transactions = []
         self.transaction_count = 0

@@ -36,6 +36,7 @@ class ExportReceiptsJob(BaseJob):
     def __init__(
             self,
             transaction_hashes_iterable,
+            chain_id,
             batch_size,
             batch_web3_provider,
             max_workers,
@@ -44,6 +45,7 @@ class ExportReceiptsJob(BaseJob):
             export_logs=True):
         self.batch_web3_provider = batch_web3_provider
         self.transaction_hashes_iterable = transaction_hashes_iterable
+        self.chain_id = chain_id
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
@@ -66,7 +68,15 @@ class ExportReceiptsJob(BaseJob):
         receipts_rpc = list(generate_get_receipt_json_rpc(transaction_hashes))
         response = self.batch_web3_provider.make_batch_request(json.dumps(receipts_rpc))
         results = rpc_response_batch_to_results(response)
-        receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
+        receipts = []
+        for result in results:
+            result['chain_id'] = self.chain_id
+            if 'logs' in result:
+                for log in result['logs']:
+                    log['chain_id'] = self.chain_id
+            receipts.append(self.receipt_mapper.json_dict_to_receipt(result))
+
+        #receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
         for receipt in receipts:
             self._export_receipt(receipt)
 

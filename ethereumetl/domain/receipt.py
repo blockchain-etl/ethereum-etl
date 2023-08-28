@@ -24,6 +24,7 @@
 class EthReceipt(object):
     def __init__(self):
         self.transaction_hash = None
+        self.chain_id = None
         self.transaction_index = None
         self.block_hash = None
         self.block_number = None

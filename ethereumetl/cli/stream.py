@@ -74,6 +74,8 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         max_workers=max_workers,
         entity_types=entity_types
     )
+
+    logging.info("Iniatilised streamer_adapter")
     streamer = Streamer(
         blockchain_streamer_adapter=streamer_adapter,
         last_synced_block_file=last_synced_block_file,
@@ -83,6 +85,8 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         block_batch_size=block_batch_size,
         pid_file=pid_file
     )
+    logging.info("Iniatilised streamer")
+    logging.info(f"Here last_synced_block_file is {last_synced_block_file}")
     streamer.stream()
 
 

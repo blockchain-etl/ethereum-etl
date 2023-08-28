@@ -27,6 +27,7 @@ class EthTokenTransferMapper(object):
             'type': 'token_transfer',
             'token_address': token_transfer.token_address,
             'from_address': token_transfer.from_address,
+            'chain_id': token_transfer.chain_id,
             'to_address': token_transfer.to_address,
             'value': token_transfer.value,
             'transaction_hash': token_transfer.transaction_hash,

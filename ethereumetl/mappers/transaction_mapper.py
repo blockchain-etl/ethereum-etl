@@ -23,10 +23,13 @@
 
 from ethereumetl.domain.transaction import EthTransaction
 from ethereumetl.utils import hex_to_dec, to_normalized_address
+from web3 import Web3
+
 
 
 class EthTransactionMapper(object):
     def json_dict_to_transaction(self, json_dict, **kwargs):
+        #w3 = Web3(Web3.HTTPProvider('https://rpc.testnet.immutable.com/'))
         transaction = EthTransaction()
         transaction.hash = json_dict.get('hash')
         transaction.nonce = hex_to_dec(json_dict.get('nonce'))
@@ -43,6 +46,7 @@ class EthTransactionMapper(object):
         transaction.max_fee_per_gas = hex_to_dec(json_dict.get('maxFeePerGas'))
         transaction.max_priority_fee_per_gas = hex_to_dec(json_dict.get('maxPriorityFeePerGas'))
         transaction.transaction_type = hex_to_dec(json_dict.get('type'))
+        transaction.chain_id = json_dict.get('chain_id')
         return transaction
 
     def transaction_to_dict(self, transaction):
@@ -62,5 +66,6 @@ class EthTransactionMapper(object):
             'input': transaction.input,
             'max_fee_per_gas': transaction.max_fee_per_gas,
             'max_priority_fee_per_gas': transaction.max_priority_fee_per_gas,
-            'transaction_type': transaction.transaction_type
+            'transaction_type': transaction.transaction_type,
+            'chain_id': transaction.chain_id
         }

@@ -17,6 +17,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
 
+
 class EthStreamerAdapter:
     def __init__(
             self,
@@ -40,16 +41,16 @@ class EthStreamerAdapter:
         w3 = build_web3(self.batch_web3_provider)
         return int(w3.eth.getBlock("latest").number)
 
-    def export_all(self, start_block, end_block):
+    def export_all(self, start_block, end_block, chain_id):
         # Export blocks and transactions
         blocks, transactions = [], []
         if self._should_export(EntityType.BLOCK) or self._should_export(EntityType.TRANSACTION):
-            blocks, transactions = self._export_blocks_and_transactions(start_block, end_block)
+            blocks, transactions = self._export_blocks_and_transactions(start_block, end_block, chain_id)
 
         # Export receipts and logs
         receipts, logs = [], []
         if self._should_export(EntityType.RECEIPT) or self._should_export(EntityType.LOG):
-            receipts, logs = self._export_receipts_and_logs(transactions)
+            receipts, logs = self._export_receipts_and_logs(transactions, chain_id)
 
         # Extract token transfers
         token_transfers = []
@@ -102,11 +103,12 @@ class EthStreamerAdapter:
 
         self.item_exporter.export_items(all_items)
 
-    def _export_blocks_and_transactions(self, start_block, end_block):
+    def _export_blocks_and_transactions(self, start_block, end_block, chain_id):
         blocks_and_transactions_item_exporter = InMemoryItemExporter(item_types=['block', 'transaction'])
         blocks_and_transactions_job = ExportBlocksJob(
             start_block=start_block,
             end_block=end_block,
+            chain_id=chain_id,
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
@@ -119,10 +121,11 @@ class EthStreamerAdapter:
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
 
-    def _export_receipts_and_logs(self, transactions):
+    def _export_receipts_and_logs(self, transactions, chain_id):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
+            chain_id=chain_id,
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
