@@ -39,6 +39,16 @@ quit_if_returned_error() {
 
 usage() { echo "Usage: $0 -s <start_block> -e <end_block> -b <batch_size> -p <provider_uri> [-o <output_dir>]" 1>&2; exit 1; }
 
+is_log_filter_supported() {
+  provider_uri=$1
+
+  if [[ "$provider_uri" == *"infura"* ]]; then
+    echo false
+  else
+    echo true
+  fi
+}
+
 while getopts ":s:e:b:p:o:" opt; do
     case "${opt}" in
         s)
@@ -94,16 +104,6 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     python3 ethereumetl export_blocks_and_transactions --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --blocks-output=${blocks_file} --transactions-output=${transactions_file}
     quit_if_returned_error
 
-    ### token_transfers
-
-    token_transfers_output_dir=${output_dir}/token_transfers${partition_dir}
-    mkdir -p ${token_transfers_output_dir};
-
-    token_transfers_file=${token_transfers_output_dir}/token_transfers_${file_name_suffix}.csv
-    log "Exporting ERC20 transfers from blocks ${block_range} to ${token_transfers_file}"
-    python3 ethereumetl export_token_transfers --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --output=${token_transfers_file}
-    quit_if_returned_error
-
     ### receipts_and_logs
 
     transaction_hashes_output_dir=${output_dir}/transaction_hashes${partition_dir}
@@ -142,6 +142,23 @@ for (( batch_start_block=$start_block; batch_start_block <= $end_block; batch_st
     contracts_file=${contracts_output_dir}/contracts_${file_name_suffix}.csv
     log "Exporting contracts from blocks ${block_range} to ${contracts_file}"
     python3 ethereumetl export_contracts --contract-addresses ${contract_addresses_file} --provider-uri="${provider_uri}" --output=${contracts_file}
+    quit_if_returned_error
+
+    ### token_transfers
+
+    token_transfers_output_dir=${output_dir}/token_transfers${partition_dir}
+    mkdir -p ${token_transfers_output_dir};
+
+    token_transfers_file=${token_transfers_output_dir}/token_transfers_${file_name_suffix}.csv
+    log "Exporting ERC20 transfers from blocks ${block_range} to ${token_transfers_file}"
+
+    supported_condition=$( is_log_filter_supported "$provider_uri" )
+    if [ "$supported_condition" == true ]; then
+      python3 ethereumetl export_token_transfers --start-block=${batch_start_block} --end-block=${batch_end_block} --provider-uri="${provider_uri}" --output=${token_transfers_file}
+    else
+      python3 ethereumetl extract_token_transfers --logs=${logs_file} --output=${token_transfers_file}
+    fi
+
     quit_if_returned_error
 
     ### tokens
