@@ -63,7 +63,7 @@ def extract_csv_column_unique(input, output, column):
             output_file.write(row[column] + '\n')
 
 
-def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_size):
+def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_size, max_retries):
 
     for batch_start_block, batch_end_block, partition_dir in partitions:
         # # # start # # #
@@ -118,6 +118,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
+            max_retries=max_retries,
             item_exporter=blocks_and_transactions_item_exporter(blocks_file, transactions_file),
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
@@ -148,7 +149,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 batch_size=batch_size,
                 web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
                 item_exporter=token_transfers_item_exporter(token_transfers_file),
-                max_workers=max_workers)
+                max_workers=max_workers,
+                max_retries=max_retries)
             job.run()
 
         # # # receipts_and_logs # # #
@@ -200,6 +202,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 batch_size=batch_size,
                 batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
                 max_workers=max_workers,
+                max_retries=max_retries,
                 item_exporter=receipts_and_logs_item_exporter(receipts_file, logs_file),
                 export_receipts=receipts_file is not None,
                 export_logs=logs_file is not None)
@@ -239,7 +242,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                 batch_size=batch_size,
                 batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
                 item_exporter=contracts_item_exporter(contracts_file),
-                max_workers=max_workers)
+                max_workers=max_workers,
+                max_retries=max_retries)
             job.run()
 
         # # # tokens # # #
@@ -274,7 +278,8 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
                     token_addresses_iterable=(token_address.strip() for token_address in token_addresses),
                     web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
                     item_exporter=tokens_item_exporter(tokens_file),
-                    max_workers=max_workers)
+                    max_workers=max_workers,
+                    max_retries=max_retries)
                 job.run()
 
         # # # finish # # #

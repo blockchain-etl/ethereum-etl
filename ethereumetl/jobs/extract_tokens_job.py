@@ -25,8 +25,8 @@ from ethereumetl.jobs.export_tokens_job import ExportTokensJob
 
 
 class ExtractTokensJob(ExportTokensJob):
-    def __init__(self, web3, item_exporter, contracts_iterable, max_workers):
-        super().__init__(web3, item_exporter, [], max_workers)
+    def __init__(self, web3, item_exporter, contracts_iterable, max_workers, max_retries):
+        super().__init__(web3, item_exporter, [], max_workers, max_retries)
         self.contracts_iterable = contracts_iterable
 
     def _export(self):
