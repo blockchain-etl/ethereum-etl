@@ -66,10 +66,10 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     # TODO: Implement fallback mechanism for provider uris instead of picking randomly
     # provider_uri = pick_random_provider_uri(provider_uri)
     provider_uris = parse_provider_uri(provider_uri)
-
-    for index, provider_uri in enumerate(provider_uris):
-        provider_uri_0 = pick_provider_uri_move_to_end
-        logging.info('Using (new)' + provider_uri_0)
+    index = 0
+    while True:
+        provider_uri_0 = pick_provider_uri_move_to_end(provider_uris)
+        logging.info('Using new' + provider_uri_0)
         try:
             streamer_adapter = EthStreamerAdapter(
                 batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
@@ -92,8 +92,10 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         except Exception as e:
             if index < (len(provider_uris) - 1):
                 logging.exception('An exception occurred. Trying another uri')
+                index += 1
             else:
                 logging.exception('All URIs have been tried to be linked, but none have been successfully called. Keep trying')
+                index = 0
 
 
 def parse_entity_types(entity_types):
