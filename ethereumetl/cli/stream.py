@@ -64,26 +64,36 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     from blockchainetl.streaming.streamer import Streamer
 
     # TODO: Implement fallback mechanism for provider uris instead of picking randomly
-    provider_uri = pick_random_provider_uri(provider_uri)
-    logging.info('Using ' + provider_uri)
+    # provider_uri = pick_random_provider_uri(provider_uri)
+    provider_uris = parse_provider_uri(provider_uri)
 
-    streamer_adapter = EthStreamerAdapter(
-        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=create_item_exporters(output),
-        batch_size=batch_size,
-        max_workers=max_workers,
-        entity_types=entity_types
-    )
-    streamer = Streamer(
-        blockchain_streamer_adapter=streamer_adapter,
-        last_synced_block_file=last_synced_block_file,
-        lag=lag,
-        start_block=start_block,
-        period_seconds=period_seconds,
-        block_batch_size=block_batch_size,
-        pid_file=pid_file
-    )
-    streamer.stream()
+    for index, provider_uri in enumerate(provider_uris):
+        provider_uri_0 = pick_provider_uri_move_to_end
+        logging.info('Using (new)' + provider_uri_0)
+        try:
+            streamer_adapter = EthStreamerAdapter(
+                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+                item_exporter=create_item_exporters(output),
+                batch_size=batch_size,
+                max_workers=max_workers,
+                entity_types=entity_types
+            )
+            streamer = Streamer(
+                blockchain_streamer_adapter=streamer_adapter,
+                last_synced_block_file=last_synced_block_file,
+                lag=lag,
+                start_block=start_block,
+                period_seconds=period_seconds,
+                block_batch_size=block_batch_size,
+                retry_errors=True,
+                pid_file=pid_file
+            )
+            streamer.stream()
+        except Exception as e:
+            if index < (len(provider_uris) - 1):
+                logging.exception('An exception occurred. Trying another uri')
+            else:
+                logging.exception('All URIs have been tried to be linked, but none have been successfully called. Keep trying')
 
 
 def parse_entity_types(entity_types):
@@ -100,5 +110,15 @@ def parse_entity_types(entity_types):
 
 
 def pick_random_provider_uri(provider_uri):
-    provider_uris = [uri.strip() for uri in provider_uri.split(',')]
+    provider_uris = parse_provider_uri(provider_uri)
     return random.choice(provider_uris)
+
+
+def parse_provider_uri(provider_uri):
+    return [uri.strip() for uri in provider_uri.split(',')]
+
+
+def pick_provider_uri_move_to_end(provider_uris):
+    provider_uri = provider_uris.pop(0)
+    provider_uris.append(provider_uri)
+    return provider_uri
