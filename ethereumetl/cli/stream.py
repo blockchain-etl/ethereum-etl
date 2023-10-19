@@ -21,6 +21,7 @@
 # SOFTWARE.
 import logging
 import random
+from time import sleep
 
 import click
 from blockchainetl.streaming.streaming_utils import configure_signals, configure_logging
@@ -28,6 +29,7 @@ from ethereumetl.enumeration.entity_type import EntityType
 
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.item_exporter_creator import create_item_exporters
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 
@@ -65,37 +67,28 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
 
     # TODO: Implement fallback mechanism for provider uris instead of picking randomly
     # provider_uri = pick_random_provider_uri(provider_uri)
-    provider_uris = parse_provider_uri(provider_uri)
-    index = 0
-    while True:
-        provider_uri_0 = pick_provider_uri_move_to_end(provider_uris)
-        logging.info('Using new' + provider_uri_0)
-        try:
-            streamer_adapter = EthStreamerAdapter(
-                batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-                item_exporter=create_item_exporters(output),
-                batch_size=batch_size,
-                max_workers=max_workers,
-                entity_types=entity_types
-            )
-            streamer = Streamer(
-                blockchain_streamer_adapter=streamer_adapter,
-                last_synced_block_file=last_synced_block_file,
-                lag=lag,
-                start_block=start_block,
-                period_seconds=period_seconds,
-                block_batch_size=block_batch_size,
-                retry_errors=True,
-                pid_file=pid_file
-            )
-            streamer.stream()
-        except Exception as e:
-            if index < (len(provider_uris) - 1):
-                logging.exception('An exception occurred. Trying another uri')
-                index += 1
-            else:
-                logging.exception('All URIs have been tried to be linked, but none have been successfully called. Keep trying')
-                index = 0
+    provider_uri_0 = parse_provider_uri(provider_uri)[0]
+    logging.info('Using new' + provider_uri_0)
+
+    streamer_adapter = EthStreamerAdapter(
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri_0, batch=True)),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(provider_uri)),
+        item_exporter=create_item_exporters(output),
+        batch_size=batch_size,
+        max_workers=max_workers,
+        entity_types=entity_types
+    )
+    streamer = Streamer(
+        blockchain_streamer_adapter=streamer_adapter,
+        last_synced_block_file=last_synced_block_file,
+        lag=lag,
+        start_block=start_block,
+        period_seconds=period_seconds,
+        block_batch_size=block_batch_size,
+        retry_errors=False,
+        pid_file=pid_file
+    )
+    streamer.stream()
 
 
 def parse_entity_types(entity_types):
@@ -120,7 +113,7 @@ def parse_provider_uri(provider_uri):
     return [uri.strip() for uri in provider_uri.split(',')]
 
 
-def pick_provider_uri_move_to_end(provider_uris):
-    provider_uri = provider_uris.pop(0)
-    provider_uris.append(provider_uri)
-    return provider_uri
+if __name__ == '__main__':
+    stream(last_synced_block_file='./synced_block/ethereum_basic_last_synced_block.txt', lag=10, provider_uri='https://rpc.ankr123.com/eth,https://eth.getblock.io/e0c21a25-b7f2-4615-8c58-cc84567183b6/mainnet/', output='kafka/10.10.17.23:9092/ethereum_chain_data_', start_block=None, entity_types='block',
+           period_seconds=10, batch_size=1, block_batch_size=1, max_workers=1, log_file=None, pid_file=None)
+

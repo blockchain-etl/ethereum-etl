@@ -23,6 +23,7 @@
 
 import json
 
+from blockchainetl.jobs.auto_switch_node_job import AutoSwitchNodeJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.json_rpc_requests import generate_get_block_by_number_json_rpc
@@ -32,17 +33,19 @@ from ethereumetl.utils import rpc_response_batch_to_results, validate_range
 
 
 # Exports blocks and transactions
-class ExportBlocksJob(BaseJob):
+class ExportBlocksJob(AutoSwitchNodeJob):
     def __init__(
             self,
             start_block,
             end_block,
             batch_size,
             batch_web3_provider,
+            web3_provider_selector,
             max_workers,
             item_exporter,
             export_blocks=True,
             export_transactions=True):
+        super().__init__(web3_provider_selector)
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -66,13 +69,16 @@ class ExportBlocksJob(BaseJob):
     def _export(self):
         self.batch_work_executor.execute(
             range(self.start_block, self.end_block + 1),
-            self._export_batch,
+            self._export_batch_with_auto_switch_node,
             total_items=self.end_block - self.start_block + 1
         )
 
+    def _export_function(self, block_number_batch):
+        self._export_batch(block_number_batch)
+
     def _export_batch(self, block_number_batch):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(block_number_batch, self.export_transactions))
-        response = self.batch_web3_provider.make_batch_request(json.dumps(blocks_rpc))
+        response = self.web3_provider_selector.batch_web3_provider.make_batch_request(json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
         blocks = [self.block_mapper.json_dict_to_block(result) for result in results]
 

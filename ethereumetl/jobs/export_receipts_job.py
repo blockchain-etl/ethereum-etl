@@ -23,6 +23,7 @@
 
 import json
 
+from blockchainetl.jobs.auto_switch_node_job import AutoSwitchNodeJob
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from ethereumetl.json_rpc_requests import generate_get_receipt_json_rpc
@@ -32,16 +33,18 @@ from ethereumetl.utils import rpc_response_batch_to_results
 
 
 # Exports receipts and logs
-class ExportReceiptsJob(BaseJob):
+class ExportReceiptsJob(AutoSwitchNodeJob):
     def __init__(
             self,
             transaction_hashes_iterable,
             batch_size,
             batch_web3_provider,
+            web3_provider_selector,
             max_workers,
             item_exporter,
             export_receipts=True,
             export_logs=True):
+        super().__init__(web3_provider_selector)
         self.batch_web3_provider = batch_web3_provider
         self.transaction_hashes_iterable = transaction_hashes_iterable
 
@@ -60,7 +63,10 @@ class ExportReceiptsJob(BaseJob):
         self.item_exporter.open()
 
     def _export(self):
-        self.batch_work_executor.execute(self.transaction_hashes_iterable, self._export_receipts)
+        self.batch_work_executor.execute(self.transaction_hashes_iterable, self._export_batch_with_auto_switch_node)
+
+    def _export_function(self, transaction_hashes):
+        self._export_receipts(transaction_hashes)
 
     def _export_receipts(self, transaction_hashes):
         receipts_rpc = list(generate_get_receipt_json_rpc(transaction_hashes))

@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from blockchainetl.jobs.auto_switch_node_job import AutoSwitchNodeJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.token_transfer_mapper import EthTokenTransferMapper
@@ -27,14 +28,18 @@ from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.service.token_transfer_extractor import EthTokenTransferExtractor
 
 
-class ExtractTokenTransfersJob(BaseJob):
+class ExtractTokenTransfersJob(AutoSwitchNodeJob):
     def __init__(
             self,
             logs_iterable,
             batch_size,
+            batch_web3_provider,
+            web3_provider_selector,
             max_workers,
             item_exporter):
         self.logs_iterable = logs_iterable
+        self.web3_provider_selector = web3_provider_selector
+        self.batch_web3_provider = batch_web3_provider
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
         self.item_exporter = item_exporter
@@ -47,7 +52,10 @@ class ExtractTokenTransfersJob(BaseJob):
         self.item_exporter.open()
 
     def _export(self):
-        self.batch_work_executor.execute(self.logs_iterable, self._extract_transfers)
+        self.batch_work_executor.execute(self.logs_iterable, self._export_batch_with_auto_switch_node)
+
+    def _export_function(self, log_dicts):
+        self._extract_transfers(log_dicts)
 
     def _extract_transfers(self, log_dicts):
         for log_dict in log_dicts:
