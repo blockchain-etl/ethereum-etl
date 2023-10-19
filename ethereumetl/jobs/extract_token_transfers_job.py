@@ -37,8 +37,8 @@ class ExtractTokenTransfersJob(AutoSwitchNodeJob):
             web3_provider_selector,
             max_workers,
             item_exporter):
+        super().__init__(web3_provider_selector)
         self.logs_iterable = logs_iterable
-        self.web3_provider_selector = web3_provider_selector
         self.batch_web3_provider = batch_web3_provider
 
         self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)

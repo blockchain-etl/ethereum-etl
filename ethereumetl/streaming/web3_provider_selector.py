@@ -6,6 +6,7 @@ from ethereumetl.utils import parse_provider_uri, pick_provider_uri_move_to_end
 
 
 class Web3ProviderSelector:
+    # TODO: Adjust node selection priority based on node request exception statistics
     def __init__(self, provider_uris_str, max_fail_times=10):
         self.provider_uris_str = provider_uris_str
         self.provider_uri_range = parse_provider_uri(provider_uris_str)
