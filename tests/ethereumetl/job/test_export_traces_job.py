@@ -22,6 +22,8 @@
 
 import pytest
 
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
+from ethereumetl.utils import get_provider_uri
 from ethereumetl.web3_utils import build_web3
 
 import tests.resources
@@ -29,6 +31,7 @@ from ethereumetl.jobs.export_traces_job import ExportTracesJob
 from ethereumetl.jobs.exporters.traces_item_exporter import traces_item_exporter
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from tests.ethereumetl.job.helpers import get_web3_provider
+
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
 RESOURCE_GROUP = 'test_export_traces_job'
@@ -53,6 +56,7 @@ def test_export_traces_job(tmpdir, start_block, end_block, resource_group, web3_
         web3=ThreadLocalProxy(
             lambda: build_web3(get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file)))
         ),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri())),
         max_workers=5,
         item_exporter=traces_item_exporter(traces_output_file),
     )

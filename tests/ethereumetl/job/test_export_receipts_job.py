@@ -26,8 +26,11 @@ import pytest
 import tests.resources
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.utils import get_provider_uri
 from tests.ethereumetl.job.helpers import get_web3_provider
+
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
 RESOURCE_GROUP = 'test_export_receipts_job'
@@ -60,6 +63,7 @@ def test_export_receipts_job(tmpdir, batch_size, transaction_hashes, output_form
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file), batch=True)
         ),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri())),
         max_workers=5,
         item_exporter=receipts_and_logs_item_exporter(receipts_output_file, logs_output_file),
         export_receipts=receipts_output_file is not None,
