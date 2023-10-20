@@ -114,6 +114,5 @@ def parse_provider_uri(provider_uri):
 
 
 if __name__ == '__main__':
-    stream(last_synced_block_file='./synced_block/ethereum_basic_last_synced_block.txt', lag=10, provider_uri='https://rpc.ankr123.com/eth,https://eth.getblock.io/e0c21a25-b7f2-4615-8c58-cc84567183b6/mainnet/', output='kafka/10.10.17.23:9092/ethereum_chain_data_', start_block=None, entity_types='block',
-           period_seconds=10, batch_size=1, block_batch_size=1, max_workers=1, log_file=None, pid_file=None)
+    pass
 
