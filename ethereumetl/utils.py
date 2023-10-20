@@ -165,7 +165,7 @@ def parse_provider_uri(provider_uri):
 
 def get_provider_uri():
     return read_env('RPC_ADDRESS_LIST',
-                     'https://rpc.ankr.com/eth,https://eth.getblock.io/e0c21a25-b7f2-4615-8c58-cc84567183b6/mainnet/',
+                     'https://rpc.ankr.com/eth',
                      required=True)
 
 
