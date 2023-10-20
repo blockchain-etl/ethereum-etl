@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
@@ -13,6 +14,7 @@ from ethereumetl.streaming.enrich import enrich_transactions, enrich_logs, enric
     enrich_contracts, enrich_tokens
 from ethereumetl.streaming.eth_item_id_calculator import EthItemIdCalculator
 from ethereumetl.streaming.eth_item_timestamp_calculator import EthItemTimestampCalculator
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 from ethereumetl.web3_utils import build_web3
 
@@ -21,10 +23,13 @@ class EthStreamerAdapter:
     def __init__(
             self,
             batch_web3_provider,
+            web3_provider_selector,
             item_exporter=ConsoleItemExporter(),
             batch_size=100,
             max_workers=5,
-            entity_types=tuple(EntityType.ALL_FOR_STREAMING)):
+            entity_types=tuple(EntityType.ALL_FOR_STREAMING),
+            allow_block_delay_time=3600,
+            number_of_blocks_moved_forward=200):
         self.batch_web3_provider = batch_web3_provider
         self.item_exporter = item_exporter
         self.batch_size = batch_size
@@ -32,13 +37,27 @@ class EthStreamerAdapter:
         self.entity_types = entity_types
         self.item_id_calculator = EthItemIdCalculator()
         self.item_timestamp_calculator = EthItemTimestampCalculator()
+        self.allow_block_delay_time = allow_block_delay_time
+        self.number_of_blocks_moved_forward = number_of_blocks_moved_forward
+        self.web3_provider_selector = web3_provider_selector
 
     def open(self):
         self.item_exporter.open()
 
+    def get_block_info(self,block_number=None):
+        try:
+            w3 = build_web3(self.web3_provider_selector.batch_web3_provider)
+            block_info = w3.eth.getBlock(block_number if block_number else "latest")
+            self.web3_provider_selector.reset_provider()
+            return block_info
+        except Exception as e:
+            self.web3_provider_selector.select_provider()
+            return self.get_block_info()
+
     def get_current_block_number(self):
-        w3 = build_web3(self.batch_web3_provider)
-        return int(w3.eth.getBlock("latest").number)
+        block_info = self.get_block_info()
+        return int(block_info.number)
+
 
     def export_all(self, start_block, end_block):
         # Export blocks and transactions
@@ -101,6 +120,7 @@ class EthStreamerAdapter:
         self.calculate_item_timestamps(all_items)
 
         self.item_exporter.export_items(all_items)
+        self.web3_provider_selector.reset_provider()
 
     def _export_blocks_and_transactions(self, start_block, end_block):
         blocks_and_transactions_item_exporter = InMemoryItemExporter(item_types=['block', 'transaction'])
@@ -108,7 +128,8 @@ class EthStreamerAdapter:
             start_block=start_block,
             end_block=end_block,
             batch_size=self.batch_size,
-            batch_web3_provider=self.batch_web3_provider,
+            batch_web3_provider=self.web3_provider_selector.batch_web3_provider,
+            web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(self.web3_provider_selector.provider_uris_str)),
             max_workers=self.max_workers,
             item_exporter=blocks_and_transactions_item_exporter,
             export_blocks=self._should_export(EntityType.BLOCK),
@@ -124,7 +145,8 @@ class EthStreamerAdapter:
         job = ExportReceiptsJob(
             transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
             batch_size=self.batch_size,
-            batch_web3_provider=self.batch_web3_provider,
+            batch_web3_provider=self.web3_provider_selector.batch_web3_provider,
+            web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(self.web3_provider_selector.provider_uris_str)),
             max_workers=self.max_workers,
             item_exporter=exporter,
             export_receipts=self._should_export(EntityType.RECEIPT),
@@ -140,6 +162,8 @@ class EthStreamerAdapter:
         job = ExtractTokenTransfersJob(
             logs_iterable=logs,
             batch_size=self.batch_size,
+            batch_web3_provider=self.web3_provider_selector.batch_web3_provider,
+            web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(self.web3_provider_selector.provider_uris_str)),
             max_workers=self.max_workers,
             item_exporter=exporter)
         job.run()
@@ -152,10 +176,12 @@ class EthStreamerAdapter:
             start_block=start_block,
             end_block=end_block,
             batch_size=self.batch_size,
-            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
+            web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(self.web3_provider_selector.provider_uris_str)),
+            web3=ThreadLocalProxy(lambda: build_web3(self.web3_provider_selector.batch_web3_provider)),
             max_workers=self.max_workers,
             item_exporter=exporter
         )
+        logging.info(f'job: {job}')
         job.run()
         traces = exporter.get_items('trace')
         return traces
@@ -176,7 +202,7 @@ class EthStreamerAdapter:
         exporter = InMemoryItemExporter(item_types=['token'])
         job = ExtractTokensJob(
             contracts_iterable=contracts,
-            web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
+            web3=ThreadLocalProxy(lambda: build_web3(self.web3_provider_selector.batch_web3_provider)),
             max_workers=self.max_workers,
             item_exporter=exporter
         )
@@ -221,6 +247,18 @@ class EthStreamerAdapter:
 
     def close(self):
         self.item_exporter.close()
+
+    def choose_block_base_on_delay_time(self, target_block, current_block):
+        block_info = self.get_block_info()
+        block_end_time = block_info.timestamp
+        current_time = datetime.timestamp(datetime.now())
+        # Calculation delay
+        if current_time-block_end_time > self.allow_block_delay_time:
+            logging.info(f'current_block: {current_block}')
+            logging.info(f'self.number_of_blocks_moved_forward: {self.number_of_blocks_moved_forward}')
+            return current_block - self.number_of_blocks_moved_forward
+        else:
+            return target_block
 
 
 def sort_by(arr, fields):

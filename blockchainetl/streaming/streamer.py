@@ -87,7 +87,8 @@ class Streamer:
 
     def _sync_cycle(self):
         current_block = self.blockchain_streamer_adapter.get_current_block_number()
-
+        # When the block data delay is too high, jump to the latest block execution
+        self.last_synced_block = self.blockchain_streamer_adapter.choose_block_base_on_delay_time(self.last_synced_block, current_block)
         target_block = self._calculate_target_block(current_block, self.last_synced_block)
         blocks_to_sync = max(target_block - self.last_synced_block, 0)
 

@@ -21,6 +21,7 @@
 # SOFTWARE.
 import logging
 import random
+from time import sleep
 
 import click
 from blockchainetl.streaming.streaming_utils import configure_signals, configure_logging
@@ -28,6 +29,7 @@ from ethereumetl.enumeration.entity_type import EntityType
 
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.streaming.item_exporter_creator import create_item_exporters
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
 
 
@@ -64,11 +66,13 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     from blockchainetl.streaming.streamer import Streamer
 
     # TODO: Implement fallback mechanism for provider uris instead of picking randomly
-    provider_uri = pick_random_provider_uri(provider_uri)
-    logging.info('Using ' + provider_uri)
+    # provider_uri = pick_random_provider_uri(provider_uri)
+    provider_uri_0 = parse_provider_uri(provider_uri)[0]
+    logging.info('Using new' + provider_uri_0)
 
     streamer_adapter = EthStreamerAdapter(
-        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
+        batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri_0, batch=True)),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(provider_uri)),
         item_exporter=create_item_exporters(output),
         batch_size=batch_size,
         max_workers=max_workers,
@@ -81,6 +85,7 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         start_block=start_block,
         period_seconds=period_seconds,
         block_batch_size=block_batch_size,
+        retry_errors=False,
         pid_file=pid_file
     )
     streamer.stream()
@@ -100,5 +105,14 @@ def parse_entity_types(entity_types):
 
 
 def pick_random_provider_uri(provider_uri):
-    provider_uris = [uri.strip() for uri in provider_uri.split(',')]
+    provider_uris = parse_provider_uri(provider_uri)
     return random.choice(provider_uris)
+
+
+def parse_provider_uri(provider_uri):
+    return [uri.strip() for uri in provider_uri.split(',')]
+
+
+if __name__ == '__main__':
+    pass
+

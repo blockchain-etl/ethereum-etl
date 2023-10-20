@@ -25,7 +25,9 @@ import pytest
 import tests.resources
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
 from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.utils import get_provider_uri
 from tests.ethereumetl.job.helpers import get_web3_provider
 from tests.helpers import compare_lines_ignore_order, read_file, skip_if_slow_tests_disabled
 
@@ -56,6 +58,7 @@ def test_export_blocks_job(tmpdir, start_block, end_block, batch_size, resource_
         batch_web3_provider=ThreadLocalProxy(
             lambda: get_web3_provider(web3_provider_type, lambda file: read_resource(resource_group, file), batch=True)
         ),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri())),
         max_workers=5,
         item_exporter=blocks_and_transactions_item_exporter(blocks_output_file, transactions_output_file),
         export_blocks=blocks_output_file is not None,

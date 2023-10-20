@@ -22,6 +22,7 @@
 
 
 import itertools
+import os
 import warnings
 
 from ethereumetl.misc.retriable_value_error import RetriableValueError
@@ -141,4 +142,34 @@ def check_classic_provider_uri(chain, provider_uri):
     if chain == 'classic' and provider_uri == 'https://mainnet.infura.io':
         warnings.warn("ETC Chain not supported on Infura.io. Using https://ethereumclassic.network instead")
         return 'https://ethereumclassic.network'
+    return provider_uri
+
+
+def read_env(name: str, default=None, required: bool = False, format_func=None):
+    full_var_name = name
+    env = os.environ.get(full_var_name, default)
+    env = env if env != '' else None
+    if required and env is None:
+        raise ValueError(f'{full_var_name} environment is required')
+    if format_func is not None and env is not None:
+        env = format_func(env)
+    return env
+
+
+def parse_provider_uri(provider_uri):
+    if not provider_uri:
+        provider_uri = get_provider_uri()
+    provider_uris = [uri.strip() for uri in provider_uri.split(',')]
+    return provider_uris
+
+
+def get_provider_uri():
+    return read_env('RPC_ADDRESS_LIST',
+                     'https://rpc.ankr.com/eth',
+                     required=True)
+
+
+def pick_provider_uri_move_to_end(provider_uris=None):
+    provider_uri = provider_uris.pop(0)
+    provider_uris.append(provider_uri)
     return provider_uri

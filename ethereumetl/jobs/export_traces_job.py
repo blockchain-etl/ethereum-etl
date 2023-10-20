@@ -19,8 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
 
+from blockchainetl.jobs.auto_switch_node_job import AutoSwitchNodeJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
@@ -32,17 +32,19 @@ from ethereumetl.service.trace_status_calculator import calculate_trace_statuses
 from ethereumetl.utils import validate_range
 
 
-class ExportTracesJob(BaseJob):
+class ExportTracesJob(AutoSwitchNodeJob):
     def __init__(
             self,
             start_block,
             end_block,
             batch_size,
+            web3_provider_selector,
             web3,
             item_exporter,
             max_workers,
             include_genesis_traces=False,
             include_daofork_traces=False):
+        super().__init__(web3_provider_selector)
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -65,9 +67,12 @@ class ExportTracesJob(BaseJob):
     def _export(self):
         self.batch_work_executor.execute(
             range(self.start_block, self.end_block + 1),
-            self._export_batch,
+            self._export_batch_with_auto_switch_node,
             total_items=self.end_block - self.start_block + 1
         )
+
+    def _export_function(self, block_number_batch):
+        self._export_batch(block_number_batch)
 
     def _export_batch(self, block_number_batch):
         # TODO: Change to len(block_number_batch) > 0 when this issue is fixed

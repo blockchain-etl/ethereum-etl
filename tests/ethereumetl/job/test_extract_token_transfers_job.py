@@ -28,6 +28,11 @@ import pytest
 import tests.resources
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
 from ethereumetl.jobs.extract_token_transfers_job import ExtractTokenTransfersJob
+from ethereumetl.streaming.web3_provider_selector import Web3ProviderSelector
+from ethereumetl.thread_local_proxy import ThreadLocalProxy
+from ethereumetl.utils import get_provider_uri
+from tests.ethereumetl.job.helpers import get_web3_provider
+
 from tests.helpers import compare_lines_ignore_order, read_file
 
 RESOURCE_GROUP = 'test_extract_token_transfers_job'
@@ -48,6 +53,10 @@ def test_export_token_transfers_job(tmpdir, resource_group):
     job = ExtractTokenTransfersJob(
         logs_iterable=logs_csv_reader,
         batch_size=2,
+        batch_web3_provider=ThreadLocalProxy(
+            lambda: get_web3_provider('token_transfers', lambda file: read_resource(resource_group, file), batch=True)
+        ),
+        web3_provider_selector=ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri())),
         item_exporter=token_transfers_item_exporter(output_file),
         max_workers=5
     )
