@@ -23,29 +23,35 @@ class AutoSwitchNodeJob(BaseJob):
             self._end()
 
     def _export_batch_with_auto_switch_node(self, items):
-        try:
-            self._export_function(items)
-        except Exception as e:
-            logging.exception('An exception occurred. Trying another uri')
-            sleep(5)
-            if not self.web3_provider_selector:
-                self.web3_provider_selector = ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri()))
-            self.batch_web3_provider = self.web3_provider_selector.select_provider()
-            self.web3 = ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider))
-            self._export_batch_with_auto_switch_node(items)
+        retry = True
+        while retry:
+            try:
+                self._export_function(items)
+                retry = False
+            except Exception as e:
+                logging.exception('An exception occurred. Trying another uri')
+                sleep(5)
+                if not self.web3_provider_selector:
+                    self.web3_provider_selector = ThreadLocalProxy(lambda: Web3ProviderSelector(get_provider_uri()))
+                self.batch_web3_provider = self.web3_provider_selector.select_provider()
+                self.web3 = ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider))
+                # self._export_batch_with_auto_switch_node(items)
 
     def _export_function(self, items):
         pass
 
     def export_with_auto_switch_node(self):
-        self.batch_web3_provider = self.web3_provider_selector.select_provider()
-        self.web3 = ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider))
-        try:
-            self._export()
-        except Exception as e:
-            logging.exception('An exception occurred. Trying another uri')
-            sleep(5)
-            self.export_with_auto_switch_node()
+        retry = True
+        while retry:
+            self.batch_web3_provider = self.web3_provider_selector.select_provider()
+            self.web3 = ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider))
+            try:
+                self._export()
+                retry = False
+            except Exception as e:
+                logging.exception('An exception occurred. Trying another uri')
+                sleep(5)
+                # self.export_with_auto_switch_node()
 
 
 def select_web3_provider_run_request(text, web3_provider_selector):

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from time import sleep
 
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.in_memory_item_exporter import InMemoryItemExporter
@@ -44,15 +45,16 @@ class EthStreamerAdapter:
     def open(self):
         self.item_exporter.open()
 
-    def get_block_info(self,block_number=None):
-        try:
-            w3 = build_web3(self.web3_provider_selector.batch_web3_provider)
-            block_info = w3.eth.getBlock(block_number if block_number else "latest")
-            self.web3_provider_selector.reset_provider()
-            return block_info
-        except Exception as e:
-            self.web3_provider_selector.select_provider()
-            return self.get_block_info()
+    def get_block_info(self, block_number=None):
+        block_info = None
+        while not block_info:
+            try:
+                w3 = build_web3(self.web3_provider_selector.batch_web3_provider)
+                block_info = w3.eth.getBlock(block_number if block_number else "latest")
+            except Exception as e:
+                sleep(5)
+                self.web3_provider_selector.select_provider()
+        return block_info
 
     def get_current_block_number(self):
         block_info = self.get_block_info()
