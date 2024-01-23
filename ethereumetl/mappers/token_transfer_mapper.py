@@ -20,19 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ethereumetl.utils import hex_to_base58
+
 class EthTokenTransferMapper(object):
     def token_transfer_to_dict(self, token_transfer):
         return {
             'type': 'token_transfer',
-            # 'token_address': hex_to_base58(token_transfer.token_address),
-            # 'from_address': hex_to_base58(token_transfer.from_address),
-            # 'to_address': hex_to_base58(token_transfer.to_address),
             'token_address': token_transfer.token_address,
             'from_address': token_transfer.from_address,
             'to_address': token_transfer.to_address,
-            'value': token_transfer.value/10**6,
-            'transaction_hash': token_transfer.transaction_hash.lstrip("0x"),
+            'value': token_transfer.value,
+            'transaction_hash': token_transfer.transaction_hash,
             'log_index': token_transfer.log_index,
             'block_number': token_transfer.block_number,
         }

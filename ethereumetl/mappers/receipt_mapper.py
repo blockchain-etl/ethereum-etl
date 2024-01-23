@@ -35,7 +35,6 @@ class EthReceiptMapper(object):
 
     def json_dict_to_receipt(self, json_dict):
 
-        print("result: ", json_dict)
         receipt = EthReceipt()
 
         receipt.transaction_hash = json_dict.get('transactionHash')
