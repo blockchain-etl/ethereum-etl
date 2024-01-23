@@ -22,7 +22,7 @@
 
 
 from ethereumetl.domain.transaction import EthTransaction
-from ethereumetl.utils import hex_to_dec, to_normalized_address
+from ethereumetl.utils import hex_to_dec, to_normalized_address, hex_to_base58
 
 
 class EthTransactionMapper(object):
@@ -34,10 +34,12 @@ class EthTransactionMapper(object):
         transaction.block_number = hex_to_dec(json_dict.get('blockNumber'))
         transaction.block_timestamp = kwargs.get('block_timestamp')
         transaction.transaction_index = hex_to_dec(json_dict.get('transactionIndex'))
+        # transaction.from_address = hex_to_base58(to_normalized_address(json_dict.get('from')))
+        # transaction.to_address = hex_to_base58(to_normalized_address(json_dict.get('to')))
         transaction.from_address = to_normalized_address(json_dict.get('from'))
         transaction.to_address = to_normalized_address(json_dict.get('to'))
-        transaction.value = hex_to_dec(json_dict.get('value'))
-        transaction.gas = hex_to_dec(json_dict.get('gas'))
+        transaction.value = hex_to_dec(json_dict.get('value'))/10**6
+        transaction.gas = hex_to_dec(json_dict.get('gas'))/10**9
         transaction.gas_price = hex_to_dec(json_dict.get('gasPrice'))
         transaction.input = json_dict.get('input')
         transaction.max_fee_per_gas = hex_to_dec(json_dict.get('maxFeePerGas'))
