@@ -62,8 +62,8 @@ class ExportReceiptsJob(BaseJob):
     def _export(self):
         self.batch_work_executor.execute(self.transaction_hashes_iterable, self._export_receipts)
 
-    def _export_receipts(self, transaction_hashes):
-        receipts_rpc = list(generate_get_receipt_by_block_json_rpc(transaction_hashes))
+    def _export_receipts(self, block_number):
+        receipts_rpc = list(generate_get_receipt_by_block_json_rpc(block_number))
         response = self.batch_web3_provider.make_batch_request(json.dumps(receipts_rpc))
         results_raw = rpc_response_batch_to_results(response)
         for results in results_raw:

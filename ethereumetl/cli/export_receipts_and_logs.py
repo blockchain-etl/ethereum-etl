@@ -48,13 +48,13 @@ logging_basic_config()
               help='The output file for receipt logs. '
                    'If not provided receipt logs will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_receipts_and_logs(batch_size, block_hashes, provider_uri, max_workers, receipts_output, logs_output,
+def export_receipts_and_logs(batch_size, block_number, provider_uri, max_workers, receipts_output, logs_output,
                              chain='ethereum'):
     """Exports receipts and logs."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
-    with smart_open(block_hashes, 'r') as transaction_hashes_file:
+    with smart_open(block_number, 'r') as blocks_file:
         job = ExportReceiptsJob(
-            transaction_hashes_iterable=(block_hash.strip() for block_hash in transaction_hashes_file),
+            transaction_hashes_iterable=(block_number.strip() for block_number in blocks_file),
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
