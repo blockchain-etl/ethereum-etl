@@ -54,7 +54,8 @@ class EthReceiptMapper(object):
         receipt.l1_gas_used = hex_to_dec(json_dict.get('l1GasUsed'))
         receipt.l1_gas_price = hex_to_dec(json_dict.get('l1GasPrice'))
         receipt.l1_fee_scalar = to_float_or_none(json_dict.get('l1FeeScalar'))
-        
+        receipt.blob_gas_price = hex_to_dec(json_dict.get('blobGasPrice'))
+        receipt.blob_gas_used = hex_to_dec(json_dict.get('blobGasUsed'))
 
         if 'logs' in json_dict:
             receipt.logs = [
@@ -79,6 +80,7 @@ class EthReceiptMapper(object):
             'l1_fee': receipt.l1_fee,
             'l1_gas_used': receipt.l1_gas_used,
             'l1_gas_price': receipt.l1_gas_price,
-            'l1_fee_scalar': receipt.l1_fee_scalar
-            
+            'l1_fee_scalar': receipt.l1_fee_scalar,
+            'blob_gas_price': receipt.blob_gas_price,
+            'blob_gas_used': receipt.blob_gas_used
         }

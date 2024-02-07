@@ -38,7 +38,8 @@ RECEIPT_FIELDS_TO_EXPORT = [
     'l1_gas_used',
     'l1_gas_price',
     'l1_fee_scalar'
-    
+    'blob_gas_price',
+    'blob_gas_used'
 ]
 
 LOG_FIELDS_TO_EXPORT = [

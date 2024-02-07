@@ -37,3 +37,5 @@ class EthTransaction(object):
         self.max_fee_per_gas = None
         self.max_priority_fee_per_gas = None
         self.transaction_type = None
+        self.max_fee_per_blob_gas = None
+        self.blob_versioned_hashes = []
