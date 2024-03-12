@@ -32,7 +32,7 @@ from ethereumetl.web3_utils import build_web3
 from ethereumetl.jobs.export_all_common import export_all_common
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.service.eth_service import EthService
-from ethereumetl.utils import check_classic_provider_uri
+from ethereumetl.utils import check_classic_provider_uri, get_default_provider_uri
 
 logging_basic_config()
 
@@ -109,7 +109,7 @@ def get_partitions(start, end, partition_batch_size, provider_uri):
 @click.option('-e', '--end', required=True, type=str, help='End block/ISO date/Unix time')
 @click.option('-b', '--partition-batch-size', default=10000, show_default=True, type=int,
               help='The number of blocks to export in partition.')
-@click.option('-p', '--provider-uri', default='https://mainnet.infura.io', show_default=True, type=str,
+@click.option('-p', '--provider-uri', default=get_default_provider_uri, show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-o', '--output-dir', default='output', show_default=True, type=str, help='Output directory, partitioned in Hive style.')
