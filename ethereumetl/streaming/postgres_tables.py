@@ -152,6 +152,7 @@ CONTRACTS = Table(
     Column('function_sighashes', ARRAY(String)),
     Column('is_erc20', Boolean),
     Column('is_erc721', Boolean),
+    Column('is_erc1155', Boolean),
     Column('block_number', BigInteger),
     PrimaryKeyConstraint('address', 'block_number', name='contracts_pk'),
 )

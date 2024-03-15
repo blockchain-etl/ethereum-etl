@@ -1,7 +1,7 @@
 # Limitation
 
 - In case the contract is a proxy, which forwards all calls to a delegate, interface detection doesn’t work,
-which means `is_erc20` and `is_erc721` will always be false for proxy contracts and they will be missing in the `tokens`
+which means `is_erc20`, `is_erc721` and `is_erc1155` will always be false for proxy contracts and they will be missing in the `tokens`
 table.
 - The metadata methods (`symbol`, `name`, `decimals`, `total_supply`) for ERC20 are optional, so around 10% of the
 contracts are missing this data. Also some contracts (EOS) implement these methods but with wrong return type,

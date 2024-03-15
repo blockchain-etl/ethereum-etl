@@ -103,6 +103,7 @@ bytecode                     | hex_string  |
 function_sighashes           | string      |
 is_erc20                     | boolean     |
 is_erc721                    | boolean     |
+is_erc1155                   | boolean     |
 block_number                 | bigint      |
 
 ---

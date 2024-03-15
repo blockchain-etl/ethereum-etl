@@ -192,6 +192,7 @@ def enrich_contracts(blocks, contracts):
             'function_sighashes',
             'is_erc20',
             'is_erc721',
+            'is_erc1155',
             'block_number'
         ],
         [
