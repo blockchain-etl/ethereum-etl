@@ -49,7 +49,7 @@ class EthStreamerAdapter:
         # Export receipts and logs
         receipts, logs = [], []
         if self._should_export(EntityType.RECEIPT) or self._should_export(EntityType.LOG):
-            receipts, logs = self._export_receipts_and_logs(transactions)
+            receipts, logs = self._export_receipts_and_logs(blocks)
 
         # Extract token transfers
         token_transfers = []
@@ -119,10 +119,10 @@ class EthStreamerAdapter:
         transactions = blocks_and_transactions_item_exporter.get_items('transaction')
         return blocks, transactions
 
-    def _export_receipts_and_logs(self, transactions):
+    def _export_receipts_and_logs(self, blocks):
         exporter = InMemoryItemExporter(item_types=['receipt', 'log'])
         job = ExportReceiptsJob(
-            transaction_hashes_iterable=(transaction['hash'] for transaction in transactions),
+            transaction_hashes_iterable=(blocks['number'] for blocks in blocks),
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,

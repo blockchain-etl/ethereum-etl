@@ -49,6 +49,15 @@ def generate_get_receipt_json_rpc(transaction_hashes):
         )
 
 
+def generate_get_receipt_by_block_json_rpc(block_number):
+    for idx, block_number in enumerate(block_number):
+        yield generate_json_rpc(
+            method='eth_getBlockReceipts',
+            params=[hex(int(block_number))],
+            request_id=idx
+        )
+
+
 def generate_get_code_json_rpc(contract_addresses, block='latest'):
     for idx, contract_address in enumerate(contract_addresses):
         yield generate_json_rpc(

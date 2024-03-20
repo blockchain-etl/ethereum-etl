@@ -25,7 +25,7 @@ import json
 
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.executors.batch_work_executor import BatchWorkExecutor
-from ethereumetl.json_rpc_requests import generate_get_receipt_json_rpc
+from ethereumetl.json_rpc_requests import generate_get_receipt_json_rpc,generate_get_receipt_by_block_json_rpc
 from ethereumetl.mappers.receipt_log_mapper import EthReceiptLogMapper
 from ethereumetl.mappers.receipt_mapper import EthReceiptMapper
 from ethereumetl.utils import rpc_response_batch_to_results
@@ -62,13 +62,14 @@ class ExportReceiptsJob(BaseJob):
     def _export(self):
         self.batch_work_executor.execute(self.transaction_hashes_iterable, self._export_receipts)
 
-    def _export_receipts(self, transaction_hashes):
-        receipts_rpc = list(generate_get_receipt_json_rpc(transaction_hashes))
+    def _export_receipts(self, block_number):
+        receipts_rpc = list(generate_get_receipt_by_block_json_rpc(block_number))
         response = self.batch_web3_provider.make_batch_request(json.dumps(receipts_rpc))
-        results = rpc_response_batch_to_results(response)
-        receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
-        for receipt in receipts:
-            self._export_receipt(receipt)
+        results_raw = rpc_response_batch_to_results(response)
+        for results in results_raw:
+            receipts = [self.receipt_mapper.json_dict_to_receipt(result) for result in results]
+            for receipt in receipts:
+                self._export_receipt(receipt)
 
     def _export_receipt(self, receipt):
         if self.export_receipts:
