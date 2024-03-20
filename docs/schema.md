@@ -13,6 +13,7 @@ logs_bloom        | hex_string         |
 transactions_root | hex_string         |
 state_root        | hex_string         |
 receipts_root     | hex_string         |
+withdrawals_root  | hex_string         |
 miner             | address            |
 difficulty        | numeric            |
 total_difficulty  | numeric            |
@@ -22,6 +23,7 @@ gas_limit         | bigint             |
 gas_used          | bigint             |
 timestamp         | bigint             |
 transaction_count | bigint             |
+withdrawals_count | bigint             |
 base_fee_per_gas     | bigint             |
 
 ---
