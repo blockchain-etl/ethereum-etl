@@ -78,7 +78,7 @@ For the latest version, check out the repo and call
 ```bash
 > pip3 install -e .[dev,streaming]
 > export ETHEREUM_ETL_RUN_SLOW_TESTS=True
-> export PROVIDER_URL=<your_porvider_uri>
+> export PROVIDER_URL=<your_provider_uri>
 > pytest -vv
 ``` 
 
