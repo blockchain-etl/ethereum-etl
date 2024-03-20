@@ -24,27 +24,32 @@ from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExport
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 
 
-def create_item_exporters(outputs):
+def create_item_exporters(outputs, *args, **kwargs):
     split_outputs = [output.strip() for output in outputs.split(',')] if outputs else ['console']
 
-    item_exporters = [create_item_exporter(output) for output in split_outputs]
+    item_exporters = [create_item_exporter(output, *args, **kwargs) for output in split_outputs]
     return MultiItemExporter(item_exporters)
 
 
-def create_item_exporter(output):
+def create_item_exporter(output, *args, **kwargs):
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
+        topic_prefix = kwargs.get("topic_prefix")
+        if topic_prefix and not topic_prefix.endswith("."):
+            topic_prefix += "."
+        else:
+            topic_prefix = output + "."  # For backward compatibitliy
         enable_message_ordering = 'sorted' in output or 'ordered' in output
         item_exporter = GooglePubSubItemExporter(
             item_type_to_topic_mapping={
-                'block': output + '.blocks',
-                'transaction': output + '.transactions',
-                'log': output + '.logs',
-                'token_transfer': output + '.token_transfers',
-                'trace': output + '.traces',
-                'contract': output + '.contracts',
-                'token': output + '.tokens',
+                'block': topic_prefix + 'blocks',
+                'transaction': topic_prefix + 'transactions',
+                'log': topic_prefix + 'logs',
+                'token_transfer': topic_prefix + 'token_transfers',
+                'trace': topic_prefix + 'traces',
+                'contract': topic_prefix + 'contracts',
+                'token': topic_prefix + 'tokens',
             },
             message_attributes=('item_id', 'item_timestamp'),
             batch_max_bytes=1024 * 1024 * 5,
@@ -84,14 +89,19 @@ def create_item_exporter(output):
         item_exporter = ConsoleItemExporter()
     elif item_exporter_type == ItemExporterType.KAFKA:
         from blockchainetl.jobs.exporters.kafka_exporter import KafkaItemExporter
+        topic_prefix = kwargs.get("topic_prefix")
+        if topic_prefix and not topic_prefix.endswith("."):
+            topic_prefix += "."
+        else:
+            topic_prefix = ""
         item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
-            'block': 'blocks',
-            'transaction': 'transactions',
-            'log': 'logs',
-            'token_transfer': 'token_transfers',
-            'trace': 'traces',
-            'contract': 'contracts',
-            'token': 'tokens',
+            'block': topic_prefix + 'blocks',
+            'transaction': topic_prefix + 'transactions',
+            'log': topic_prefix + 'logs',
+            'token_transfer': topic_prefix + 'token_transfers',
+            'trace': topic_prefix + 'traces',
+            'contract': topic_prefix + 'contracts',
+            'token': topic_prefix + 'tokens',
         })
 
     else:
