@@ -29,6 +29,11 @@ def generate_get_block_by_number_json_rpc(block_numbers, include_transactions):
             request_id=idx
         )
 
+def generate_get_bor_author_by_number_json_rpc(block_number):
+    yield generate_json_rpc(
+        method='bor_getAuthor',
+        params=[hex(block_number)],
+    )
 
 def generate_trace_block_by_number_json_rpc(block_numbers):
     for block_number in block_numbers:
@@ -45,6 +50,15 @@ def generate_get_receipt_json_rpc(transaction_hashes):
         yield generate_json_rpc(
             method='eth_getTransactionReceipt',
             params=[transaction_hash],
+            request_id=idx
+        )
+
+
+def generate_get_receipt_by_block_json_rpc(block_number):
+    for idx, block_number in enumerate(block_number):
+        yield generate_json_rpc(
+            method='eth_getBlockReceipts',
+            params=[hex(int(block_number))],
             request_id=idx
         )
 

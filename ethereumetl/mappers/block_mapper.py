@@ -109,3 +109,29 @@ class EthBlockMapper(object):
             'blob_gas_used': block.blob_gas_used,
             'excess_blob_gas': block.excess_blob_gas,
         }
+
+    def block_to_dict_with_author(self, block, bor_result):
+        return {
+            'type': 'block',
+            'number': block.number,
+            'hash': block.hash,
+            'parent_hash': block.parent_hash,
+            'nonce': block.nonce,
+            'sha3_uncles': block.sha3_uncles,
+            'logs_bloom': block.logs_bloom,
+            'transactions_root': block.transactions_root,
+            'state_root': block.state_root,
+            'receipts_root': block.receipts_root,
+            'miner': bor_result,
+            'difficulty': block.difficulty,
+            'total_difficulty': block.total_difficulty,
+            'size': block.size,
+            'extra_data': block.extra_data,
+            'gas_limit': block.gas_limit,
+            'gas_used': block.gas_used,
+            'timestamp': block.timestamp,
+            'transaction_count': block.transaction_count,
+            'base_fee_per_gas': block.base_fee_per_gas,
+            'withdrawals_root': block.withdrawals_root,
+            'withdrawals': block.withdrawals
+        }

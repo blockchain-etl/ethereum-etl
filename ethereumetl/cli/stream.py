@@ -53,7 +53,8 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The number of workers')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
+@click.option('--chain', default=None, show_default=True, type=str, help='chain')
+def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,chain,
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
@@ -72,7 +73,8 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
         item_exporter=create_item_exporters(output),
         batch_size=batch_size,
         max_workers=max_workers,
-        entity_types=entity_types
+        entity_types=entity_types,
+        chain=chain
     )
     streamer = Streamer(
         blockchain_streamer_adapter=streamer_adapter,

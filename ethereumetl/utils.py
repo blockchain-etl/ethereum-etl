@@ -23,6 +23,7 @@
 
 import itertools
 import warnings
+import base58
 
 from ethereumetl.misc.retriable_value_error import RetriableValueError
 
@@ -47,6 +48,7 @@ def to_int_or_none(val):
     except ValueError:
         return None
 
+
 def to_float_or_none(val):
     if isinstance(val, float):
         return val
@@ -58,6 +60,7 @@ def to_float_or_none(val):
         print("can't cast %s to float" % val)
         return val
 
+
 def chunk_string(string, length):
     return (string[0 + i:length + i] for i in range(0, len(string), length))
 
@@ -66,6 +69,21 @@ def to_normalized_address(address):
     if address is None or not isinstance(address, str):
         return address
     return address.lower()
+
+
+def hex_to_base58(hex_string):
+    if hex_string is None:
+        return hex_string
+    if hex_string[:2] in ["0x", "0X"]:
+        hex_string = "41" + hex_string[2:]
+    bytes_str = bytes.fromhex(hex_string)
+    base58_str = base58.b58encode_check(bytes_str)
+    return base58_str.decode("UTF-8")
+
+
+def base58_to_hex(self, base58_string):
+    asc_string = base58.b58decode_check(base58_string)
+    return asc_string.hex().upper()
 
 
 def validate_range(range_start_incl, range_end_incl):
