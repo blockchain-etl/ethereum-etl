@@ -24,7 +24,7 @@
 import click
 
 from ethereumetl.jobs.export_blocks_job import ExportBlocksJob
-from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
+from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import create_blocks_and_transactions_exporter
 from blockchainetl.logging_utils import logging_basic_config
 from ethereumetl.providers.auto import get_provider_from_uri
 from ethereumetl.thread_local_proxy import ThreadLocalProxy
@@ -60,7 +60,7 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
         batch_size=batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         max_workers=max_workers,
-        item_exporter=blocks_and_transactions_item_exporter(blocks_output, transactions_output),
+        item_exporter=create_blocks_and_transactions_exporter(blocks_output, transactions_output),
         export_blocks=blocks_output is not None,
         export_transactions=transactions_output is not None)
     job.run()

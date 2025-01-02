@@ -26,6 +26,9 @@ from collections import defaultdict
 
 from google.cloud import storage
 
+from blockchainetl.exporters import GcsCsvItemExporter, GcsJsonLinesItemExporter
+from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+
 
 def build_block_bundles(items):
     blocks = defaultdict(list)
@@ -109,3 +112,45 @@ def normalize_path(p):
         p = p[:len(p) - 1]
 
     return p
+
+
+def is_gcs_path(path):
+    """Check if a path is a GCS path"""
+    return path.startswith('gs://')
+
+
+def parse_gcs_path(path):
+    """Parse a GCS path into bucket and blob names"""
+    path = path.replace('gs://', '')
+    bucket_name = path.split('/')[0]
+    blob_name = '/'.join(path.split('/')[1:])
+    return bucket_name, blob_name
+
+
+def create_gcs_exporter(output_path, item_type_to_filename_mapping, field_mapping=None, **kwargs):
+    """Creates GCS exporters for each item type"""
+    bucket_name, base_blob_path = parse_gcs_path(output_path)
+    item_exporters = {}
+
+    for item_type, filename in item_type_to_filename_mapping.items():
+        blob_name = f"{base_blob_path}/{filename}"
+        exporter_kwargs = kwargs.copy()
+        
+        # Add field mapping for this item type if available
+        if field_mapping and item_type in field_mapping:
+            exporter_kwargs['fields_to_export'] = field_mapping[item_type]
+
+        if filename.endswith('.csv'):
+            item_exporters[item_type] = GcsCsvItemExporter(
+                bucket_name=bucket_name,
+                blob_name=blob_name,
+                **exporter_kwargs
+            )
+        else:
+            item_exporters[item_type] = GcsJsonLinesItemExporter(
+                bucket_name=bucket_name,
+                blob_name=blob_name,
+                **exporter_kwargs
+            )
+
+    return CompositeItemExporter(item_exporters=item_exporters)

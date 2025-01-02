@@ -34,7 +34,7 @@ from ethereumetl.jobs.export_contracts_job import ExportContractsJob
 from ethereumetl.jobs.export_receipts_job import ExportReceiptsJob
 from ethereumetl.jobs.export_token_transfers_job import ExportTokenTransfersJob
 from ethereumetl.jobs.export_tokens_job import ExportTokensJob
-from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import blocks_and_transactions_item_exporter
+from ethereumetl.jobs.exporters.blocks_and_transactions_item_exporter import create_blocks_and_transactions_exporter
 from ethereumetl.jobs.exporters.contracts_item_exporter import contracts_item_exporter
 from ethereumetl.jobs.exporters.receipts_and_logs_item_exporter import receipts_and_logs_item_exporter
 from ethereumetl.jobs.exporters.token_transfers_item_exporter import token_transfers_item_exporter
@@ -118,7 +118,7 @@ def export_all_common(partitions, output_dir, provider_uri, max_workers, batch_s
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             max_workers=max_workers,
-            item_exporter=blocks_and_transactions_item_exporter(blocks_file, transactions_file),
+            item_exporter=create_blocks_and_transactions_exporter(blocks_file, transactions_file),
             export_blocks=blocks_file is not None,
             export_transactions=transactions_file is not None)
         job.run()

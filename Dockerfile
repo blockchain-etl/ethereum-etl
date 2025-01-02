@@ -12,4 +12,10 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
+# Install additional dependencies for GCS support
+RUN pip install --no-cache-dir \
+    google-cloud-storage>=2.0.0 \
+    google-resumable-media>=2.0.0 \
+    google-auth>=2.0.0
+
 ENTRYPOINT ["/tini", "--", "python", "ethereumetl"]

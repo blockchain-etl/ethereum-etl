@@ -37,6 +37,13 @@ from json import JSONEncoder
 
 import decimal
 import six
+from google.cloud import storage
+import os
+import tempfile
+from google.cloud.storage import Blob
+from google.resumable_media.requests import ResumableUpload
+from google.auth.transport.requests import AuthorizedSession
+import json
 
 
 class BaseItemExporter(object):
@@ -103,12 +110,19 @@ class CsvItemExporter(BaseItemExporter):
         if not self.encoding:
             self.encoding = 'utf-8'
         self.include_headers_line = include_headers_line
-        self.stream = io.TextIOWrapper(
-            file,
-            line_buffering=False,
-            write_through=True,
-            encoding=self.encoding
-        ) if six.PY3 else file
+        
+        # If file is already a text stream, use it directly
+        if isinstance(file, io.TextIOBase):
+            self.stream = file
+        else:
+            # Otherwise wrap it in a TextIOWrapper
+            self.stream = io.TextIOWrapper(
+                file,
+                line_buffering=False,
+                write_through=True,
+                encoding=self.encoding
+            ) if six.PY3 else file
+            
         self.csv_writer = csv.writer(self.stream, **kwargs)
         self._headers_not_written = True
         self._join_multivalued = join_multivalued
@@ -134,7 +148,7 @@ class CsvItemExporter(BaseItemExporter):
         return value
 
     def export_item(self, item):
-        # Double-checked locking (safe in Python because of GIL) https://en.wikipedia.org/wiki/Double-checked_locking
+        # Double-checked locking (safe in Python because of GIL)
         if self._headers_not_written:
             with self._write_headers_lock:
                 if self._headers_not_written:
@@ -142,14 +156,17 @@ class CsvItemExporter(BaseItemExporter):
                     self._headers_not_written = False
 
         fields = self._get_serialized_fields(item, default_value='',
-                                             include_empty=True)
+                                           include_empty=True)
         values = list(self._build_row(x for _, x in fields))
         self.csv_writer.writerow(values)
 
     def _build_row(self, values):
         for s in values:
             try:
-                yield to_native_str(s, self.encoding)
+                if isinstance(s, bytes):
+                    yield s.decode(self.encoding)
+                else:
+                    yield str(s)
             except TypeError:
                 yield s
 
@@ -218,3 +235,77 @@ def to_unicode(text, encoding=None, errors='strict'):
     if encoding is None:
         encoding = 'utf-8'
     return text.decode(encoding, errors)
+
+
+class GcsStreamingMixin:
+    """Mixin class to handle streaming uploads to GCS"""
+    def __init__(self, bucket_name, blob_name, chunk_size=256 * 1024):
+        self.client = storage.Client()
+        self.bucket = self.client.bucket(bucket_name)
+        self.blob = self.bucket.blob(blob_name)
+        self.chunk_size = chunk_size
+        self.buffer = io.StringIO()
+
+    def open(self):
+        """Initialize the upload session"""
+        pass
+
+    def _write_row(self, row):
+        self.buffer.write(row)
+
+    def finish_exporting(self):
+        # Upload the complete buffer
+        if self.buffer:
+            content = self.buffer.getvalue()
+            self.blob.upload_from_string(content)
+            self.buffer.close()
+
+class GcsCsvItemExporter(GcsStreamingMixin, BaseItemExporter):
+    """CSV Item Exporter that streams directly to Google Cloud Storage"""
+    def __init__(self, bucket_name, blob_name, fields_to_export=None, include_headers_line=True, **kwargs):
+        GcsStreamingMixin.__init__(self, bucket_name, blob_name)
+        # Extract field_mapping from kwargs if it exists
+        if 'field_mapping' in kwargs:
+            fields_to_export = kwargs.pop('field_mapping')
+        BaseItemExporter.__init__(self, fields_to_export=fields_to_export, **kwargs)
+        self.include_headers_line = include_headers_line
+        self._headers_written = False
+
+    def open(self):
+        """Initialize the exporter"""
+        super().open()
+        self.start_exporting()
+
+    def start_exporting(self):
+        if self.include_headers_line and self.fields_to_export:
+            header_row = ','.join(self.fields_to_export) + '\n'
+            self._write_row(header_row)
+            self._headers_written = True
+
+    def export_item(self, item):
+        if not self._headers_written and self.include_headers_line:
+            self.fields_to_export = list(item.keys())
+            self.start_exporting()
+            
+        row = ','.join(str(item.get(field, '')) for field in self.fields_to_export) + '\n'
+        self._write_row(row)
+
+class GcsJsonLinesItemExporter(GcsStreamingMixin, BaseItemExporter):
+    """JSON Lines Item Exporter that streams directly to Google Cloud Storage"""
+    def __init__(self, bucket_name, blob_name, **kwargs):
+        GcsStreamingMixin.__init__(self, bucket_name, blob_name)
+        BaseItemExporter.__init__(self, **kwargs)
+        self.encoder = JSONEncoder(default=EncodeDecimal, **kwargs)
+
+    def open(self):
+        """Initialize the exporter"""
+        super().open()
+        self.start_exporting()
+
+    def start_exporting(self):
+        pass
+
+    def export_item(self, item):
+        itemdict = dict(self._get_serialized_fields(item))
+        json_line = self.encoder.encode(itemdict) + '\n'
+        self._write_row(json_line)

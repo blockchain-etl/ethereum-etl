@@ -40,13 +40,16 @@ setup(
         'ethereum-dasm==0.1.4',
         'urllib3<2',
         'base58',
-        'requests'
+        'requests',
+        # Adding GCS dependencies to main requirements since they're now core functionality
+        'google-cloud-storage>=2.0.0',
+        'google-resumable-media>=2.0.0',
+        'google-auth>=2.0.0'
     ],
     extras_require={
         'streaming': [
             'timeout-decorator==0.4.1',
             'google-cloud-pubsub==2.13.0',
-            'google-cloud-storage==1.33.0',
             'kafka-python==2.0.2',
             'sqlalchemy==1.4',
             'pg8000==1.16.6',
