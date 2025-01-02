@@ -22,7 +22,7 @@
 
 
 from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
-from blockchainetl.jobs.exporters.gcs_item_exporter import create_gcs_exporter, is_gcs_path
+from blockchainetl.jobs.exporters.gcs_item_exporter import create_gcs_exporter, is_gcs_path, parse_gcs_path
 from blockchainetl.file_utils import get_file_handle, close_silently
 import os
 
@@ -76,16 +76,20 @@ TRANSACTION_FIELDS_TO_EXPORT = [
 def create_blocks_and_transactions_exporter(blocks_output, transactions_output):
     if is_gcs_path(blocks_output):
         # For GCS output
+        # Get the bucket and path from the blocks output
+        bucket_name, blocks_blob = parse_gcs_path(blocks_output)
+        _, transactions_blob = parse_gcs_path(transactions_output)
+        
         item_type_to_filename_mapping = {
-            'block': os.path.basename(blocks_output),
-            'transaction': os.path.basename(transactions_output)
+            'block': blocks_blob,
+            'transaction': transactions_blob
         }
         field_mapping = {
             'block': BLOCK_FIELDS_TO_EXPORT,
             'transaction': TRANSACTION_FIELDS_TO_EXPORT
         }
         return create_gcs_exporter(
-            output_path=os.path.dirname(blocks_output),
+            output_path=f"gs://{bucket_name}",
             item_type_to_filename_mapping=item_type_to_filename_mapping,
             field_mapping=field_mapping
         )

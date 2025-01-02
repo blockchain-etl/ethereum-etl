@@ -122,18 +122,19 @@ def is_gcs_path(path):
 def parse_gcs_path(path):
     """Parse a GCS path into bucket and blob names"""
     path = path.replace('gs://', '')
-    bucket_name = path.split('/')[0]
-    blob_name = '/'.join(path.split('/')[1:])
+    parts = path.split('/', 1)
+    bucket_name = parts[0]
+    blob_name = parts[1] if len(parts) > 1 else ''
     return bucket_name, blob_name
 
 
 def create_gcs_exporter(output_path, item_type_to_filename_mapping, field_mapping=None, **kwargs):
     """Creates GCS exporters for each item type"""
-    bucket_name, base_blob_path = parse_gcs_path(output_path)
+    bucket_name, _ = parse_gcs_path(output_path)
     item_exporters = {}
 
     for item_type, filename in item_type_to_filename_mapping.items():
-        blob_name = f"{base_blob_path}/{filename}"
+        # filename is already the full blob path
         exporter_kwargs = kwargs.copy()
         
         # Add field mapping for this item type if available
@@ -143,13 +144,13 @@ def create_gcs_exporter(output_path, item_type_to_filename_mapping, field_mappin
         if filename.endswith('.csv'):
             item_exporters[item_type] = GcsCsvItemExporter(
                 bucket_name=bucket_name,
-                blob_name=blob_name,
+                blob_name=filename,
                 **exporter_kwargs
             )
         else:
             item_exporters[item_type] = GcsJsonLinesItemExporter(
                 bucket_name=bucket_name,
-                blob_name=blob_name,
+                blob_name=filename,
                 **exporter_kwargs
             )
 

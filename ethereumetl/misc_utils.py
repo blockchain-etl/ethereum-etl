@@ -27,12 +27,15 @@ import json
 import six
 
 from ethereumetl.csv_utils import set_max_field_size_limit
-from blockchainetl.file_utils import get_file_handle, smart_open
+from blockchainetl.file_utils import get_file_handle, smart_open, is_gcs_path, get_gcs_file_handle
 
 
 @contextlib.contextmanager
 def get_item_iterable(input_file):
-    fh = get_file_handle(input_file, 'r')
+    if is_gcs_path(input_file):
+        fh = get_gcs_file_handle(input_file, 'r')
+    else:
+        fh = get_file_handle(input_file, 'r')
 
     if input_file.endswith('.csv'):
         set_max_field_size_limit()
@@ -48,7 +51,10 @@ def get_item_iterable(input_file):
 
 @contextlib.contextmanager
 def get_item_sink(output_file):
-    fh = get_file_handle(output_file, 'w')
+    if is_gcs_path(output_file):
+        fh = get_gcs_file_handle(output_file, 'w')
+    else:
+        fh = get_file_handle(output_file, 'w')
 
     if output_file.endswith('.csv'):
         set_max_field_size_limit()

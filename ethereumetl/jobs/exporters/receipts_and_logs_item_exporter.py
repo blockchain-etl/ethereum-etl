@@ -22,6 +22,7 @@
 
 
 from blockchainetl.jobs.exporters.composite_item_exporter import CompositeItemExporter
+from blockchainetl.jobs.exporters.gcs_item_exporter import create_gcs_exporter, is_gcs_path, parse_gcs_path
 
 RECEIPT_FIELDS_TO_EXPORT = [
     'transaction_hash',
@@ -53,15 +54,42 @@ LOG_FIELDS_TO_EXPORT = [
     'topics'
 ]
 
-
 def receipts_and_logs_item_exporter(receipts_output=None, logs_output=None):
-    return CompositeItemExporter(
-        filename_mapping={
-            'receipt': receipts_output,
-            'log': logs_output
-        },
-        field_mapping={
+    if is_gcs_path(receipts_output) or is_gcs_path(logs_output):
+        # For GCS output
+        # Get the bucket and path from either output
+        output_path = receipts_output if receipts_output else logs_output
+        bucket_name, _ = parse_gcs_path(output_path)
+        
+        # Get the blob names
+        _, receipts_blob = parse_gcs_path(receipts_output) if receipts_output else (None, None)
+        _, logs_blob = parse_gcs_path(logs_output) if logs_output else (None, None)
+        
+        item_type_to_filename_mapping = {}
+        if receipts_output:
+            item_type_to_filename_mapping['receipt'] = receipts_blob
+        if logs_output:
+            item_type_to_filename_mapping['log'] = logs_blob
+            
+        field_mapping = {
             'receipt': RECEIPT_FIELDS_TO_EXPORT,
             'log': LOG_FIELDS_TO_EXPORT
         }
-    )
+        
+        return create_gcs_exporter(
+            output_path=f"gs://{bucket_name}",
+            item_type_to_filename_mapping=item_type_to_filename_mapping,
+            field_mapping=field_mapping
+        )
+    else:
+        # File-based output
+        return CompositeItemExporter(
+            filename_mapping={
+                'receipt': receipts_output,
+                'log': logs_output
+            },
+            field_mapping={
+                'receipt': RECEIPT_FIELDS_TO_EXPORT,
+                'log': LOG_FIELDS_TO_EXPORT
+            }
+        )
