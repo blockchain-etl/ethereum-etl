@@ -4,6 +4,7 @@
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/BlockchainETL)
 [![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/tRKG7zGKtF)
+[![Twitter](https://img.shields.io/twitter/follow/BlockchainETL)](https://x.com/BlockchainETL)
 
 Ethereum ETL lets you convert blockchain data into convenient formats like CSVs and relational databases.
 
