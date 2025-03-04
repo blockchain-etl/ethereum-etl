@@ -3,7 +3,7 @@
 [![Build Status](https://app.travis-ci.com/blockchain-etl/ethereum-etl.svg?branch=develop)](https://travis-ci.com/github/blockchain-etl/ethereum-etl)
 [![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/BlockchainETL)
-[![Twitter](https://img.shields.io/twitter/follow/BlockchainETL)](https://x.com/BlockchainETL)
+[![Twitter](https://img.shields.io/twitter/follow/EthereumETL)](https://x.com/EthereumETL)
 
 Ethereum ETL lets you convert blockchain data into convenient formats like CSVs and relational databases.
 
