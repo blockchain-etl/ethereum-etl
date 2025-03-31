@@ -1,6 +1,6 @@
 ## Exporting the Blockchain
 
-If you'd like to have blockchain dataset set up and hosted for you, [get in touch with us at D5](https://d5.ai/?ref=ethereumetl).
+If you'd like to have blockchain dataset set up and hosted for you, [get in touch with us at D5]().
 
 1. Install python 3.5.3+: [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
