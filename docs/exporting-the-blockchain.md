@@ -1,7 +1,5 @@
 ## Exporting the Blockchain
 
-If you'd like to have blockchain dataset set up and hosted for you, [get in touch with us at D5]().
-
 1. Install python 3.5.3+: [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 1. You can use Infura if you don't need ERC20 transfers (Infura doesn't support eth_getFilterLogs JSON RPC method).
