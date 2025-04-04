@@ -40,8 +40,6 @@ Easily export:
 ## Projects using Ethereum ETL
 * [Google](https://goo.gl/oY5BCQ) - Public BigQuery Ethereum datasets
 * [Nansen](https://nansen.ai/query?ref=ethereumetl) - Analytics platform for Ethereum
-* [Dune Analytics](https://dune.com/) - Crypto analytics platform leveraging ETL data pipelines
-* [Flipside Crypto](https://flipsidecrypto.xyz/) - On-chain analytics and data services
 * [Ethereum Blockchain ETL on GCP](https://cloud.google.com/blog/products/data-analytics/ethereum-bigquery-public-dataset-smart-contract-analytics) - Official Google Cloud reference architecture
 
 ## Getting Started
