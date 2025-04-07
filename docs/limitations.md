@@ -11,5 +11,5 @@ because numeric types there can't handle 32-byte integers. You should use
 `cast(value as FLOAT64)` (possible loss of precision) or
 `safe_cast(value as NUMERIC)` (possible overflow) to convert to numbers.
 - The contracts that don't implement `decimals()` function but have the
-[fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) that returns a `boolean`
+[fallback function](https://docs.soliditylang.org/en/v0.4.21/contracts.html) that returns a `boolean`
 will have `0` or `1` in the `decimals` column in the CSVs.
