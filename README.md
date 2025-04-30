@@ -2,7 +2,6 @@
 
 [![Build Status](https://app.travis-ci.com/blockchain-etl/ethereum-etl.svg?branch=develop)](https://travis-ci.com/github/blockchain-etl/ethereum-etl)
 [![License](https://img.shields.io/github/license/blockchain-etl/ethereum-etl)](https://github.com/blockchain-etl/ethereum-etl/blob/develop/LICENSE)
-[![Join the chat at https://gitter.im/ethereum-eth](https://badges.gitter.im/ethereum-etl.svg)](https://gitter.im/ethereum-etl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/BlockchainETL)
 [![Twitter](https://img.shields.io/twitter/follow/EthereumETL)](https://x.com/EthereumETL)
 
