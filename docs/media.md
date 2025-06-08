@@ -5,7 +5,6 @@
 - [Ethereum in BigQuery: a Public Dataset for smart contract analytics](https://cloud.google.com/blog/products/data-analytics/ethereum-bigquery-public-dataset-smart-contract-analytics)
 - [Ethereum in BigQuery: how we built this dataset](https://cloud.google.com/blog/products/data-analytics/ethereum-bigquery-how-we-built-dataset)
 - [Introducing six new cryptocurrencies in BigQuery Public Datasets—and how to analyze them](https://cloud.google.com/blog/products/data-analytics/introducing-six-new-cryptocurrencies-in-bigquery-public-datasets-and-how-to-analyze-them)
-- [Querying the Ethereum Blockchain in Snowflake](https://community.snowflake.com/s/article/Querying-the-Ethereum-Blockchain-in-Snowflake)
 - [ConsenSys Grants funds third cohort of projects to benefit the Ethereum ecosystem](https://www.cryptoninjas.net/2020/02/17/consensys-grants-funds-third-cohort-of-projects-to-benefit-the-ethereum-ecosystem/)
 - [Ivan on Tech overviews crypto datasets in BigQuery](https://youtu.be/2IkJBNhsXNY?t=239)
 - [Unlocking the Power of Google BigQuery (Cloud Next '19)](https://youtu.be/KL_i5XZIaJg?t=131)
