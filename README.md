@@ -5,13 +5,29 @@
 [![Telegram](https://img.shields.io/badge/telegram-join%20chat-blue.svg)](https://t.me/BlockchainETL)
 [![Twitter](https://img.shields.io/twitter/follow/EthereumETL)](https://x.com/EthereumETL)
 
-Ethereum ETL lets you convert blockchain data into convenient formats like CSVs and relational databases.
+## Overview
 
-*Do you just want to query Ethereum data right away? Use the [public dataset in BigQuery](https://console.cloud.google.com/marketplace/details/ethereum/crypto-ethereum-blockchain).*
+Ethereum ETL is a powerful tool for extracting data from the Ethereum blockchain and converting it into convenient formats like CSVs and relational databases. The project enables:
+
+- Exporting blocks, transactions and tokens
+- Tracking ERC20 and ERC721 transfers
+- Extracting smart contracts and their ABIs
+- Real-time data streaming
+- Integration with popular data analysis tools
+
+*Want to start querying Ethereum data right away? Use the [public dataset in BigQuery](https://console.cloud.google.com/marketplace/details/ethereum/crypto-ethereum-blockchain).*
 
 [Full documentation available here](http://ethereum-etl.readthedocs.io/).
 
-## Quickstart
+## System Requirements
+
+- Python 3.6 or higher
+- pip3
+- Access to Ethereum node (local or through provider like Infura)
+- Minimum 2GB RAM for basic operations
+- SSD storage recommended for data
+
+## Quick Start
 
 Install Ethereum ETL:
 
@@ -57,6 +73,25 @@ For the latest version, check out the repo and call
 ```bash
 > pip3 install -e . 
 > python3 ethereumetl.py
+```
+
+## Data Usage Examples
+
+Ethereum ETL enables various types of analysis:
+
+1. Address activity tracking
+2. Gas price analysis and dynamics
+3. Token activity monitoring
+4. Smart contract research
+5. Dashboard and visualization creation
+
+Example BigQuery query:
+```sql
+SELECT DATE(block_timestamp) as date,
+       COUNT(*) as tx_count
+FROM `bigquery-public-data.crypto_ethereum.transactions`
+GROUP BY date
+ORDER BY date
 ```
 
 ## Useful Links
