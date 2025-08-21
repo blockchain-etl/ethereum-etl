@@ -95,7 +95,7 @@ class ExportOriginJob(BaseJob):
             })
 
         for batch in batches:
-            # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
+            # https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getfilterlogs
             filter_params = {
                 'address': batch['contract_address'],
                 'fromBlock': batch['from_block'],

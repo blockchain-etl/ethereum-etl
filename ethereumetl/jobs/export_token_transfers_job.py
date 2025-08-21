@@ -65,7 +65,7 @@ class ExportTokenTransfersJob(BaseJob):
 
     def _export_batch(self, block_number_batch):
         assert len(block_number_batch) > 0
-        # https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
+        # https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getfilterlogs
         filter_params = {
             'fromBlock': block_number_batch[0],
             'toBlock': block_number_batch[-1],
