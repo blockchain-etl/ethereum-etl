@@ -54,7 +54,7 @@ class EthContractService:
                c.implements('allowance(address,address)')
 
     # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
-    # https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC721/ERC721Basic.sol
+    # https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol
     # Doesn't check the below ERC721 methods to match CryptoKitties contract
     # getApproved(uint256)
     # setApprovalForAll(address,bool)
