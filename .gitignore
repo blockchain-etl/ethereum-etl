@@ -50,3 +50,6 @@ ENV/
 
 # etl
 /last_synced_block.txt
+
+# macOS
+.DS_Store
