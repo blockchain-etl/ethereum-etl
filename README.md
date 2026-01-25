@@ -59,12 +59,16 @@ For the latest version, check out the repo and call
 > python3 ethereumetl.py
 ```
 
+## Rust Implementation
+
+For improved performance, check out [ethereum-etl-rs](https://github.com/blockchain-etl/ethereum-etl-rs) - a Rust rewrite that is ~1.4x faster than this Python version while maintaining full CLI compatibility.
+
 ## Useful Links
 
 - [Schema](https://ethereum-etl.readthedocs.io/en/latest/schema/)
 - [Command Reference](https://ethereum-etl.readthedocs.io/en/latest/commands/)
 - [Documentation](https://ethereum-etl.readthedocs.io/)
-- [Public Datasets in BigQuery](https://github.com/blockchain-etl/public-datasets)  
+- [Public Datasets in BigQuery](https://github.com/blockchain-etl/public-datasets)
 - [Exporting the Blockchain](https://ethereum-etl.readthedocs.io/en/latest/exporting-the-blockchain/)
 - [Querying in Amazon Athena](https://ethereum-etl.readthedocs.io/en/latest/amazon-athena/)
 - [Querying in Google BigQuery](https://ethereum-etl.readthedocs.io/en/latest/google-bigquery/)
