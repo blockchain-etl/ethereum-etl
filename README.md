@@ -61,7 +61,7 @@ For the latest version, check out the repo and call
 
 ## Rust Implementation
 
-For improved performance, check out [ethereum-etl-rs](https://github.com/blockchain-etl/ethereum-etl-rs) - a Rust rewrite that is ~1.4x faster than this Python version while maintaining full CLI compatibility.
+For improved performance, check out [ethereum-etl.rs](https://github.com/blockchain-etl/ethereum-etl.rs) - a Rust rewrite that is ~1.4x faster than this Python version while maintaining full CLI compatibility.
 
 ## Useful Links
 
