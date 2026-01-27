@@ -38,7 +38,7 @@ class EthBlockMapper(object):
         block.number = hex_to_dec(json_dict.get('number'))
         block.hash = json_dict.get('hash')
         block.parent_hash = json_dict.get('parentHash')
-        block.nonce = json_dict.get('nonce')
+        block.nonce = hex_to_dec(json_dict.get('nonce'))
         block.sha3_uncles = json_dict.get('sha3Uncles')
         block.logs_bloom = json_dict.get('logsBloom')
         block.transactions_root = json_dict.get('transactionsRoot')
