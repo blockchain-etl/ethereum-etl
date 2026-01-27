@@ -28,6 +28,7 @@ class EthContractService:
 
     def get_function_sighashes(self, bytecode):
         bytecode = clean_bytecode(bytecode)
+        function_sighashes = []
         if bytecode is not None:
             evm_code = EvmCode(contract=Contract(bytecode=bytecode), static_analysis=False, dynamic_analysis=False)
             evm_code.disassemble(bytecode)
@@ -35,8 +36,15 @@ class EthContractService:
             if basic_blocks and len(basic_blocks) > 0:
                 init_block = basic_blocks[0]
                 instructions = init_block.instructions
-                push4_instructions = [inst for inst in instructions if inst.name == 'PUSH4']
-                return sorted(list(set('0x' + inst.operand for inst in push4_instructions)))
+                for inst in instructions:
+                    # Special case when balanceOf(address,uint256) becomes PUSH3 due to optimization
+                    # https://github.com/blockchain-etl/ethereum-etl/issues/349#issuecomment-1243352201
+                    if inst.name == "PUSH3" and inst.operand == "fdd58e":
+                        function_sighashes.append("0x00" + inst.operand)
+                    if inst.name == "PUSH4":
+                        function_sighashes.append("0x" + inst.operand)
+
+                return sorted(list(set(function_sighashes)))
             else:
                 return []
         else:
@@ -68,6 +76,19 @@ class EthContractService:
                c.implements('ownerOf(uint256)') and \
                c.implements_any_of('transfer(address,uint256)', 'transferFrom(address,address,uint256)') and \
                c.implements('approve(address,uint256)')
+
+    # https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md
+    # https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol
+    def is_erc1155_contract(self, function_sighashes):
+        c = ContractWrapper(function_sighashes)
+        return (
+               c.implements("balanceOf(address, uint256)") and \
+               c.implements("balanceOfBatch(address[],uint256[])") and \
+               c.implements("setApprovalForAll(address, bool)") and \
+               c.implements("isApprovedForAll(address,address)") and \
+               c.implements("safeTransferFrom(address,address,uint256,uint256,bytes)") and \
+               c.implements("safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)")
+        )           
 
 
 def clean_bytecode(bytecode):
