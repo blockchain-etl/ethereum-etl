@@ -38,7 +38,7 @@ class EthStreamerAdapter:
 
     def get_current_block_number(self):
         w3 = build_web3(self.batch_web3_provider)
-        return int(w3.eth.getBlock("latest").number)
+        return int(w3.eth.get_block("latest").number)
 
     def export_all(self, start_block, end_block):
         # Export blocks and transactions

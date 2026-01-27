@@ -25,7 +25,7 @@ import logging
 from builtins import map
 
 from ethereumetl.domain.token_transfer import EthTokenTransfer
-from ethereumetl.utils import chunk_string, hex_to_dec, to_normalized_address
+from ethereumetl.utils import chunk_string, hex_to_dec, hex_to_str, to_normalized_address
 
 # https://ethereum.stackexchange.com/questions/12553/understanding-logs-and-log-blooms
 TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -42,7 +42,7 @@ class EthTokenTransferExtractor(object):
 
         if (topics[0]).casefold() == TRANSFER_EVENT_TOPIC:
             # Handle unindexed event fields
-            topics_with_data = topics + split_to_words(receipt_log.data)
+            topics_with_data = topics + split_to_words(hex_to_str(receipt_log.data))
             # if the number of topics and fields in data part != 4, then it's a weird event
             if len(topics_with_data) != 4:
                 logger.warning("The number of topics and data parts is not equal to 4 in log {} of transaction {}"

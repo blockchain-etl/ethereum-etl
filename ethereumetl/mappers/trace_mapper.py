@@ -23,7 +23,7 @@
 
 from ethereumetl.domain.trace import EthTrace
 from ethereumetl.mainnet_daofork_state_changes import DAOFORK_BLOCK_NUMBER
-from ethereumetl.utils import hex_to_dec, to_normalized_address
+from ethereumetl.utils import hex_to_dec, to_normalized_address, hex_to_str
 
 
 class EthTraceMapper(object):
@@ -31,7 +31,7 @@ class EthTraceMapper(object):
         trace = EthTrace()
 
         trace.block_number = json_dict.get('blockNumber')
-        trace.transaction_hash = json_dict.get('transactionHash')
+        trace.transaction_hash = hex_to_str(json_dict.get('transactionHash'))
         trace.transaction_index = json_dict.get('transactionPosition')
         trace.subtraces = json_dict.get('subtraces')
         trace.trace_address = json_dict.get('traceAddress', [])
@@ -62,12 +62,12 @@ class EthTraceMapper(object):
         if trace_type == 'call':
             trace.call_type = action.get('callType')
             trace.to_address = to_normalized_address(action.get('to'))
-            trace.input = action.get('input')
-            trace.output = result.get('output')
+            trace.input = hex_to_str(action.get('input'))
+            trace.output = hex_to_str(result.get('output'))
         elif trace_type == 'create':
             trace.to_address = result.get('address')
-            trace.input = action.get('init')
-            trace.output = result.get('code')
+            trace.input = hex_to_str(action.get('init'))
+            trace.output = hex_to_str(result.get('code'))
         elif trace_type == 'suicide':
             trace.from_address = to_normalized_address(action.get('address'))
             trace.to_address = to_normalized_address(action.get('refundAddress'))
@@ -132,10 +132,8 @@ class EthTraceMapper(object):
 
         trace.from_address = to_normalized_address(tx_trace.get('from'))
         trace.to_address = to_normalized_address(tx_trace.get('to'))
-
-        trace.input = tx_trace.get('input')
-        trace.output = tx_trace.get('output')
-
+        trace.input = hex_to_str(tx_trace.get('input'))
+        trace.output = hex_to_str(tx_trace.get('output'))
         trace.value = hex_to_dec(tx_trace.get('value'))
         trace.gas = hex_to_dec(tx_trace.get('gas'))
         trace.gas_used = hex_to_dec(tx_trace.get('gasUsed'))

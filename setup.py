@@ -31,13 +31,13 @@ setup(
     keywords='ethereum',
     python_requires='>=3.7.2,<4',
     install_requires=[
-        'web3>=5.29,<6',
-        'eth-utils==1.10',
-        'eth-abi>=2.2.0,<3.0.0',
+        'web3>=6,<7',
+        'eth-utils>=4.0.0',
+        'eth-abi>=5',
         # TODO: This has to be removed when "ModuleNotFoundError: No module named 'eth_utils.toolz'" is fixed at eth-abi
         'python-dateutil>=2.8.0,<3',
         'click>=8.0.4,<9',
-        'ethereum-dasm==0.1.4',
+        'ethereum-dasm==0.1.5',
         'urllib3<2',
         'base58',
         'requests'
@@ -45,8 +45,8 @@ setup(
     extras_require={
         'streaming': [
             'timeout-decorator==0.4.1',
-            'google-cloud-pubsub==2.13.0',
-            'google-cloud-storage==1.33.0',
+            'google-cloud-pubsub==2.13.12',
+            'google-cloud-storage==1.44.0',
             'kafka-python==2.0.2',
             'sqlalchemy==1.4',
             'pg8000==1.16.6',

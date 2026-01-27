@@ -71,13 +71,13 @@ class BlockTimestampGraph(object):
 
     def get_first_point(self):
         # Ignore the genesis block as its timestamp is 0
-        return block_to_point(self._web3.eth.getBlock(1))
+        return block_to_point(self._web3.eth.get_block(1))
 
     def get_last_point(self):
-        return block_to_point(self._web3.eth.getBlock('latest'))
+        return block_to_point(self._web3.eth.get_block('latest'))
 
     def get_point(self, x):
-        return block_to_point(self._web3.eth.getBlock(x))
+        return block_to_point(self._web3.eth.get_block(x))
 
 
 def block_to_point(block):

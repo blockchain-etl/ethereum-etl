@@ -23,11 +23,25 @@
 
 import itertools
 import warnings
+from eth_utils import to_int, to_text, text_if_str
+from hexbytes import HexBytes
 
 from ethereumetl.misc.retriable_value_error import RetriableValueError
 
 
+def hex_to_str(hex_string):
+    if isinstance(hex_string, HexBytes):
+        return hex_string.hex()
+
+    if hex_string is not None:
+        return text_if_str(to_text, hex_string)
+    return hex_string
+
+
 def hex_to_dec(hex_string):
+    if type(hex_string) is int:
+        return to_int(hex_string)
+
     if hex_string is None:
         return None
     try:

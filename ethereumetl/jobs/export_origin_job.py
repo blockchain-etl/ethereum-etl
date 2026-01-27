@@ -108,11 +108,11 @@ class ExportOriginJob(BaseJob):
                 except ValueError as e:
                     if str(e) == "{'code': -32000, 'message': 'the method is currently not implemented: eth_newFilter'}":
                         self._supports_eth_newFilter = False
-                        events = self.web3.eth.getLogs(filter_params)
+                        events = self.web3.eth.get_logs(filter_params)
                     else:
                         raise(e)
             else:
-                events = self.web3.eth.getLogs(filter_params)
+                events = self.web3.eth.get_logs(filter_params)
             for event in events:
                 log = self.receipt_log_mapper.web3_dict_to_receipt_log(event)
                 listing, shop_products = self.event_extractor.extract_event_from_log(log, batch['contract_version'])
@@ -124,7 +124,7 @@ class ExportOriginJob(BaseJob):
                     self.shop_product_exporter.export_item(item)
 
             if self._supports_eth_newFilter:
-                self.web3.eth.uninstallFilter(event_filter.filter_id)
+                self.web3.eth.uninstall_filter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()

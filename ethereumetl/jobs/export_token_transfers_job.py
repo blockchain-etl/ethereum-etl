@@ -81,7 +81,7 @@ class ExportTokenTransfersJob(BaseJob):
         except ValueError as e:
             if str(e) == "{'code': -32000, 'message': 'the method is currently not implemented: eth_newFilter'}":
                 self._supports_eth_newFilter = False
-                events = self.web3.eth.getLogs(filter_params)
+                events = self.web3.eth.get_logs(filter_params)
             else:
                 raise(e)
         for event in events:
@@ -91,7 +91,7 @@ class ExportTokenTransfersJob(BaseJob):
                 self.item_exporter.export_item(self.token_transfer_mapper.token_transfer_to_dict(token_transfer))
 
         if self._supports_eth_newFilter:
-            self.web3.eth.uninstallFilter(event_filter.filter_id)
+            self.web3.eth.uninstall_filter(event_filter.filter_id)
 
     def _end(self):
         self.batch_work_executor.shutdown()

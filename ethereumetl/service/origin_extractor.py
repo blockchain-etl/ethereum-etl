@@ -1,7 +1,7 @@
 import base58
 import logging
 
-from ethereumetl.utils import hex_to_dec, to_normalized_address
+from ethereumetl.utils import hex_to_dec, hex_to_str
 from ethereumetl.ipfs.origin import get_origin_marketplace_data
 
 #
@@ -55,7 +55,7 @@ class OriginEventExtractor(object):
             return None, []
 
         listing_id = hex_to_dec(topics[2])
-        ipfs_hash = hex_to_ipfs_hash(receipt_log.data)
+        ipfs_hash = hex_to_ipfs_hash(hex_to_str(receipt_log.data))
 
         full_listing_id = compose_listing_id(1, contract_version, listing_id)
         marketplace_listing, shop_products = get_origin_marketplace_data(receipt_log, full_listing_id, self.ipfs_client, ipfs_hash)

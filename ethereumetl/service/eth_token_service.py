@@ -35,7 +35,7 @@ class EthTokenService(object):
         self._function_call_result_transformer = function_call_result_transformer
 
     def get_token(self, token_address):
-        checksum_address = self._web3.toChecksumAddress(token_address)
+        checksum_address = self._web3.to_checksum_address(token_address)
         contract = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI)
         contract_alternative_1 = self._web3.eth.contract(address=checksum_address, abi=ERC20_ABI_ALTERNATIVE_1)
 
