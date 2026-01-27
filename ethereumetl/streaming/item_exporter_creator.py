@@ -23,15 +23,33 @@
 from blockchainetl.jobs.exporters.console_item_exporter import ConsoleItemExporter
 from blockchainetl.jobs.exporters.multi_item_exporter import MultiItemExporter
 
+import os
 
-def create_item_exporters(outputs):
+
+def create_item_exporters(outputs, output_config_files):
     split_outputs = [output.strip() for output in outputs.split(',')] if outputs else ['console']
+    split_output_config_files = [output_config_file.strip() for output_config_file in output_config_files.split(',')] if output_config_files else [None] * len(split_outputs)
 
-    item_exporters = [create_item_exporter(output) for output in split_outputs]
+    if len(split_outputs) != len(split_output_config_files):
+        raise ValueError('outputs and output_config_files should have the same number of elements')
+
+    item_exporters = [create_item_exporter(output, output_config) for output, output_config in zip(split_outputs, split_output_config_files)]
     return MultiItemExporter(item_exporters)
 
 
-def create_item_exporter(output):
+def create_item_exporter(output, output_config_file):
+
+    output_config = {}
+    if os.path.isfile(output_config_file):
+        try:
+            import yaml
+            with open(output_config_file, 'r') as file:
+                output_config = yaml.safe_load(file)
+        except Exception as e:
+            raise ValueError('Error parsing output config file: ' + str(e))
+    else:
+        raise ValueError('Output config file not found: ' + output_config_file)
+
     item_exporter_type = determine_item_exporter_type(output)
     if item_exporter_type == ItemExporterType.PUBSUB:
         from blockchainetl.jobs.exporters.google_pubsub_item_exporter import GooglePubSubItemExporter
@@ -92,7 +110,7 @@ def create_item_exporter(output):
         item_exporter = ConsoleItemExporter()
     elif item_exporter_type == ItemExporterType.KAFKA:
         from blockchainetl.jobs.exporters.kafka_exporter import KafkaItemExporter
-        item_exporter = KafkaItemExporter(output, item_type_to_topic_mapping={
+        item_exporter = KafkaItemExporter(output, output_config, item_type_to_topic_mapping={
             'block': 'blocks',
             'transaction': 'transactions',
             'log': 'logs',

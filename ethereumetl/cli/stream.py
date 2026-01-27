@@ -44,6 +44,8 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
                    'or kafka, output name and connection host:port e.g. kafka/127.0.0.1:9092 '
                    'or Kinesis, e.g. kinesis://your-data-stream-name'
                    'If not specified will print to console')
+@click.option('--output-config-file', default='output_config.yaml', type=str,
+              help='Configuration for the output. File path. For Kafka, YAML file with KafkaProducer configurations (will override bootstrap_servers if included).')
 @click.option('-s', '--start-block', default=None, show_default=True, type=int, help='Start block')
 @click.option('-e', '--entity-types', default=','.join(EntityType.ALL_FOR_INFURA), show_default=True, type=str,
               help='The list of entity types to export.')
@@ -53,7 +55,7 @@ from ethereumetl.thread_local_proxy import ThreadLocalProxy
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The number of workers')
 @click.option('--log-file', default=None, show_default=True, type=str, help='Log file')
 @click.option('--pid-file', default=None, show_default=True, type=str, help='pid file')
-def stream(last_synced_block_file, lag, provider_uri, output, start_block, entity_types,
+def stream(last_synced_block_file, lag, provider_uri, output, output_config_file, start_block, entity_types,
            period_seconds=10, batch_size=2, block_batch_size=10, max_workers=5, log_file=None, pid_file=None):
     """Streams all data types to console or Google Pub/Sub."""
     configure_logging(log_file)
@@ -67,9 +69,12 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, entit
     provider_uri = pick_random_provider_uri(provider_uri)
     logging.info('Using ' + provider_uri)
 
+    if output_config_file:
+        logging.info('Using output config file ' + output_config_file)
+
     streamer_adapter = EthStreamerAdapter(
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
-        item_exporter=create_item_exporters(output),
+        item_exporter=create_item_exporters(output, output_config_file),
         batch_size=batch_size,
         max_workers=max_workers,
         entity_types=entity_types
