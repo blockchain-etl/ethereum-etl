@@ -23,6 +23,7 @@
 
 from urllib.parse import urlparse
 
+import mesc
 from web3 import IPCProvider, HTTPProvider
 
 from ethereumetl.providers.ipc import BatchIPCProvider
@@ -32,6 +33,15 @@ DEFAULT_TIMEOUT = 60
 
 
 def get_provider_from_uri(uri_string, timeout=DEFAULT_TIMEOUT, batch=False):
+
+    if mesc.is_mesc_enabled():
+        try:
+            endpoint = mesc.get_endpoint_by_query(uri_string, profile='ethereum_etl')
+            if endpoint is not None:
+                uri_string = endpoint['url']
+        except Exception as e:
+            print('MESC configured improperly')
+
     uri = urlparse(uri_string)
     if uri.scheme == 'file':
         if batch:

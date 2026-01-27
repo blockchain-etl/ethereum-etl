@@ -24,6 +24,8 @@
 import itertools
 import warnings
 
+import mesc
+
 from ethereumetl.misc.retriable_value_error import RetriableValueError
 
 
@@ -142,3 +144,15 @@ def check_classic_provider_uri(chain, provider_uri):
         warnings.warn("ETC Chain not supported on Infura.io. Using https://ethereumclassic.network instead")
         return 'https://ethereumclassic.network'
     return provider_uri
+
+
+def get_default_provider_uri():
+    if mesc.is_mesc_enabled():
+        try:
+            endpoint = mesc.get_default_endpoint(profile='ethereum_etl')
+            if endpoint is not None:
+                return endpoint['url']
+        except Exception:
+            print('MESC configured improperly')
+
+    return 'https://mainnet.infura.io'
