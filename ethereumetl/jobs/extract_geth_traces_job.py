@@ -32,10 +32,15 @@ class ExtractGethTracesJob(BaseJob):
             traces_iterable,
             batch_size,
             max_workers,
-            item_exporter):
+            item_exporter,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         self.traces_iterable = traces_iterable
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+            starting_batch_size=batch_size, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
         self.item_exporter = item_exporter
 
         self.trace_mapper = EthTraceMapper()

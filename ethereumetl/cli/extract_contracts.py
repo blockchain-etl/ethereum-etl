@@ -39,7 +39,8 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
-def extract_contracts(traces, batch_size, output, max_workers):
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
+def extract_contracts(traces, batch_size, output, max_workers, max_retries):
     """Extracts contracts from traces file."""
 
     set_max_field_size_limit()
@@ -53,6 +54,7 @@ def extract_contracts(traces, batch_size, output, max_workers):
             traces_iterable=traces_iterable,
             batch_size=batch_size,
             max_workers=max_workers,
+            max_retries=max_retries,
             item_exporter=contracts_item_exporter(output))
 
         job.run()

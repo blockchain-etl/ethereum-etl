@@ -42,7 +42,8 @@ class ExportTracesJob(BaseJob):
             item_exporter,
             max_workers,
             include_genesis_traces=False,
-            include_daofork_traces=False):
+            include_daofork_traces=False,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -50,7 +51,11 @@ class ExportTracesJob(BaseJob):
         self.web3 = web3
 
         # TODO: use batch_size when this issue is fixed https://github.com/paritytech/parity-ethereum/issues/9822
-        self.batch_work_executor = BatchWorkExecutor(1, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+            starting_batch_size=1, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
         self.item_exporter = item_exporter
 
         self.trace_mapper = EthTraceMapper()

@@ -40,6 +40,7 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=5, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/.local/share/io.parity.ethereum/jsonrpc.ipc or http://localhost:8545/')
@@ -47,7 +48,7 @@ logging_basic_config()
 @click.option('--daofork-traces/--no-daofork-traces', default=False, show_default=True, help='Whether to include daofork traces')
 @click.option('-t', '--timeout', default=60, show_default=True, type=int, help='IPC or HTTP request timeout.')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_traces(start_block, end_block, batch_size, output, max_workers, provider_uri,
+def export_traces(start_block, end_block, batch_size, output, max_workers, max_retries, provider_uri,
                   genesis_traces, daofork_traces, timeout=60, chain='ethereum'):
     """Exports traces from parity node."""
     if chain == 'classic' and daofork_traces == True:
@@ -60,6 +61,7 @@ def export_traces(start_block, end_block, batch_size, output, max_workers, provi
         web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri, timeout=timeout))),
         item_exporter=traces_item_exporter(output),
         max_workers=max_workers,
+        max_retries=max_retries,
         include_genesis_traces=genesis_traces,
         include_daofork_traces=daofork_traces)
 

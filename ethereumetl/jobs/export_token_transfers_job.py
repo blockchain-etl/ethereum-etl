@@ -37,7 +37,8 @@ class ExportTokenTransfersJob(BaseJob):
             web3,
             item_exporter,
             max_workers,
-            tokens=None):
+            tokens=None,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
@@ -46,7 +47,11 @@ class ExportTokenTransfersJob(BaseJob):
         self.tokens = tokens
         self.item_exporter = item_exporter
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+            starting_batch_size=batch_size, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
 
         self.receipt_log_mapper = EthReceiptLogMapper()
         self.token_transfer_mapper = EthTokenTransferMapper()

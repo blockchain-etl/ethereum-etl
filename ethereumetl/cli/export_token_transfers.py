@@ -41,10 +41,11 @@ logging_basic_config()
 @click.option('-b', '--batch-size', default=100, show_default=True, type=int, help='The number of blocks to filter at a time.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('-p', '--provider-uri', required=True, type=str,
               help='The URI of the web3 provider e.g. file://$HOME/Library/Ethereum/geth.ipc or http://localhost:8545/')
 @click.option('-t', '--tokens', default=None, show_default=True, type=str, multiple=True, help='The list of token addresses to filter by.')
-def export_token_transfers(start_block, end_block, batch_size, output, max_workers, provider_uri, tokens):
+def export_token_transfers(start_block, end_block, batch_size, output, max_workers, max_retries, provider_uri, tokens):
     """Exports ERC20/ERC721 transfers."""
     set_max_field_size_limit()
     job = ExportTokenTransfersJob(
@@ -54,5 +55,6 @@ def export_token_transfers(start_block, end_block, batch_size, output, max_worke
         web3=ThreadLocalProxy(lambda: build_web3(get_provider_from_uri(provider_uri))),
         item_exporter=token_transfers_item_exporter(output),
         max_workers=max_workers,
+        max_retries=max_retries,
         tokens=tokens)
     job.run()

@@ -24,11 +24,13 @@ class EthStreamerAdapter:
             item_exporter=ConsoleItemExporter(),
             batch_size=100,
             max_workers=5,
+            max_retries=5,
             entity_types=tuple(EntityType.ALL_FOR_STREAMING)):
         self.batch_web3_provider = batch_web3_provider
         self.item_exporter = item_exporter
         self.batch_size = batch_size
         self.max_workers = max_workers
+        self.max_retries = max_retries
         self.entity_types = entity_types
         self.item_id_calculator = EthItemIdCalculator()
         self.item_timestamp_calculator = EthItemTimestampCalculator()
@@ -110,6 +112,7 @@ class EthStreamerAdapter:
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=blocks_and_transactions_item_exporter,
             export_blocks=self._should_export(EntityType.BLOCK),
             export_transactions=self._should_export(EntityType.TRANSACTION)
@@ -126,6 +129,7 @@ class EthStreamerAdapter:
             batch_size=self.batch_size,
             batch_web3_provider=self.batch_web3_provider,
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=exporter,
             export_receipts=self._should_export(EntityType.RECEIPT),
             export_logs=self._should_export(EntityType.LOG)
@@ -141,6 +145,7 @@ class EthStreamerAdapter:
             logs_iterable=logs,
             batch_size=self.batch_size,
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=exporter)
         job.run()
         token_transfers = exporter.get_items('token_transfer')
@@ -154,6 +159,7 @@ class EthStreamerAdapter:
             batch_size=self.batch_size,
             web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=exporter
         )
         job.run()
@@ -166,6 +172,7 @@ class EthStreamerAdapter:
             traces_iterable=traces,
             batch_size=self.batch_size,
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=exporter
         )
         job.run()
@@ -178,6 +185,7 @@ class EthStreamerAdapter:
             contracts_iterable=contracts,
             web3=ThreadLocalProxy(lambda: build_web3(self.batch_web3_provider)),
             max_workers=self.max_workers,
+            max_retries=self.max_retries,
             item_exporter=exporter
         )
         job.run()

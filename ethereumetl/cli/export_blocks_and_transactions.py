@@ -41,13 +41,14 @@ logging_basic_config()
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('--blocks-output', default=None, show_default=True, type=str,
               help='The output file for blocks. If not provided blocks will not be exported. Use "-" for stdout')
 @click.option('--transactions-output', default=None, show_default=True, type=str,
               help='The output file for transactions. '
                    'If not provided transactions will not be exported. Use "-" for stdout')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, blocks_output,
+def export_blocks_and_transactions(start_block, end_block, batch_size, provider_uri, max_workers, max_retries, blocks_output,
                                    transactions_output, chain='ethereum'):
     """Exports blocks and transactions."""
     provider_uri = check_classic_provider_uri(chain, provider_uri)
@@ -60,6 +61,7 @@ def export_blocks_and_transactions(start_block, end_block, batch_size, provider_
         batch_size=batch_size,
         batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
         max_workers=max_workers,
+        max_retries=max_retries,
         item_exporter=blocks_and_transactions_item_exporter(blocks_output, transactions_output),
         export_blocks=blocks_output is not None,
         export_transactions=transactions_output is not None)

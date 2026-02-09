@@ -40,11 +40,12 @@ logging_basic_config()
               help='The file containing contract addresses, one per line.')
 @click.option('-o', '--output', default='-', show_default=True, type=str, help='The output file. If not specified stdout is used.')
 @click.option('-w', '--max-workers', default=5, show_default=True, type=int, help='The maximum number of workers.')
+@click.option('-r', '--max-retries', default=5, show_default=True, type=int, help='The maximum number of retries')
 @click.option('-p', '--provider-uri', default='https://mainnet.infura.io', show_default=True, type=str,
               help='The URI of the web3 provider e.g. '
                    'file://$HOME/Library/Ethereum/geth.ipc or https://mainnet.infura.io')
 @click.option('-c', '--chain', default='ethereum', show_default=True, type=str, help='The chain network to connect to.')
-def export_contracts(batch_size, contract_addresses, output, max_workers, provider_uri, chain='ethereum'):
+def export_contracts(batch_size, contract_addresses, output, max_workers, max_retries, provider_uri, chain='ethereum'):
     """Exports contracts bytecode and sighashes."""
     check_classic_provider_uri(chain, provider_uri)
     with smart_open(contract_addresses, 'r') as contract_addresses_file:
@@ -55,6 +56,7 @@ def export_contracts(batch_size, contract_addresses, output, max_workers, provid
             batch_size=batch_size,
             batch_web3_provider=ThreadLocalProxy(lambda: get_provider_from_uri(provider_uri, batch=True)),
             item_exporter=contracts_item_exporter(output),
-            max_workers=max_workers)
+            max_workers=max_workers,
+            max_retries=max_retries)
 
         job.run()

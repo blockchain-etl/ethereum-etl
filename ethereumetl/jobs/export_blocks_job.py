@@ -42,14 +42,19 @@ class ExportBlocksJob(BaseJob):
             max_workers,
             item_exporter,
             export_blocks=True,
-            export_transactions=True):
+            export_transactions=True,
+            max_retries=BatchWorkExecutor.DEFAULT_MAX_RETRIES):
         validate_range(start_block, end_block)
         self.start_block = start_block
         self.end_block = end_block
 
         self.batch_web3_provider = batch_web3_provider
 
-        self.batch_work_executor = BatchWorkExecutor(batch_size, max_workers)
+        self.batch_work_executor = BatchWorkExecutor(
+            starting_batch_size=batch_size, 
+            max_workers=max_workers,
+            max_retries=max_retries
+        )
         self.item_exporter = item_exporter
 
         self.export_blocks = export_blocks
@@ -72,6 +77,7 @@ class ExportBlocksJob(BaseJob):
 
     def _export_batch(self, block_number_batch):
         blocks_rpc = list(generate_get_block_by_number_json_rpc(block_number_batch, self.export_transactions))
+        
         response = self.batch_web3_provider.make_batch_request(json.dumps(blocks_rpc))
         results = rpc_response_batch_to_results(response)
         blocks = [self.block_mapper.json_dict_to_block(result) for result in results]
