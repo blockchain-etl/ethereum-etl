@@ -27,6 +27,7 @@ from ethereumetl.json_rpc_requests import generate_trace_block_by_number_json_rp
 from blockchainetl.jobs.base_job import BaseJob
 from ethereumetl.mappers.geth_trace_mapper import EthGethTraceMapper
 from ethereumetl.utils import validate_range, rpc_response_to_result
+from ethereumetl.misc.retriable_value_error import RetriableValueError
 
 
 # Exports geth traces
@@ -68,6 +69,10 @@ class ExportGethTracesJob(BaseJob):
             block_number = response_item.get('id')
             result = rpc_response_to_result(response_item)
 
+            # We add this check because the response of trace block rpc is a list of tx_trace,
+            # so we need to make sure there is no error in each tx_trace
+            self._check_result(result, block_number)
+
             geth_trace = self.geth_trace_mapper.json_dict_to_geth_trace({
                 'block_number': block_number,
                 'transaction_traces': [tx_trace.get('result') for tx_trace in result],
@@ -78,3 +83,11 @@ class ExportGethTracesJob(BaseJob):
     def _end(self):
         self.batch_work_executor.shutdown()
         self.item_exporter.close()
+
+    def _check_result(self, result, block_number):
+        for tx_trace in result:
+            if tx_trace.get('result') is None:
+                raise RetriableValueError(
+                    'Error for trace in block {block}. Need to retry. Error: {err}, trace: {trace}'
+                        .format(block=block_number, trace=json.dumps(tx_trace), err=tx_trace.get('error'))
+                )
