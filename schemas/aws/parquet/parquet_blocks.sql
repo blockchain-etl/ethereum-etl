@@ -1,4 +1,5 @@
 CREATE EXTERNAL TABLE IF NOT EXISTS parquet_blocks (
+    timestamp TIMESTAMP,
     number BIGINT,
     hash STRING,
     parent_hash STRING,
@@ -15,11 +16,9 @@ CREATE EXTERNAL TABLE IF NOT EXISTS parquet_blocks (
     extra_data STRING,
     gas_limit BIGINT,
     gas_used BIGINT,
-    timestamp BIGINT,
-    transaction_count BIGINT
+    transaction_count BIGINT,
+    base_fee_per_gas BIGINT
 )
 PARTITIONED BY (start_block BIGINT, end_block BIGINT)
 STORED AS PARQUET
 LOCATION 's3://<your_bucket>/ethereumetl/parquet/blocks';
-
-MSCK REPAIR TABLE parquet_blocks;
